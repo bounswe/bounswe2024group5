@@ -1,9 +1,6 @@
 ---
 name: Issue Template
 about: Create a Issue
-title: ''
-assignees: ''
-
 ---
 
 ## Description
