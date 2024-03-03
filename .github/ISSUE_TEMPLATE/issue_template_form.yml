@@ -48,7 +48,7 @@ body:
   - type: input
     attributes:
       label: Reviewer
-      description: Assign a reviewer for this issue.
+      description: Assign a reviewer for this issue. Speciy the deadline for the review.
       placeholder: "@username - Deadline of the review (dd/mm/yyyy - hour)"
     validations:
       required: true
