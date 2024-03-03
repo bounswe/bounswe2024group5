@@ -15,6 +15,8 @@ body:
       label: Issue Description
       description: Describe the issue in detail.
       placeholder: Add a detailed description of your issue here.
+    validations:
+      required: true
 
   - type: textarea
     attributes:
@@ -24,21 +26,29 @@ body:
         - [x] ~Task 1~
         - [ ] Task 2
         - [ ] Task 3
+    validations:
+      required: true
 
   - type: input
     attributes:
       label: Estimated Time
       description: Time estimation in minutes.
       placeholder: Enter time in minutes
+    validations:
+      required: true
       
   - type: input
     attributes:
       label: Deadline
       description: Specify the deadline for this issue.
       placeholder: "dd/mm/yyyy - Hour"
+    validations:
+      required: true
 
   - type: input
     attributes:
       label: Reviewer
       description: Assign a reviewer for this issue.
       placeholder: "@username - Deadline of the review (dd/mm/yyyy - hour)"
+    validations:
+      required: true
