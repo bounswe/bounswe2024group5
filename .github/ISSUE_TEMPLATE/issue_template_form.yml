@@ -1,5 +1,5 @@
 name: Issue Template
-description: General template for all issues
+description: General template for all issues as form
 title: "Issue: "
 labels: ["status: new"]
 assignees:
@@ -23,11 +23,8 @@ body:
       description: Mark the tasks that are to be completed.
       options:
         - label: Task 1
-        required: true
         - label: Task 2
-        required: true
         - label: Task 3
-        required: true
 
   - type: input
     attributes:
