@@ -2,7 +2,6 @@ name: Issue Template Form
 description: General template for all issues as form
 title: "Issue: "
 labels: ["status: new"]
-assignees:
   - 
 
 body:
@@ -16,14 +15,14 @@ body:
       description: Describe the issue in detail.
       placeholder: Add a detailed description of your issue here.
 
-  - type: checkboxes
+  - type: textarea
     attributes:
       label: Tasks
-      description: Mark the tasks that are to be completed.
-      options:
-        - label: Task 1
-        - label: Task 2
-        - label: Task 3
+      description: Edit and check off the tasks as needed.
+      placeholder: |
+        - [x] ~Task 1~
+        - [ ] Task 2
+        - [ ] Task 3
 
   - type: input
     attributes:
