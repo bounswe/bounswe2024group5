@@ -2,7 +2,7 @@ name: Issue Template Form
 description: General template for all issues as form
 title: "Issue: "
 labels: ["status: new"]
-assignees: []
+assignees:
   - 
 
 body:
