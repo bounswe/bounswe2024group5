@@ -1,0 +1,51 @@
+name: Issue Template
+description: General template for all issues
+title: "Issue: "
+labels: ["status: new"]
+assignees:
+  - 
+
+body:
+  - type: markdown
+    attributes:
+      value: "## Description\nThe issue description."
+
+  - type: textarea
+    attributes:
+      label: Issue Description
+      description: Describe the issue in detail.
+      placeholder: Add a detailed description of your issue here.
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: Tasks
+      description: Mark the tasks that are to be completed.
+      options:
+        - label: Task 1
+        required: true
+        - label: Task 2
+        required: true
+        - label: Task 3
+        required: true
+
+  - type: input
+    attributes:
+      label: Estimated Time
+      description: Time estimation in minutes.
+      placeholder: Enter time in minutes
+      required: false
+
+  - type: input
+    attributes:
+      label: Deadline
+      description: Enter the deadline date in dd/mm/yyyy format.
+      placeholder: dd/mm/yyyy - Hour
+      required: true
+
+  - type: input
+    attributes:
+      label: Reviewer
+      description: Mention the reviewer's GitHub username.
+      placeholder: @username
+      required: true
