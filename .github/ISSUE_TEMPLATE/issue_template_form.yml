@@ -32,12 +32,12 @@ body:
       description: Time estimation in minutes.
       placeholder: Enter time in minutes
       required: false
-
+      
   - type: input
     attributes:
-      label: Deadline
-      description: Enter the deadline date in dd/mm/yyyy format.
-      placeholder: dd/mm/yyyy - Hour
+      label: Reviewer
+      description: Assign a reviewer for this issue.
+      placeholder: "@username - Deadline of the review (dd/mm/yyyy - hour)"
       required: true
 
   - type: input
