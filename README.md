@@ -14,9 +14,35 @@ We are a group of students from Boğaziçi University, Department of Computer En
 
 ## Team Members
 
-| <img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/abdullahumut.png" alt="Abdullah Umut" width="150"> | <img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/Arınç.jpg" alt="Arınç Demir" width="150"> | <img src="https://avatars.githubusercontent.com/u/83813907?v=4" alt="Ebrar Kiziloglu" width="150"> | <img src="https://github.com/bounswe/bounswe2024group5/assets/137878803/906204e2-ce93-4594-90ba-ca03cfcc336f" alt="Güney Yüksel" width="150"> | <img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/HalilUtkuCelik.jpg" alt="Halil Utku Celik" width="150"> |
-|---|---|---|---|---|
-|[ABDULLAH UMUT HAMZAOĞULLARI](https://github.com/bounswe/bounswe2024group5/wiki/Abdullah-Umut-Hamzao%C4%9Fullar%C4%B1)|[ARINÇ DEMİR](https://github.com/bounswe/bounswe2024group5/wiki/Ar%C4%B1n%C3%A7-Demir)|[ASUDE EBRAR KIZILOĞLU](https://github.com/bounswe/bounswe2024group5/wiki/Asude-Ebrar-K%C4%B1z%C4%B1lo%C4%9Flu) (Communicator)|[GÜNEY YÜKSEL](https://github.com/bounswe/bounswe2024group5/wiki/Güney-Yüksel)|[HALİL UTKU ÇELİK](https://github.com/bounswe/bounswe2024group5/wiki/Halil-Utku-%C3%87elik)|
-| <img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/ozgurdenizdemir.jpeg" alt="Özgür Deniz Demir" width="150"> | <img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/ramazanonur.jpeg" alt="Ramazan" width="150"> | <img src="https://raw.githubusercontent.com/bounswe/bounswe2024group5/main/.github/images/members/semih.jpg" alt="Semih" width="150"> | <img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/suleymanemir.jpg" alt="Suleyman Emir" width="150"> |
-|[ÖZGÜR DENİZ DEMİR](https://github.com/bounswe/bounswe2024group5/wiki/%C3%96zg%C3%BCr-Deniz-Demir)|[RAMAZAN ONUR ACAR](https://github.com/bounswe/bounswe2024group5/wiki/Ramazan-Onur-Acar)|[SEMİH YILMAZ](https://github.com/bounswe/bounswe2024group5/wiki/Semih-Y%C4%B1lmaz)|[SÜLEYMAN EMİR TAŞAN](https://github.com/bounswe/bounswe2024group5/wiki/S%C3%BCleyman-Emir-Ta%C5%9Fan)| ERENCEM ÖZBEY
+<table>
+  <tr>
+    <td><img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/abdullahumut.png" alt="Abdullah Umut" width="150"></td>
+    <td><img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/Arınç.jpg" alt="Arınç Demir" width="150"></td>
+    <td><img src="https://avatars.githubusercontent.com/u/83813907?v=4" alt="Ebrar Kiziloglu" width="150"></td>
+    <td><img src="https://github.com/bounswe/bounswe2024group5/assets/137878803/906204e2-ce93-4594-90ba-ca03cfcc336f" alt="Güney Yüksel" width="150"></td>
+    <td><img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/HalilUtkuCelik.jpg" alt="Halil Utku Celik" width="150"></td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/Abdullah-Umut-Hamzao%C4%9Fullar%C4%B1">ABDULLAH UMUT HAMZAOĞULLARI</a></td>
+    <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/Ar%C4%B1n%C3%A7-Demir">ARINÇ DEMİR</a></td>
+    <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/Asude-Ebrar-K%C4%B1z%C4%B1lo%C4%9Flu">ASUDE EBRAR KIZILOĞLU</a> (Communicator)</td>
+    <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/Güney-Yüksel">GÜNEY YÜKSEL</a></td>
+    <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/Halil-Utku-%C3%87elik">HALIL UTKU ÇELİK</a></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/ozgurdenizdemir.jpeg" alt="Özgür Deniz Demir" width="150"></td>
+    <td><img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/ramazanonur.jpeg" alt="Ramazan" width="150"></td>
+    <td><img src="https://raw.githubusercontent.com/bounswe/bounswe2024group5/main/.github/images/members/semih.jpg" alt="Semih" width="150"></td>
+    <td><img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/suleymanemir.jpg" alt="Suleyman Emir" width="150"></td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/%C3%96zg%C3%BCr-Deniz-Demir">ÖZGÜR DENİZ DEMİR</a></td>
+    <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/Ramazan-Onur-Acar">RAMAZAN ONUR ACAR</a></td>
+    <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/Semih-Y%C4%B1lmaz">SEMİH YILMAZ</a></td>
+    <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/S%C3%BCleyman-Emir-Ta%C5%9Fan">SÜLEYMAN EMİR TAŞAN</a></td>
+  </tr>
+</table>
+
+
+
 
