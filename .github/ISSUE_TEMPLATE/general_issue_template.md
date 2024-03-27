@@ -3,6 +3,7 @@ name: Issue Template
 about: General template for all issues
 labels: 'status: new'
 ---
+<!--- ADD YOUR NEWER ISSUE'S TO RAM -->
 
 ## Description
 The issue description.
