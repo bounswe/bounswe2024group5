@@ -1,57 +1,49 @@
-import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Button, Alert } from 'react-native';
+import React from 'react';
+import { View, TextInput, StyleSheet, Text } from 'react-native';
+import CustomButton from '../components/CustomButton';
+import GradientBackground from '../components/GradientBackground';
 
 const LoginScreen = ({ navigation }) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-
-    const handleLogin = () => {
-        Alert.alert('Login Attempt', `Username: ${username} Password: ${password}`);
-    };
-
     return (
+      <GradientBackground>
         <View style={styles.container}>
-            <TextInput
-                style={styles.input}
-                placeholder="Username"
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={true}
-            />
-            <Button
-                title="Log In"
-                onPress={handleLogin}
-            />
-            <Button
-                title="Register"
-                onPress={() => navigation.navigate('Register')}
-            />
+          <Text style={styles.title}>Login</Text>
+          <TextInput style={styles.input} placeholder="Username" placeholderTextColor="#ccc" />
+          <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#ccc" secureTextEntry />
+          <View style={styles.buttonContainer}>
+            <CustomButton title="Register" onPress={() => navigation.navigate('Register')} />
+            <CustomButton title="Login" onPress={() => console.log('Login Pressed')} />
+          </View>
         </View>
+      </GradientBackground>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: 20,
+      color: 'white',
     },
     input: {
-        width: '100%',
-        marginVertical: 10,
-        padding: 10,
-        borderWidth: 1,
-        borderColor: 'gray',
-        borderRadius: 5,
-    }
+      width: '80%',
+      backgroundColor: 'white',
+      padding: 10,
+      borderRadius: 10,
+      marginBottom: 10,
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-evenly',
+      width: '80%',
+    },
 });
 
 export default LoginScreen;
