@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
+import FeedPage from './screens/FeedPage';
 
 const Stack = createStackNavigator();
 
@@ -17,6 +18,11 @@ function MyStack() {
       <Stack.Screen 
         name="Register" 
         component={RegisterScreen} 
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="Feed" 
+        component={FeedPage} 
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

@@ -12,7 +12,7 @@ const LoginScreen = ({ navigation }) => {
           <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#ccc" secureTextEntry />
           <View style={styles.buttonContainer}>
             <CustomButton title="Register" onPress={() => navigation.navigate('Register')} />
-            <CustomButton title="Login" onPress={() => console.log('Login Pressed')} />
+            <CustomButton title="Login" onPress={() => navigation.navigate('Feed')} />
           </View>
         </View>
       </GradientBackground>
