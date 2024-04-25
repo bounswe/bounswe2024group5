@@ -1,9 +1,39 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
+
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import FeedPage from './screens/FeedPage';
+import ProfilePage from './screens/ProfilePage';
+
+const Tab = createBottomTabNavigator();
+
+function HomeTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          if (route.name === 'Feed') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'person' : 'person-outline';
+          }
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: 'tomato',
+        tabBarInactiveTintColor: 'gray',
+      })}
+    >
+      <Tab.Screen name="Feed" component={FeedPage} options={{headerShown: false}}/>
+      <Tab.Screen name="Profile" component={ProfilePage} options={{headerShown: false}}/>
+    </Tab.Navigator>
+  );
+}
+
 
 const Stack = createStackNavigator();
 
@@ -21,8 +51,8 @@ function MyStack() {
         options={{ headerShown: false }}
       />
       <Stack.Screen 
-        name="Feed" 
-        component={FeedPage} 
+        name="Home" 
+        component={HomeTabs} 
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

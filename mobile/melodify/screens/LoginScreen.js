@@ -4,20 +4,22 @@ import CustomButton from '../components/CustomButton';
 import GradientBackground from '../components/GradientBackground';
 
 const LoginScreen = ({ navigation }) => {
-    return (
-      <GradientBackground>
-        <View style={styles.container}>
-          <Text style={styles.title}>Login</Text>
-          <TextInput style={styles.input} placeholder="Username" placeholderTextColor="#ccc" />
-          <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#ccc" secureTextEntry />
-          <View style={styles.buttonContainer}>
-            <CustomButton title="Register" onPress={() => navigation.navigate('Register')} />
-            <CustomButton title="Login" onPress={() => navigation.navigate('Feed')} />
-          </View>
+  return (
+    <GradientBackground>
+      <View style={styles.container}>
+        <Text style={styles.title}>Login</Text>
+        <TextInput style={styles.input} placeholder="Username" placeholderTextColor="#ccc" />
+        <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#ccc" secureTextEntry />
+        <View style={styles.buttonContainer}>
+          <CustomButton title="Register" onPress={() => navigation.navigate('Register')} />
+          <CustomButton title="Login" onPress={() => navigation.navigate('Home')} /> 
         </View>
-      </GradientBackground>
-    );
+      </View>
+    </GradientBackground>
+  );
 };
+
+
 
 const styles = StyleSheet.create({
     container: {
