@@ -1,25 +1,81 @@
-import React from 'react';
-import { View, TextInput, StyleSheet, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, StyleSheet, Text, Modal, TouchableOpacity } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import GradientBackground from '../components/GradientBackground';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const LoginScreen = ({ navigation }) => {
+const CustomModal = ({ visible, message, onClose }) => {
   return (
-    <GradientBackground>
-      <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
-        <TextInput style={styles.input} placeholder="Username" placeholderTextColor="#ccc" />
-        <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#ccc" secureTextEntry />
-        <View style={styles.buttonContainer}>
-          <CustomButton title="Register" onPress={() => navigation.navigate('Register')} />
-          <CustomButton title="Login" onPress={() => navigation.navigate('Home')} /> 
+    <Modal
+        animationType="slide"
+        transparent={true}
+        visible={visible}
+        onRequestClose={onClose}
+    >
+        <View style={styles.centeredView}>
+            <LinearGradient
+                colors={['#4c669f', '#3b5998', '#192f6a']}
+                style={styles.modalView}
+            >
+                <Text style={styles.modalText}>{message}</Text>
+                <TouchableOpacity
+                    style={styles.buttonClose}
+                    onPress={onClose}
+                >
+                    <Text style={styles.textStyle}>Close</Text>
+                </TouchableOpacity>
+            </LinearGradient>
         </View>
-      </View>
-    </GradientBackground>
+    </Modal>
   );
 };
 
+const LoginScreen = ({ navigation }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
+  const handleSignIn = () => {
+    if (username === password) {
+      setModalVisible(true);
+    } else {
+      navigation.navigate('Home');
+    }
+  };
+
+  return (
+    <GradientBackground>
+      <View style={styles.container}>
+        <Text style={styles.title}>Melodify</Text>
+        <Text style={styles.subtitle}>Sign in to your account</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Username" 
+          placeholderTextColor="#ccc" 
+          onChangeText={setUsername}
+          value={username}
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Password" 
+          placeholderTextColor="#ccc" 
+          secureTextEntry 
+          onChangeText={setPassword}
+          value={password}
+        />
+        <View style={styles.buttonContainer}>
+          <CustomButton title="Register" onPress={() => navigation.navigate('Register')} />
+          <CustomButton title="Sign In" onPress={handleSignIn} />
+        </View>
+      </View>
+      <CustomModal
+        visible={modalVisible}
+        message="Invalid username/password"
+        onClose={() => setModalVisible(false)}
+      />
+    </GradientBackground>
+  );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -27,15 +83,25 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
       width: '100%',
+      padding: 20,
     },
     title: {
-      fontSize: 24,
+      fontSize: 30,
       fontWeight: 'bold',
-      marginBottom: 20,
       color: 'white',
+      alignSelf: 'flex-start',
+      marginLeft: 0,
+      marginTop: 20,
+    },
+    subtitle: {
+      fontSize: 20,
+      color: 'white',
+      alignSelf: 'flex-start',
+      marginLeft: 0,
+      marginBottom: 20,
     },
     input: {
-      width: '80%',
+      width: '100%',
       backgroundColor: 'white',
       padding: 10,
       borderRadius: 10,
@@ -44,7 +110,45 @@ const styles = StyleSheet.create({
     buttonContainer: {
       flexDirection: 'row',
       justifyContent: 'space-evenly',
-      width: '80%',
+      width: '100%',
+    },
+    centeredView: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 22
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: 'white',
+      borderRadius: 20,
+      padding: 35,
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5
+    },
+    modalText: {
+      marginBottom: 15,
+      textAlign: 'center',
+      color: 'white',
+      fontSize: 18,
+    },
+    buttonClose: {
+      backgroundColor: "#ffffff",
+      borderRadius: 20,
+      padding: 10,
+      elevation: 2
+    },
+    textStyle: {
+      color: "#3b5998",
+      fontWeight: "bold",
+      textAlign: "center"
     },
 });
 
