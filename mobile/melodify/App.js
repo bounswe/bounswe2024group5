@@ -24,8 +24,11 @@ function HomeTabs() {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: 'tomato',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: 'white',
+        tabBarInactiveTintColor: 'white',
+        tabBarStyle: {
+          backgroundColor: '#192f6a',
+        },
       })}
     >
       <Tab.Screen name="Feed" component={FeedPage} options={{headerShown: false}}/>
