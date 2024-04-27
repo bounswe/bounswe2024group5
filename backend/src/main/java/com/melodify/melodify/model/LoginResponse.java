@@ -1,13 +1,10 @@
 package com.melodify.melodify.model;
 
-
-public class RegisterResponse {
-    
+public class LoginResponse {
     private String token;
-
     private String message;
 
-    public RegisterResponse(String token, String message) {
+    public LoginResponse(String token, String message) {
         this.token = token;
         this.message = message;
     }
