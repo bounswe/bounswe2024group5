@@ -1,0 +1,39 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    depends_on:
+      - database
+
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - app-network
+
+  database:
+    image: mysql:latest
+    command: --default-authentication-plugin=caching_sha2_password --bind-address=0.0.0.0
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: melodify
+      MYSQL_USER: melodify
+      MYSQL_PASSWORD: melodify
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:
