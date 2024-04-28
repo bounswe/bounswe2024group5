@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
-    backgroundColor: '#01112C', // Dark blue background color
+    backgroundColor: '#111927', // Dark blue background color
   },
   platformName: {
     fontSize: 40,
@@ -106,7 +106,6 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 12,
     marginBottom: 5,
-    // alignItems: 'flex-start',
     color: '#C1C1C2', // light gray text color
   },
   online: {
@@ -118,7 +117,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 5,
     alignSelf: 'flex-start',
-    backgroundColor: '#90B7FA', // Light blue background color
+    backgroundColor: '#004074', // Light blue background color
   },
   editprofileButton: {
     alignSelf: 'flex-start',
@@ -126,7 +125,7 @@ const styles = StyleSheet.create({
   },
   editprofileButtonText: {
     fontSize: 12, // Adjust font size here
-    color: '#000000',
+    color: '#ffffff',
   },
 
   rightSection: {
@@ -178,9 +177,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     justifyContent: 'center',
     borderRadius: 15,
-    borderWidth: 1,
+    // borderWidth: 1,
     padding: 10,
-    backgroundColor: '#B9D1F9', // Light blue background color
+    backgroundColor: '#004074', // Light blue background color
   },
   newpostButton: {
     alignSelf: 'center',
@@ -189,7 +188,7 @@ const styles = StyleSheet.create({
   newpostButtonText: {
     fontSize: 20, // Adjust font size here
     fontWeight: 'bold',
-    color: '#01112C',
+    color: '#ffffff',
   },
   separator: {
     borderBottomWidth: 1,
