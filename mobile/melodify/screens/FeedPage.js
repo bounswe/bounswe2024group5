@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import GradientBackground from '../components/GradientBackground';
 
 const FeedPage = () => {
     return (
-        <GradientBackground>
+        <View style={styles.container}>
             <Text style={styles.mainTitle}>Melodify</Text>
             <View style={styles.searchContainer}>
                 <TextInput 
@@ -19,18 +18,25 @@ const FeedPage = () => {
                 <Text style={styles.title}>Feed Page</Text>
                 <Text style={styles.content}>Welcome to the Feed!</Text>
             </View>
-        </GradientBackground>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingHorizontal: 20,
+        paddingTop: 20,
+        backgroundColor: '#111927', // Dark blue background color
+    },
     mainTitle: {
-        fontSize: 24,
         fontWeight: 'bold',
-        color: 'white',
         marginTop: 30,
-        marginLeft: 20,
+        // marginLeft: 20,
         alignSelf: 'flex-start',
+        fontSize: 40,
+        marginBottom: 20,
+        color: '#ffffff', // White text color
     },
     searchContainer: {
         alignSelf: 'flex-start',

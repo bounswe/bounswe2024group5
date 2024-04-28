@@ -27,7 +27,7 @@ function HomeTabs() {
         tabBarActiveTintColor: 'white',
         tabBarInactiveTintColor: 'white',
         tabBarStyle: {
-          backgroundColor: '#192f6a',
+          backgroundColor: '#111927',
         },
       })}
     >

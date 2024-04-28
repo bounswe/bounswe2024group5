@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#111927', // Dark blue background color
   },
   platformName: {
+    marginTop: 30,
     fontSize: 40,
     fontWeight: 'bold',
     marginBottom: 20,
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 5,
     alignSelf: 'flex-start',
-    backgroundColor: '#004074', // Light blue background color
+    backgroundColor: '#C2E6FF', // Light blue background color
   },
   editprofileButton: {
     alignSelf: 'flex-start',
@@ -125,9 +126,8 @@ const styles = StyleSheet.create({
   },
   editprofileButtonText: {
     fontSize: 12, // Adjust font size here
-    color: '#ffffff',
+    color: '#111927',
   },
-
   rightSection: {
     flexDirection: 'column', // Stack children vertically
     marginTop: 15,
@@ -177,9 +177,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     justifyContent: 'center',
     borderRadius: 15,
-    // borderWidth: 1,
     padding: 10,
-    backgroundColor: '#004074', // Light blue background color
+    backgroundColor: '#C2E6FF', // Light blue background color
   },
   newpostButton: {
     alignSelf: 'center',
@@ -188,7 +187,7 @@ const styles = StyleSheet.create({
   newpostButtonText: {
     fontSize: 20, // Adjust font size here
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#111927',
   },
   separator: {
     borderBottomWidth: 1,
