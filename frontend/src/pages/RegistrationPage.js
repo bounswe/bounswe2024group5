@@ -1,6 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import InputBox from "../components/InputBox";
 
 function RegistrationPage() {
+    const navigate = useNavigate();
     return (
         <>
             <div className="flex flex-col sm:w-full max-w-[360px] bg-[#111927CC] 
@@ -15,6 +17,9 @@ function RegistrationPage() {
                     <InputBox placeholder={"Confirm Password"}></InputBox>
                 </div>
                 <button className="bg-[#0090FF] text-white leading-6 font-medium py-2 px-5 rounded-lg text-center border-2 border-solid border-transparent transition-all duration-200 hover:bg-[#0588F0] hover:cursor-pointer">Sign Up</button>
+                <p className="text-white text-center mt-4">
+                    Already a member? <span className="text-blue-500 cursor-pointer" onClick={() => navigate('/login')}>Login from here.</span>
+                </p>
             </div>
         </>
     );

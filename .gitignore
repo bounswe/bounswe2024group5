@@ -1,0 +1,7 @@
+.vs/
+.github/
+backend/
+database/
+doc/ 
+README.md
+docker-compse.yml
