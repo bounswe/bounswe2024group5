@@ -4,5 +4,5 @@
 
 # If you encounter the following DeprecationWarning warning: The `punycode` module is deprecated
 Downgrade the node version:
-4. nvm install 20.5.1
-5. nvm use 20.5.1
+1. nvm install 20.5.1
+2. nvm use 20.5.1
