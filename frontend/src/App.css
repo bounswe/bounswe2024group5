@@ -1,0 +1,110 @@
+* {
+ margin: 0;
+ border: none;
+}
+
+body {
+  background-color: #205D9E;
+  background-image: url('../public/concert-bg.jpeg');
+  background-size: cover;
+  background-position: center top; 
+}
+
+/*
+.login-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 360px;
+  padding: 24px;
+  background-color: #111927CC;
+  gap: 16px;
+  border-radius: 16px;
+  opacity: 1;
+  border: 2px solid #ffffff1c;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.084);
+  backdrop-filter: blur(8px);
+}
+
+input::placeholder {
+  font-family: sans-serif;
+  color: #AAA;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+input {
+  transition: all 0.15s;
+  font-size: 16px;
+  padding: 12px;
+  font-family: sans-serif;
+  color: white;
+  background-color: #0D2847; 
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  border-radius: 8px;
+  border: 1.5px solid #0000;
+  box-shadow: 0px -12px 8px -2px #1804311f inset;
+}
+
+input:focus {
+  border: 1.5px solid #003362;
+  outline: none;
+}
+
+.login-prompt {
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.hidden {
+  display: none;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+button {
+  background-color: #0090FF;
+  color: #fff;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  padding: 8px 20px;
+  border-radius: 8px;
+  text-align: center;
+  border: 2px solid #fff0;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background-color: #0588F0;
+  cursor: pointer;
+}
+
+*/
+@media screen and (max-width: 600px){
+  body {
+    background-size: auto 1000px;
+    background-position: center top; 
+  }
+
+  /*
+  .login-card {
+    width: 80%;
+  }*/
+}

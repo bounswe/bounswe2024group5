@@ -1,0 +1,20 @@
+import InputBox from "../components/InputBox";
+
+function LoginPage() {
+    return (
+        <>
+        <div className="flex flex-col sm:w-full max-w-[360px] bg-[#111927CC] 
+            rounded-2xl p-6 shadow-[0_-4px_8px_-2px_rgba(0,0,0,0.25)] backdrop-blur w-5/6
+            ">
+                <p className="text-[28px] text-white text-center mb-6 tracking-tight leading-8 font-medium">Login to Melodify</p>
+                <div className="flex flex-col gap-4 mb-6">
+                    <InputBox placeholder={"Email"}></InputBox>
+                    <InputBox placeholder={"Password"}></InputBox>
+                </div>
+                <button className="bg-[#0090FF] text-white leading-6 font-medium py-2 px-5 rounded-lg text-center border-2 border-solid border-transparent transition-all duration-200 hover:bg-[#0588F0] hover:cursor-pointer">Sign In</button>
+            </div>
+        </>
+    );
+}
+
+export default LoginPage;
