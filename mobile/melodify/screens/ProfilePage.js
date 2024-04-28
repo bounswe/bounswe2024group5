@@ -4,60 +4,63 @@ import { View, Text, Image, Button, StyleSheet, TouchableOpacity } from 'react-n
 const ProfilePage = () => {
   return (
     <View style={styles.container}>
-      {/* Top Section */}
-      <View style={styles.topSection}>
-        <Text style={styles.platformName}>Melodify</Text>
-        <View style={styles.profileInfoContainer}>
-          <Image
+    <Text style={styles.platformName}>Melodify</Text>
+    <View style={styles.separator}></View>
+
+    {/* Top Section */}
+    <View style={styles.topSection}>
+      {/* Left Section for the profile picture, name, online status, and edit profile button.*/}
+      <View style={styles.leftSection}>
+        <Image
             source={require('../assets/profile_pic.png')}
             style={styles.profileImage}
           />
-          {/* Followers and Following */}
-          <View style={styles.followContainer}>
-            <Text style={styles.followerNumber}>10K</Text>
-            <Text style={styles.followerText}>folowers</Text>
-            <Text style={styles.followingNumber}>50</Text>
-            <Text style={styles.followingText}>following</Text>
-          </View>
-        </View>
-        
-        <View style={styles.nameContainer}>
-          {/* Name and Username */}
-          <View style={styles.names}>
-            <Text style={styles.name}>Melody Max</Text>
-            <Text style={styles.username}>@melodymelinda</Text>
-            <Text style={styles.online}>online</Text>
-          </View>
-          {/* Currently Listening */}
-          <View style={styles.currentlyListeningContainer}>
-            <Text style={styles.listening}>Listening now</Text>
-            <Text style={styles.songname}>Song Name - Artist</Text>
-          </View>
-        </View>
+        {/* Name and Username */}
+          <Text style={styles.name}>Melody Max</Text>
+          <Text style={styles.username}>@melodymelinda</Text>
+          <Text style={styles.online}>online</Text>
 
-        <View style={styles.buttons}>
-          <View style={styles.buttonContainer1}>
-            {/* Edit Profile Button */}
-            <TouchableOpacity onPress={() => console.log("Edit profile button pressed")} style={styles.editprofileButton}>
-              <Text style={styles.editprofileButtonText}>Edit Profile</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.buttonContainer2}>
-            {/* New Post Button */}
-            <TouchableOpacity onPress={() => console.log("New post button pressed")} style={styles.newpostButton}>
-              <Text style={styles.newpostButtonText}>+ Share a Post</Text>
-            </TouchableOpacity>
-        </View>
+        {/* Edit Profile Button */}
+        <View style={styles.buttonContainer_edit}>
+          <TouchableOpacity onPress={() => console.log("Edit profile button pressed")} style={styles.editprofileButton}>
+            <Text style={styles.editprofileButtonText}>Edit Profile</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Separator */}
-      <View style={styles.separator}></View>
-      {/* Latest Activity */}
-      <Text style={styles.activityTitle}>Last Activities</Text>
-      {/* Posts */}
-      {/* Render user's posts here */}
+      {/* Right Section for followers info, current song, and create post button.*/}
+      <View style={styles.rightSection}>
+        {/* Followers and Following */}
+        <View style={styles.followContainer}>
+          <Text style={styles.followerNumber}>10K</Text>
+          <Text style={styles.followerText}>folowers</Text>
+          <Text style={styles.followingNumber}>50</Text>
+          <Text style={styles.followingText}>following</Text>
+        </View>
+        
+        {/* Currently Listening */}
+        <View style={styles.currentlyListeningContainer}>
+          <Text style={styles.listening}>Listening now</Text>
+          <Text style={styles.songname}>Song Name - Artist</Text>
+        </View>
+
+        {/* New Post Button */}
+        <View style={styles.buttonContainer_share}>
+          <TouchableOpacity onPress={() => console.log("New post button pressed")} style={styles.newpostButton}>
+            <Text style={styles.newpostButtonText}>+ Share a Post</Text>
+          </TouchableOpacity>
+        </View>
+
+      </View>
+
+    </View>
+
+    {/* Separator */}
+    <View style={styles.separator}></View>
+    {/* Latest Activity */}
+    <Text style={styles.activityTitle}>Last Activities</Text>
+    {/* Posts */}
+    {/* Render user's posts here */}
     </View>
   );
 };
@@ -69,19 +72,23 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     backgroundColor: '#01112C', // Dark blue background color
   },
-  topSection: {
-    marginBottom: 20,
-  },
   platformName: {
     fontSize: 40,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#ffffff', // White text color
   },
-  profileInfoContainer: {
+  topSection: {
+    marginBottom: 20,
     flexDirection: 'row', // Arrange children horizontally
     alignItems: 'top', // Align children vertically
     marginBottom: 10,
+  },
+  leftSection: {
+    alignItems: 'flex-start', // Align children vertically
+    marginBottom: 10,
+    flex: 1, // Take remaining space
+    flexDirection: 'column', // Stack children vertically
   },
   profileImage: {
     width: 100,
@@ -89,73 +96,25 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginBottom: 10,
   },
-  followContainer: {
-    flexDirection: 'row',
-    // justifyContent: 'space-between',
-    marginBottom: 10,
-    marginTop: 20,
-    justifyContent: 'flex-end',
-    flex: 1, // Take remaining space
-  },
-  followerNumber: { 
-    color: '#ffffff', // White text color
-    fontWeight: 'bold',
-
-  },
-  followerText: {
-    color: '#ffffff', // White text color
-    marginLeft: 5,
-
-  },
-  followingNumber: {
-    color: '#ffffff', // White text color
-    fontWeight: 'bold',
-    marginLeft: 20,
-  },
-  followingText: {
-    color: '#ffffff', // White text color
-    marginLeft: 5,
-  },
-  nameContainer: {
-    flexDirection: 'row', // Arrange children horizontally
-    alignItems: 'top', // Align children vertically
-    marginBottom: 10,
-  },
-  names: {
-    flex: 1, // Take remaining space
-  },
   name: {
     fontSize: 20,
     fontWeight: 'bold',
+    alignItems: 'flex-start',
     marginBottom: 5,
     color: '#ffffff', // White text color
   },
   username: {
     fontSize: 12,
     marginBottom: 5,
+    // alignItems: 'flex-start',
     color: '#C1C1C2', // light gray text color
   },
   online: {
-    color: '#00C600', // Green text color
+    alignItems: 'flex-start',
+    color: '#02BC02', // Green text color
+    marginBottom: 15,
   },
-  currentlyListeningContainer: {
-    marginBottom: 10,
-    marginRight: 20,
-    alignItems: 'right',
-  },
-  listening: {
-    color: '#C1C1C2', // light gray text color
-  },
-  songname: {
-    color: '#ffffff', // White text color
-  },
-  buttons:{
-    flexDirection: 'row', // Arrange children horizontally
-    alignItems: 'top', // Align children vertically
-    marginBottom: 10,
-  },
-  buttonContainer1: {
-    // borderColor: 'black',
+  buttonContainer_edit: {
     borderRadius: 20,
     padding: 5,
     alignSelf: 'flex-start',
@@ -169,17 +128,58 @@ const styles = StyleSheet.create({
     fontSize: 12, // Adjust font size here
     color: '#000000',
   },
-  buttonContainer2: {
-    flexDirection: 'row',
-    marginBottom: 10,
-    justifyContent: 'center',
-    flex: 1, // Take remaining space
 
-    // borderColor: 'black',
+  rightSection: {
+    flexDirection: 'column', // Stack children vertically
+    marginTop: 15,
+    marginBottom: 10,
+    alignItems: 'flex-end', 
+    justifyContent: 'flex-end',
+    flex: 1, // Take remaining space
+  },
+  followContainer: {
+    flexDirection: 'row',
+    marginBottom: 50,
+    marginTop: 20,
+    justifyContent: 'flex-end',
+    // flex: 1, // Take remaining space
+  },
+  followerNumber: { 
+    color: '#ffffff', // White text color
+    fontWeight: 'bold',
+  },
+  followerText: {
+    color: '#ffffff', // White text color
+    marginLeft: 5,
+  },
+  followingNumber: {
+    color: '#ffffff', // White text color
+    fontWeight: 'bold',
+    marginLeft: 20,
+  },
+  followingText: {
+    color: '#ffffff', // White text color
+    marginLeft: 5,
+  },
+  currentlyListeningContainer: {
+    marginBottom: 10,
+    marginRight: 20,
+    alignItems: 'flex-end',
+  },
+  listening: {
+    color: '#C1C1C2', // light gray text color
+  },
+  songname: {
+    color: '#ffffff', // White text color
+  },
+  buttonContainer_share: {
+    flexDirection: 'row',
+    marginTop: 25,
+    marginBottom: 5,
+    justifyContent: 'center',
     borderRadius: 15,
     borderWidth: 1,
-    padding: 5,
-    marginLeft: 50,
+    padding: 10,
     backgroundColor: '#B9D1F9', // Light blue background color
   },
   newpostButton: {
