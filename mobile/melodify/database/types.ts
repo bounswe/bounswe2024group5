@@ -1,3 +1,39 @@
+export type Content = {
+    author: RegisteredUser;
+    creationTimestamp: number;
+    editTimestamp?: number;
+    text?: string;
+    likeList: RegisteredUser[];
+};
+export type Post = {
+    postId: string;
+    comments: Comment[];
+    imageUrl?: string;
+    videoUrl?: string;
+    tag?: string;
+
+}
+
+export type Profile = {
+    followingList: RegisteredUser[];
+    followerList: RegisteredUser[];
+    sharedPosts: Post[];
+    bio: string;
+    publicName: string;
+    profilePicture: string;
+    socialPlatforms: string[];
+    private: boolean;
+}
+
+export type Comment = {
+    commentId: string;
+    parentPost: Post;
+}
+
+export type Feed = {
+    postList: Post[];
+}
+
 export type User = {
     username: string;
     password: string;
@@ -19,7 +55,12 @@ export type RegisteredUser = {
     likedPosts: Post[];
 };
 
-export type Profile = {
-}
+export type SearchEngine = {
+    searchHistory: string[];
+    filter: Filter;
+};
 
-export type Post = {}
+
+export type Filter = {
+    parameters: Map<string, Object>;
+};
