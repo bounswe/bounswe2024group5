@@ -1,7 +1,7 @@
-function InputBox({placeholder}) {
+function InputBox({placeholder, onChange}) {
     return (
         <>
-            <input placeholder={placeholder} className="
+            <input placeholder={placeholder} onChange={onChange} className="
             p-3 rounded-lg bg-[#0D2847] text-white font-sans font-medium 
             tracking-tight border-[1.5px] border-solid border-transparent outline-none 
             focus:border-[#003362] placeholder:text-[#AAA] placeholder:font-sans
