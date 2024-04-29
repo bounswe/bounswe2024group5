@@ -51,21 +51,18 @@ paths:
               username: "john_doe"
               password: "password123"  
       responses:
-        '201':
+        '200':
           description: User registered successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  userId:
-                    type: string
                   token:
                     type: string
                   message:
                     type: string
               example:
-                userId: "12345"
                 token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 message: "Registration successful"
         '400':
@@ -102,18 +99,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  userId:
-                    type: string
                   token:
-                    type: string
-                  expires:
                     type: string
                   message:
                     type: string
               example:
-                userId: "12345"
                 token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                expires: "2024-04-21T12:00:00Z"
                 message: "Login successful"
 
   /posts:

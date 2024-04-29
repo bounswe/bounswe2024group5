@@ -1,10 +1,9 @@
-package com.melodify.melodify.model;
+package com.melodify.melodify.model.response;
 
 
 public class RegisterResponse {
     
     private String token;
-
     private String message;
 
     public RegisterResponse(String token, String message) {
