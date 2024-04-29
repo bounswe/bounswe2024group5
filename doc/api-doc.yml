@@ -530,3 +530,19 @@ paths:
           description: User is not following this user
         '404':
           description: User not found
+  /search:
+    get:
+      tags:
+        - Search
+      summary: returns wikidata results
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+        '401':
+          description: Unauthorized
