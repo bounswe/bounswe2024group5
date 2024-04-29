@@ -8,12 +8,12 @@ services:
     depends_on:
       - database
 
-  # frontend:
-  #   build: ./frontend
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - app-network
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
 
   database:
     image: mysql:latest
