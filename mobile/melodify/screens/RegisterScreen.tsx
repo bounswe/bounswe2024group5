@@ -86,9 +86,40 @@ const RegisterScreen = ({ navigation }) => {
     return true;
   };
 
-  const handleContinuePress = () => {
-    if (validateInputs()) {
-      navigation.navigate("Login");
+  const handleRegister = async () => {
+    if (!validateInputs()) return;
+    try {
+      const response = await fetch("https://api.yourdomain.com/v1/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", 
+          // "Content-Length": "0",
+          "Host": "localhost:8080",
+        },
+        body: JSON.stringify({
+          name,
+          surname,
+          email,
+          username,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.status === 201) {
+        // Handle success, possibly logging in the user directly or redirecting to login screen
+        console.log(data.message); // Or handle token as needed
+        navigation.navigate("Login");
+      } else if (response.status === 400) {
+        showError("Bad request. Please check the information provided.");
+      } else if (response.status === 409) {
+        showError("User already exists. Please try a different username or email.");
+      } else {
+        showError("An unexpected error occurred. Please try again.");
+      }
+    } catch (error) {
+      console.error("Registration failed:", error);
+      showError("Failed to connect. Please check your network and try again.");
     }
   };
 
@@ -153,7 +184,7 @@ const RegisterScreen = ({ navigation }) => {
           onChangeText={setConfirmPassword}
         />
 
-        <CustomButton title="Continue" onPress={handleContinuePress} />
+        <CustomButton title="Continue" onPress={handleRegister} />
 
         <View style={styles.signInText}>
           <Text style={styles.normalText}>Already have an account? </Text>
