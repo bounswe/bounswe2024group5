@@ -50,7 +50,9 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { login } = useAuth();
 
+  
   const handleSignIn = async () => {
+    /*
     try {
       const response = await fetch("https://api.yourdomain.com/v1/auth/login", {
         method: "POST",
@@ -74,6 +76,9 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
       console.error("Network or other error:", error);
       setModalVisible(true);
     }
+    */
+
+    navigation.navigate("Home");
   };
 
   return (
