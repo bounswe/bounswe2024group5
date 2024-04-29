@@ -6,7 +6,9 @@ services:
     networks:
       - app-network
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+
 
   # frontend:
   #   build: ./frontend
@@ -30,6 +32,11 @@ services:
       - ./database/migrations:/docker-entrypoint-initdb.d
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
 
 networks:
   app-network:

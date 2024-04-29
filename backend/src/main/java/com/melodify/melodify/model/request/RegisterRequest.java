@@ -1,6 +1,8 @@
-package com.melodify.melodify.model;
+package com.melodify.melodify.model.request;
+
 
 public class RegisterRequest {
+
     private String username;
     private String password;
     private String email;
