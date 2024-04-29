@@ -8,7 +8,8 @@ import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import FeedPage from "./screens/FeedPage";
 import ProfilePage from "./screens/ProfilePage";
-import { AuthProvider } from "./screens/AuthProvider"; // Ensure the path is correct
+import CreatePostScreen from "./screens/CreatePostScreen";
+import { AuthProvider } from "./screens/AuthProvider";
 
 const Tab = createBottomTabNavigator();
 
@@ -66,6 +67,11 @@ function MyStack() {
         component={HomeTabs}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="CreatePostScreen"
+        component={CreatePostScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
@@ -73,8 +79,6 @@ function MyStack() {
 export default function App() {
   return (
     <AuthProvider>
-      {" "}
-      {/* Wrap NavigationContainer inside AuthProvider */}
       <NavigationContainer>
         <MyStack />
       </NavigationContainer>

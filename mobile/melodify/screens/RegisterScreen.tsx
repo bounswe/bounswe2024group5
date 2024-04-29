@@ -88,7 +88,7 @@ const RegisterScreen = ({ navigation }) => {
 
   const handleContinuePress = () => {
     if (validateInputs()) {
-      navigation.navigate("Home");
+      navigation.navigate("Login");
     }
   };
 

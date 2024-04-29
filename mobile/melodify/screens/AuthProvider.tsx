@@ -1,37 +1,23 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AuthContextType } from "../database/AuthTypes"; // Ensure correct path
+import React, { createContext, useContext, useState } from "react";
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext(null);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [userToken, setUserToken] = useState<string | null>(null);
-
-  const login = async (token: string) => {
-    setUserToken(token);
-    await AsyncStorage.setItem("userToken", token);
+  const login = (userData) => {
+    setUser(userData);
   };
 
-  const logout = async () => {
-    setUserToken(null);
-    await AsyncStorage.removeItem("userToken");
+  const logout = () => {
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ userToken, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
