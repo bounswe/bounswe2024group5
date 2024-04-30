@@ -45,6 +45,7 @@ public class AuthenticationController {
     @Autowired
     JwtUtils jwtUtils;
     
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         if(userRepository.existsByUsername(request.getUsername())) {
@@ -69,6 +70,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(new RegisterResponse(jwt, "Registration successful"));
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
