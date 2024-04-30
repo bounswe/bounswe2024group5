@@ -108,7 +108,7 @@ const RegisterScreen = ({ navigation }) => {
       if (response.status === 200) {
         // Handle success, possibly logging in the user directly or redirecting to login screen
         console.log(data.message); // Or handle token as needed
-        navigation.navigate("Login");
+        navigation.navigate("Home");
       } else if (response.status === 400) {
         showError("Bad request. Please check the information provided.");
       } else if (response.status === 409) {
