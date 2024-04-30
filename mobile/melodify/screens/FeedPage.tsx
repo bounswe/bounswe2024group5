@@ -1,14 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import data from "../assets/example.json"; // replace with the path to your JSON file
+
 
 const FeedPage = ({ navigation }) => {
+  const [inputValue, setInputValue] = useState('');
+  const [descriptions, setDescriptions] = useState([]);
+
+
+  const handleSearch = async () => {
+    try {
+      /*
+      const response = await fetch(`localhost:8080/search?keyword=${inputValue}`);
+      const data = await response.json();
+      console.log(data);
+      */
+      const descriptions = data.search.map(item => item.description);
+      console.log(descriptions);
+      setDescriptions(descriptions);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.mainTitle}>Melodify</Text>
@@ -17,6 +40,9 @@ const FeedPage = ({ navigation }) => {
           style={styles.input}
           placeholder="Search"
           placeholderTextColor="#ccc"
+          value={inputValue}
+          onChangeText={text => setInputValue(text)}
+          onSubmitEditing={handleSearch}
         />
         <Ionicons
           name="search"
@@ -26,8 +52,11 @@ const FeedPage = ({ navigation }) => {
         />
       </View>
       <View style={styles.container2}>
-        <Text style={styles.title}>Feed Page</Text>
-        <Text style={styles.content}>Welcome to the Feed!</Text>
+        <FlatList
+          data={descriptions}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <Text style={styles.description}>• {item}</Text>}
+        />
       </View>
       <TouchableOpacity
         style={styles.fab}
@@ -81,6 +110,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     padding: 20,
+  },
+  description: {
+    color: 'white',
+    fontSize: 16,
+    marginVertical: 10,
   },
   title: {
     fontSize: 24,
