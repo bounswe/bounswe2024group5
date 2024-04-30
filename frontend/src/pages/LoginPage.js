@@ -17,12 +17,12 @@ function LoginPage() {
 
     console.log("Attempting to login with:\n", requestBody);
 
-    fetch("http://localhost:8080/auth/login", {
+    fetch("http://34.118.44.165:80/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Content-Length": JSON.stringify(requestBody).length.toString(),
-        Host: "localhost:8080",
+        Host: "34.118.44.165:80",
       },
       body: JSON.stringify(requestBody),
     })

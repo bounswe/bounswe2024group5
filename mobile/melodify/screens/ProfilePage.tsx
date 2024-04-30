@@ -30,14 +30,7 @@ const ProfilePage = () => {
           <Text style={styles.online}>online</Text>
 
           {/* Edit Profile Button */}
-          <View style={styles.buttonContainer_edit}>
-            <TouchableOpacity
-              onPress={() => console.log("Edit profile button pressed")}
-              style={styles.editprofileButton}
-            >
-              <Text style={styles.editprofileButtonText}>Edit Profile</Text>
-            </TouchableOpacity>
-          </View>
+          {/* <x */}
         </View>
 
         {/* Right Section for followers info, current song, and create post button.*/}

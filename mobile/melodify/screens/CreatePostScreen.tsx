@@ -8,6 +8,8 @@ import {
   Alert,
 } from "react-native";
 import { useAuth } from "./AuthProvider"; // Adjust path as needed
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons
+
 
 const CreatePostScreen = ({ navigation }) => {
   const { user } = useAuth(); // Destructure to get user from context
@@ -50,6 +52,12 @@ const CreatePostScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.returnButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="arrow-back" size={24} color="white" />
+      </TouchableOpacity>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -78,6 +86,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#111927",
   },
   inputContainer: {
+    marginTop: 20,
     padding: 10,
     marginBottom: 20,
   },
@@ -102,6 +111,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  returnButton: {
+    marginTop: 20,
+    top: 10,
+    left: 10,
+  }
 });
 
 export default CreatePostScreen;

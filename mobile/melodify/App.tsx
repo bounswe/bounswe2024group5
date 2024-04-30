@@ -26,7 +26,7 @@ function HomeTabs() {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "tomato",
+        tabBarActiveTintColor: "white",
         tabBarInactiveTintColor: "gray",
         tabBarStyle: {
           backgroundColor: "#111927",
