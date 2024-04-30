@@ -70,7 +70,7 @@ const RegisterScreen = ({ navigation }) => {
       showError("Password cannot be empty");
       return false;
     }
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (password && !passwordRegex.test(password)) {
       showError(
         "Password must be 8 chars, include an uppercase letter, a lowecase letter, and a number."
@@ -89,36 +89,45 @@ const RegisterScreen = ({ navigation }) => {
   const handleRegister = async () => {
     if (!validateInputs()) return;
     try {
-      const response = await fetch("http://34.118.44.165:80/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Host": "34.118.44.165:80"
-        },
-        body: JSON.stringify({
-          name: name,
-          surname: surname,
-          email: email,
-          username: username,
-          password: password,
-        }),
-      });
+      const response = await fetch(
+        "http://34.118.44.165:80/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Host: "34.118.44.165:80",
+          },
+          body: JSON.stringify({
+            name: name,
+            surname: surname,
+            email: email,
+            username: username,
+            password: password,
+          }),
+        }
+      );
       
+
+      console.log('====================================');
+      console.log(response);
+      console.log('====================================');
       const data = await response.json();
+      
       if (response.status === 200) {
-        // Handle success, possibly logging in the user directly or redirecting to login screen
-        console.log(data.message); // Or handle token as needed
-        navigation.navigate("Login");
+        console.log(data.message);
+        navigation.goBack();
       } else if (response.status === 400) {
         showError("Bad request. Please check the information provided.");
       } else if (response.status === 409) {
-        showError("User already exists. Please try a different username or email.");
+        showError(
+          "User already exists. Please try a different username or email."
+        );
       } else {
         showError("An unexpected error occurred. Please try again.");
       }
     } catch (error) {
       console.error("Registration failed:", error);
-      showError("Failed to connect. Please check your network and try again.");
+      showError("Network error. Please try again.");
     }
   };
 

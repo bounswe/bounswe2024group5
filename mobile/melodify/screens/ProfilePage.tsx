@@ -10,7 +10,7 @@ import {
   ImageStyle,
 } from "react-native";
 
-const ProfilePage = () => {
+const ProfilePage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.platformName}>Melodify</Text>
@@ -52,8 +52,8 @@ const ProfilePage = () => {
           {/* New Post Button */}
           <View style={styles.buttonContainer_share}>
             <TouchableOpacity
-              onPress={() => console.log("New post button pressed")}
               style={styles.newpostButton}
+              onPress={() => navigation.navigate("CreatePostScreen")}
             >
               <Text style={styles.newpostButtonText}>+ Share a Post</Text>
             </TouchableOpacity>

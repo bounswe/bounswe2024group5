@@ -7,47 +7,27 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { useAuth } from "./AuthProvider"; // Adjust path as needed
-import { Ionicons } from "@expo/vector-icons"; // Import Ionicons
-
+import { useAuth } from "./AuthProvider";
+import { Ionicons } from "@expo/vector-icons";
+import CustomModal from "../components/CustomModal";
 
 const CreatePostScreen = ({ navigation }) => {
-  const { user } = useAuth(); // Destructure to get user from context
+  const { user } = useAuth();
   const [postContent, setPostContent] = useState("");
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handlePostCreation = async () => {
-    if (!postContent.trim()) {
-      Alert.alert("Post content is required");
-      return;
-    }
+    // if (!postContent.trim()) {
+    //   Alert.alert("Post content is required");
+    //   return;
+    // }
 
     setLoading(true);
-    try {
-      const response = await fetch("https://api.yourdomain.com/v1/posts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`, // Use token from context
-        },
-        body: JSON.stringify({
-          username: user.username, // Use username from context
-          content: postContent,
-        }),
-      });
-
-      if (response.ok) {
-        Alert.alert("Success", "Your post has been created!");
-        navigation.goBack();
-      } else {
-        const errorData = await response.json();
-        Alert.alert("Error", errorData.message || "Failed to create post");
-      }
-    } catch (error) {
-      Alert.alert("Error", "An unexpected error occurred");
-    } finally {
+    setTimeout(() => {
       setLoading(false);
-    }
+      setModalVisible(true);
+    }, 0);
   };
 
   return (
@@ -75,10 +55,17 @@ const CreatePostScreen = ({ navigation }) => {
       >
         <Text style={styles.buttonText}>Post</Text>
       </TouchableOpacity>
+      <CustomModal
+        visible={modalVisible}
+        message="Cannot post something now."
+        onClose={() => {
+          setModalVisible(false);
+          navigation.goBack();
+        }}
+      />
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -115,7 +102,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     top: 10,
     left: 10,
-  }
+  },
 });
 
 export default CreatePostScreen;
