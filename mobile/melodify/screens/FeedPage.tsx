@@ -6,31 +6,51 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import data from "../assets/example.json"; // replace with the path to your JSON file
-
 
 const FeedPage = ({ navigation }) => {
-  const [inputValue, setInputValue] = useState('');
-  const [descriptions, setDescriptions] = useState([]);
-
+  const [inputValue, setInputValue] = useState("");
+  const [results, setResults] = useState([]);
 
   const handleSearch = async () => {
+    const url = "https://wikidata.org/w/api.php";
+    const params = {
+      action: "wbsearchentities",
+      format: "json",
+      language: "en",
+      search: inputValue,
+      props: "info|claims", // Include claims to get image info directly
+      uselang: "en",
+    };
+    const queryString = new URLSearchParams(params).toString();
+    const fullUrl = `${url}?${queryString}`;
+
     try {
-      /*
-      const response = await fetch(`localhost:8080/search?keyword=${inputValue}`);
+      const response = await fetch(fullUrl);
       const data = await response.json();
-      console.log(data);
-      */
-      const descriptions = data.search.map(item => item.description);
-      console.log(descriptions);
-      setDescriptions(descriptions);
+      const promises = data.search.map(async (item) => {
+        const entityUrl = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${item.id}&format=json&props=claims`;
+        const entityResponse = await fetch(entityUrl);
+        const entityData = await entityResponse.json();
+
+        let imageUrl = undefined;
+        if (entityData.entities[item.id].claims.P18) {
+          const imageFilename =
+            entityData.entities[item.id].claims.P18[0].mainsnak.datavalue.value;
+          imageUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(
+            imageFilename
+          )}`;
+        }
+        return { description: item.description, imageUrl: imageUrl };
+      });
+      const results = await Promise.all(promises);
+      setResults(results);
     } catch (error) {
-      console.error(error);
+      console.error("Error:", error);
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -41,7 +61,7 @@ const FeedPage = ({ navigation }) => {
           placeholder="Search"
           placeholderTextColor="#ccc"
           value={inputValue}
-          onChangeText={text => setInputValue(text)}
+          onChangeText={(text) => setInputValue(text)}
           onSubmitEditing={handleSearch}
         />
         <Ionicons
@@ -53,9 +73,16 @@ const FeedPage = ({ navigation }) => {
       </View>
       <View style={styles.container2}>
         <FlatList
-          data={descriptions}
+          data={results}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => <Text style={styles.description}>• {item}</Text>}
+          renderItem={({ item }) => (
+            <View style={styles.resultContainer}>
+              {item.imageUrl && (
+                <Image source={{ uri: item.imageUrl }} style={styles.image} />
+              )}
+              <Text style={styles.description}>• {item.description}</Text>
+            </View>
+          )}
         />
       </View>
       <TouchableOpacity
@@ -112,19 +139,19 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   description: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
     marginVertical: 10,
+    textAlign: "center",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
+  resultContainer: {
+    alignItems: "center",
     marginBottom: 20,
-    color: "white",
   },
-  content: {
-    fontSize: 18,
-    color: "white",
+  image: {
+    width: 100,
+    height: 100,
+    marginBottom: 10,
   },
   fab: {
     position: "absolute",
