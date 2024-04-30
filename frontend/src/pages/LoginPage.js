@@ -39,7 +39,7 @@ function LoginPage() {
         }
       })
       .catch((error) => {
-        setErrorMessage(error);
+        setErrorMessage(error.toString());
         console.error(error);
       });
   };

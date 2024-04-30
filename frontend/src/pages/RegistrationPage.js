@@ -51,7 +51,7 @@ function RegistrationPage() {
         }
       })
       .catch((error) => {
-        setErrorMessage(error);
+        setErrorMessage(error.toString());
         console.error(error);
       });
   };
