@@ -123,7 +123,7 @@ const RegisterScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Registration failed:", error);
-      showError(error);
+      showError("Network error. Please try again.");
     }
   };
 

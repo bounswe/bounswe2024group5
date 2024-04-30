@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { useAuth } from "./AuthProvider"; // Ensure correct path
+import { useAuth } from "./AuthProvider";
 import CustomButton from "../components/CustomButton";
 import GradientBackground from "../components/GradientBackground";
 import { LinearGradient } from "expo-linear-gradient";
