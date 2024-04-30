@@ -25,7 +25,7 @@
       },
       "package": "com.roacar.melodify",
       "permissions": [
-        "INTERNET"
+        "android.permission.INTERNET"
       ]
     },
     "web": {
