@@ -4,7 +4,7 @@ info:
   description: API for a music-based social media application
   version: 0.1.0
 servers:
-  - url: 'https://api.yourdomain.com/v1'
+  - url: 'http://34.118.44.165/api'
     description: Main API server
 
 tags:
@@ -67,8 +67,6 @@ paths:
                 message: "Registration successful"
         '400':
           description: Bad request
-        '409':
-          description: User already exists
   /auth/login:
     post:
       tags:
@@ -106,6 +104,8 @@ paths:
               example:
                 token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 message: "Login successful"
+        '401':
+          description: Unauthorized
 
   /posts:
     post:
