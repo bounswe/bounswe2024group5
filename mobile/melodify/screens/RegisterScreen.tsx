@@ -70,7 +70,7 @@ const RegisterScreen = ({ navigation }) => {
       showError("Password cannot be empty");
       return false;
     }
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (password && !passwordRegex.test(password)) {
       showError(
         "Password must be 8 chars, include an uppercase letter, a lowecase letter, and a number."

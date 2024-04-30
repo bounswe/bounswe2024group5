@@ -7,48 +7,97 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  Keyboard,
+  ActivityIndicator,
 } from "react-native";
+import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
 
+const ResultItem = ({ item }) => {
+  return (
+    <View style={styles.resultContainer}>
+      {item.imageUrl ? (
+        <Image source={{ uri: item.imageUrl }} style={styles.image} />
+      ) : null}
+      <View
+        style={[styles.textContainer, { marginTop: item.imageUrl ? 0 : 0 }]}
+      >
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    </View>
+  );
+};
+
 const FeedPage = ({ navigation }) => {
+  const { token } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [results, setResults] = useState([]);
+  const [searchMade, setsearchMade] = useState(false);
 
-  const handleSearch = async () => {
-    const url = "https://wikidata.org/w/api.php";
-    const params = {
-      action: "wbsearchentities",
-      format: "json",
-      language: "en",
-      search: inputValue,
-      props: "info|claims", // Include claims to get image info directly
-      uselang: "en",
-    };
-    const queryString = new URLSearchParams(params).toString();
-    const fullUrl = `${url}?${queryString}`;
+  const fetchImageData = async (entityId) => {
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&format=json&props=claims`;
 
     try {
-      const response = await fetch(fullUrl);
+      const response = await fetch(url);
       const data = await response.json();
-      const promises = data.search.map(async (item) => {
-        const entityUrl = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${item.id}&format=json&props=claims`;
-        const entityResponse = await fetch(entityUrl);
-        const entityData = await entityResponse.json();
+      const claims = data.entities[entityId].claims;
+      const imageProperty = claims.P18;
 
-        let imageUrl = undefined;
-        if (entityData.entities[item.id].claims.P18) {
-          const imageFilename =
-            entityData.entities[item.id].claims.P18[0].mainsnak.datavalue.value;
-          imageUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(
-            imageFilename
-          )}`;
-        }
-        return { description: item.description, imageUrl: imageUrl };
-      });
-      const results = await Promise.all(promises);
-      setResults(results);
+      if (imageProperty) {
+        const imageFilename = imageProperty[0].mainsnak.datavalue.value;
+        const imageUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(
+          imageFilename
+        )}`;
+        return imageUrl;
+      }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Failed to fetch image data:", error);
+    }
+    return null;
+  };
+
+  const handleSearch = async () => {
+    Keyboard.dismiss();
+    setIsLoading(true);
+    setsearchMade(true);
+
+    const fullUrl = `http://34.118.44.165/api/search?query=${encodeURIComponent(
+      inputValue
+    )}`;
+
+    try {
+      const response = await fetch(fullUrl, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      console.log("Received data:", data);
+      console.log(data.search[0].display);
+
+      if (!response.ok) throw new Error(data.message || "Failed to fetch data");
+
+      if (!Array.isArray(data.search))
+        throw new TypeError("Received data under 'search' is not an array");
+
+      setResults(
+        await Promise.all(
+          data.search.map(async (item) => {
+            const imageUrl = await fetchImageData(item.id);
+            return {
+              description: item.description,
+              imageUrl: imageUrl,
+            };
+          })
+        )
+      );
+    } catch (error) {
+      console.error("Error fetching search results:", error.message);
+      setResults([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -64,27 +113,38 @@ const FeedPage = ({ navigation }) => {
           onChangeText={(text) => setInputValue(text)}
           onSubmitEditing={handleSearch}
         />
-        <Ionicons
-          name="search"
-          size={24}
-          color="gray"
-          style={styles.iconStyle}
-        />
+        <TouchableOpacity
+          style={[
+            styles.iconStyle,
+            {
+              width: 44,
+              height: 44,
+              justifyContent: "center",
+              alignItems: "center",
+            },
+          ]}
+          onPress={handleSearch}
+        >
+          <Ionicons name="search" size={24} color="gray" />
+        </TouchableOpacity>
       </View>
-      <View style={styles.container2}>
-        <FlatList
-          data={results}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.resultContainer}>
-              {item.imageUrl && (
-                <Image source={{ uri: item.imageUrl }} style={styles.image} />
-              )}
-              <Text style={styles.description}>• {item.description}</Text>
-            </View>
-          )}
+      {isLoading ? (
+        <ActivityIndicator
+          size="large"
+          color="#00ff00"
+          style={styles.loading}
         />
-      </View>
+      ) : searchMade && results.length === 0 ? (
+        <Text style={styles.noResultsText}>No results found.</Text>
+      ) : (
+        <View style={styles.container2}>
+          <FlatList
+            data={results}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => <ResultItem item={item} />}
+          />
+        </View>
+      )}
       <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate("CreatePostScreen")}
@@ -111,9 +171,12 @@ const styles = StyleSheet.create({
     color: "white",
   },
   searchContainer: {
-    alignSelf: "flex-start",
+    alignSelf: "center",
     width: "100%",
-    padding: 20,
+    marginTop: 0,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 0,
     position: "relative",
   },
   input: {
@@ -122,13 +185,13 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 40,
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 0,
     width: "100%",
   },
   iconStyle: {
     position: "absolute",
-    right: 30,
-    top: 33,
+    right: 5,
+    top: 2,
     backgroundColor: "transparent",
   },
   container2: {
@@ -139,19 +202,32 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   description: {
-    color: "white",
+    color: "#111",
     fontSize: 16,
-    marginVertical: 10,
-    textAlign: "center",
+    fontWeight: "bold",
   },
   resultContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    marginVertical: 10,
+    padding: 15,
     alignItems: "center",
-    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { height: 2, width: 0 },
+    elevation: 3,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
     marginBottom: 10,
+  },
+  textContainer: {
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
   fab: {
     position: "absolute",
@@ -168,6 +244,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     shadowOffset: { height: 2, width: 2 },
+  },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noResultsText: {
+    fontSize: 18,
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 20,
   },
 });
 

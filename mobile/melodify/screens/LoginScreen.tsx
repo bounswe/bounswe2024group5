@@ -63,8 +63,8 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         }),
       });
 
-      const data = await response.json();
       if (response.status === 200) {
+        const data = await response.json();
         login(data.token); // Save token using AuthProvider
         navigation.navigate("Home");
       } else {
