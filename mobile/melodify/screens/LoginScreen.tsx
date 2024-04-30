@@ -65,7 +65,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
 
       if (response.status === 200) {
         const data = await response.json();
-        login(data.token); // Save token using AuthProvider
+        login(data.token);
         navigation.navigate("Home");
       } else {
         setModalVisible(true);
