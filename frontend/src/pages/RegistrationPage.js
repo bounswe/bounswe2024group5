@@ -42,7 +42,7 @@ function RegistrationPage() {
       })
       .then((response) => {
         console.log(response);
-        if (response.message === "User registered successfully") {
+        if (response.message === "Registration successful") {
           navigate("/feed");
         }
       })
