@@ -1,7 +1,11 @@
-package com.melodify.melodify.entity;
+package com.melodify.melodify.model;
 
 import jakarta.persistence.*;
 import java.util.Date;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")

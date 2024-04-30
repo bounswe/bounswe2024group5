@@ -2,18 +2,22 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8080:8080"
+      - "8080"
     networks:
       - app-network
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+
 
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "3000"
     networks:
       - app-network
+    depends_on:
+      - backend
 
   database:
     image: mysql:latest
@@ -24,12 +28,29 @@ services:
       MYSQL_USER: melodify
       MYSQL_PASSWORD: melodify
     ports:
-      - "3306:3306"
+      - "3306"
     volumes:
       - db-data:/var/lib/mysql
       - ./database/migrations:/docker-entrypoint-initdb.d
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - app-network
+    depends_on:
+      - backend
+      - frontend
+
 
 networks:
   app-network:

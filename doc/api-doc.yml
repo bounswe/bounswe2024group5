@@ -4,7 +4,7 @@ info:
   description: API for a music-based social media application
   version: 0.1.0
 servers:
-  - url: 'https://api.yourdomain.com/v1'
+  - url: 'http://34.118.44.165/api'
     description: Main API server
 
 tags:
@@ -51,27 +51,22 @@ paths:
               username: "john_doe"
               password: "password123"  
       responses:
-        '201':
+        '200':
           description: User registered successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  userId:
-                    type: string
                   token:
                     type: string
                   message:
                     type: string
               example:
-                userId: "12345"
                 token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 message: "Registration successful"
         '400':
           description: Bad request
-        '409':
-          description: User already exists
   /auth/login:
     post:
       tags:
@@ -102,19 +97,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  userId:
-                    type: string
                   token:
-                    type: string
-                  expires:
                     type: string
                   message:
                     type: string
               example:
-                userId: "12345"
                 token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                expires: "2024-04-21T12:00:00Z"
                 message: "Login successful"
+        '401':
+          description: Unauthorized
 
   /posts:
     post:
@@ -539,3 +530,19 @@ paths:
           description: User is not following this user
         '404':
           description: User not found
+  /search:
+    get:
+      tags:
+        - Search
+      summary: returns wikidata results
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+        '401':
+          description: Unauthorized

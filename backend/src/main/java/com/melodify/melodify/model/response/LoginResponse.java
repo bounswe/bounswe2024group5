@@ -1,6 +1,8 @@
-package com.melodify.melodify.model;
+package com.melodify.melodify.model.response;
+
 
 public class LoginResponse {
+
     private String token;
     private String message;
 
