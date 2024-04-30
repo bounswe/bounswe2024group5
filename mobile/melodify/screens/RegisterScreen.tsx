@@ -89,24 +89,23 @@ const RegisterScreen = ({ navigation }) => {
   const handleRegister = async () => {
     if (!validateInputs()) return;
     try {
-      const response = await fetch("https://api.yourdomain.com/v1/auth/register", {
+      const response = await fetch("http://34.118.44.165:80/api/auth/register", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", 
-          // "Content-Length": "0",
-          "Host": "localhost:8080",
+          "Content-Type": "application/json",
+          "Host": "34.118.44.165:80"
         },
         body: JSON.stringify({
-          name,
-          surname,
-          email,
-          username,
-          password,
+          name: name,
+          surname: surname,
+          email: email,
+          username: username,
+          password: password,
         }),
       });
-
+      
       const data = await response.json();
-      if (response.status === 201) {
+      if (response.status === 200) {
         // Handle success, possibly logging in the user directly or redirecting to login screen
         console.log(data.message); // Or handle token as needed
         navigation.navigate("Login");
