@@ -30,12 +30,12 @@ function RegistrationPage() {
 
     console.log("Attempting to register with:\n", requestBody);
 
-    fetch("http://localhost:8080/auth/register", {
+    fetch("http://34.118.44.165:80/api/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Content-Length": JSON.stringify(requestBody).length.toString(),
-        Host: "localhost:8080",
+        Host: "34.118.44.165:80",
       },
       body: JSON.stringify(requestBody),
     })
