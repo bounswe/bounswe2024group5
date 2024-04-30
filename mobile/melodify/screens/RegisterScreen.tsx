@@ -106,11 +106,16 @@ const RegisterScreen = ({ navigation }) => {
           }),
         }
       );
+      
 
+      console.log('====================================');
+      console.log(response);
+      console.log('====================================');
       const data = await response.json();
+      
       if (response.status === 200) {
         console.log(data.message);
-        navigation.navigate("Home");
+        navigation.goBack();
       } else if (response.status === 400) {
         showError("Bad request. Please check the information provided.");
       } else if (response.status === 409) {

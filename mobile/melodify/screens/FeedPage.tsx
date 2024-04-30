@@ -58,6 +58,7 @@ const FeedPage = ({ navigation }) => {
   };
 
   const handleSearch = async () => {
+    console.log("Searching for:", inputValue);
     Keyboard.dismiss();
     setIsLoading(true);
     setsearchMade(true);
@@ -65,7 +66,7 @@ const FeedPage = ({ navigation }) => {
     const fullUrl = `http://34.118.44.165/api/search?query=${encodeURIComponent(
       inputValue
     )}`;
-
+   
     try {
       const response = await fetch(fullUrl, {
         headers: {
@@ -73,6 +74,7 @@ const FeedPage = ({ navigation }) => {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log("Response:", response);
       const data = await response.json();
       console.log("Received data:", data);
       console.log(data.search[0].display);

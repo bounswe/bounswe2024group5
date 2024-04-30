@@ -63,6 +63,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         }),
       });
 
+
       if (response.status === 200) {
         const data = await response.json();
         login(data.token);
