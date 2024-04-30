@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -33,9 +34,12 @@ function LoginPage() {
         console.log(response);
         if (response.message === "Login successful") {
           navigate("/feed");
+        } else {
+          setErrorMessage(response.message);
         }
       })
       .catch((error) => {
+        setErrorMessage(error);
         console.error(error);
       });
   };
@@ -50,6 +54,9 @@ function LoginPage() {
         <p className="text-[28px] text-white text-center mb-6 tracking-tight leading-8 font-medium">
           Login to Melodify
         </p>
+        {errorMessage && ( // Conditionally render error message
+          <p className="text-red-500 text-center mb-4">{errorMessage}</p>
+        )}
         <div className="flex flex-col gap-4 mb-6">
           <InputBox
             placeholder={"Username"}

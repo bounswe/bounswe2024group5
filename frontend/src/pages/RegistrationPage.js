@@ -9,12 +9,14 @@ function RegistrationPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
 
   const register = () => {
     if (password !== confirmPassword) {
       console.error("Passwords do not match!");
+      setErrorMessage("Passwords do not match!");
       return;
     }
 
@@ -44,9 +46,12 @@ function RegistrationPage() {
         console.log(response);
         if (response.message === "User registered successfully") {
           navigate("/feed");
+        } else {
+          setErrorMessage(response.message);
         }
       })
       .catch((error) => {
+        setErrorMessage(error);
         console.error(error);
       });
   };
@@ -61,6 +66,9 @@ function RegistrationPage() {
         <p className="text-[28px] text-white text-center mb-6 tracking-tight leading-8 font-medium">
           Register to Melodify
         </p>
+        {errorMessage && ( // Conditionally render error message
+          <p className="text-red-500 text-center mb-4">{errorMessage}</p>
+        )}
         <div className="flex flex-col gap-4 mb-6">
           <InputBox
             placeholder={"Name"}
