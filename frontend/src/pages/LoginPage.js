@@ -46,6 +46,9 @@ function LoginPage() {
 
   return (
     <>
+    <div className="w-screen h-screen concert-bg flex items-center justify-center">
+        
+    
       <div
         className="flex flex-col sm:w-full max-w-[360px] bg-[#111927CC] 
             rounded-2xl p-6 shadow-[0_-4px_8px_-2px_rgba(0,0,0,0.25)] backdrop-blur w-5/6
@@ -85,6 +88,7 @@ function LoginPage() {
             </a>
           </p>
         </div>
+      </div>
       </div>
     </>
   );

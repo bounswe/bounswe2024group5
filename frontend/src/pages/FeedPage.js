@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Post from "../components/Post";
 
 function FeedPage() {
     const navigate = useNavigate();
@@ -17,26 +18,15 @@ function FeedPage() {
 
   return (
     <>
-      <div>
-        <h1 className="text-white text-6xl font-medium">Welcome to Melodify.</h1>
-        <div className="mt-4">
-          <input
-            type="text"
-            placeholder="Search for songs, artists, etc."
-            className="py-2 px-4 w-full rounded-md border border-gray-300 focus:outline-none focus:border-indigo-500"
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-        </div>
-        <div className="mt-4">
-          <button
-            onClick={handleLogout}
-            className="py-2 px-4 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600"
-          >
-            Logout
-          </button>
-        </div>
+    <div className="flex justify-center bg-[#0D1520] p-4 w-screen">
+      <div className="w-[400px] overflow-scroll h-screen flex flex-col items-center gap-4
+      no-scrollbar">
+        <Post></Post>   
+        <Post></Post> 
+        <Post></Post>  
       </div>
+    </div>
+       
     </>
   );
 }
