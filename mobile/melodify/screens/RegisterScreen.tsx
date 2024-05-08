@@ -125,8 +125,13 @@ const RegisterScreen = ({ navigation }) => {
         showError(textResponse);
       }
     } catch (error) {
-      console.error("Registration failed:", error);
-      showError("Network error. Please try again.");
+      try {
+        console.error("Registration failed:", error);
+        showError(error);
+      } catch (error2) {
+        console.error("Failed to display error:", error2);
+        showError("error2 " + error.message);
+      }
     }
   };
 
