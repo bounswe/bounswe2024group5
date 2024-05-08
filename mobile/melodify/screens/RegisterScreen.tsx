@@ -107,18 +107,20 @@ const RegisterScreen = ({ navigation }) => {
         }
       );
 
-      const data = await response.json();
-      if (response.status === 200) {
+      if (response.ok) {
+        const data = await response.json();
         console.log(data.message);
         navigation.navigate("Home");
-      } else if (response.status === 400) {
-        showError("Bad request. Please check the information provided.");
-      } else if (response.status === 409) {
-        showError(
-          "User already exists. Please try a different username or email."
-        );
       } else {
-        showError("An unexpected error occurred. Please try again.");
+        if (response.status === 400) {
+          showError("Bad request. Please check the information provided.");
+        } else if (response.status === 409) {
+          showError(
+            "User already exists. Please try a different username or email."
+          );
+        } else {
+          showError("An unexpected error occurred. Please try again.");
+        }
       }
     } catch (error) {
       console.error("Registration failed:", error);

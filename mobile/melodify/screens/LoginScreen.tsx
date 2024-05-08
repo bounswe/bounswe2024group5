@@ -51,6 +51,10 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
   const { login } = useAuth();
 
   const handleSignIn = async () => {
+    if (password === "" || username === "") {
+      setModalVisible(true);
+      return;
+    }
     try {
       const response = await fetch("http://34.118.44.165:80/api/auth/login", {
         method: "POST",
@@ -63,10 +67,14 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         }),
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         const data = await response.json();
-        login(data.token);
-        navigation.navigate("Home");
+        if (data.token) {
+          login(data.token);
+          navigation.navigate("Home");
+        } else {
+          setModalVisible(true);
+        }
       } else {
         setModalVisible(true);
       }
