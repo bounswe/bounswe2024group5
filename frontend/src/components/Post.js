@@ -1,7 +1,7 @@
 import { FaHeart, FaRegHeart, FaRegComment, FaShareAlt } from "react-icons/fa";
 import { useState } from "react";
 
-function Post() {
+function Post({postData}) {
 
     const [liked, setLiked] = useState(false);
 
@@ -11,17 +11,17 @@ function Post() {
 
     return (
         <>
-            <div className="w-[400px] text-white bg-[#111927] border border-[#777] border-solid p-4 h-fit
+            <div className="w-[400px] text-white bg-[#111927] border border-[#777] border-solid p-4 pr-6 h-fit
             flex rounded-2xl">
-                <img src="pp2.jpeg" alt="Profile" className="w-12 h-12 rounded-full object-cover"/>
-                <div className="ps-4">
+                <img src={postData.pp} alt="Profile" className="w-12 h-12 rounded-full object-cover"/>
+                <div className="ps-4 grow">
                     <p className="font-bold pb-2 horizontal-break-after">
-                        The Lumineers <span className="font-normal text-[#aaa]">- 6 Hours Ago</span>
+                        {postData.username} <span className="font-normal text-[#aaa]">- {postData.when}</span>
                     </p>
                     <p className="pb-2">
-                        Last night was a very special night for us. Thank you to everyone who came for our show in Istanbul
+                        {postData.textBody}
                     </p>
-                    <img src="content.jpg" className="rounded-xl"></img>
+                    {postData && postData.imageURL && <img src={postData.imageURL} className="rounded-xl"></img>}
                     <div className="flex justify-start px-2 pt-3 gap-8">
                         <div className="pr-2" onClick={toggleLike}>
                             {liked ? 
