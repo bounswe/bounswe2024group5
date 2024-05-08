@@ -95,7 +95,6 @@ const RegisterScreen = ({ navigation }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Host: "34.118.44.165:80",
           },
           body: JSON.stringify({
             name: name,
@@ -107,20 +106,23 @@ const RegisterScreen = ({ navigation }) => {
         }
       );
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data.message);
-        navigation.navigate("Home");
-      } else {
-        if (response.status === 400) {
-          showError("Bad request. Please check the information provided.");
-        } else if (response.status === 409) {
-          showError(
-            "User already exists. Please try a different username or email."
-          );
+      const textResponse = await response.text();
+      try {
+        console.log(textResponse);
+        const data = JSON.parse(textResponse);
+        if (response.ok) {
+          console.log(data.message);
+          navigation.navigate("Login");
         } else {
-          showError("An unexpected error occurred. Please try again.");
+          console.log(data);
+          showError(
+            data.message || "An unexpected error occurred. Please try again."
+          );
         }
+      } catch (jsonError) {
+        console.error("Failed to parse JSON:", jsonError);
+        console.log("Received from server:", textResponse);
+        showError(textResponse);
       }
     } catch (error) {
       console.error("Registration failed:", error);
