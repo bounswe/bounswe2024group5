@@ -12,7 +12,7 @@ function Post({postData}) {
     return (
         <>
             <div className="w-[400px] text-white bg-[#111927] border border-[#777] border-solid p-4 pr-6 h-fit
-            flex rounded-2xl">
+            flex border-b-0">
                 <img src={postData.pp} alt="Profile" className="w-12 h-12 rounded-full object-cover"/>
                 <div className="ps-4 grow">
                     <p className="font-bold pb-2 horizontal-break-after">
