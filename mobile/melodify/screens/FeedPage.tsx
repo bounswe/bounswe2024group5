@@ -74,15 +74,17 @@ const FeedPage = ({ navigation }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Response:", response);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       const data = await response.json();
       console.log("Received data:", data);
       console.log(data.search[0].display);
 
-      if (!response.ok) throw new Error(data.message || "Failed to fetch data");
-
-      if (!Array.isArray(data.search))
+      if (!Array.isArray(data.search)) {
         throw new TypeError("Received data under 'search' is not an array");
+      }
 
       setResults(
         await Promise.all(

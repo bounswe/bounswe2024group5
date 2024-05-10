@@ -88,6 +88,14 @@ const RegisterScreen = ({ navigation }) => {
 
   const handleRegister = async () => {
     if (!validateInputs()) return;
+
+    const requestBody = {
+      name: name,
+      surname: surname,
+      email: email,
+      username: username,
+      password: password,
+    };
     try {
       const response = await fetch(
         "http://34.118.44.165:80/api/auth/register",
@@ -95,39 +103,41 @@ const RegisterScreen = ({ navigation }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Content-Length": JSON.stringify(requestBody).length.toString(),
             Host: "34.118.44.165:80",
           },
-          body: JSON.stringify({
-            name: name,
-            surname: surname,
-            email: email,
-            username: username,
-            password: password,
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
       
+      const rawData = await response.text();
 
-      console.log('====================================');
-      console.log(response);
-      console.log('====================================');
-      const data = await response.json();
-      
-      if (response.status === 200) {
+      if (response.ok) {
+        const data = JSON.parse(rawData);
         console.log(data.message);
-        navigation.goBack();
-      } else if (response.status === 400) {
-        showError("Bad request. Please check the information provided.");
-      } else if (response.status === 409) {
-        showError(
-          "User already exists. Please try a different username or email."
-        );
+        navigation.navigate("Login");
       } else {
-        showError("An unexpected error occurred. Please try again.");
+        const data = rawData;
+        switch (response.status) {
+          case 400:
+            showError(data || "Invalid request. Please check your data.");
+            break;
+          case 401:
+            showError(data || "Unauthorized. Please check your credentials.");
+            break;
+          case 500:
+            showError(data || "Server error. Please try again later.");
+            break;
+          default:
+            showError(
+              data || "An unexpected error occurred. Please try again."
+            );
+            break;
+        }
       }
     } catch (error) {
-      console.error("Registration failed:", error);
-      showError("Network error. Please try again.");
+      console.log("Registration failed:", error);
+      showError(error.message || "An unexpected error occurred.");
     }
   };
 

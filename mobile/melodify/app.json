@@ -14,6 +14,16 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugins": [
+      ["expo-build-properties", {
+        "android": {
+          "usesCleartextTraffic": true
+        },
+        "ios": {
+          "usesCleartextTraffic": true
+        }
+      }]
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.roacar.melodify"
