@@ -24,6 +24,9 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.roacar.melodify",
+      "config": {
+        "usesCleartextTraffic": true
+      },
       "permissions": [
         "android.permission.INTERNET"
       ]
