@@ -14,6 +14,16 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugins": [
+      ["expo-build-properties", {
+        "android": {
+          "usesCleartextTraffic": true
+        },
+        "ios": {
+          "usesCleartextTraffic": true
+        }
+      }]
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.roacar.melodify"
@@ -24,16 +34,6 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.roacar.melodify",
-      "plugins": [
-        ["expo-build-properties", {
-          "android": {
-            "usesCleartextTraffic": true
-          },
-          "ios": {
-            "usesCleartextTraffic": true
-          }
-        }]
-      ],
       "permissions": [
         "android.permission.INTERNET"
       ]
@@ -45,9 +45,6 @@
       "eas": {
         "projectId": "da5b5972-91cc-4492-94e7-9137909cba21"
       }
-    },
-    "plugins": [
-      "expo-build-properties"
-    ]
+    }
   }
 }
