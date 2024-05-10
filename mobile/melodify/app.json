@@ -24,9 +24,16 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.roacar.melodify",
-      "config": {
-        "usesCleartextTraffic": true
-      },
+      "plugins": [
+        ["expo-build-properties", {
+          "android": {
+            "usesCleartextTraffic": true
+          },
+          "ios": {
+            "usesCleartextTraffic": true
+          }
+        }]
+      ],
       "permissions": [
         "android.permission.INTERNET"
       ]
@@ -38,6 +45,9 @@
       "eas": {
         "projectId": "da5b5972-91cc-4492-94e7-9137909cba21"
       }
-    }
+    },
+    "plugins": [
+      "expo-build-properties"
+    ]
   }
 }
