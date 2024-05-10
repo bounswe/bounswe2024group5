@@ -109,7 +109,7 @@ const RegisterScreen = ({ navigation }) => {
           body: JSON.stringify(requestBody),
         }
       );
-
+      
       const rawData = await response.text();
 
       if (response.ok) {
@@ -139,34 +139,6 @@ const RegisterScreen = ({ navigation }) => {
       console.log("Registration failed:", error);
       showError(error.message || "An unexpected error occurred.");
     }
-
-    //   const textResponse = await response.text();
-    //   try {
-    //     console.log(textResponse);
-    //     const data = JSON.parse(textResponse);
-    //     if (response.ok) {
-    //       console.log(data.message);
-    //       navigation.navigate("Login");
-    //     } else {
-    //       console.log(data);
-    //       showError(
-    //         data.message || "An unexpected error occurred. Please try again."
-    //       );
-    //     }
-    //   } catch (jsonError) {
-    //     console.error("Failed to parse JSON:", jsonError);
-    //     console.log("Received from server:", textResponse);
-    //     showError(textResponse);
-    //   }
-    // } catch (error) {
-    //   try {
-    //     console.error("Registration failed:", error);
-    //     showError(error);
-    //   } catch (error2) {
-    //     console.error("Failed to display error:", error2);
-    //     showError("error2 " + error.message);
-    //   }
-    // }
   };
 
   return (
