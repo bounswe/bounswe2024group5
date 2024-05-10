@@ -10,7 +10,7 @@ function App() {
 
   return (
     <>
-      <div className='h-screen flex justify-center items-center'>
+      <div className='h-screen flex justify-center items-center relative'>
         <BrowserRouter>
         <Routes>
           <Route path="/" element={<SearchPage />} />

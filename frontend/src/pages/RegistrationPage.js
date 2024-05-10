@@ -30,12 +30,12 @@ function RegistrationPage() {
 
     console.log("Attempting to register with:\n", requestBody);
 
-    fetch("http://localhost:8080/auth/register", {
+    fetch("http://34.118.44.165:80/api/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Content-Length": JSON.stringify(requestBody).length.toString(),
-        Host: "localhost:8080",
+        Host: "34.118.44.165:80",
       },
       body: JSON.stringify(requestBody),
     })
@@ -44,7 +44,7 @@ function RegistrationPage() {
       })
       .then((response) => {
         console.log(response);
-        if (response.message === "User registered successfully") {
+        if (response.message === "Registration successful") {
           navigate("/feed");
         } else {
           setErrorMessage(response.message);
@@ -58,6 +58,7 @@ function RegistrationPage() {
 
   return (
     <>
+    <div className="w-screen h-screen concert-bg flex justify-center items-center">
       <div
         className="flex flex-col sm:w-full max-w-[360px] bg-[#111927CC] 
             rounded-2xl p-6 shadow-[0_-4px_8px_-2px_rgba(0,0,0,0.25)] backdrop-blur w-5/6
@@ -121,6 +122,7 @@ function RegistrationPage() {
             </a>
           </p>
         </div>
+      </div>
       </div>
     </>
   );

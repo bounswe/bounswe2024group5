@@ -3,11 +3,25 @@
  border: none;
 }
 
-body {
+.concert-bg {
   background-color: #205D9E;
   background-image: url('../public/concert-bg.jpeg');
   background-size: cover;
   background-position: center top; 
+}
+
+.horizontal-break-after::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 1px;
+  background-color: #777;
+  transform: translateY(4px);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+
 }
 
 /*
