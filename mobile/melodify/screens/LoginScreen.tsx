@@ -55,23 +55,16 @@ const LoginScreen = ({ navigation }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username,
-          password: password,
+          username,
+          password,
         }),
       });
-
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
-        if (data.token) {
-          login(data.token);
-          navigation.navigate("Home");
-        } else {
-          setErrorMessage("Login failed. Please try again.");
-          setModalVisible(true);
-        }
+        login(data.token);
+        navigation.navigate("Home");
       } else {
-        const errorData = await response.json();
-        setErrorMessage(errorData.message || "Invalid username/password");
+        setErrorMessage(data.message || "Invalid username/password");
         setModalVisible(true);
       }
     } catch (error) {
@@ -79,6 +72,26 @@ const LoginScreen = ({ navigation }) => {
       setErrorMessage("Network error. Please try again.");
       setModalVisible(true);
     }
+
+    // if (response.ok) {
+    //   const data = await response.json();
+    //   if (data.token) {
+    //     login(data.token);
+    //     navigation.navigate("Home");
+    //   } else {
+    //     setErrorMessage("Login failed. Please try again.");
+    //     setModalVisible(true);
+    //   }
+    //   } else {
+    //     const errorData = await response.json();
+    //     setErrorMessage(errorData.message || "Invalid username/password");
+    //     setModalVisible(true);
+    //   }
+    // } catch (error) {
+    //   console.error("Network or other error:", error);
+    //   setErrorMessage("Network error. Please try again.");
+    //   setModalVisible(true);
+    // }
   };
 
   return (

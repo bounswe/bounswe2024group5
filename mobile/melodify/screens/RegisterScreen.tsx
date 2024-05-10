@@ -97,42 +97,72 @@ const RegisterScreen = ({ navigation }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name: name,
-            surname: surname,
-            email: email,
-            username: username,
-            password: password,
+            name,
+            surname,
+            email,
+            username,
+            password,
           }),
         }
       );
 
-      const textResponse = await response.text();
-      try {
-        console.log(textResponse);
-        const data = JSON.parse(textResponse);
-        if (response.ok) {
-          console.log(data.message);
-          navigation.navigate("Login");
-        } else {
-          console.log(data);
-          showError(
-            data.message || "An unexpected error occurred. Please try again."
-          );
+      const rawData = await response.text();
+
+      if (response.ok) {
+        const data = JSON.parse(rawData);
+        console.log(data.message);
+        navigation.navigate("Login");
+      } else {
+        const data = rawData;
+        switch (response.status) {
+          case 400:
+            showError(data || "Invalid request. Please check your data.");
+            break;
+          case 401:
+            showError(data || "Unauthorized. Please check your credentials.");
+            break;
+          case 500:
+            showError(data || "Server error. Please try again later.");
+            break;
+          default:
+            showError(
+              data || "An unexpected error occurred. Please try again."
+            );
+            break;
         }
-      } catch (jsonError) {
-        console.error("Failed to parse JSON:", jsonError);
-        console.log("Received from server:", textResponse);
-        showError(textResponse);
       }
     } catch (error) {
-      try {
-        console.error("Registration failed:", error);
-        showError(error);
-      } catch (error2) {
-        console.error("Failed to display error:", error2);
-        showError("error2 " + error.message);
-      }
+      console.log("Registration failed:", error);
+      showError(error.message || "An unexpected error occurred.");
     }
+
+    //   const textResponse = await response.text();
+    //   try {
+    //     console.log(textResponse);
+    //     const data = JSON.parse(textResponse);
+    //     if (response.ok) {
+    //       console.log(data.message);
+    //       navigation.navigate("Login");
+    //     } else {
+    //       console.log(data);
+    //       showError(
+    //         data.message || "An unexpected error occurred. Please try again."
+    //       );
+    //     }
+    //   } catch (jsonError) {
+    //     console.error("Failed to parse JSON:", jsonError);
+    //     console.log("Received from server:", textResponse);
+    //     showError(textResponse);
+    //   }
+    // } catch (error) {
+    //   try {
+    //     console.error("Registration failed:", error);
+    //     showError(error);
+    //   } catch (error2) {
+    //     console.error("Failed to display error:", error2);
+    //     showError("error2 " + error.message);
+    //   }
+    // }
   };
 
   return (
