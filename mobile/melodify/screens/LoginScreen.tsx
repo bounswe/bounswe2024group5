@@ -48,16 +48,19 @@ const LoginScreen = ({ navigation }) => {
       setModalVisible(true);
       return;
     }
+    const requestBody = {
+      username: username,
+      password: password,
+    };
     try {
       const response = await fetch("http://34.118.44.165:80/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Content-Length": JSON.stringify(requestBody).length.toString(),
+          Host: "34.118.44.165:80",
         },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
+        body: JSON.stringify(requestBody),
       });
       const data = await response.json();
       if (response.ok) {

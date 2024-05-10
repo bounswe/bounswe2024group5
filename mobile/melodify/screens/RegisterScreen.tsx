@@ -88,6 +88,14 @@ const RegisterScreen = ({ navigation }) => {
 
   const handleRegister = async () => {
     if (!validateInputs()) return;
+
+    const requestBody = {
+      name: name,
+      surname: surname,
+      email: email,
+      username: username,
+      password: password,
+    };
     try {
       const response = await fetch(
         "http://34.118.44.165:80/api/auth/register",
@@ -95,14 +103,10 @@ const RegisterScreen = ({ navigation }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Content-Length": JSON.stringify(requestBody).length.toString(),
+            Host: "34.118.44.165:80",
           },
-          body: JSON.stringify({
-            name,
-            surname,
-            email,
-            username,
-            password,
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
 

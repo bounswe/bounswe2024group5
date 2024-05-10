@@ -15,14 +15,8 @@
     },
     "production": {
       "android": {
-        "buildType": "apk",
-        "publish": true
-      },
-      "ios": {
-        "buildType": "ipa",
-        "publish": true
+        "buildType": "apk"
       }
-
     }
   }
 }
