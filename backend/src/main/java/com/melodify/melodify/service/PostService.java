@@ -30,7 +30,7 @@ public class PostService {
         if (author == null) {
             throw new IllegalArgumentException("Author not found");
         }
-        Post post = new Post(newPostRequest.getText(), author, newPostRequest.getMedia_url(), newPostRequest.getTag());
+        Post post = new Post(newPostRequest.getText(), author, newPostRequest.getMedia_url());
         postRepository.save(post);
         return true;
     }

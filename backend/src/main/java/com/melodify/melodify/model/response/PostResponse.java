@@ -7,7 +7,6 @@ public class PostResponse {
     private String text;
     private String author;
     private String media_url;
-    private String tag;
     private String createdAt;
     private String editedAt;
 
@@ -16,7 +15,6 @@ public class PostResponse {
         this.text = post.getText();
         this.author = post.getAuthor().getUsername();
         this.media_url = post.getMedia_url();
-        this.tag = post.getTag();
         this.createdAt = post.getCreatedAt().toString();
         this.editedAt = post.getEditedAt().toString();
     }
@@ -35,10 +33,6 @@ public class PostResponse {
 
     public String getMedia_url() {
         return media_url;
-    }
-
-    public String getTag() {
-        return tag;
     }
 
     public String getCreatedAt() {

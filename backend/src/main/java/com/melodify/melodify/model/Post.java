@@ -27,9 +27,6 @@ public class Post {
     @Column(name = "media_url")
     private String media_url;
 
-    @Column(name = "tag")
-    private String tag;
-
     @Column(name = "edited_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date editedAt;
@@ -39,11 +36,10 @@ public class Post {
         // Default constructor required for JPA
     }
 
-    public Post(String text, User author, String media_url, String tag) {
+    public Post(String text, User author, String media_url) {
         this.text = text;
         this.author = author;
         this.media_url = media_url;
-        this.tag = tag;
         this.createdAt = new Date();
         this.editedAt = new Date();
     }
@@ -69,10 +65,6 @@ public class Post {
         return media_url;
     }
 
-    public String getTag() {
-        return tag;
-    }
-
     public Date getEditedAt() {
         return editedAt;
     }
@@ -87,9 +79,6 @@ public class Post {
         this.media_url = media_url;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
 
     public void setAuthor(User author) {
         this.author = author;
