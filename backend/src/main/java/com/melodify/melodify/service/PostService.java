@@ -26,12 +26,9 @@ public class PostService {
     }
 
     public Post createOnePost(PostCreateRequest newPostRequest) {
-        Post post = new Post();
+
         User author = userService.getOneUserByUsername(newPostRequest.getAuthor());
-        post.setAuthor(author);
-        post.setText(newPostRequest.getText());
-        post.setMedia_url(newPostRequest.getMedia_url());
-        post.setTag(newPostRequest.getTag());
+        Post post = new Post(newPostRequest.getText(), author, newPostRequest.getMedia_url(), newPostRequest.getTag());
         return postRepository.save(post);
     }
 

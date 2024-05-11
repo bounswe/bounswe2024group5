@@ -10,8 +10,6 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long>{
 
-    boolean existsbyAuthor(User author);
-
     List<Post> findByAuthor(User author);
 
     List<Post> findByTag(String tag);

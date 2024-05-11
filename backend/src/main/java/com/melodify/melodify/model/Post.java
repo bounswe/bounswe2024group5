@@ -45,6 +45,7 @@ public class Post {
         this.media_url = media_url;
         this.tag = tag;
         this.createdAt = new Date();
+        this.editedAt = new Date();
     }
 
     // Getters
