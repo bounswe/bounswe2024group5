@@ -25,11 +25,14 @@ public class PostService {
         return postRepository.findAll().stream().map(PostResponse::new).collect(Collectors.toList());
     }
 
-    public Post createOnePost(PostCreateRequest newPostRequest) {
-
+    public boolean createOnePost(PostCreateRequest newPostRequest) {
         User author = userService.getOneUserByUsername(newPostRequest.getAuthor());
+        if (author == null) {
+            throw new IllegalArgumentException("Author not found");
+        }
         Post post = new Post(newPostRequest.getText(), author, newPostRequest.getMedia_url(), newPostRequest.getTag());
-        return postRepository.save(post);
+        postRepository.save(post);
+        return true;
     }
 
 }

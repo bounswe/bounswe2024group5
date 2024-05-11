@@ -5,6 +5,7 @@ import com.melodify.melodify.model.Post;
 import com.melodify.melodify.model.request.PostCreateRequest;
 import com.melodify.melodify.model.response.PostResponse;
 import com.melodify.melodify.service.PostService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +26,14 @@ public class PostController {
     }
 
     @PostMapping
-    public Post createOnePost(@RequestBody PostCreateRequest newPostRequest) {
-        return postService.createOnePost(newPostRequest);
+    public ResponseEntity<String> createOnePost(@RequestBody PostCreateRequest newPostRequest) {
+        try {
+            postService.createOnePost(newPostRequest);
+        } catch (Exception e) {
+            System.out.println("Error creating post: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error creating post: " + e.getMessage());
+        }
+        return ResponseEntity.ok("Post created successfully!");
     }
 
 }
