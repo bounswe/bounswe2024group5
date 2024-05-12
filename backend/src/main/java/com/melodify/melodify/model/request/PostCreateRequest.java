@@ -8,7 +8,6 @@ import java.util.List;
 public class PostCreateRequest {
 
     private List<String> tags;
-    private String author;
     private String text;
     private String media_url;
 

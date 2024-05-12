@@ -5,18 +5,26 @@ import com.melodify.melodify.model.Post;
 import com.melodify.melodify.model.request.PostCreateRequest;
 import com.melodify.melodify.model.request.PostUpdateRequest;
 import com.melodify.melodify.model.response.PostResponse;
+import com.melodify.melodify.security.jwt.JwtUtils;
 import com.melodify.melodify.service.PostService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/posts")
 public class PostController {
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     private PostService postService;
 
@@ -37,9 +45,10 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createOnePost(@RequestBody PostCreateRequest newPostRequest) {
+    public ResponseEntity<?> createOnePost(@RequestHeader("Authorization") String jwt, @RequestBody PostCreateRequest newPostRequest) {
+        String authorUsername = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
         try {
-            long id = postService.createOnePost(newPostRequest);
+            long id = postService.createOnePost(authorUsername, newPostRequest);
             URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{id}")
                     .buildAndExpand(id)
@@ -61,13 +70,37 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public PostResponse updateOnePost(@PathVariable Long postId, @RequestBody PostUpdateRequest updatePost) {
-        return postService.updateOnePostById(postId, updatePost);
+    public ResponseEntity<?> updateOnePost(@RequestHeader("Authorization") String jwt, @PathVariable Long postId, @RequestBody PostUpdateRequest updatePost) {
+        String authorUsername = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
+        try{
+            PostResponse response = postService.updateOnePostById(authorUsername, postId, updatePost);
+            return ResponseEntity.ok().body(response);
+        }
+        catch (ResponseStatusException e){
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
+            else if (e.getStatusCode() == HttpStatus.FORBIDDEN)
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the author of this post");
+            else if (e.getStatusCode() == HttpStatus.BAD_REQUEST)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            else
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+        }
     }
 
     @DeleteMapping("/{postId}")
-    public void deleteOnePost(@PathVariable Long postId) {
-        postService.deleteOnePostById(postId);
+    public ResponseEntity<String> deleteOnePost(@RequestHeader("Authorization") String jwt, @PathVariable Long postId) {
+        String authorUsername = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
+        try{
+            postService.deleteOnePostById(authorUsername, postId);
+            return ResponseEntity.ok().body("Post deleted");
+        }
+        catch (ResponseStatusException e){
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
+            else
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the author of this post");
+        }
     }
 
 }

@@ -7,8 +7,11 @@ import com.melodify.melodify.model.request.PostCreateRequest;
 import com.melodify.melodify.model.request.PostUpdateRequest;
 import com.melodify.melodify.model.response.PostResponse;
 import com.melodify.melodify.repository.PostRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,11 +56,10 @@ public class PostService {
         return mapper(tagService.getPostsByTag(tag));
     }
 
-    public long createOnePost(PostCreateRequest newPostRequest) {
-        User author = userService.getOneUserByUsername(newPostRequest.getAuthor());
-        if (author == null) {
-            throw new IllegalArgumentException("Author not found");
-        }
+    public long createOnePost(String authorUsername, PostCreateRequest newPostRequest) {
+        User author = userService.getOneUserByUsername(authorUsername);
+        if (newPostRequest.getText() == null)
+            throw new IllegalArgumentException("text is required");
         Post post = new Post(newPostRequest.getText(), author, newPostRequest.getMedia_url());
         long id = postRepository.save(post).getId();
         try {
@@ -82,15 +84,16 @@ public class PostService {
         return convertToResponse(post);
     }
 
-    public PostResponse updateOnePostById(Long postId, PostUpdateRequest updatePost) {
+    public PostResponse updateOnePostById(String authorUsername, Long postId, PostUpdateRequest updatePost) {
         Post post = postRepository.findById(postId).orElse(null);
-        if (post == null) {
-            throw new IllegalArgumentException("Post not found");
-        }
+        if (post == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!post.getAuthor().getUsername().equals(authorUsername))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         String text = updatePost.getText();
         String media_url = updatePost.getMedia_url();
         if (text == null && media_url == null)
-            throw new IllegalArgumentException("Nothing to update");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "text or media_url is required");
         if (text != null)
             post.setText(text);
         if (media_url != null)
@@ -99,11 +102,12 @@ public class PostService {
         return convertToResponse(post);
     }
 
-    public void deleteOnePostById(Long postId) {
+    public void deleteOnePostById(String authorUsername, Long postId)  {
         Post post = postRepository.findById(postId).orElse(null);
-        if (post == null) {
-            throw new IllegalArgumentException("Post not found");
-        }
+        if (post == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!post.getAuthor().getUsername().equals(authorUsername))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         postRepository.delete(post);
     }
 
