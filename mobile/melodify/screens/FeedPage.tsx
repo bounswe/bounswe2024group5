@@ -12,6 +12,18 @@ import {
 } from "react-native";
 import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
+import Post from "../components/Post";
+import pp2Image from "../assets/profile_pic.png";
+import contentImage from "../assets/content.jpg";
+
+const mockPost = {
+  pp: require("../assets/profile_pic.png"),
+  username: "The Lumineers",
+  when: "2 hours ago",
+  textBody: "Hey everyone! We're excited to announce our new album coming out next month. Stay tuned for more updates!",
+  imageURL: require("../assets/content.jpg"),
+};
+
 
 const ResultItem = ({ item }) => {
   return (
@@ -34,6 +46,7 @@ const FeedPage = ({ navigation }) => {
   const [inputValue, setInputValue] = useState("");
   const [results, setResults] = useState([]);
   const [searchMade, setsearchMade] = useState(false);
+  const [posts, setPosts] = useState([mockPost, mockPost, mockPost]);
 
   const fetchImageData = async (entityId) => {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&format=json&props=claims`;
@@ -103,6 +116,10 @@ const FeedPage = ({ navigation }) => {
     }
   };
 
+  const addPost = (newPost) => {
+    setPosts([newPost, ...posts]);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.mainTitle}>Melodify</Text>
@@ -139,14 +156,17 @@ const FeedPage = ({ navigation }) => {
       ) : searchMade && results.length === 0 ? (
         <Text style={styles.noResultsText}>No results found.</Text>
       ) : (
-        <View style={styles.container2}>
-          <FlatList
-            data={results}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => <ResultItem item={item} />}
-          />
-        </View>
+        <FlatList
+          data={results}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <ResultItem item={item} />}
+        />
       )}
+      <FlatList
+        data={posts}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => <Post postData={item} />}
+      />
       <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate("CreatePostScreen")}
