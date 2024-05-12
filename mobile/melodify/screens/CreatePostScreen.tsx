@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     paddingVertical: 10,
     marginBottom: 20,
+    marginTop: 20,
   },
   input: {
     height: 200,
