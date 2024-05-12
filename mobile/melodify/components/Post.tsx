@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import CommentScreen from '../screens/CommentScreen';
 
 interface PostData {
     id: string; // Unique ID for the post
@@ -17,7 +19,7 @@ interface PostProps {
 
 const Post: React.FC<PostProps> = ({ postData }) => {
     const [liked, setLiked] = useState(false);
-    // const navigation = useNavigation();
+    const navigation = useNavigation();
     const [likeCount, setLikeCount] = useState(0); // State to keep track of like count
 
     const toggleLike = () => {
@@ -26,10 +28,10 @@ const Post: React.FC<PostProps> = ({ postData }) => {
         setLikeCount((prevCount) => (liked ? prevCount - 1 : prevCount + 1));
     };
 
-    // const handleCommentPress = () => {
-    //     // Navigate to the comment screen with necessary data
-    //     navigation.navigate('CommentScreen', { postId: postData.id });
-    // };
+    const handleCommentPress = () => {
+        // Navigate to the comment screen with necessary data
+        navigation.navigate('CommentScreen', {postId: postData.id});
+    };
 
     return (
         <View style={styles.postContainer}>
@@ -62,10 +64,9 @@ const Post: React.FC<PostProps> = ({ postData }) => {
                     </TouchableOpacity>
                     <Text style={styles.likeCount}>{likeCount}</Text>
 
-                    {/* <TouchableOpacity onPress={handleCommentPress}>
-                        <FontAwesome name="comment-o" size={18} color="#777" />
-                    </TouchableOpacity> */}
-                    <FontAwesome name="comment-o" size={18} color="#777" style={styles.comment} />
+                    <TouchableOpacity onPress={handleCommentPress}>
+                        <FontAwesome name="comment-o" size={18} color="#777" style={styles.comment} />
+                    </TouchableOpacity>
                     <FontAwesome name="share-alt" size={16} color="#777" style={styles.share} />
                 </View>
             </View>
