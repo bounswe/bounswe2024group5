@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS tags (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tag varchar(255),
     post_id INT references posts (id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE IF NOT EXISTS comments (
     id INT AUTO_INCREMENT PRIMARY KEY,

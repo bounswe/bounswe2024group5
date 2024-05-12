@@ -25,4 +25,9 @@ public class TagService {
         return tagRepository.findByTag(tag).stream().map(Tag::getPost).collect(Collectors.toList());
     }
 
+    public void createOneTag(String tag, Post post) {
+        Tag newTag = new Tag(tag, post);
+        tagRepository.save(newTag);
+    }
+
 }

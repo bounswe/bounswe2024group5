@@ -73,10 +73,12 @@ public class Post {
 
     public void setText(String text) {
         this.text = text;
+        this.editedAt = new Date();
     }
 
     public void setMedia_url(String media_url) {
         this.media_url = media_url;
+        this.editedAt = new Date();
     }
 
 
