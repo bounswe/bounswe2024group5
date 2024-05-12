@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
 interface PostData {
+    id: string; // Unique ID for the post
     pp: string; // Profile picture URL
     username: string; // Username of the poster
     when: string; // Description of when the post was made
@@ -16,17 +17,25 @@ interface PostProps {
 
 const Post: React.FC<PostProps> = ({ postData }) => {
     const [liked, setLiked] = useState(false);
+    // const navigation = useNavigation();
+    const [likeCount, setLikeCount] = useState(0); // State to keep track of like count
 
     const toggleLike = () => {
         setLiked(!liked);
+        // Increment or decrement like count based on the current state of liked
+        setLikeCount((prevCount) => (liked ? prevCount - 1 : prevCount + 1));
     };
+
+    // const handleCommentPress = () => {
+    //     // Navigate to the comment screen with necessary data
+    //     navigation.navigate('CommentScreen', { postId: postData.id });
+    // };
 
     return (
         <View style={styles.postContainer}>
             <Image
                 source={require("../assets/profile_pic.png")}
                 // source={{ uri: postData.pp }}
-                // uri={{postData.pp }}
                 style={styles.profilePic}
                 onLoad={() => console.log('Profile picture loaded')}
                 onError={(error) => console.error('Error loading profile picture:', error)}
@@ -51,8 +60,13 @@ const Post: React.FC<PostProps> = ({ postData }) => {
                             <FontAwesome name="heart-o" size={18} color="#777" />
                         )}
                     </TouchableOpacity>
-                    <FontAwesome name="comment-o" size={18} color="#777" />
-                    <FontAwesome name="share-alt" size={16} color="#777" />
+                    <Text style={styles.likeCount}>{likeCount}</Text>
+
+                    {/* <TouchableOpacity onPress={handleCommentPress}>
+                        <FontAwesome name="comment-o" size={18} color="#777" />
+                    </TouchableOpacity> */}
+                    <FontAwesome name="comment-o" size={18} color="#777" style={styles.comment} />
+                    <FontAwesome name="share-alt" size={16} color="#777" style={styles.share} />
                 </View>
             </View>
         </View>
@@ -97,9 +111,20 @@ const styles = StyleSheet.create({
     iconRow: {
         flexDirection: 'row',
         marginTop: 10,
-        justifyContent: 'space-around',
+        alignItems: 'center', // Align items vertically
+        justifyContent: 'flex-start', // Align items from the start
         width: '100%',
     },
+    likeCount: {
+        color: 'white',
+        marginLeft: 5,
+    },
+    comment: {
+        marginLeft: 80,
+    },
+    share: {
+        marginLeft: 80,
+    }
 });
 
 export default Post;

@@ -17,6 +17,7 @@ import pp2Image from "../assets/profile_pic.png";
 import contentImage from "../assets/content.jpg";
 
 const mockPost = {
+  id: "1",
   pp: require("../assets/profile_pic.png"),
   username: "The Lumineers",
   when: "2 hours ago",
