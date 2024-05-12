@@ -5,7 +5,7 @@
 
 We are a group of students from Boğaziçi University, Department of Computer Engineering. We are taking the course CMPE352 - Fundamentals of Software Engineering. This repository is created for the project of this course and will be modified throughout the year with the nature and progression of our project. You can visit our [wiki page](https://github.com/bounswe/bounswe2024group5/wiki) by clicking on the link.
 
-![cover](https://github.com/bounswe/bounswe2024group5/blob/banner-update/.github/banner_updated.png)
+![cover](https://github.com/bounswe/bounswe2024group5/blob/main/.github/banner_updated.png)
 
 ### About the Project
 
