@@ -53,17 +53,22 @@ public class PostService {
         return mapper(tagService.getPostsByTag(tag));
     }
 
-    public boolean createOnePost(PostCreateRequest newPostRequest) {
+    public long createOnePost(PostCreateRequest newPostRequest) {
         User author = userService.getOneUserByUsername(newPostRequest.getAuthor());
         if (author == null) {
             throw new IllegalArgumentException("Author not found");
         }
         Post post = new Post(newPostRequest.getText(), author, newPostRequest.getMedia_url());
-        postRepository.save(post);
-        for (String tag : newPostRequest.getTags()) {
-            tagService.createOneTag(tag, post);
+        long id = postRepository.save(post).getId();
+        try {
+            for (String tag : newPostRequest.getTags()) {
+                tagService.createOneTag(tag, post);
+            }
+        } catch (Exception e) {
+            postRepository.delete(post);
+            throw new IllegalArgumentException(e.getMessage());
         }
-        return true;
+        return id;
     }
 
     private PostResponse convertToResponse(Post post) {

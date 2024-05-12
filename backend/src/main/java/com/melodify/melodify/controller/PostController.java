@@ -8,8 +8,11 @@ import com.melodify.melodify.model.response.PostResponse;
 import com.melodify.melodify.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/posts")
@@ -34,14 +37,18 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createOnePost(@RequestBody PostCreateRequest newPostRequest) {
+    public ResponseEntity<?> createOnePost(@RequestBody PostCreateRequest newPostRequest) {
         try {
-            postService.createOnePost(newPostRequest);
+            long id = postService.createOnePost(newPostRequest);
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(id)
+                    .toUri();
+            return ResponseEntity.created(location).body(Map.of("post_id", id));
         } catch (Exception e) {
             System.out.println("Error creating post: " + e.getMessage());
             return ResponseEntity.badRequest().body("Error creating post: " + e.getMessage());
         }
-        return ResponseEntity.ok("Post created successfully!");
     }
 
     @GetMapping("/{postId}")
