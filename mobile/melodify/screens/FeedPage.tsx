@@ -157,17 +157,22 @@ const FeedPage = ({ navigation }) => {
       ) : searchMade && results.length === 0 ? (
         <Text style={styles.noResultsText}>No results found.</Text>
       ) : (
-        <FlatList
-          data={results}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => <ResultItem item={item} />}
-        />
+        <View style={{ flex: 1 }}>
+          <FlatList
+            data={results}
+            // data={results.concat(posts)} // Concatenate results and posts arrays
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => <ResultItem item={item} />}
+          />
+        </View>
       )}
-      <FlatList
-        data={posts}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Post postData={item} />}
-      />
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={posts}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <Post postData={item} />}
+        />
+      </View>
       <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate("CreatePostScreen")}
