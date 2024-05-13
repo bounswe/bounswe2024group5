@@ -9,7 +9,8 @@ interface CommentScreenProps {
 }
 
 interface Comment {
-  id: string;
+  commentId: string;
+  username: string;
   content: string;
   postId: string; 
 }
@@ -25,8 +26,9 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
   const handleAddComment = () => {
     if (newComment.trim() !== "") {
       const comment: Comment = {
-        id: String(comments.length + 1),
+        commentId: String(comments.length + 1),
         content: newComment.trim(),
+        username: "User",     // get the related username from the database
         postId: "1",
       };
       setComments([...comments, comment]);
@@ -39,9 +41,10 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
       <Text style={styles.title}>Comments</Text>
       <FlatList
         data={comments}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.commentId}
         renderItem={({ item }) => (
           <View style={styles.commentContainer}>
+            <Text style={styles.usernameText}>{item.username}</Text>
             <Text style={styles.commentText}>{item.content}</Text>
           </View>
         )}
@@ -78,6 +81,11 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+  },
+  usernameText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#111927",
   },
   commentText: {
     fontSize: 16,
