@@ -18,11 +18,16 @@ import contentImage from "../assets/content.jpg";
 
 const mockPost = {
   id: "1",
-  pp: require("../assets/profile_pic.png"),
-  username: "The Lumineers",
-  when: "2 hours ago",
-  textBody: "Hey everyone! We're excited to announce our new album coming out next month. Stay tuned for more updates!",
+  // pp: require("../assets/profile_pic.png"),
+  author: "The Lumineers",
+  created_at: "2 hours ago",
+  text: "Hey everyone! We're excited to announce our new album coming out next month. Stay tuned for more updates!",
   imageURL: require("../assets/content.jpg"),
+  tags: [
+    "#concert",
+    "#guitar"
+  ],
+  likes: 77,
 };
 
 
@@ -157,10 +162,9 @@ const FeedPage = ({ navigation }) => {
       ) : searchMade && results.length === 0 ? (
         <Text style={styles.noResultsText}>No results found.</Text>
       ) : (
-        <View style={{ flex: 1 }}>
+        <View style={styles.container2}>
           <FlatList
             data={results}
-            // data={results.concat(posts)} // Concatenate results and posts arrays
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => <ResultItem item={item} />}
           />

@@ -6,11 +6,14 @@ import CommentScreen from '../screens/CommentScreen';
 
 interface PostData {
     id: string; // Unique ID for the post
-    pp: string; // Profile picture URL
-    username: string; // Username of the poster
-    when: string; // Description of when the post was made
-    textBody: string; // Main text content of the post
+    // pp: string; // Profile picture URL
+    author: string; // Username of the author of the poster 
+    created_at: string; // Description of when the post was made
+    text: string; // Main text content of the post
     imageURL?: string; // Optional image URL for the post
+    tags: string[]; // Array of tags associated with the post
+    likes: number; // Number of likes for the post
+    comments: string[]; // Array of comment IDs for the post
 }
 
 interface PostProps {
@@ -20,12 +23,15 @@ interface PostProps {
 const Post: React.FC<PostProps> = ({ postData }) => {
     const [liked, setLiked] = useState(false);
     const navigation = useNavigation();
-    const [likeCount, setLikeCount] = useState(0); // State to keep track of like count
+    const [likeCount, setLikeCount] = useState(postData.likes);
 
     const toggleLike = () => {
         setLiked(!liked);
         // Increment or decrement like count based on the current state of liked
-        setLikeCount((prevCount) => (liked ? prevCount - 1 : prevCount + 1));
+        // setLikeCount((prevCount) => (liked ? prevCount - 1 : prevCount + 1));
+        setLikeCount((prevCount) => {
+            return liked ? Math.max(0, prevCount - 1) : prevCount + 1;
+        });
     };
 
     const handleCommentPress = () => {
@@ -36,17 +42,19 @@ const Post: React.FC<PostProps> = ({ postData }) => {
     return (
         <View style={styles.postContainer}>
             <Image
-                source={require("../assets/profile_pic.png")}
+                source={require("../assets/profile_pic.png")}   // profile picture will come from the database
                 // source={{ uri: postData.pp }}
                 style={styles.profilePic}
                 onLoad={() => console.log('Profile picture loaded')}
                 onError={(error) => console.error('Error loading profile picture:', error)}
             />
             <View style={styles.postContent}>
-                <Text style={styles.username}>
-                    {postData.username} <Text style={styles.when}>- {postData.when}</Text>
+                <Text style={styles.author}>
+                    {postData.author} <Text style={styles.created_at}>- {postData.created_at}</Text>
                 </Text>
-                <Text style={styles.textBody}>{postData.textBody}</Text>
+                <Text style={styles.text}>{postData.text}</Text>
+                <View style={styles.separator} />
+                <Text style={styles.tags}>{postData.tags.join(' ')}</Text>
                 {postData.imageURL && (
                     <Image 
                         source={require("../assets/content.jpg")} 
@@ -92,17 +100,27 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         flex: 1,
     },
-    username: {
+    author: {
         fontWeight: 'bold',
         color: 'white',
     },
-    when: {
+    created_at: {
         fontWeight: 'normal',
         color: '#aaa',
     },
-    textBody: {
+    text: {
         color: 'white',
     },
+    tags: {
+        color: 'white',
+        // fontStyle: 'italic',
+        fontWeight: 'bold',
+    },
+    separator: {
+        borderBottomColor: 'white',
+        borderBottomWidth: 1,
+        marginVertical: 10, // Adjust the vertical spacing as needed
+      },
     postImage: {
         borderRadius: 10,
         marginTop: 10,
