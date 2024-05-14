@@ -12,6 +12,8 @@ tags:
     description: Authentication related endpoints
   - name: Posts
     description: Endpoints related to post operations
+  - name: Feed
+    description: Endpoints related to feed operations
   - name: Users
     description: User profile and related information
 
@@ -537,6 +539,78 @@ paths:
           description: User is not authorized to delete this comment
         '404':
           description: Post or comment not found
+
+  /feed:
+    get:
+      tags:
+        - Feed
+      summary: Get user feed
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Page number
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Number of posts per page
+      responses:
+        '200':
+          description: Feed retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    postId:
+                      type: string
+                    username:
+                      type: string
+                    content:
+                      type: string
+                    likes:
+                      type: integer
+                    comments:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          commentId:
+                            type: string
+                          username:
+                            type: string
+                          content:
+                            type: string
+                          likes:
+                            type: integer
+              example:
+                - postId: "12345"
+                  username: "john_doe"
+                  content: "Check out this new song I discovered!"
+                  likes: 10
+                  comments:
+                    - commentId: "54321"
+                      username: "jane_smith"
+                      content: "Great song!"
+                    - commentId: "67890"
+                      username: "mike_jones"
+                      content: "I love this track!"
+                - postId: "54321"
+                  username: "john_doe"
+                  content: "Just posted a new remix!"
+                  likes: 5
+                  comments:
+                    - commentId: "98765"
+                      username: "jane_smith"
+                      content: "Awesome remix!"
+        '401':
+          description: Unauthorized
   
   /users/{username}:
     get:

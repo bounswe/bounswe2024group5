@@ -11,6 +11,8 @@ import ProfilePage from "./screens/ProfilePage";
 import CreatePostScreen from "./screens/CreatePostScreen";
 import { AuthProvider } from "./screens/AuthProvider";
 import ProfileSettingsScreen from "./screens/ProfileSettingsScreen";
+import Post from './components/Post';
+import CommentScreen from './screens/CommentScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -78,6 +80,8 @@ function MyStack() {
         component={ProfileSettingsScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen name="Post" component={Post} />
+      <Stack.Screen name="CommentScreen" component={CommentScreen} />
     </Stack.Navigator>
   );
 }
