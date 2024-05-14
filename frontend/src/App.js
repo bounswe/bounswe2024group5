@@ -13,7 +13,7 @@ function App() {
       <div className='h-screen flex justify-center items-center relative'>
         <BrowserRouter>
         <Routes>
-          <Route path="/" element={<SearchPage />} />
+          <Route path="/" element={<LoginPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegistrationPage />} />
           <Route path="feed" element={<FeedPage />} />
