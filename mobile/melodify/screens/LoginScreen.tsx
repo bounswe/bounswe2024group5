@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { useAuth } from "./AuthProvider"; // Ensure correct path
+import { useAuth } from "./AuthProvider";
 import CustomButton from "../components/CustomButton";
 import GradientBackground from "../components/GradientBackground";
 import { LinearGradient } from "expo-linear-gradient";
@@ -63,9 +63,10 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         }),
       });
 
-      const data = await response.json();
+
       if (response.status === 200) {
-        login(data.token); // Save token using AuthProvider
+        const data = await response.json();
+        login(data.token);
         navigation.navigate("Home");
       } else {
         setModalVisible(true);
