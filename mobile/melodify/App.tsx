@@ -10,6 +10,7 @@ import FeedPage from "./screens/FeedPage";
 import ProfilePage from "./screens/ProfilePage";
 import CreatePostScreen from "./screens/CreatePostScreen";
 import { AuthProvider } from "./screens/AuthProvider";
+import ProfileSettingsScreen from "./screens/ProfileSettingsScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -70,6 +71,11 @@ function MyStack() {
       <Stack.Screen
         name="CreatePostScreen"
         component={CreatePostScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ProfileSettingsScreen"
+        component={ProfileSettingsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

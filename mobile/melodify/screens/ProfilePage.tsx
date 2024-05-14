@@ -1,71 +1,74 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Image,
-  Button,
-  StyleSheet,
-  TouchableOpacity,
-  StyleProp,
-  ImageStyle,
-} from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { useAuth } from "./AuthProvider"; // Ensure this import path is correct
+import { Ionicons } from "@expo/vector-icons";
+import { RegisteredUser } from "../database/types";
 
 const ProfilePage = ({ navigation }) => {
+  const { user } = useAuth(); // Assume useAuth provides user details
+  const registeredUser: RegisteredUser = {
+    username: "melodymelinda",
+    password: "password",
+    profile: {
+      followingList: [],
+      followerList: [],
+      sharedPosts: [],
+      bio: "I love music!",
+      publicName: "Melody Melinda",
+      profilePicture: "profile_pic.png",
+      socialPlatforms: [],
+      private: false,
+    },
+    blockedUsers: [],
+    likedPosts: [],
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.platformName}>Melodify</Text>
       <View style={styles.separator}></View>
-
-      {/* Top Section */}
       <View style={styles.topSection}>
-        {/* Left Section for the profile picture, name, online status, and edit profile button.*/}
         <View style={styles.leftSection}>
           <Image
             source={require("../assets/profile_pic.png")}
-            style={styles.profileImage as StyleProp<ImageStyle>}
+            style={styles.profileImage}
           />
-          {/* Name and Username */}
-          <Text style={styles.name}>Melody Max</Text>
-          <Text style={styles.username}>@melodymelinda</Text>
+          <Text style={styles.name}>{user ? user.name : "Melody Max"}</Text>
+          <Text style={styles.username}>
+            {user ? user.username : "@melodymelinda"}
+          </Text>
           <Text style={styles.online}>online</Text>
-
-          {/* Edit Profile Button */}
-          {/* <x */}
+          <TouchableOpacity
+            style={styles.buttonContainer_edit}
+            onPress={() =>
+              navigation.navigate("ProfileSettingsScreen", {
+                user: registeredUser,
+              })
+            }
+          >
+            <Text style={styles.editprofileButtonText}>Edit Profile</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Right Section for followers info, current song, and create post button.*/}
         <View style={styles.rightSection}>
-          {/* Followers and Following */}
           <View style={styles.followContainer}>
             <Text style={styles.followerNumber}>10K</Text>
-            <Text style={styles.followerText}>folowers</Text>
+            <Text style={styles.followerText}>followers</Text>
             <Text style={styles.followingNumber}>50</Text>
             <Text style={styles.followingText}>following</Text>
           </View>
-
-          {/* Currently Listening */}
           <View style={styles.currentlyListeningContainer}>
             <Text style={styles.listening}>Listening now</Text>
             <Text style={styles.songname}>Song Name - Artist</Text>
           </View>
-
-          {/* New Post Button */}
-          <View style={styles.buttonContainer_share}>
-            <TouchableOpacity
-              style={styles.newpostButton}
-              onPress={() => navigation.navigate("CreatePostScreen")}
-            >
-              <Text style={styles.newpostButtonText}>+ Share a Post</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.buttonContainer_edit}
+            onPress={() => navigation.navigate("CreatePostScreen")}
+          >
+            <Text style={styles.editprofileButtonText}>+ Share a Post</Text>
+          </TouchableOpacity>
         </View>
       </View>
-
-      {/* Separator */}
       <View style={styles.separator}></View>
-      {/* Latest Activity */}
       <Text style={styles.activityTitle}>Last Activities</Text>
-      {/* Posts */}
       {/* Render user's posts here */}
     </View>
   );
@@ -76,25 +79,22 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
-    backgroundColor: "#111927", // Dark blue background color
+    backgroundColor: "#111927",
   },
   platformName: {
-    marginTop: 30,
     fontSize: 40,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#ffffff", // White text color
+    color: "#ffffff",
   },
   topSection: {
-    marginBottom: 20,
-    flexDirection: "row", // Arrange children horizontally
-    alignItems: "flex-start", // Align children vertically
+    flexDirection: "row",
+    alignItems: "flex-start",
   },
   leftSection: {
-    alignItems: "flex-start", // Align children vertically
-    marginBottom: 10,
-    flex: 1, // Take remaining space
-    flexDirection: "column", // Stack children vertically
+    flex: 1,
+    flexDirection: "column",
+    alignItems: "flex-start",
   },
   profileImage: {
     width: 100,
@@ -105,107 +105,86 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: "bold",
-    alignItems: "flex-start",
     marginBottom: 5,
-    color: "#ffffff", // White text color
+    color: "#ffffff",
   },
   username: {
     fontSize: 12,
     marginBottom: 5,
-    color: "#C1C1C2", // light gray text color
+    color: "#C1C1C2",
   },
   online: {
-    alignItems: "flex-start",
-    color: "#02BC02", // Green text color
+    color: "#02BC02",
     marginBottom: 15,
   },
   buttonContainer_edit: {
-    borderRadius: 20,
-    padding: 5,
-    alignSelf: "flex-start",
-    backgroundColor: "#ffffff", // Light blue background color
-  },
-  editprofileButton: {
-    alignSelf: "flex-start",
-    textAlign: "center",
-    backgroundColor: "ffffff",
+    backgroundColor: "#192f6a",
+    borderRadius: 10,
+    padding: 10,
+    alignItems: "center",
   },
   editprofileButtonText: {
-    fontSize: 12, // Adjust font size here
-    color: "#111927",
+    color: "white",
+    fontSize: 16,
     fontWeight: "bold",
   },
   rightSection: {
-    flexDirection: "column", // Stack children vertically
-    marginTop: 15,
-    marginBottom: 10,
+    flex: 1,
+    flexDirection: "column",
     alignItems: "flex-end",
-    justifyContent: "flex-end",
-    flex: 1, // Take remaining space
   },
   followContainer: {
     flexDirection: "row",
-    marginBottom: 50,
-    marginTop: 20,
-    justifyContent: "flex-end",
-    // flex: 1, // Take remaining space
+    marginBottom: 20,
   },
   followerNumber: {
-    color: "#ffffff", // White text color
     fontWeight: "bold",
+    color: "#ffffff",
   },
   followerText: {
-    color: "#ffffff", // White text color
     marginLeft: 5,
+    color: "#ffffff",
   },
   followingNumber: {
-    color: "#ffffff", // White text color
-    fontWeight: "bold",
     marginLeft: 20,
+    fontWeight: "bold",
+    color: "#ffffff",
   },
   followingText: {
-    color: "#ffffff", // White text color
     marginLeft: 5,
+    color: "#ffffff",
   },
   currentlyListeningContainer: {
-    marginBottom: 10,
-    marginRight: 20,
-    alignItems: "flex-end",
+    marginBottom: 20,
   },
   listening: {
-    color: "#C1C1C2", // light gray text color
+    color: "#C1C1C2",
   },
   songname: {
-    color: "#ffffff", // White text color
+    color: "#ffffff",
   },
   buttonContainer_share: {
-    flexDirection: "row",
-    marginTop: 25,
-    marginBottom: 5,
-    justifyContent: "center",
+    backgroundColor: "#192f6a",
     borderRadius: 15,
     padding: 10,
-    backgroundColor: "#ffffff", // Light blue background color
-  },
-  newpostButton: {
-    alignSelf: "center",
-    textAlign: "center",
+    alignItems: "center",
   },
   newpostButtonText: {
-    fontSize: 20, // Adjust font size here
-    fontWeight: "bold",
+    fontSize: 20,
     color: "#111927",
+    fontWeight: "bold",
   },
   separator: {
     borderBottomWidth: 1,
-    borderBottomColor: "#888888", // Light gray border color
+    borderBottomColor: "#888888",
+    marginTop: 10,
     marginBottom: 20,
   },
   activityTitle: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 10,
-    color: "#ffffff", // White text color
+    color: "#ffffff",
   },
 });
 
