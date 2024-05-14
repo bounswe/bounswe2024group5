@@ -10,6 +10,7 @@ import FeedPage from "./screens/FeedPage";
 import ProfilePage from "./screens/ProfilePage";
 import CreatePostScreen from "./screens/CreatePostScreen";
 import { AuthProvider } from "./screens/AuthProvider";
+import ProfileSettingsScreen from "./screens/ProfileSettingsScreen";
 import Post from './components/Post';
 import CommentScreen from './screens/CommentScreen';
 
@@ -72,6 +73,11 @@ function MyStack() {
       <Stack.Screen
         name="CreatePostScreen"
         component={CreatePostScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ProfileSettingsScreen"
+        component={ProfileSettingsScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Post" component={Post} />
