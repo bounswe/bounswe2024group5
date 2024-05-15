@@ -6,7 +6,11 @@ import com.melodify.melodify.model.Tag;
 import com.melodify.melodify.model.request.PostCreateRequest;
 import com.melodify.melodify.model.request.PostUpdateRequest;
 import com.melodify.melodify.model.response.PostResponse;
+import com.melodify.melodify.model.PostSearch;
 import com.melodify.melodify.repository.PostRepository;
+import com.melodify.melodify.repository.PostSearchRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,15 +22,17 @@ import java.util.stream.Collectors;
 @Service
 public class PostService {
 
-    private final PostRepository postRepository;
-    private final UserService userService;
-    private final TagService tagService;
+    @Autowired
+    private PostRepository postRepository;
 
-    public PostService(PostRepository postRepository, UserService userService, TagService tagService) {
-        this.postRepository = postRepository;
-        this.userService = userService;
-        this.tagService = tagService;
-    }
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private TagService tagService;
+
+    @Autowired
+    private PostSearchRepository postSearchRepository;
 
     private List<PostResponse> mapper(List<Post> posts) {
         return posts.stream().map(post -> {
@@ -61,7 +67,9 @@ public class PostService {
         if (newPostRequest.getText() == null)
             throw new IllegalArgumentException("text is required");
         Post post = new Post(newPostRequest.getText(), author, newPostRequest.getMedia_url());
-        long id = postRepository.save(post).getId();
+        int id = postRepository.save(post).getId().intValue();
+        PostSearch postSearch = new PostSearch(id, newPostRequest.getText(), authorUsername);
+        postSearchRepository.save(postSearch);
         try {
             for (String tag : newPostRequest.getTags()) {
                 tagService.createOneTag(tag, post);
@@ -99,16 +107,21 @@ public class PostService {
         if (media_url != null)
             post.setMedia_url(media_url);
         postRepository.save(post);
+        PostSearch postSearch = new PostSearch(postId.intValue(), text, authorUsername);
+        postSearchRepository.save(postSearch);
         return convertToResponse(post);
     }
 
     public void deleteOnePostById(String authorUsername, Long postId)  {
         Post post = postRepository.findById(postId).orElse(null);
+        PostSearch postSearch = postSearchRepository.findById(postId.intValue()).orElse(null);
         if (post == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         if (!post.getAuthor().getUsername().equals(authorUsername))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         postRepository.delete(post);
+        if(postSearch != null)
+            postSearchRepository.delete(postSearch);
     }
 
 }
