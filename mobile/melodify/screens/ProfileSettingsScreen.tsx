@@ -64,26 +64,35 @@ const ProfileSettingsScreen = ({ route, navigation }) => {
       </TouchableOpacity>
       <CustomButton title="Upload New Photo" onPress={pickImage} />
 
-      <TextInput
-        style={styles.input}
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Enter your new username"
-      />
-      <TextInput
-        style={styles.input}
-        value={publicName}
-        onChangeText={setPublicName}
-        placeholder="Enter your public name"
-      />
-      <TextInput
-        style={styles.input}
-        value={bio}
-        onChangeText={setBio}
-        placeholder="Enter your new bio"
-      />
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>username:</Text>
+        <TextInput
+          style={styles.textInput}
+          value={username}
+          onChangeText={setUsername}
+          placeholder="Enter your new username"
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>public name:</Text>
+        <TextInput
+          style={styles.textInput}
+          value={publicName}
+          onChangeText={setPublicName}
+          placeholder="Enter your public name"
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>bio:</Text>
+        <TextInput
+          style={styles.textInput}
+          value={bio}
+          onChangeText={setBio}
+          placeholder="Enter your new bio"
+        />
+      </View>
       <View style={styles.checkboxContainer}>
-        <Text style={styles.label}>Private Account:</Text>
+        <Text style={styles.checkboxText}>Private Account:</Text>
         <TouchableOpacity
           style={styles.checkbox}
           onPress={() => setIsPrivate(!isPrivate)}
@@ -95,11 +104,7 @@ const ProfileSettingsScreen = ({ route, navigation }) => {
           />
         </TouchableOpacity>
       </View>
-      <CustomButton
-        title="Save Changes"
-        onPress={saveChanges}
-        disabled={saving}
-      />
+      <CustomButton title="Save Changes" onPress={saveChanges} />
       {saving && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#00ff00" />
@@ -141,19 +146,25 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 16,
   },
-  input: {
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "white",
-    color: "black",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
     borderRadius: 10,
-    fontSize: 16,
+    paddingHorizontal: 10,
     marginBottom: 10,
   },
   label: {
-    color: "white",
+    color: "black",
     fontSize: 16,
-    marginBottom: 5,
+    fontWeight: "bold",
+    marginRight: 5,
+  },
+  textInput: {
+    flex: 1,
+    color: "black",
+    fontSize: 16,
+    paddingVertical: 8,
   },
   checkboxContainer: {
     flexDirection: "row",
@@ -165,10 +176,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#111927",
     padding: 10,
   },
-  checkboxText: {
-    color: "white",
-    fontWeight: "bold",
-  },
   loadingContainer: {
     position: "absolute",
     left: 0,
@@ -177,6 +184,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: "center",
     justifyContent: "center",
+  },
+  checkboxText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

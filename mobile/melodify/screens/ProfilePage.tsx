@@ -17,11 +17,12 @@ const ProfilePage = ({ navigation }) => {
       publicName: "Melody Melinda",
       profilePicture: "profile_pic.png",
       socialPlatforms: [],
-      private: false,
+      private: true,
     },
     blockedUsers: [],
     likedPosts: [],
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.platformName}>Melodify</Text>
@@ -37,16 +38,6 @@ const ProfilePage = ({ navigation }) => {
             {user ? user.username : "@melodymelinda"}
           </Text>
           <Text style={styles.online}>online</Text>
-          <TouchableOpacity
-            style={styles.buttonContainer_edit}
-            onPress={() =>
-              navigation.navigate("ProfileSettingsScreen", {
-                user: registeredUser,
-              })
-            }
-          >
-            <Text style={styles.editprofileButtonText}>Edit Profile</Text>
-          </TouchableOpacity>
         </View>
         <View style={styles.rightSection}>
           <View style={styles.followContainer}>
@@ -61,14 +52,26 @@ const ProfilePage = ({ navigation }) => {
           </View>
           <TouchableOpacity
             style={styles.buttonContainer_edit}
-            onPress={() => navigation.navigate("CreatePostScreen")}
+            onPress={() =>
+              navigation.navigate("ProfileSettingsScreen", {
+                user: registeredUser,
+              })
+            }
           >
-            <Text style={styles.editprofileButtonText}>+ Share a Post</Text>
+            <Text style={styles.editprofileButtonText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
       </View>
       <View style={styles.separator}></View>
-      <Text style={styles.activityTitle}>Last Activities</Text>
+      <View style={styles.bottomSection}>
+        <Text style={styles.activityTitle}>Last Activities</Text>
+        <TouchableOpacity
+          style={styles.buttonContainer_share}
+          onPress={() => navigation.navigate("CreatePostScreen")}
+        >
+          <Text style={styles.sharePostButtonText}>+ Share a Post</Text>
+        </TouchableOpacity>
+      </View>
       {/* Render user's posts here */}
     </View>
   );
@@ -84,7 +87,8 @@ const styles = StyleSheet.create({
   platformName: {
     fontSize: 40,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginTop: 20,
+    marginBottom: 10,
     color: "#ffffff",
   },
   topSection: {
@@ -122,6 +126,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     alignItems: "center",
+    marginTop: 10,
   },
   editprofileButtonText: {
     color: "white",
@@ -165,13 +170,15 @@ const styles = StyleSheet.create({
   },
   buttonContainer_share: {
     backgroundColor: "#192f6a",
-    borderRadius: 15,
+    borderRadius: 10,
     padding: 10,
     alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
   },
-  newpostButtonText: {
-    fontSize: 20,
-    color: "#111927",
+  sharePostButtonText: {
+    color: "white",
+    fontSize: 16,
     fontWeight: "bold",
   },
   separator: {
@@ -183,8 +190,12 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 10,
     color: "#ffffff",
+  },
+  bottomSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });
 
