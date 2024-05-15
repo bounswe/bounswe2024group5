@@ -6,22 +6,13 @@ import {
   Text,
   Modal,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import { useAuth } from "./AuthProvider";
 import CustomButton from "../components/CustomButton";
 import GradientBackground from "../components/GradientBackground";
 import { LinearGradient } from "expo-linear-gradient";
 
-const CustomModal = ({
-  visible,
-  message,
-  onClose,
-}: {
-  visible: boolean;
-  message: string;
-  onClose: () => void;
-}) => {
+const CustomModal = ({ visible, message, onClose }) => {
   return (
     <Modal
       animationType="slide"
@@ -44,35 +35,44 @@ const CustomModal = ({
   );
 };
 
-const LoginScreen = ({ navigation }: { navigation: any }) => {
+const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
   const { login } = useAuth();
 
   const handleSignIn = async () => {
+    if (password === "" || username === "") {
+      setErrorMessage("Username and password cannot be empty.");
+      setModalVisible(true);
+      return;
+    }
+    const requestBody = {
+      username: username,
+      password: password,
+    };
     try {
       const response = await fetch("http://34.118.44.165:80/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Content-Length": JSON.stringify(requestBody).length.toString(),
+          Host: "34.118.44.165:80",
         },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
+        body: JSON.stringify(requestBody),
       });
-
-
-      if (response.status === 200) {
-        const data = await response.json();
+      const data = await response.json();
+      if (response.ok) {
         login(data.token);
         navigation.navigate("Home");
       } else {
+        setErrorMessage(data.message || "Invalid username/password");
         setModalVisible(true);
       }
     } catch (error) {
       console.error("Network or other error:", error);
+      setErrorMessage("Network error. Please try again.");
       setModalVisible(true);
     }
   };
@@ -107,7 +107,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
       </View>
       <CustomModal
         visible={modalVisible}
-        message="Invalid username/password"
+        message={errorMessage}
         onClose={() => setModalVisible(false)}
       />
     </GradientBackground>

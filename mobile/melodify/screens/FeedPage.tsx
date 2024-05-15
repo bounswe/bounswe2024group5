@@ -12,6 +12,24 @@ import {
 } from "react-native";
 import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
+import Post from "../components/Post";
+import pp2Image from "../assets/profile_pic.png";
+import contentImage from "../assets/content.jpg";
+
+const mockPost = {
+  id: "1",
+  // pp: require("../assets/profile_pic.png"),
+  author: "The Lumineers",
+  created_at: "2 hours ago",
+  text: "Hey everyone! We're excited to announce our new album coming out next month. Stay tuned for more updates!",
+  imageURL: require("../assets/content.jpg"),
+  tags: [
+    "#concert",
+    "#guitar"
+  ],
+  likes: 77,
+};
+
 
 const ResultItem = ({ item }) => {
   return (
@@ -34,6 +52,7 @@ const FeedPage = ({ navigation }) => {
   const [inputValue, setInputValue] = useState("");
   const [results, setResults] = useState([]);
   const [searchMade, setsearchMade] = useState(false);
+  const [posts, setPosts] = useState([mockPost, mockPost, mockPost]);
 
   const fetchImageData = async (entityId) => {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&format=json&props=claims`;
@@ -74,15 +93,17 @@ const FeedPage = ({ navigation }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Response:", response);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       const data = await response.json();
       console.log("Received data:", data);
       console.log(data.search[0].display);
 
-      if (!response.ok) throw new Error(data.message || "Failed to fetch data");
-
-      if (!Array.isArray(data.search))
+      if (!Array.isArray(data.search)) {
         throw new TypeError("Received data under 'search' is not an array");
+      }
 
       setResults(
         await Promise.all(
@@ -101,6 +122,10 @@ const FeedPage = ({ navigation }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const addPost = (newPost) => {
+    setPosts([newPost, ...posts]);
   };
 
   return (
@@ -147,6 +172,13 @@ const FeedPage = ({ navigation }) => {
           />
         </View>
       )}
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={posts}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <Post postData={item} />}
+        />
+      </View>
       <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate("CreatePostScreen")}

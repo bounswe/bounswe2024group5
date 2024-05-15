@@ -25,9 +25,14 @@ CREATE TABLE IF NOT EXISTS posts (
     author VARCHAR(255) NOT NULL references users (username) ON DELETE CASCADE,
     text VARCHAR(1024),
     media_url varchar(1023),
-    tag varchar(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     edited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tags (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tag varchar(255),
+    post_id INT references posts (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS comments (
