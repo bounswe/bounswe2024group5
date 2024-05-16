@@ -34,3 +34,4 @@ build/
 
 ### Ignore credentials.json ###
 credentials.json
+credentials-template.json
