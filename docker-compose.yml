@@ -6,7 +6,7 @@ services:
     networks:
       - app-network
     volumes:
-      - ./credentials-template.json:/app/credentials-template.json
+      - ./backend/credentials-template.json:/app/credentials-template.json
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials-template.json
 
