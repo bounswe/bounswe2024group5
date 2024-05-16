@@ -39,6 +39,7 @@ const ResultItem = ({ item, type }) => (
 const SearchResultPage = ({ route, navigation }) => {
   const { token } = useAuth();
   const { searchResults } = route.params;
+  const { registeredUser } = route.params;
   const [selectedTab, setSelectedTab] = useState("Semantic Search");
   const [wikiResults, setWikiResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

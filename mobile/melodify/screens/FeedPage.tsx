@@ -25,7 +25,8 @@ const mockPost = {
   likes: 77,
 };
 
-const FeedPage = ({ navigation }) => {
+const FeedPage = ({ route, navigation }) => {
+  const { registeredUser } = route.params;
   const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -54,7 +55,7 @@ const FeedPage = ({ navigation }) => {
       const data = await response.json();
       console.log("Received data:", data);
 
-      navigation.navigate("SearchResultPage", { searchResults: data });
+      navigation.navigate("SearchResultPage", { registeredUser: registeredUser, searchResults: data});
     } catch (error) {
       console.error("Error fetching search results:", error.message);
     } finally {
@@ -109,7 +110,7 @@ const FeedPage = ({ navigation }) => {
       />
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => navigation.navigate("CreatePostScreen")}
+        onPress={() => navigation.navigate("CreatePostScreen", {registeredUser: registeredUser})}
       >
         <Ionicons name="add" size={24} color="#111927" />
       </TouchableOpacity>

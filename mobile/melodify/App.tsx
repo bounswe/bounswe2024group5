@@ -13,10 +13,12 @@ import ProfileSettingsScreen from "./screens/ProfileSettingsScreen";
 import SeePostScreen from "./screens/SeePostScreen";
 import SearchResultPage from "./screens/SearchResultPage";
 import { AuthProvider } from "./screens/AuthProvider";
+import CommentScreen from "./screens/CommentScreen";
 
 const Tab = createBottomTabNavigator();
 
-function HomeTabs() {
+function HomeTabs({ route }) {
+  const { registeredUser } = route.params;
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -39,11 +41,13 @@ function HomeTabs() {
       <Tab.Screen
         name="Feed"
         component={FeedPage}
+        initialParams={{ registeredUser }}
         options={{ headerShown: false }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfilePage}
+        initialParams={{ registeredUser }}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
@@ -88,6 +92,11 @@ function MyStack() {
       <Stack.Screen
         name="SearchResultPage"
         component={SearchResultPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CommentScreen"
+        component={CommentScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import CustomModal from "../components/CustomModal";
+import { useAuth } from "./AuthProvider";
 
 type CommentScreenRouteProp = RouteProp<
   { CommentScreen: { postId: string } },
@@ -27,6 +28,7 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
   const { postId } = route.params;
   // Use the postId value in your component
   console.log("postId:", postId);
+  const { login, token } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -42,16 +44,16 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
       comment: newComment.trim(),
     };
     try {
-      const response = await fetch(
-        `http://34.118.44.165:80/api/posts/${postId}/comment`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ requestBody }),
-        }
-      );
+      const response = await fetch(`http://34.118.44.165:80/api/posts/${postId}/comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ requestBody }),
+      });
+      console.log('token:', token)
+      console.log('response:', response)
       if (response.ok) {
         setComments([...comments, requestBody]);
         setNewComment("");
@@ -68,33 +70,39 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Comments</Text>
-      <FlatList
-        data={comments}
-        // keyExtractor={(item) => item.commentId}
-        renderItem={({ item }) => (
-          <View style={styles.commentContainer}>
-            <Text style={styles.usernameText}>{"User"}</Text>
-            <Text style={styles.commentText}>{item.comment}</Text>
-          </View>
-        )}
-      />
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Add a comment"
-          value={newComment}
-          onChangeText={(text) => setNewComment(text)}
-        />
-        <TouchableOpacity style={styles.addButton} onPress={handleAddComment}>
-          <Text style={styles.buttonText}>Add</Text>
-        </TouchableOpacity>
+        <FlatList
+    data={comments}
+    keyExtractor={(item) => item.commentId.toString()}
+    renderItem={({ item }) => (
+      <View style={styles.commentContainer}>
+        <Text style={styles.usernameText}>User</Text>
+        <Text style={styles.commentText}>{item.comment}</Text>
       </View>
-      <CustomModal
-        visible={modalVisible}
-        message={errorMessage}
-        onClose={() => setModalVisible(false)}
-      />
+    )}
+    ListHeaderComponent={
+      <Text style={styles.title}>Comments</Text>
+    }
+    ListFooterComponent={(
+      <>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Add a comment"
+            value={newComment}
+            onChangeText={(text) => setNewComment(text)}
+          />
+          <TouchableOpacity style={styles.addButton} onPress={handleAddComment}>
+            <Text style={styles.buttonText}>Add</Text>
+          </TouchableOpacity>
+        </View>
+        <CustomModal
+          visible={modalVisible}
+          message={errorMessage}
+          onClose={() => setModalVisible(false)}
+        />
+      </>
+    )}
+  />
     </View>
   );
 };
