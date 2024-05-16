@@ -11,7 +11,7 @@ import ProfilePage from "./screens/ProfilePage";
 import CreatePostScreen from "./screens/CreatePostScreen";
 import ProfileSettingsScreen from "./screens/ProfileSettingsScreen";
 import SeePostScreen from "./screens/SeePostScreen";
-import SearchResultPage from "./screens/SearchResultPage"; // Import SearchResultPage
+import SearchResultPage from "./screens/SearchResultPage";
 import { AuthProvider } from "./screens/AuthProvider";
 
 const Tab = createBottomTabNavigator();
@@ -86,7 +86,7 @@ function MyStack() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="SearchResultPage" // Register SearchResultPage here
+        name="SearchResultPage"
         component={SearchResultPage}
         options={{ headerShown: false }}
       />
