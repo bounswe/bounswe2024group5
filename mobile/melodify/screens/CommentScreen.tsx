@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { RouteProp } from "@react-navigation/native";
+import CustomModal from "../components/CustomModal";
 
 type CommentScreenRouteProp = RouteProp<{ CommentScreen: { postId: string } }, 'CommentScreen'>;
 
@@ -9,12 +10,8 @@ interface CommentScreenProps {
 }
 
 interface Comment {
-  commentId: string;
-  username: string;
-  content: string;
-  postId: string; 
+  comment: string;
 }
-
 
 const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
   const { postId } = route.params;
@@ -22,18 +19,38 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
   console.log("postId:", postId);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
-
-  const handleAddComment = () => {
-    if (newComment.trim() !== "") {
-      const comment: Comment = {
-        commentId: String(comments.length + 1),
-        content: newComment.trim(),
-        username: "User",     // get the related username from the database
-        postId: "1",
-      };
-      setComments([...comments, comment]);
-      setNewComment("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
+  
+  const handleAddComment = async () => {
+    if (newComment.trim() == "") {
+      setErrorMessage("Comment cannot be empty");
+      setModalVisible(true);
+      return;
     }
+    const requestBody = {
+      comment: newComment.trim(),
+    };
+    try {
+      const response = await fetch(`http://34.118.44.165:80/api/posts/${postId}/comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ requestBody }),
+      });
+      if (response.ok) {
+        setComments([...comments, requestBody]);
+        setNewComment("");
+      } else {
+        setErrorMessage("Failed to add comment");
+        setModalVisible(true);
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      setErrorMessage("Failed to add comment");
+      setModalVisible(true);
+      }
   };
 
   return (
@@ -41,11 +58,11 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
       <Text style={styles.title}>Comments</Text>
       <FlatList
         data={comments}
-        keyExtractor={(item) => item.commentId}
+        // keyExtractor={(item) => item.commentId}
         renderItem={({ item }) => (
           <View style={styles.commentContainer}>
-            <Text style={styles.usernameText}>{item.username}</Text>
-            <Text style={styles.commentText}>{item.content}</Text>
+            <Text style={styles.usernameText}>{"User"}</Text>
+            <Text style={styles.commentText}>{item.comment}</Text>
           </View>
         )}
       />
@@ -60,6 +77,11 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
           <Text style={styles.buttonText}>Add</Text>
         </TouchableOpacity>
       </View>
+      <CustomModal
+        visible={modalVisible}
+        message={errorMessage}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 };

@@ -5,10 +5,13 @@ services:
       - "8080"
     networks:
       - app-network
+    volumes:
+      - ./backend/credentials-template.json:/app/credentials-template.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials-template.json
     depends_on:
       database:
         condition: service_healthy
-
 
   frontend:
     build: ./frontend
@@ -38,6 +41,7 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 5s
       retries: 10
+
 
   nginx:
     image: nginx:latest

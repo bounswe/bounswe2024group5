@@ -19,6 +19,7 @@ const CreatePostScreen = ({ navigation }) => {
   const [postContent, setPostContent] = useState("");
   const [customTags, setCustomTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [tagInput, setTagInput] = useState("");
   const [media, setMedia] = useState<string | null>(null);
@@ -53,6 +54,36 @@ const CreatePostScreen = ({ navigation }) => {
       setLoading(false);
       setModalVisible(true);
     }, 1500);
+
+    const requestBody = {
+      text: postContent.trim(),
+      media_url: media, // Assuming you have the media URL stored in the 'media' state
+      tags: customTags,
+    };
+  
+    try {
+      const response = await fetch('http://34.118.44.165:80/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          "Content-Length": JSON.stringify(requestBody).length.toString(),
+        },
+        body: JSON.stringify(requestBody),
+      });
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Post created successfully. Post ID:', responseData.postId);
+        setModalVisible(true);
+      } else {
+        console.error('Failed to create post:', response.status);
+      }
+    } catch (error) {
+      console.error('Error creating post:', error);
+      setErrorMessage('Failed to create post. Please try again.');
+      setModalVisible(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const addCustomTag = () => {
@@ -133,7 +164,7 @@ const CreatePostScreen = ({ navigation }) => {
       </TouchableOpacity>
       <CustomModal
         visible={modalVisible}
-        message="Cannot post something now."
+        message={errorMessage}
         onClose={() => {
           setModalVisible(false);
           navigation.goBack();
