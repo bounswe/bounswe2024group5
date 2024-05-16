@@ -5,10 +5,10 @@ services:
       - "8080"
     networks:
       - app-network
-    depends_on:
-      database:
-        condition: service_healthy
-
+    volumes:
+      - ./credentials.json:/app/credentials.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
 
   frontend:
     build: ./frontend
@@ -18,26 +18,6 @@ services:
       - app-network
     depends_on:
       - backend
-
-  database:
-    image: mysql:latest
-    command: --default-authentication-plugin=caching_sha2_password --bind-address=0.0.0.0
-    environment:
-      MYSQL_ROOT_PASSWORD: admin123
-      MYSQL_DATABASE: melodify
-      MYSQL_USER: melodify
-      MYSQL_PASSWORD: melodify
-    ports:
-      - "3306"
-    volumes:
-      - db-data:/var/lib/mysql
-      - ./database/migrations:/docker-entrypoint-initdb.d
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-      timeout: 5s
-      retries: 10
 
   nginx:
     image: nginx:latest
@@ -58,3 +38,4 @@ networks:
 
 volumes:
   db-data:
+
