@@ -5,9 +5,9 @@ import { TbLogout2 } from "react-icons/tb";
 
 function Navbar() {
     return (<>
-        <nav className="w-[200px] h-screen absolute left-[180px] top-0 text-white flex flex-col">
+        <nav className="w-[200px] h-full text-white flex flex-col">
             <Link to="/feed">
-                <div className="flex items-center py-3 text-slate-300 hover:text-slate-50 transition-all duration-300">
+                <div className="flex items-center pb-6 text-slate-300 hover:text-slate-50 transition-all duration-300">
                     <div className="flex items-center justify-center w-12">
                         <IoMdHome size={18}></IoMdHome>
                     </div>
@@ -23,11 +23,13 @@ function Navbar() {
                 </div>
             </Link>
             <Link className="mt-auto" to="/feed">
-                <div className="flex items-center py-3 text-slate-300 hover:text-white transition-all duration-300">
-                    <div className="flex items-center justify-center w-12 -translate-x-0.5">
-                        <TbLogout2 size={16}></TbLogout2>
+                <div className="flex items-center py-3 text-slate-300 hover:text-white font-semibold transition-all duration-300 ">
+                    <div className="bg-[#9c2b2b] flex pl-4 pr-6 py-2 gap-2 rounded-md">
+                        <div className="flex items-center justify-center w-6 -translate-x-0.5">
+                            <TbLogout2 size={16} fontWeight={700}></TbLogout2>
+                        </div>
+                        <div className="flex items-center justify-start">Logout</div>
                     </div>
-                    <div className="flex items-center justify-start">Logout</div>
                 </div>
             </Link>
         </nav>

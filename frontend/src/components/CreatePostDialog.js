@@ -5,6 +5,9 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
 
     const [textBody, setTextBody] = useState("");
     const [selectedImage, setSelectedImage] = useState(null);
+    const [reqestError, setRequestError] = useState(false);
+    const [tags, setTags] = useState([]);
+    const [tagInput, setTagInput] = useState("")
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
@@ -15,6 +18,15 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
 
     const handleTextBodyChange = (event) => {
         setTextBody(event.target.value);
+    }
+
+    const handleAddTag = () => {
+        if (!tagInput) {
+            return;
+        }
+        console.log("Adding tag: ", tagInput);
+        setTags([...tags, tagInput]);
+        setTagInput("");
     }
 
     const handlePost = () => {
@@ -33,25 +45,32 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
 
         const requestBody = {
             text: textBody,
-            tags: [],
+            tags: tags,
         }
 
-        console.log("Posting with, ", sessionStorage.getItem("token"));
-        fetch("http://localhost:80/api/posts/", {
+        const token = sessionStorage.getItem("token");
+
+        console.log("Posting with, ", token);
+        fetch("http://localhost:80/api/posts", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Content-Length": JSON.stringify(requestBody).length.toString(),
                 "Host": "localhost:80",
-                "Authorization": "Bearer " + sessionStorage.getItem("token"),
+                "Authorization": `Bearer ${token}`,
             },
             body: JSON.stringify(requestBody)
         }).then((response) => {
             return response.json();
         }).then((response) => {
             console.log(response);
+            setTextBody("");
+            setSelectedImage(null);
+            setRequestError(false);
+            setIsOpen(false);
         }).catch((error) => {
             console.log(error);
+            setRequestError(true);
         });
     }
 
@@ -60,8 +79,16 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
         backdrop-blur-[2px] flex items-center justify-center z-10 transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div onClick={(e) => {e.stopPropagation()}} className="w-[400px] p-4 pb-6 bg-[#0D2847] text-white border-2 border-[#777] border-solid rounded-xl">
                 <p className="text-center pb-4 text-2xl font-medium">Create New Post</p>
+                {reqestError && <p className="text-center text-red-500 pb-6">Could not post.</p>}
                 <textarea value={textBody} onChange={handleTextBodyChange} className="w-full h-[140px] bg-[#0D1520] px-3 py-2 resize-none outline-none rounded-lg no-scrollbar" placeholder="What's on your mind?"></textarea>
                 { selectedImage && <img src={URL.createObjectURL(selectedImage)} alt="Selected" className="w-full h-[200px] object-cover mt-4 rounded-lg"/> }
+                <div className="flex flex-wrap gap-2">
+                        {tags && tags.map((tag, index) => <div key={index} className="text-white bg-[#0D1520] w-fit px-4 py-2 rounded-md">#{tag}</div>)}
+                </div>
+                <div className="pt-2">
+                    <input value={tagInput} onChange={(e) => {setTagInput(e.target.value)}} className="bg-[#0D1520] outline-none py-2 px-4 rounded-l-lg" placeholder="Tag a topic."></input>
+                    <button onClick={handleAddTag} className="bg-[#2870BD] py-2 px-4 rounded-r-lg">Add Tag</button>
+                </div>
                 <div className="pt-4 flex justify-between">
                     <label htmlFor="imageInput" className="bg-[#2870BD] hover:bg-[#0090FF] transition-colors duration-300 pl-4 pr-4 py-2 rounded-md cursor-pointer">
                         <FaPlus className="inline-block mr-2"/>
