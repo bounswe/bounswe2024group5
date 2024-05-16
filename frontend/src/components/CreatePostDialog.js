@@ -51,6 +51,23 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
         const token = sessionStorage.getItem("token");
 
         console.log("Posting with, ", token);
+        fetch("http://localhost:80/api/file/upload", {
+            method: "POST",
+            headers: {
+                "Host": "localhost:80",
+                "Content-Type": "multipart/form-data",
+            },
+            body: {
+                file: selectedImage,
+            }
+        }).then((response) => {
+            return response.json();
+        }).then((response) => {
+            console.log(response);
+        }).catch((error) => {
+            console.error(error);
+        });
+        /*
         fetch("http://localhost:80/api/posts", {
             method: "POST",
             headers: {
@@ -71,7 +88,7 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
         }).catch((error) => {
             console.log(error);
             setRequestError(true);
-        });
+        });*/
     }
 
     return (<>
