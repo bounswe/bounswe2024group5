@@ -1,9 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../database/NavigationTypes";
 
 const Post = ({ postData, onPress }) => {
   const { author, created_at, text, imageUrl, tags, likes } = postData;
+  const [liked, setLiked] = useState(false);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [likeCount, setLikeCount] = useState(postData.likes);
 
+  const toggleLike = () => {
+    setLiked(!liked);
+    setLikeCount((prevCount) =>
+      liked ? Math.max(0, prevCount - 1) : prevCount + 1
+    );
+  };
+
+  const handleCommentPress = () => {
+    navigation.navigate("CommentScreen", { postId: postData.id });
+  };
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.postContainer}>
@@ -18,7 +34,25 @@ const Post = ({ postData, onPress }) => {
             </Text>
           ))}
         </View>
-        <Text style={styles.likes}>{likes} likes</Text>
+        <View style={styles.iconRow}>
+          <TouchableOpacity onPress={toggleLike}>
+            {liked ? (
+              <FontAwesome name="heart" size={18} color="#ff0000" />
+            ) : (
+              <FontAwesome name="heart-o" size={18} color="#777" />
+            )}
+          </TouchableOpacity>
+          {/* <Text style={styles.likes}>{likes}</Text> */}
+          <TouchableOpacity onPress={handleCommentPress}>
+            <FontAwesome
+              name="comment-o"
+              size={18}
+              color="#777"
+              style={styles.comment}
+            />
+          </TouchableOpacity>
+        {/* <Text style={styles.likes}>{likes} likes</Text> */}
+      </View>
       </View>
     </TouchableOpacity>
   );
@@ -65,9 +99,18 @@ const styles = StyleSheet.create({
     marginRight: 5,
     marginBottom: 5,
   },
+  iconRow: {
+    marginTop: 10,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    width: "100%",
+  },
   likes: {
     fontSize: 16,
     color: "white",
+  },
+  comment: {
+    marginLeft: 80,
   },
 });
 
