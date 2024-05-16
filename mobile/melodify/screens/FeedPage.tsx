@@ -64,7 +64,7 @@ const FeedPage = ({ route, navigation }) => {
   };
 
   const handlePostPress = (post) => {
-    navigation.navigate("SeePostScreen", { post });
+    navigation.navigate("SeePostScreen", { post, username: registeredUser.username});
   };
 
   return (

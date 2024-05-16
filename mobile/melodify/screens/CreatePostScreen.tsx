@@ -26,6 +26,7 @@ const CreatePostScreen = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [tagInput, setTagInput] = useState("");
   const [media, setMedia] = useState<string | null>(null);
+  const { login, token } = useAuth();
 
   const pickMedia = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -70,12 +71,14 @@ const CreatePostScreen = ({ route, navigation }) => {
         headers: {
           'Content-Type': 'application/json',
           "Content-Length": JSON.stringify(requestBody).length.toString(),
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(requestBody),
       });
+      console.log('token:', token)
       if (response.ok) {
         const responseData = await response.json();
-        console.log('Post created successfully. Post ID:', responseData.postId);
+        console.log('Post created successfully. Post ID:', responseData.post_id);
         setModalVisible(true);
       } else {
         console.error('Failed to create post:', response.status);

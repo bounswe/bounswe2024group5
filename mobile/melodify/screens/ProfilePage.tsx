@@ -23,6 +23,7 @@ const ProfilePage = ({ route, navigation }) => {
   //   blockedUsers: [],
   //   likedPosts: [],
   // };
+  
   console.log('REGISTERED:\n', registeredUser);
 
   return (
@@ -69,7 +70,7 @@ const ProfilePage = ({ route, navigation }) => {
         <Text style={styles.activityTitle}>Last Activities</Text>
         <TouchableOpacity
           style={styles.buttonContainer_share}
-          onPress={() => navigation.navigate("CreatePostScreen")}
+          onPress={() => navigation.navigate("CreatePostScreen", { user: registeredUser })}
         >
           <Text style={styles.sharePostButtonText}>+ Share a Post</Text>
         </TouchableOpacity>
