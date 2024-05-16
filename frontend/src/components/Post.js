@@ -13,7 +13,7 @@ function Post({postData}) {
 
     const dateFormat = (date) => {
         const diff = new Date() - new Date(date);
-        const seconds = diff / 1000;
+        const seconds = (diff / 1000) - 10800;
         if (seconds < 60) {
             return `${Math.floor(seconds)}s ago`;
         }
@@ -69,7 +69,7 @@ function Post({postData}) {
                 <img src={"pp2.jpeg"} alt="Profile" className="w-12 h-12 rounded-full object-cover"/>
                 <div className="ps-4 grow">
                     <div className="flex items-center justify-between pb-2">
-                        <p className="font-bold horizontal-break-after grow">
+                        <p className="font-medium horizontal-break-after grow">
                             {postData.username} <span className="font-normal text-[#aaa]">- {dateFormat(postData.createdAt)}</span>
                         </p>
                         <div onClick={() => {setDialogOpen(!dialogOpen)}} className="flex w-8 h-8 transition-colors duration-300 hover:bg-[#0D1520] items-center justify-center rounded-full hover:cursor-pointer">

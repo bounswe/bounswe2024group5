@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Post from "../components/Post";
 import CreatePostDialog from "../components/CreatePostDialog";
-import ResultPreview from "../components/SearchResultPreview";
 import { FaPlus } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 
@@ -15,20 +13,9 @@ const mockPost = {
 }
 
 function FeedPage() {
-    const navigate = useNavigate();
-    const [searchQuery, setSearchQuery] = useState("");
     const [createPostDialogOpen, setCreatePostDialogOpen] = useState(false);
     const [posts, setPosts] = useState([]);
     const [searchInput, setSearchInput] = useState("");
-
-    const mockResults = [
-        { id: 1, name: "Adam Acker", imageURL: "ProfilePicture1.png" },
-        { id: 2, name: "Jessie Jordan", imageURL: "ProfilePicture2.png" },
-        { id: 3, name: "Kareem Kahil", imageURL: "ProfilePicture3.png" },
-        { id: 4, name: "Glenn Garrison", imageURL: "ProfilePicture4.png" },
-        { id: 5, name: "Melina Maxwell", imageURL: "ProfilePicture5.png" }
-    ];
-    const [searchResults, setSearchResults] = useState([]);
 
     useEffect(() => {
         const token = sessionStorage.getItem("token");
@@ -49,28 +36,6 @@ function FeedPage() {
             console.error(error);
         });
     }, []);
-
-    const handleSearchChange = (event) => {
-        setSearchQuery(event.target.value);
-        if (event.target.value) {
-            setSearchResults(mockResults);
-        } else {
-            setSearchResults([]);
-        }
-    };
-
-
-    const handleSearchKeyPress = (event) => {
-        if (event.key === 'Enter') {
-            navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
-            console.log("Search for:", searchQuery);
-        }
-    };
-
-
-    const handleLogout = () => {
-        navigate("/login");
-    };
 
     const addPost = (newPost) => {
         setPosts([newPost, ...posts]);
@@ -100,7 +65,7 @@ function FeedPage() {
             <div className="w-screen h-screen overflow-hidden bg-[#0D1520] flex items-center justify-center">
                 <div className="flex w-[90%] h-full p-6 justify-center">
                     <Navbar></Navbar>
-                    <div className="w-[400px] overflow-scroll h-full flex flex-col items-center no-scrollbar gap-2">
+                    <div className="w-[400px] overflow-hidden h-full flex flex-col items-center gap-2">
                         <div className="text-white w-full flex mb-4">
                             <input 
                             placeholder="Search..." 
@@ -114,7 +79,9 @@ function FeedPage() {
                                 Search
                             </button>
                         </div>
-                        {posts && posts.map((post, index) => <Post key={index} postData={{id: post.id, username: post.author, textBody: post.text, tags: post.tags, createdAt: post.createdAt}}></Post>)}
+                        <div className="w-full overflow-scroll flex flex-col items-center gap-2 no-scrollbar">
+                            {posts && posts.sort((a,b) => (new Date(b.createdAt) - new Date(a.createdAt))).map((post, index) => <Post key={index} postData={{id: post.id, username: post.author, textBody: post.text, tags: post.tags, createdAt: post.createdAt}}></Post>)}
+                        </div>
                     </div>
                 </div>
                 <CreatePostDialog isOpen={createPostDialogOpen} setIsOpen={setCreatePostDialogOpen} addPost={addPost}></CreatePostDialog>
