@@ -4,7 +4,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../database/NavigationTypes";
 
-const Post = ({ postData, onPress }) => {
+const Post = ({ username, postData, onPress }) => {
   const { author, created_at, text, imageUrl, tags, likes } = postData;
   const [liked, setLiked] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -17,7 +17,7 @@ const Post = ({ postData, onPress }) => {
     );
   };
   const handleCommentPress = () => {
-    navigation.navigate("CommentScreen", { postId: postData.id });
+    navigation.navigate("CommentScreen", { postId: postData.id, username: username});
   };
   return (
     <TouchableOpacity onPress={onPress}>
