@@ -13,6 +13,7 @@ import { AuthProvider } from "./screens/AuthProvider";
 import ProfileSettingsScreen from "./screens/ProfileSettingsScreen";
 import SeePostScreen from "./screens/SeePostScreen";
 import SearchResultPage from "./screens/SearchResultPage";
+import CommentScreen from "./screens/CommentScreen";
 const Tab = createBottomTabNavigator();
 
 function HomeTabs({ route }) {
@@ -90,6 +91,11 @@ function MyStack() {
       <Stack.Screen
         name="SearchResultPage"
         component={SearchResultPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CommentScreen"
+        component={CommentScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
