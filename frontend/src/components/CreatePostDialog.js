@@ -1,5 +1,7 @@
 import { FaPlus } from "react-icons/fa";
 import { useState } from "react";
+import { useContext } from "react";
+import HostContext from "../HostContext";
 
 function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
 
@@ -8,6 +10,8 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
     const [reqestError, setRequestError] = useState(false);
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState("")
+
+    const hostURL = useContext(HostContext);
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
@@ -53,7 +57,7 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
         console.log("Posting with, ", token);
         const formData = new FormData();
         formData.append('file', selectedImage);
-        fetch("http://localhost:80/api/file/upload", {
+        fetch(`${hostURL}/api/file/upload`, {
             method: "POST",
             headers: {
                 "Host": "localhost:80",
@@ -69,7 +73,7 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
             console.error(error);
         });
         /*
-        fetch("http://localhost:80/api/posts", {
+        fetch(`${hostURL}/api/posts`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

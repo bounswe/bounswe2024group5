@@ -1,6 +1,8 @@
 import InputBox from "../components/InputBox";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import HostContext from "../HostContext";
+import { useContext } from "react";
 
 function RegistrationPage() {
   const [name, setName] = useState("");
@@ -12,6 +14,8 @@ function RegistrationPage() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
+
+  const hostURL = useContext(HostContext);
 
   const register = () => {
     if (password !== confirmPassword) {
@@ -30,7 +34,7 @@ function RegistrationPage() {
 
     console.log("Attempting to register with:\n", requestBody);
 
-    fetch("http://localhost:80/api/auth/register", {
+    fetch(`${hostURL}/api/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,7 +1,7 @@
 import InputBox from "../components/InputBox";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import HostContext from "../HostContext";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -9,6 +9,9 @@ function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
+
+  const hostURL = useContext(HostContext);
+  console.log("Host URL is: ", hostURL);
 
   const login = () => {
     const requestBody = {
@@ -18,12 +21,12 @@ function LoginPage() {
 
     console.log("Attempting to login with:\n", requestBody);
 
-    fetch("http://localhost:80/api/auth/login", {
+    fetch(`${hostURL}/api/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Content-Length": JSON.stringify(requestBody).length.toString(),
-        Host: "34.118.44.165:80",
+        Host: "localhost:80",
       },
       body: JSON.stringify(requestBody),
     })

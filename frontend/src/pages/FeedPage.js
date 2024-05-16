@@ -3,6 +3,8 @@ import Post from "../components/Post";
 import CreatePostDialog from "../components/CreatePostDialog";
 import { FaPlus } from "react-icons/fa";
 import Navbar from "../components/Navbar";
+import { useContext } from "react";
+import HostContext from "../HostContext";
 
 const mockPost = {
     pp: "pp2.jpeg",
@@ -17,11 +19,13 @@ function FeedPage() {
     const [posts, setPosts] = useState([]);
     const [searchInput, setSearchInput] = useState("");
 
+    const hostURL = useContext(HostContext);
+
     useEffect(() => {
         const token = sessionStorage.getItem("token");
         //console.log("Getting posts with token: ", token);
 
-        fetch("http://localhost:80/api/posts", {
+        fetch(`${hostURL}/api/posts`, {
             method: "GET",
             headers: {
                 "Host": "localhost:80",
@@ -45,7 +49,7 @@ function FeedPage() {
         const token = sessionStorage.getItem("token");
         const params = new URLSearchParams();
         params.append("query", searchInput);
-        fetch("http://localhost:80/api/search?" + params.toString(), {
+        fetch(`${hostURL}/api/search?` + params.toString(), {
             method: "GET",
             headers: {
                 "Host": "localhost:80",

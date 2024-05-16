@@ -1,11 +1,15 @@
 import { FaHeart, FaRegHeart, FaRegComment, FaShareAlt } from "react-icons/fa";
 import { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { useContext } from "react";
+import HostContext from "../HostContext";
 
 function Post({postData}) {
 
     const [liked, setLiked] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
+
+    const hostURL = useContext(HostContext);
 
      const toggleLike = () => {
         setLiked(!liked);
@@ -43,7 +47,7 @@ function Post({postData}) {
 
     const handleDelete = () => {
         const token = sessionStorage.getItem("token");
-        fetch(`http://localhost:80/api/posts/${postData.id}`, {
+        fetch(`${hostURL}/api/posts/${postData.id}`, {
             method: "DELETE",
             headers: {
                 "Host": "localhost:80",
