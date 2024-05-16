@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useAuth } from "./AuthProvider"; // Ensure this import path is correct
 import { Ionicons } from "@expo/vector-icons";
-import { RegisteredUser } from "../database/types";
+import { RegisteredUser } from '../database/types';
 
 const ProfilePage = ({ route, navigation }) => {
   const { registeredUser } = route.params;
@@ -35,22 +35,23 @@ const ProfilePage = ({ route, navigation }) => {
             source={require("../assets/profile_pic.png")}
             style={styles.profileImage}
           />
-          <Text style={styles.name}>{user ? user.name : "Melody Max"}</Text>
+          <Text style={styles.name}>{user ? user.name : registeredUser.name}</Text>
           <Text style={styles.username}>
-            {user ? user.username : "@melodymelinda"}
+            {user ? user.username : registeredUser.username}
           </Text>
           <Text style={styles.online}>online</Text>
         </View>
         <View style={styles.rightSection}>
           <View style={styles.followContainer}>
-            <Text style={styles.followerNumber}>10K</Text>
+            <Text style={styles.followerNumber}>registeredUser.profile.followers</Text>
             <Text style={styles.followerText}>followers</Text>
-            <Text style={styles.followingNumber}>50</Text>
+            <Text style={styles.followingNumber}>registeredUser.profile.following</Text>
             <Text style={styles.followingText}>following</Text>
           </View>
           <View style={styles.currentlyListeningContainer}>
             <Text style={styles.listening}>Listening now</Text>
             <Text style={styles.songname}>Song Name - Artist</Text>
+            <Text style={styles.bio}>registeredUser.profile.bio</Text>
           </View>
           <TouchableOpacity
             style={styles.buttonContainer_edit}
@@ -168,6 +169,9 @@ const styles = StyleSheet.create({
     color: "#C1C1C2",
   },
   songname: {
+    color: "#ffffff",
+  },
+  bio: {
     color: "#ffffff",
   },
   buttonContainer_share: {
