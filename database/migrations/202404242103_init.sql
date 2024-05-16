@@ -9,14 +9,15 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS profiles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL references users (username) ON DELETE CASCADE,
     bio VARCHAR(1023),
-    public_name VARCHAR(255) NOT NULL,
-    profile_picture VARCHAR(255),
+    public_name VARCHAR(255),
+    profile_picture_url VARCHAR(1023),
     spotify_acc VARCHAR(255),
     instagram_acc VARCHAR(255),
     is_Private boolean DEFAULT 0,
-    primary key (username),
+    UNIQUE (username),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -45,43 +46,49 @@ CREATE TABLE IF NOT EXISTS comments (
 );
 
 CREATE TABLE IF NOT EXISTS followings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     follower VARCHAR(255) NOT NULL references users (username) ON DELETE CASCADE,
     followed VARCHAR(255) NOT NULL references users (username) ON DELETE CASCADE,
-    primary key (follower, followed),
+    UNIQUE(follower, followed),
     check(follower != followed),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS post_likes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL references users (username) ON DELETE CASCADE,
     post_id INT NOT NULL references posts (id) ON DELETE CASCADE,
-    primary key (username, post_id),
+    UNIQUE(username, post_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS comment_likes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL references users (username) ON DELETE CASCADE,
     comment_id INT NOT NULL references comments (id) ON DELETE CASCADE,
-    primary key (username, comment_id),
+    UNIQUE(username, comment_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS blocks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     blocker VARCHAR(255) NOT NULL references users (username) ON DELETE CASCADE,
     blocked VARCHAR(255) NOT NULL references users (username) ON DELETE CASCADE,
-    primary key (blocker, blocked),
+    UNIQUE(blocker, blocked),
     check(blocker != blocked),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS post_sharings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL references users (username) ON DELETE CASCADE,
     post_id INT NOT NULL references posts (id) ON DELETE CASCADE,
-    primary key (username, post_id),
+    UNIQUE(username, post_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS search_histories (
+	id INT AUTO_INCREMENT PRIMARY KEY,
 	username VARCHAR(255) NOT NULL references users (username) ON DELETE CASCADE,
     query VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
