@@ -4,6 +4,8 @@ import {
   Text,
   TextInput,
   StyleSheet,
+
+  ScrollView,
   TouchableOpacity,
   Alert,
   Image,
@@ -61,7 +63,7 @@ const CreatePostScreen = ({ route, navigation }) => {
       media_url: media, // Assuming you have the media URL stored in the 'media' state
       tags: customTags,
     };
-  
+
     try {
       const response = await fetch('http://34.118.44.165:80/api/posts', {
         method: 'POST',
@@ -101,7 +103,7 @@ const CreatePostScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <TouchableOpacity
         style={styles.returnButton}
         onPress={() => navigation.goBack()}
@@ -171,7 +173,7 @@ const CreatePostScreen = ({ route, navigation }) => {
           navigation.goBack();
         }}
       />
-    </View>
+    </ScrollView>
   );
 };
 
