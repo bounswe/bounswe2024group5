@@ -11,11 +11,12 @@ import ProfilePage from "./screens/ProfilePage";
 import CreatePostScreen from "./screens/CreatePostScreen";
 import { AuthProvider } from "./screens/AuthProvider";
 import ProfileSettingsScreen from "./screens/ProfileSettingsScreen";
-import SeePostScreen from "./screens/SeePostScreen"; // Ensure this is imported
-
+import SeePostScreen from "./screens/SeePostScreen";
+import SearchResultPage from "./screens/SearchResultPage";
 const Tab = createBottomTabNavigator();
 
-function HomeTabs() {
+function HomeTabs({ route }) {
+  const { registeredUser } = route.params;
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -38,11 +39,13 @@ function HomeTabs() {
       <Tab.Screen
         name="Feed"
         component={FeedPage}
+        initialParams={{ registeredUser }}
         options={{ headerShown: false }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfilePage}
+        initialParams={{ registeredUser }}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
@@ -82,6 +85,11 @@ function MyStack() {
       <Stack.Screen
         name="SeePostScreen"
         component={SeePostScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SearchResultPage"
+        component={SearchResultPage}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

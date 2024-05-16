@@ -14,7 +14,8 @@ import * as ImagePicker from "expo-image-picker";
 import { Video, ResizeMode } from "expo-av"; // Import Video and ResizeMode from expo-av
 import CustomModal from "../components/CustomModal";
 
-const CreatePostScreen = ({ navigation }) => {
+const CreatePostScreen = ({ route, navigation }) => {
+  const { registeredUser } = route.params;
   const { user } = useAuth();
   const [postContent, setPostContent] = useState("");
   const [customTags, setCustomTags] = useState<string[]>([]);

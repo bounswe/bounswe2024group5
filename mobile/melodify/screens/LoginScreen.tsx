@@ -11,6 +11,8 @@ import { useAuth } from "./AuthProvider";
 import CustomButton from "../components/CustomButton";
 import GradientBackground from "../components/GradientBackground";
 import { LinearGradient } from "expo-linear-gradient";
+import { RegisteredUser } from '../database/types';
+import { Profile } from '../database/types';
 
 const CustomModal = ({ visible, message, onClose }) => {
   return (
@@ -40,7 +42,30 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
-  const { login } = useAuth();
+  const { login, token } = useAuth();
+  const [registeredUser, setUserData] = useState(null);
+
+  const fetchUserProfile = async () => {
+    try {
+      console.log('token is:', token)
+      const response = await fetch(`http://34.118.44.165:80/api/users/${username}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const user = await response.json();
+      // console.log("User profile data:", user);
+      if (response.ok) {
+        setUserData(user);
+      } else {
+        // It currently enters here...
+        console.error("Failed to fetch user profile data", response);
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
 
   const handleSignIn = async () => {
     if (password === "" || username === "") {
@@ -65,7 +90,22 @@ const LoginScreen = ({ navigation }) => {
       const data = await response.json();
       if (response.ok) {
         login(data.token);
-        navigation.navigate("Home");
+        // navigation.navigate("Home");
+        console.log("Logged in successfully");
+        fetchUserProfile();
+        const userProfile: Profile = {
+          name: registeredUser.name,
+          surname: registeredUser.surname,
+          bio: registeredUser.bio,
+          private: false,
+        };
+        const user: RegisteredUser = {
+          username: data.username,
+          password: data.password,
+          email: registeredUser.email,
+          profile: userProfile,
+        };
+        navigation.navigate("Home", { registeredUser: "" });
       } else {
         setErrorMessage(data.message || "Invalid username/password");
         setModalVisible(true);

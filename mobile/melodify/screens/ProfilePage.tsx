@@ -4,24 +4,26 @@ import { useAuth } from "./AuthProvider"; // Ensure this import path is correct
 import { Ionicons } from "@expo/vector-icons";
 import { RegisteredUser } from "../database/types";
 
-const ProfilePage = ({ navigation }) => {
+const ProfilePage = ({ route, navigation }) => {
+  const { registeredUser } = route.params;
   const { user } = useAuth(); // Assume useAuth provides user details
-  const registeredUser: RegisteredUser = {
-    username: "melodymelinda",
-    password: "password",
-    profile: {
-      followingList: [],
-      followerList: [],
-      sharedPosts: [],
-      bio: "I love music!",
-      publicName: "Melody Melinda",
-      profilePicture: "profile_pic.png",
-      socialPlatforms: [],
-      private: true,
-    },
-    blockedUsers: [],
-    likedPosts: [],
-  };
+  // const registeredUser: RegisteredUser = {
+  //   username: "melodymelinda",
+  //   password: "password",
+  //   profile: {
+  //     followingList: [],
+  //     followerList: [],
+  //     sharedPosts: [],
+  //     bio: "I love music!",
+  //     publicName: "Melody Melinda",
+  //     profilePicture: "profile_pic.png",
+  //     socialPlatforms: [],
+  //     private: true,
+  //   },
+  //   blockedUsers: [],
+  //   likedPosts: [],
+  // };
+  console.log('REGISTERED:\n', registeredUser);
 
   return (
     <View style={styles.container}>
