@@ -22,6 +22,7 @@ const ResultItem = ({ item }) => (
 
 const SearchResultPage = ({ route, navigation }) => {
   const { searchResults } = route.params;
+  const { registeredUser } = route.params;
   const [selectedTab, setSelectedTab] = useState("Semantic Search");
 
   return (

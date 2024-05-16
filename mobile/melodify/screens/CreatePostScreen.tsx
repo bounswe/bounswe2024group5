@@ -4,6 +4,8 @@ import {
   Text,
   TextInput,
   StyleSheet,
+
+  ScrollView,
   TouchableOpacity,
   Alert,
   Image,
@@ -14,7 +16,8 @@ import * as ImagePicker from "expo-image-picker";
 import { Video, ResizeMode } from "expo-av"; // Import Video and ResizeMode from expo-av
 import CustomModal from "../components/CustomModal";
 
-const CreatePostScreen = ({ navigation }) => {
+const CreatePostScreen = ({ route, navigation }) => {
+  const { registeredUser } = route.params;
   const { user } = useAuth();
   const [postContent, setPostContent] = useState("");
   const [customTags, setCustomTags] = useState<string[]>([]);
@@ -60,7 +63,7 @@ const CreatePostScreen = ({ navigation }) => {
       media_url: media, // Assuming you have the media URL stored in the 'media' state
       tags: customTags,
     };
-  
+
     try {
       const response = await fetch('http://34.118.44.165:80/api/posts', {
         method: 'POST',
@@ -100,7 +103,7 @@ const CreatePostScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <TouchableOpacity
         style={styles.returnButton}
         onPress={() => navigation.goBack()}
@@ -170,7 +173,7 @@ const CreatePostScreen = ({ navigation }) => {
           navigation.goBack();
         }}
       />
-    </View>
+    </ScrollView>
   );
 };
 

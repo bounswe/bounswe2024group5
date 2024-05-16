@@ -15,13 +15,12 @@ export type Post = {
 }
 
 export type Profile = {
-    followingList: RegisteredUser[];
-    followerList: RegisteredUser[];
-    sharedPosts: Post[];
+    followers: number;
+    following: number;
+    name: string;
+    surname: string;
     bio: string;
-    publicName: string;
-    profilePicture: string;
-    socialPlatforms: string[];
+    // profilePicture: string;
     private: boolean;
 }
 
@@ -51,8 +50,6 @@ export type RegisteredUser = {
     password: string;
     email?: string;
     profile: Profile
-    blockedUsers: RegisteredUser[];
-    likedPosts: Post[];
 };
 
 export type SearchEngine = {

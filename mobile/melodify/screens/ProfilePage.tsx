@@ -2,26 +2,28 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useAuth } from "./AuthProvider"; // Ensure this import path is correct
 import { Ionicons } from "@expo/vector-icons";
-import { RegisteredUser } from "../database/types";
+import { RegisteredUser } from '../database/types';
 
-const ProfilePage = ({ navigation }) => {
+const ProfilePage = ({ route, navigation }) => {
+  const { registeredUser } = route.params;
   const { user } = useAuth(); // Assume useAuth provides user details
-  const registeredUser: RegisteredUser = {
-    username: "melodymelinda",
-    password: "password",
-    profile: {
-      followingList: [],
-      followerList: [],
-      sharedPosts: [],
-      bio: "I love music!",
-      publicName: "Melody Melinda",
-      profilePicture: "profile_pic.png",
-      socialPlatforms: [],
-      private: true,
-    },
-    blockedUsers: [],
-    likedPosts: [],
-  };
+  // const registeredUser: RegisteredUser = {
+  //   username: "melodymelinda",
+  //   password: "password",
+  //   profile: {
+  //     followingList: [],
+  //     followerList: [],
+  //     sharedPosts: [],
+  //     bio: "I love music!",
+  //     publicName: "Melody Melinda",
+  //     profilePicture: "profile_pic.png",
+  //     socialPlatforms: [],
+  //     private: true,
+  //   },
+  //   blockedUsers: [],
+  //   likedPosts: [],
+  // };
+  console.log('REGISTERED:\n', registeredUser);
 
   return (
     <View style={styles.container}>
@@ -33,22 +35,22 @@ const ProfilePage = ({ navigation }) => {
             source={require("../assets/profile_pic.png")}
             style={styles.profileImage}
           />
-          <Text style={styles.name}>{user ? user.name : "Melody Max"}</Text>
+          <Text style={styles.name}>{user ? user.name : registeredUser.profile.name} {user ? user.name : registeredUser.profile.surname}</Text>
           <Text style={styles.username}>
-            {user ? user.username : "@melodymelinda"}
+            @{user ? user.username : registeredUser.username}
           </Text>
           <Text style={styles.online}>online</Text>
         </View>
         <View style={styles.rightSection}>
           <View style={styles.followContainer}>
-            <Text style={styles.followerNumber}>10K</Text>
+            <Text style={styles.followerNumber}>{registeredUser.profile.followers}</Text>
             <Text style={styles.followerText}>followers</Text>
-            <Text style={styles.followingNumber}>50</Text>
+            <Text style={styles.followingNumber}>{registeredUser.profile.following}</Text>
             <Text style={styles.followingText}>following</Text>
           </View>
-          <View style={styles.currentlyListeningContainer}>
-            <Text style={styles.listening}>Listening now</Text>
-            <Text style={styles.songname}>Song Name - Artist</Text>
+          <View style={styles.bioContainer}>
+            <Text style={styles.biotitle}>Bio</Text>
+            <Text style={styles.bio}> {registeredUser.profile.bio} </Text>
           </View>
           <TouchableOpacity
             style={styles.buttonContainer_edit}
@@ -159,13 +161,17 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     color: "#ffffff",
   },
-  currentlyListeningContainer: {
+  bioContainer: {
+    marginTop: 20,
     marginBottom: 20,
   },
-  listening: {
+  biotitle: {
     color: "#C1C1C2",
   },
   songname: {
+    color: "#ffffff",
+  },
+  bio: {
     color: "#ffffff",
   },
   buttonContainer_share: {
