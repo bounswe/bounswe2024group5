@@ -1,11 +1,11 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { useAuth } from "./AuthProvider"; // Ensure this import path is correct
+import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { RegisteredUser } from "../database/types";
 
 const ProfilePage = ({ navigation }) => {
-  const { user } = useAuth(); // Assume useAuth provides user details
+  const { user } = useAuth();
   const registeredUser: RegisteredUser = {
     username: "melodymelinda",
     password: "password",

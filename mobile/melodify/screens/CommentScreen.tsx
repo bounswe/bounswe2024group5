@@ -1,9 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+} from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import CustomModal from "../components/CustomModal";
 
-type CommentScreenRouteProp = RouteProp<{ CommentScreen: { postId: string } }, 'CommentScreen'>;
+type CommentScreenRouteProp = RouteProp<
+  { CommentScreen: { postId: string } },
+  "CommentScreen"
+>;
 
 interface CommentScreenProps {
   route: CommentScreenRouteProp;
@@ -21,7 +31,7 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
   const [newComment, setNewComment] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
-  
+
   const handleAddComment = async () => {
     if (newComment.trim() == "") {
       setErrorMessage("Comment cannot be empty");
@@ -32,13 +42,16 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
       comment: newComment.trim(),
     };
     try {
-      const response = await fetch(`http://34.118.44.165:80/api/posts/${postId}/comment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ requestBody }),
-      });
+      const response = await fetch(
+        `http://34.118.44.165:80/api/posts/${postId}/comment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ requestBody }),
+        }
+      );
       if (response.ok) {
         setComments([...comments, requestBody]);
         setNewComment("");
@@ -47,10 +60,10 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
         setModalVisible(true);
       }
     } catch (error) {
-      console.error('Error adding comment:', error);
+      console.error("Error adding comment:", error);
       setErrorMessage("Failed to add comment");
       setModalVisible(true);
-      }
+    }
   };
 
   return (

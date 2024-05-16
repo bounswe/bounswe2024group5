@@ -13,7 +13,6 @@ import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
 import Post from "../components/Post";
 
-// Import local images
 const localImage1 = require("../assets/content.jpg");
 
 const mockPost = {
@@ -55,11 +54,7 @@ const FeedPage = ({ navigation }) => {
       const data = await response.json();
       console.log("Received data:", data);
 
-      if (!Array.isArray(data.search)) {
-        throw new TypeError("Received data under 'search' is not an array");
-      }
-
-      navigation.navigate("SearchResultPage", { searchResults: data.search });
+      navigation.navigate("SearchResultPage", { searchResults: data });
     } catch (error) {
       console.error("Error fetching search results:", error.message);
     } finally {
