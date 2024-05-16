@@ -39,7 +39,7 @@ function RegistrationPage() {
       headers: {
         "Content-Type": "application/json",
         "Content-Length": JSON.stringify(requestBody).length.toString(),
-        Host: "localhost:80",
+        "Host": "localhost:80",
       },
       body: JSON.stringify(requestBody),
     })

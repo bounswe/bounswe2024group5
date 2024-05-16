@@ -24,6 +24,11 @@
 
 }
 
+.active-tab {
+  color: #fff;
+  background-color: #2870BD;
+}
+
 /*
 .login-card {
   display: flex;
