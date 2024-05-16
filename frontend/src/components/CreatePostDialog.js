@@ -18,6 +18,7 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
     }
 
     const handlePost = () => {
+        /*
         addPost({
             pp: "pp2.jpeg",
             username: "The Lumineers",
@@ -28,6 +29,30 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
         setIsOpen(false);
         setTextBody("");
         setSelectedImage(null);
+        */
+
+        const requestBody = {
+            text: textBody,
+            tags: [],
+        }
+
+        console.log("Posting with, ", sessionStorage.getItem("token"));
+        fetch("http://localhost:80/api/posts/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": JSON.stringify(requestBody).length.toString(),
+                "Host": "localhost:80",
+                "Authorization": "Bearer " + sessionStorage.getItem("token"),
+            },
+            body: JSON.stringify(requestBody)
+        }).then((response) => {
+            return response.json();
+        }).then((response) => {
+            console.log(response);
+        }).catch((error) => {
+            console.log(error);
+        });
     }
 
     return (<>

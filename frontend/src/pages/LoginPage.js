@@ -18,7 +18,7 @@ function LoginPage() {
 
     console.log("Attempting to login with:\n", requestBody);
 
-    fetch("http://34.118.44.165:80/api/auth/login", {
+    fetch("http://localhost:80/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,6 +33,7 @@ function LoginPage() {
       .then((response) => {
         console.log(response);
         if (response.message === "Login successful") {
+          sessionStorage.setItem("token", response.token);
           navigate("/feed");
         } else {
           setErrorMessage(response.message);

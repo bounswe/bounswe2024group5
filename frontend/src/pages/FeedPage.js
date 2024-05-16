@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Post from "../components/Post";
 import CreatePostDialog from "../components/CreatePostDialog";
@@ -29,6 +29,23 @@ function FeedPage() {
     ];
     const [searchResults, setSearchResults] = useState([]);
 
+    useEffect(() => {
+        const token = sessionStorage.getItem("token");
+
+        fetch("http://localhost:80/api/posts", {
+            method: "GET",
+            headers: {
+                "Host": "localhost:80",
+                "Authorization": `Bearer ${token}`,
+            },
+        }).then((response) => {
+            return response.json();
+        }).then((response) => {
+            console.log(response);
+        }).catch((error) => {
+            console.error(error);
+        });
+    }, []);
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
