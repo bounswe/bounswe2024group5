@@ -9,12 +9,14 @@ function RegistrationPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
 
   const register = () => {
     if (password !== confirmPassword) {
       console.error("Passwords do not match!");
+      setErrorMessage("Passwords do not match!");
       return;
     }
 
@@ -28,12 +30,12 @@ function RegistrationPage() {
 
     console.log("Attempting to register with:\n", requestBody);
 
-    fetch("http://34.118.44.165:80/api/auth/register", {
+    fetch("http://localhost:80/api/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Content-Length": JSON.stringify(requestBody).length.toString(),
-        Host: "34.118.44.165:80",
+        Host: "localhost:80",
       },
       body: JSON.stringify(requestBody),
     })
@@ -43,16 +45,21 @@ function RegistrationPage() {
       .then((response) => {
         console.log(response);
         if (response.message === "Registration successful") {
+          sessionStorage.setItem("token", response.token);
           navigate("/feed");
+        } else {
+          setErrorMessage(response.message);
         }
       })
       .catch((error) => {
+        setErrorMessage(error.toString());
         console.error(error);
       });
   };
 
   return (
     <>
+    <div className="w-screen h-screen concert-bg flex justify-center items-center">
       <div
         className="flex flex-col sm:w-full max-w-[360px] bg-[#111927CC] 
             rounded-2xl p-6 shadow-[0_-4px_8px_-2px_rgba(0,0,0,0.25)] backdrop-blur w-5/6
@@ -61,6 +68,9 @@ function RegistrationPage() {
         <p className="text-[28px] text-white text-center mb-6 tracking-tight leading-8 font-medium">
           Register to Melodify
         </p>
+        {errorMessage && ( // Conditionally render error message
+          <p className="text-red-500 text-center mb-4">{errorMessage}</p>
+        )}
         <div className="flex flex-col gap-4 mb-6">
           <InputBox
             placeholder={"Name"}
@@ -113,6 +123,7 @@ function RegistrationPage() {
             </a>
           </p>
         </div>
+      </div>
       </div>
     </>
   );
