@@ -42,6 +42,7 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const showError = (message) => {
@@ -73,7 +74,7 @@ const RegisterScreen = ({ navigation }) => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (password && !passwordRegex.test(password)) {
       showError(
-        "Password must be 8 chars, include an uppercase letter, a lowecase letter, and a number."
+        "Password must be 8 chars, include an uppercase letter, a lowercase letter, and a number."
       );
       return false;
     }
@@ -109,13 +110,13 @@ const RegisterScreen = ({ navigation }) => {
           body: JSON.stringify(requestBody),
         }
       );
-      
+
       const rawData = await response.text();
 
       if (response.ok) {
         const data = JSON.parse(rawData);
         console.log(data.message);
-        navigation.navigate("Login");
+        setSuccessModalVisible(true);
       } else {
         const data = rawData;
         switch (response.status) {
@@ -148,6 +149,14 @@ const RegisterScreen = ({ navigation }) => {
           visible={modalVisible}
           message={errorMessage}
           onClose={() => setModalVisible(false)}
+        />
+        <CustomModal
+          visible={successModalVisible}
+          message="Registration successful!"
+          onClose={() => {
+            setSuccessModalVisible(false);
+            navigation.navigate("Login");
+          }}
         />
         <Text style={styles.title}>Melodify</Text>
         <Text style={styles.subtitle}>Set up your account</Text>
