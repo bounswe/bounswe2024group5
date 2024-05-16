@@ -13,6 +13,11 @@ nvm install 20.5.1
 nvm use 20.5.1
 ```
 
+# Install additional libraries:
+```sh
+npm install expo-image-picker
+```
+
 # Option 1: Expo Go
 - download Expo GO to your mobile device
 - go to ./melodify using the command line

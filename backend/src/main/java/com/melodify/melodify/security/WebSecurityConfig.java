@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 import com.melodify.melodify.security.jwt.*;
 import com.melodify.melodify.security.services.UserDetailsServiceImpl;
@@ -68,6 +69,10 @@ public class WebSecurityConfig {
         http.authenticationProvider(authenticationProvider());
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        http.cors(httpSecurityCorsConfigurer -> 
+            httpSecurityCorsConfigurer.configurationSource(request -> 
+           new CorsConfiguration().applyPermitDefaultValues()));
 
         return http.build();
     }
