@@ -23,7 +23,7 @@ services:
       - backend
 
   database:
-    image: mysql:latest
+    image: mysql:8.3.0
     command: --default-authentication-plugin=caching_sha2_password --bind-address=0.0.0.0
     environment:
       MYSQL_ROOT_PASSWORD: admin123
