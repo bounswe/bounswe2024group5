@@ -11,9 +11,7 @@ import ProfilePage from "./screens/ProfilePage";
 import CreatePostScreen from "./screens/CreatePostScreen";
 import { AuthProvider } from "./screens/AuthProvider";
 import ProfileSettingsScreen from "./screens/ProfileSettingsScreen";
-import Post from "./components/Post";
-import CommentScreen from "./screens/CommentScreen";
-import SearchResultPage from "./screens/SearchResultPage"; // Import the new screen
+import SeePostScreen from "./screens/SeePostScreen"; // Ensure this is imported
 
 const Tab = createBottomTabNavigator();
 
@@ -82,18 +80,8 @@ function MyStack() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Post"
-        component={Post}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="CommentScreen"
-        component={CommentScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="SearchResultPage"
-        component={SearchResultPage}
+        name="SeePostScreen"
+        component={SeePostScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

@@ -13,12 +13,15 @@ import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
 import Post from "../components/Post";
 
+// Import local images
+const localImage1 = require("../assets/content.jpg");
+
 const mockPost = {
   id: "1",
   author: "The Lumineers",
   created_at: "2 hours ago",
   text: "Hey everyone! We're excited to announce our new album coming out next month. Stay tuned for more updates!",
-  imageURL: require("../assets/content.jpg"),
+  imageUrl: localImage1,
   tags: ["#concert", "#guitar"],
   likes: 77,
 };
@@ -64,6 +67,10 @@ const FeedPage = ({ navigation }) => {
     }
   };
 
+  const handlePostPress = (post) => {
+    navigation.navigate("SeePostScreen", { post });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.mainTitle}>Melodify</Text>
@@ -101,7 +108,9 @@ const FeedPage = ({ navigation }) => {
       <FlatList
         data={posts}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Post postData={item} />}
+        renderItem={({ item }) => (
+          <Post postData={item} onPress={() => handlePostPress(item)} />
+        )}
       />
       <TouchableOpacity
         style={styles.fab}
