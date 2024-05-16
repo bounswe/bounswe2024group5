@@ -13,6 +13,15 @@ services:
       database:
         condition: service_healthy
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
   database:
     image: mysql:latest
     command: --default-authentication-plugin=caching_sha2_password --bind-address=0.0.0.0
@@ -33,14 +42,6 @@ services:
       timeout: 5s
       retries: 10
 
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000"
-    networks:
-      - app-network
-    depends_on:
-      - backend
 
   nginx:
     image: nginx:latest
