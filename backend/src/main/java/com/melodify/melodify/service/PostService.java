@@ -76,6 +76,7 @@ public class PostService {
             }
         } catch (Exception e) {
             postRepository.delete(post);
+            postSearchRepository.delete(postSearch);
             throw new IllegalArgumentException(e.getMessage());
         }
         return id;
