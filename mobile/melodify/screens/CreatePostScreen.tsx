@@ -1,8 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Image,
+} from "react-native";
 import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from 'expo-image-picker'; // Import Expo ImagePicker
+import * as ImagePicker from "expo-image-picker";
+import { Video, ResizeMode } from "expo-av"; // Import Video and ResizeMode from expo-av
 import CustomModal from "../components/CustomModal";
 
 const CreatePostScreen = ({ navigation }) => {
@@ -12,13 +21,15 @@ const CreatePostScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [tagInput, setTagInput] = useState("");
-  const [media, setMedia] = useState<string | null>(null); // State to store selected media (image or video)
+  const [media, setMedia] = useState<string | null>(null);
 
-  // Function to handle media selection
   const pickMedia = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission denied', 'Sorry, we need camera roll permissions to make this work!');
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission denied",
+        "Sorry, we need camera roll permissions to make this work!"
+      );
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -26,22 +37,22 @@ const CreatePostScreen = ({ navigation }) => {
       allowsEditing: true,
       quality: 1,
     });
-    if (!result.canceled && 'uri' in result) { // Check if 'uri' property exists
-      setMedia(result.uri);
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setMedia(result.assets[0].uri);
     }
   };
 
   const handlePostCreation = async () => {
-    // if (!postContent.trim()) {
-    //   Alert.alert("Post content is required");
-    //   return;
-    // }
+    if (!postContent.trim()) {
+      Alert.alert("Post content is required");
+      return;
+    }
 
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       setModalVisible(true);
-    }, 0);
+    }, 1500);
   };
 
   const addCustomTag = () => {
@@ -59,7 +70,10 @@ const CreatePostScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.returnButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.returnButton}
+        onPress={() => navigation.goBack()}
+      >
         <Ionicons name="arrow-back" size={24} color="white" />
       </TouchableOpacity>
       <View style={styles.inputContainer}>
@@ -79,21 +93,25 @@ const CreatePostScreen = ({ navigation }) => {
       {media && (
         <View style={styles.mediaPreviewContainer}>
           <Text style={styles.mediaPreviewText}>Media Preview:</Text>
-          {media.includes('.jpg') || media.includes('.png') ? (
+          {media.match(/\.(jpeg|jpg|png)$/) ? (
             <Image source={{ uri: media }} style={styles.imagePreview} />
           ) : (
             <Video
               source={{ uri: media }}
               style={styles.videoPreview}
               useNativeControls
-              resizeMode="contain"
+              resizeMode={ResizeMode.CONTAIN} // Correct usage of ResizeMode
             />
           )}
         </View>
       )}
       <View style={styles.tagContainer}>
         {customTags.map((tag, index) => (
-          <TouchableOpacity key={index} style={styles.tag} onPress={() => removeCustomTag(index)}>
+          <TouchableOpacity
+            key={index}
+            style={styles.tag}
+            onPress={() => removeCustomTag(index)}
+          >
             <Text style={styles.tagText}>{tag}</Text>
           </TouchableOpacity>
         ))}
@@ -106,7 +124,11 @@ const CreatePostScreen = ({ navigation }) => {
           onSubmitEditing={addCustomTag}
         />
       </View>
-      <TouchableOpacity style={styles.button} onPress={handlePostCreation} disabled={loading}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handlePostCreation}
+        disabled={loading}
+      >
         <Text style={styles.buttonText}>Post</Text>
       </TouchableOpacity>
       <CustomModal
