@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { useAuth } from "./AuthProvider"; // Ensure this import path is correct
+import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { RegisteredUser } from '../database/types';
 

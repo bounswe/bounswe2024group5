@@ -9,11 +9,12 @@ import RegisterScreen from "./screens/RegisterScreen";
 import FeedPage from "./screens/FeedPage";
 import ProfilePage from "./screens/ProfilePage";
 import CreatePostScreen from "./screens/CreatePostScreen";
-import { AuthProvider } from "./screens/AuthProvider";
 import ProfileSettingsScreen from "./screens/ProfileSettingsScreen";
 import SeePostScreen from "./screens/SeePostScreen";
 import SearchResultPage from "./screens/SearchResultPage";
+import { AuthProvider } from "./screens/AuthProvider";
 import CommentScreen from "./screens/CommentScreen";
+
 const Tab = createBottomTabNavigator();
 
 function HomeTabs({ route }) {

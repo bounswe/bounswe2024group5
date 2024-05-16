@@ -1,10 +1,20 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+} from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import CustomModal from "../components/CustomModal";
 import { useAuth } from "./AuthProvider";
 
-type CommentScreenRouteProp = RouteProp<{ CommentScreen: { postId: string } }, 'CommentScreen'>;
+type CommentScreenRouteProp = RouteProp<
+  { CommentScreen: { postId: string } },
+  "CommentScreen"
+>;
 
 interface CommentScreenProps {
   route: CommentScreenRouteProp;
@@ -52,7 +62,7 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
         setModalVisible(true);
       }
     } catch (error) {
-      console.error('Error adding comment:', error);
+      console.error("Error adding comment:", error);
       setErrorMessage("Failed to add comment");
       setModalVisible(true);
     }
