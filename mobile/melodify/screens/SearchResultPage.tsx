@@ -297,8 +297,9 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: "white",
-    fontSize: 18,
+    fontSize: 30,
     textAlign: "center",
+    fontWeight: "bold",
   },
 });
 
