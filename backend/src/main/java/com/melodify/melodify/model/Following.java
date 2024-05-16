@@ -11,11 +11,13 @@ public class Following {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "follower", nullable = false)
-    private String followerUsername;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "follower", referencedColumnName = "username", nullable = false)
+    private User follower;
 
-    @Column(name = "followed", nullable = false)
-    private String followingUsername;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "followed", referencedColumnName = "username", nullable = false)
+    private User followed;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -25,9 +27,9 @@ public class Following {
         // Default constructor required for JPA
     }
 
-    public Following(String followerUsername, String followingUsername) {
-        this.followerUsername = followerUsername;
-        this.followingUsername = followingUsername;
+    public Following(User follower, User followed) {
+        this.follower = follower;
+        this.followed = followed;
         this.followedAt = new Date();
     }
 
@@ -36,12 +38,12 @@ public class Following {
         return id;
     }
 
-    public String getFollowerUsername() {
-        return followerUsername;
+    public User getFollower() {
+        return follower;
     }
 
-    public String getFollowingUsername() {
-        return followingUsername;
+    public User getFollowed() {
+        return followed;
     }
 
     public Date getFollowedAt() {

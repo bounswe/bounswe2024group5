@@ -1,8 +1,13 @@
 package com.melodify.melodify.service;
 
 import com.melodify.melodify.model.Following;
+import com.melodify.melodify.model.User;
 import com.melodify.melodify.repository.FollowingRepository;
+import com.melodify.melodify.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 
 @Service
 public class FollowingService {
@@ -11,34 +16,40 @@ public class FollowingService {
     private final FollowingRepository followingRepository;
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
-    public FollowingService(FollowingRepository followingRepository, UserService userService) {
+    public FollowingService(FollowingRepository followingRepository, UserService userService, UserRepository userRepository) {
         this.followingRepository = followingRepository;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     public void follow(String followerUsername, String followingUsername) {
         if (followerUsername.equals(followingUsername)) {
-            throw new IllegalArgumentException("You can't follow yourself");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot follow yourself");
         }
-        if (followingRepository.findByFollowerUsernameAndFollowingUsername(followerUsername, followingUsername) != null) {
-            throw new IllegalArgumentException("You are already following this user");
-        }
-        userService.getOneUserByUsername(followingUsername);
-        userService.getOneUserByUsername(followerUsername);
-        followingRepository.save(new Following(followerUsername, followingUsername));
+        System.out.println(followerUsername);
+        System.out.println(followingUsername);
+        User following = userService.getOneUserByUsername(followingUsername);
+        User follower =  userService.getOneUserByUsername(followerUsername);
+        if (followingRepository.findByFollowerAndFollowed(follower, following) != null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are already following this user");
+        else
+            followingRepository.save(new Following(follower, following));
     }
 
     public void unfollow(String followerUsername, String followingUsername) {
-        Following following = followingRepository.findByFollowerUsernameAndFollowingUsername(followerUsername, followingUsername);
-        if (following == null) {
-            throw new IllegalArgumentException("You are not following this user");
-        }
-        followingRepository.delete(following);
+        User following = userService.getOneUserByUsername(followingUsername);
+        User follower =  userService.getOneUserByUsername(followerUsername);
+        Following follow = followingRepository.findByFollowerAndFollowed(follower, following);
+        if (follow == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not following this user");
+        else
+            followingRepository.delete(follow);
     }
 
-    public boolean isFollowing(String followerUsername, String followingUsername) {
-        return followingRepository.findByFollowerUsernameAndFollowingUsername(followerUsername, followingUsername) != null;
+    public boolean isFollowing(User follower, User followed) {
+        return followingRepository.findByFollowerAndFollowed(follower, followed) != null;
     }
 
 
