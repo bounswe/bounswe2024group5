@@ -779,7 +779,60 @@ paths:
             type: string
       responses:
         '200':
-          description: success
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        author:
+                          type: string
+                        text:
+                          type: string
+                        media_url:
+                          type: string
+                        created_at:
+                          type: string
+                        edited_at:
+                          type: string
+                        tags:
+                          items:
+                            type: string
+                        likes:
+                          type: integer
+                        comments:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              commentId:
+                                type: string
+                              username:
+                                type: string
+                              content:
+                                type: string
+                              likes:
+                                type: integer
+                  wiki:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        label:
+                          type: string
+                        description:
+                          type: string
+                        url:
+                          type: string    
         '401':
           description: Unauthorized
   /file/upload:

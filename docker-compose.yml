@@ -55,6 +55,19 @@ services:
       - backend
       - frontend
 
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    environment:
+      - discovery.type=single-node
+      - network.host=0.0.0.0
+    ports:
+      - "9200:9200"
+    networks:
+      - app-network
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
+  
+
 
 networks:
   app-network:
@@ -62,3 +75,4 @@ networks:
 
 volumes:
   db-data:
+  elastic-data:

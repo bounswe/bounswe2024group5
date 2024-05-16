@@ -86,3 +86,7 @@ CREATE TABLE IF NOT EXISTS search_histories (
     query VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS wiki_data_entities (
+    entity_id VARCHAR(20) NOT NULL PRIMARY KEY UNIQUE
+);
