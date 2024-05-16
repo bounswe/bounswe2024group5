@@ -92,20 +92,22 @@ const LoginScreen = ({ navigation }) => {
         login(data.token);
         // navigation.navigate("Home");
         console.log("Logged in successfully");
-        fetchUserProfile();
+        // fetchUserProfile();
         const userProfile: Profile = {
-          name: registeredUser.name,
-          surname: registeredUser.surname,
-          bio: registeredUser.bio,
+          name: 'John',
+          surname: 'Doe',
+          bio: 'I am a music lover',
           private: false,
+          followers: 50,
+          following: 100,
         };
         const user: RegisteredUser = {
-          username: data.username,
-          password: data.password,
-          email: registeredUser.email,
+          username: 'JohnDoe',
+          password: 'password',
+          email: 'john@gmail.com',
           profile: userProfile,
         };
-        navigation.navigate("Home", { registeredUser: "" });
+        navigation.navigate("Home", { registeredUser: user });
       } else {
         setErrorMessage(data.message || "Invalid username/password");
         setModalVisible(true);
