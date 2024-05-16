@@ -88,6 +88,5 @@ CREATE TABLE IF NOT EXISTS search_histories (
 );
 
 CREATE TABLE IF NOT EXISTS wiki_data_entities (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    entity_id VARCHAR(255) NOT NULL
+    entity_id VARCHAR(20) NOT NULL PRIMARY KEY UNIQUE
 );

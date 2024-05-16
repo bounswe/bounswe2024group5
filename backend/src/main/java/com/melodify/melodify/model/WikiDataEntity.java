@@ -7,10 +7,7 @@ import jakarta.persistence.*;
 public class WikiDataEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "entity_id")
+    @Column(name = "entity_id", nullable = false, unique = true)
     private String entityId;
 
     public WikiDataEntity() {
