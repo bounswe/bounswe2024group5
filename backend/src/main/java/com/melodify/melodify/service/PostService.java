@@ -5,6 +5,7 @@ import com.melodify.melodify.model.User;
 import com.melodify.melodify.model.Tag;
 import com.melodify.melodify.model.request.PostCreateRequest;
 import com.melodify.melodify.model.request.PostUpdateRequest;
+import com.melodify.melodify.model.response.CommentResponse;
 import com.melodify.melodify.model.response.PostResponse;
 import com.melodify.melodify.model.PostSearch;
 import com.melodify.melodify.repository.PostRepository;
@@ -34,10 +35,18 @@ public class PostService {
     @Autowired
     private PostSearchRepository postSearchRepository;
 
+    @Autowired
+    private PostLikeService postLikeService;
+
+    @Autowired
+    private CommentService commentService;
+
     private List<PostResponse> mapper(List<Post> posts) {
         return posts.stream().map(post -> {
             List<String> tags = tagService.getTagsByPost(post).stream().map(Tag::getTag).collect(Collectors.toList());
-            return new PostResponse(post, tags);
+            int likes = postLikeService.numberOfLikes(post.getId());
+            List<CommentResponse> comments = commentService.getCommentsByPostId(post.getId()).stream().collect(Collectors.toList());
+            return new PostResponse(post, tags, comments, likes);
         }).collect(Collectors.toList());
     }
 
@@ -82,15 +91,22 @@ public class PostService {
         return id;
     }
 
-    private PostResponse convertToResponse(Post post) {
+    public PostResponse convertToResponse(Post post) {
         List<String> tags = tagService.getTagsByPost(post).stream().map(Tag::getTag).collect(Collectors.toList());
-        return new PostResponse(post, tags);
+        int likes = postLikeService.numberOfLikes(post.getId());
+        List<CommentResponse> comments = commentService.getCommentsByPostId(post.getId()).stream().collect(Collectors.toList());
+        return new PostResponse(post, tags, comments, likes);
     }
 
     public PostResponse getOnePostById(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found with ID: " + postId));
         return convertToResponse(post);
+    }
+
+    public Post getPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with ID: " + postId));
     }
 
     public PostResponse updateOnePostById(String authorUsername, Long postId, PostUpdateRequest updatePost) {
