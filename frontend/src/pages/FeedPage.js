@@ -100,12 +100,12 @@ function FeedPage() {
                         </div>
                         {tab === "feed" &&
                         <div className="w-full overflow-scroll flex flex-col items-center gap-2 no-scrollbar">
-                            {posts && posts.sort((a,b) => (new Date(b.createdAt) - new Date(a.createdAt))).map((post, index) => <Post key={index} postData={{id: post.id, username: post.author, textBody: post.text, tags: post.tags, createdAt: post.createdAt}}></Post>)}
+                            {posts && posts.sort((a,b) => (new Date(b.createdAt) - new Date(a.createdAt))).map((post, index) => <Post key={index} postData={{id: post.id, username: post.author, textBody: post.text, tags: post.tags, createdAt: post.createdAt, imageURL: post.media_url}}></Post>)}
                         </div>
                         }
                         {tab === "posts" &&
                         <div className="w-full overflow-scroll flex flex-col items-center gap-2 no-scrollbar">
-                            {searchResults && searchResults.posts && searchResults.posts.sort((a,b) => (new Date(b.createdAt) - new Date(a.createdAt))).map((post, index) => <Post key={index} postData={{id: post.id, username: post.author, textBody: post.text, tags: post.tags, createdAt: post.createdAt}}></Post>)}
+                            {searchResults && searchResults.posts && searchResults.posts.sort((a,b) => (new Date(b.createdAt) - new Date(a.createdAt))).map((post, index) => <Post key={index} postData={{id: post.id, username: post.author, textBody: post.text, tags: post.tags, createdAt: post.createdAt, imageURL: post.media_url}}></Post>)}
                         </div>
                         }
                         {tab === "wikidata" && <div className="w-full flex flex-wrap gap-4">{searchResults && searchResults.wiki && searchResults.wiki.map((wikidata, index) => <WikidataCard key={index} wikidata={wikidata}></WikidataCard>)}</div>
