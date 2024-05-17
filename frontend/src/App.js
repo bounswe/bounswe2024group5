@@ -12,7 +12,7 @@ function App() {
   return (
     <>
       {/* Change the following line to change the server URL. */}
-      <HostContext.Provider value="http://localhost:80">
+      <HostContext.Provider value="http://34.118.44.165:80">
         <div className='h-screen flex justify-center items-center relative'>
           <BrowserRouter>
           <Routes>

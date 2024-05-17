@@ -94,6 +94,7 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
             console.log(response);
             setTextBody("");
             setSelectedImage(null);
+            setTags([]);
             setRequestError(false);
             setIsOpen(false);
         }).catch((error) => {

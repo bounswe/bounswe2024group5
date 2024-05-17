@@ -44,7 +44,7 @@ function FeedPage() {
         }).catch((error) => {
             console.error(error);
         });
-    }, [hostURL]);
+    }, [hostURL, createPostDialogOpen]);
 
     const addPost = (newPost) => {
         setPosts([newPost, ...posts]);
