@@ -12,7 +12,7 @@ import CustomModal from "../components/CustomModal";
 import { useAuth } from "./AuthProvider";
 
 type CommentScreenRouteProp = RouteProp<
-  { CommentScreen: { postId: string } },
+  { CommentScreen: { postId: string, username: string } },
   "CommentScreen"
 >;
 
@@ -30,6 +30,7 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
   const { postId, username } = route.params;
   // Use the postId value in your component
   console.log("postId:", postId);
+  console.log("username:", username);
   const { login, token } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -42,34 +43,42 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
       setModalVisible(true);
       return;
     }
-    const requestBody = {
+    const comment: Comment = {
+      commentId: String(comments.length + 1),
       comment: newComment.trim(),
-      username: username,
+      username: username,     // get the related username from the database
     };
-    console.log('requestBody:', requestBody)
-    try {
-      const response = await fetch(`http://34.118.44.165:80/api/posts/${postId}/comment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ requestBody }),
-      });
-      console.log('token:', token)
-      console.log('response:', response)
-      if (response.ok) {
-        setComments([...comments, requestBody]);
-        setNewComment("");
-      } else {
-        setErrorMessage("Failed to add comment");
-        setModalVisible(true);
-      }
-    } catch (error) {
-      console.error("Error adding comment:", error);
-      setErrorMessage("Failed to add comment");
-      setModalVisible(true);
-    }
+    console.log('comment:', comment)
+    setComments([...comments, comment]);
+    setNewComment("");
+    // const requestBody = {
+    //   comment: newComment.trim(),
+    //   username: username,
+    // };
+    // console.log('requestBody:', requestBody)
+    // try {
+    //   const response = await fetch(`http://34.118.44.165:80/api/posts/${postId}/comment`, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //     body: JSON.stringify({ requestBody }),
+    //   });
+    //   console.log('token:', token)
+    //   console.log('response:', response)
+    //   if (response.ok) {
+    //     setComments([...comments, requestBody]);
+    //     setNewComment("");
+    //   } else {
+    //     setErrorMessage("Failed to add comment");
+    //     setModalVisible(true);
+    //   }
+    // } catch (error) {
+    //   console.error("Error adding comment:", error);
+    //   setErrorMessage("Failed to add comment");
+    //   setModalVisible(true);
+    // }
   };
 
   return (
