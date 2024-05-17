@@ -66,7 +66,7 @@ const FeedPage = ({ route, navigation }) => {
   useEffect(() => {
     // const token = sessionStorage.getItem("token");
     console.log("Getting posts with token: ", token);
-    fetch(`http://34.118.44.165/api/feed?page=1&limit=1000`, {
+    fetch(`http://34.118.44.165/api/feed?page=0&limit=1000`, {
       method: "GET",
       headers: {
         // "Host": hostURL.split("://")[1],
