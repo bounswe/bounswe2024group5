@@ -639,12 +639,20 @@ paths:
                     type: string
                   email:
                     type: string
+                  profilePictureUrl:
+                    type: string
                   bio:
                     type: string
                   followers:
                     type: integer
                   following:
                     type: integer
+                  publicName:
+                    type: string
+                  spotifyAcc:
+                    type: string
+                  instagramAcc:
+                    type: string
               example:
                 username: "john_doe"
                 name: "John"
@@ -653,6 +661,84 @@ paths:
                 bio: "Music lover and aspiring artist"
                 followers: 100
                 following: 50
+                publicName: "public_name"
+                profilePictureUrl: "www.google.com"
+                spotifyAcc: "something"
+                instagramAcc: "something"
+        '404':
+          description: User not found
+    put:
+      tags:
+        - Users
+      summary: Edit user profile
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bio:
+                  type: string
+                publicName:
+                  type: string
+                spotifyAcc:
+                  type: string
+                instagramAcc:
+                  type: string
+                profilePictureUrl:
+                  type: string
+            example:
+              bio: "Hi there"
+              publicName: "public_name"
+      responses:
+        '200':
+          description: User profile edited successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  name:
+                    type: string
+                  surname:
+                    type: string
+                  email:
+                    type: string
+                  profilePictureUrl:
+                    type: string
+                  bio:
+                    type: string
+                  followers:
+                    type: integer
+                  following:
+                    type: integer
+                  publicName:
+                    type: string
+                  spotifyAcc:
+                    type: string
+                  instagramAcc:
+                    type: string
+              example:
+                username: "john_doe"
+                name: "John"
+                surname: "Doe"
+                email: "john_doe@gmail.com"
+                bio: "Hi there"
+                followers: 100
+                following: 50
+                publicName: "public_name"
+                profilePictureUrl: "www.google.com"
+                spotifyAcc: "something"
+                instagramAcc: "something"
         '404':
           description: User not found
   /users/{username}/followers:
@@ -678,17 +764,9 @@ paths:
                   properties:
                     username:
                       type: string
-                    name:
-                      type: string
-                    surname:
-                      type: string
               example:
                 - username: "jane_smith"
-                  name: "Jane"
-                  surname: "Smith"
                 - username: "mike_jones"
-                  name: "Mike"
-                  surname: "Jones"
         '404':
           description: User not found  
   /users/{username}/following:
@@ -714,17 +792,9 @@ paths:
                   properties:
                     username:
                       type: string
-                    name:
-                      type: string
-                    surname:
-                      type: string
               example:
                 - username: "jane_smith"
-                  name: "Jane"
-                  surname: "Smith"
                 - username: "mike_jones"
-                  name: "Mike"
-                  surname: "Jones"
         '404':
           description: User not found
   /users/follow/{username}:
