@@ -81,6 +81,10 @@ public class Post {
         this.editedAt = new Date();
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
 
     public void setAuthor(User author) {
         this.author = author;
