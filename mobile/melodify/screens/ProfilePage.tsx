@@ -1,12 +1,13 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import React, {useEffect, useState} from "react";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { RegisteredUser } from '../database/types';
 
 const ProfilePage = ({ route, navigation }) => {
   const { registeredUser } = route.params;
-  const { user } = useAuth(); // Assume useAuth provides user details
+  const { token } = useAuth(); // Assume useAuth provides user details
+  const [posts, setPosts] = useState([]);
   // const registeredUser: RegisteredUser = {
   //   username: "melodymelinda",
   //   password: "password",
@@ -23,8 +24,34 @@ const ProfilePage = ({ route, navigation }) => {
   //   blockedUsers: [],
   //   likedPosts: [],
   // };
-  
   console.log('REGISTERED:\n', registeredUser);
+
+  useEffect(() => {
+    fetchUserPosts();
+  }, []);
+
+  const fetchUserPosts = async () => {
+    console.log('here!!')
+    try {
+      console.log('token is:', token)
+      const response = await fetch(`http://34.118.44.165:80/api/posts?author=${registeredUser.username}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      // console.log("User profile data:", user);
+      if (response.ok) {
+        console.log(data);
+        setPosts(data);
+      } else {
+        console.error("Failed to fetch user posts", response);
+      }
+    } catch (error) {
+      console.error("Error fetching user posts:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -36,9 +63,9 @@ const ProfilePage = ({ route, navigation }) => {
             source={require("../assets/profile_pic.png")}
             style={styles.profileImage}
           />
-          <Text style={styles.name}>{user ? user.name : registeredUser.profile.name} {user ? user.name : registeredUser.profile.surname}</Text>
+          <Text style={styles.name}>{ registeredUser.profile.name } {registeredUser.profile.surname}</Text>
           <Text style={styles.username}>
-            @{user ? user.username : registeredUser.username}
+            @{ registeredUser.username }
           </Text>
           <Text style={styles.online}>online</Text>
         </View>
@@ -66,16 +93,35 @@ const ProfilePage = ({ route, navigation }) => {
         </View>
       </View>
       <View style={styles.separator}></View>
-      <View style={styles.bottomSection}>
-        <Text style={styles.activityTitle}>Last Activities</Text>
-        <TouchableOpacity
-          style={styles.buttonContainer_share}
-          onPress={() => navigation.navigate("CreatePostScreen", { user: registeredUser })}
-        >
-          <Text style={styles.sharePostButtonText}>+ Share a Post</Text>
-        </TouchableOpacity>
-      </View>
-      {/* Render user's posts here */}
+      <ScrollView>
+        <View style={styles.bottomSection}>
+          <Text style={styles.activityTitle}>Your Posts</Text>
+          <View style={styles.postsSection}>
+          {posts.map((post) => (
+            <View key={post.id} style={styles.postItem}>
+              <Text style={styles.author}>@{post.author}</Text>
+            <Text style={styles.createdAt}>{post.created_at}</Text>
+            <Text style={styles.text}>{post.text}</Text>
+            {/* {imageUrl && <Image source={imageUrl} style={styles.image} />} */}
+            <View style={styles.tagsContainer}>
+              {post.tags.map((tag, index) => (
+                <Text key={index} style={styles.tag}>
+                  {tag}
+                </Text>
+              ))}
+            </View>
+              <Text>{post.text}</Text>
+            </View>
+          ))}
+        </View>
+        </View>
+      </ScrollView>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate("CreatePostScreen", {registeredUser: registeredUser})}
+      >
+        <Ionicons name="add" size={24} color="#111927" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -169,9 +215,6 @@ const styles = StyleSheet.create({
   biotitle: {
     color: "#C1C1C2",
   },
-  songname: {
-    color: "#ffffff",
-  },
   bio: {
     color: "#ffffff",
   },
@@ -183,26 +226,99 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 10,
   },
-  sharePostButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   separator: {
     borderBottomWidth: 1,
     borderBottomColor: "#888888",
     marginTop: 10,
     marginBottom: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bottomSection: {
+    flexDirection: "row",
+    // justifyContent: 'center',
+    alignItems: 'flex-start',
+    // alignItems: "center",
+    justifyContent: "center",
   },
   activityTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#ffffff",
+    marginBottom: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  postsSection: {
+    marginTop: 50,
+    flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'flex-start',
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  postsTitle: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#ffffff",
   },
-  bottomSection: {
-    flexDirection: "row",
+  postItem: {
+    backgroundColor: "#192f6a",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    // alignItems: "center",
+    justifyContent: "center",
+  },
+  fab: {
+    position: "absolute",
+    width: 56,
+    height: 56,
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    right: 20,
+    bottom: 20,
+    backgroundColor: "#ffffff",
+    borderRadius: 28,
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { height: 2, width: 2 },
+  },
+  author: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+  },
+  createdAt: {
+    fontSize: 16,
+    color: "#ccc",
+    marginBottom: 10,
+  },
+  text: {
+    fontSize: 18,
+    color: "white",
+    marginBottom: 10,
+  },
+  image: {
+    width: "100%",
+    height: 300,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 10,
+  },
+  tag: {
+    backgroundColor: "#3b5998",
+    color: "white",
+    padding: 5,
+    borderRadius: 5,
+    marginRight: 5,
+    marginBottom: 5,
   },
 });
 

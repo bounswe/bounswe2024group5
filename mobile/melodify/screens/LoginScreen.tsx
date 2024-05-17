@@ -55,9 +55,10 @@ const LoginScreen = ({ navigation }) => {
         },
       });
       const user = await response.json();
-      // console.log("User profile data:", user);
+      console.log("User profile data:", user);
       if (response.ok) {
         setUserData(user);
+        console.log("User profile data:", user);
       } else {
         // It currently enters here...
         console.error("Failed to fetch user profile data", response);
@@ -94,7 +95,7 @@ const LoginScreen = ({ navigation }) => {
         console.log("Logged in successfully");
         // fetchUserProfile();
         const userProfile: Profile = {
-          name: 'John',
+          name: 'ebrar',
           surname: 'Doe',
           bio: 'I am a music lover',
           private: false,
@@ -102,8 +103,8 @@ const LoginScreen = ({ navigation }) => {
           following: 100,
         };
         const user: RegisteredUser = {
-          username: 'JohnDoe',
-          password: 'password',
+          username: 'ebrar',
+          password: 'Ebrar2001',
           email: 'john@gmail.com',
           profile: userProfile,
         };
