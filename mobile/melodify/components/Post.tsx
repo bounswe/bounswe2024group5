@@ -26,9 +26,9 @@ const Post = ({ username, postData, onPress }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+      // if (!response.ok) {
+        // throw new Error(`HTTP error! Status: ${response.status}`);
+      // }
 
     } catch (error) {
       console.error("Error liking post:", error.message);

@@ -18,16 +18,16 @@ const SeePostScreen = ({ route, navigation }) => {
       liked ? Math.max(0, prevCount - 1) : prevCount + 1
     );
     try {
-      const response = await fetch(`http://34.118.44.165/api/posts/${postData.id}/like`, {
+      const response = await fetch(`http://34.118.44.165/api/posts/${post.id}/like`, {
         method: liked ? "DELETE" : "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+      // if (!response.ok) {
+        // throw new Error(`HTTP error! Status: ${response.status}`);
+      // }
     } catch (error) {
       console.error("Error liking post:", error.message);
     }
