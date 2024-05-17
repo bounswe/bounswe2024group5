@@ -48,6 +48,14 @@ public class FollowingService {
             followingRepository.delete(follow);
     }
 
+    public int getFollowerCount(User user) {
+        return followingRepository.findByFollowed(user).size();
+    }
+
+    public int getFollowingCount(User user) {
+        return followingRepository.findByFollower(user).size();
+    }
+
     public boolean isFollowing(User follower, User followed) {
         return followingRepository.findByFollowerAndFollowed(follower, followed) != null;
     }
