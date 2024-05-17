@@ -42,29 +42,31 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
-  const { login, token } = useAuth();
+  const {login, token} = useAuth();
   const [registeredUser, setUserData] = useState(null);
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = async (token) => {
     try {
       console.log('token is:', token)
       const response = await fetch(`http://34.118.44.165:80/api/users/${username}`, {
+        method: "GET",
         headers: {
-          "Content-Type": "application/json",
+          Host: '34.118.44.165',
           Authorization: `Bearer ${token}`,
         },
       });
       const user = await response.json();
-      console.log("User profile data:", user);
       if (response.ok) {
         setUserData(user);
         console.log("User profile data:", user);
+        return user;
       } else {
-        // It currently enters here...
         console.error("Failed to fetch user profile data", response);
+        return null;
       }
     } catch (error) {
       console.error("Error fetching user profile:", error);
+      return null;  
     }
   };
 
@@ -90,24 +92,25 @@ const LoginScreen = ({ navigation }) => {
       });
       const data = await response.json();
       if (response.ok) {
-        login(data.token);
-        // navigation.navigate("Home");
+        await login(data.token);
         console.log("Logged in successfully");
-        // fetchUserProfile();
+        fetchUserProfile(data.token);
+        const registeredUser = await fetchUserProfile(data.token);
         const userProfile: Profile = {
-          name: 'ebrar',
-          surname: 'Doe',
-          bio: 'I am a music lover',
+          name: registeredUser.name,
+          surname: registeredUser.surname,
+          bio: registeredUser.bio,
           private: false,
-          followers: 50,
-          following: 100,
+          followers: registeredUser.followers,
+          following: registeredUser.following,
         };
         const user: RegisteredUser = {
-          username: 'ebrar',
-          password: 'Ebrar2001',
-          email: 'john@gmail.com',
+          username: registeredUser.username,
+          password: registeredUser.password,
+          email: registeredUser.email,
           profile: userProfile,
         };
+        console.log("Registered user data:", user);
         navigation.navigate("Home", { registeredUser: user });
       } else {
         setErrorMessage(data.message || "Invalid username/password");

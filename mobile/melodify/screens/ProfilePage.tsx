@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,15 +10,52 @@ import {
 import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { RegisteredUser } from "../database/types";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 const ProfilePage = ({ route, navigation }) => {
   const { registeredUser } = route.params;
   const { token, logout } = useAuth(); // Assume useAuth provides user details and logout function
   const [posts, setPosts] = useState([]);
+  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    fetchUserPosts();
-  }, []);
+  // useEffect(() => {
+  //   fetchUserPosts();
+  //   const user = fetchUserProfile();
+  //   console.log("User profile:", user);
+  //   setUser(user);
+  // }, []);
+
+  // const fetchUserProfile = useCallback(() => {
+  //   try {
+  //     console.log('token is:', token)
+  //     const response = fetch(`http://34.118.44.165:80/api/users/${registeredUser.username}`, {
+  //       method: "GET",
+  //       headers: {
+  //         Host: '34.118.44.165',
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     const user = response.json();
+  //     if (response.ok) {
+  //       console.log("User profile data:", user);
+  //       setUser(user);
+  //       return user;
+  //     } else {
+  //       console.error("Failed to fetch user profile data", response);
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching user profile:", error);
+  //     return null;  
+  //   }
+  // });
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     fetchUserProfile();
+  //   }, [fetchUserProfile])
+  // );
 
   const fetchUserPosts = async () => {
     try {
