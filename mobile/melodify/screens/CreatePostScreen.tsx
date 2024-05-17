@@ -4,46 +4,79 @@ import {
   Text,
   TextInput,
   StyleSheet,
-
   ScrollView,
   TouchableOpacity,
   Alert,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { Video, ResizeMode } from "expo-av"; // Import Video and ResizeMode from expo-av
 import CustomModal from "../components/CustomModal";
 
 const CreatePostScreen = ({ route, navigation }) => {
   const { registeredUser } = route.params;
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [postContent, setPostContent] = useState("");
   const [customTags, setCustomTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [tagInput, setTagInput] = useState("");
   const [media, setMedia] = useState<string | null>(null);
-  const { login, token } = useAuth();
+  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
 
   const pickMedia = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
-        "Permission denied",
-        "Sorry, we need camera roll permissions to make this work!"
-      );
+      Alert.alert("Permission denied", "Camera roll permission is needed.");
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
+
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      setMedia(result.assets[0].uri);
+      const selectedMedia = result.assets[0].uri;
+      setMedia(selectedMedia);
+
+      const formData = new FormData();
+      formData.append("file", {
+        uri: selectedMedia,
+        name: "upload.jpg",
+        type: "image/jpeg",
+      });
+
+      setUploading(true); // Start uploading
+      try {
+        const uploadResponse = await fetch(
+          "http://34.118.44.165/api/file/upload",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+            body: formData,
+          }
+        );
+
+        if (!uploadResponse.ok) {
+          throw new Error(`HTTP error! Status: ${uploadResponse.status}`);
+        }
+        console.log("Media file uploaded successfully");
+        const uploadData = await uploadResponse.text();
+        setMediaUrl(uploadData);
+      } catch (error) {
+        console.error("Error uploading media file:", error);
+        Alert.alert("Error", "Failed to upload media file. Please try again.");
+      } finally {
+        setUploading(false); // End uploading
+      }
     }
   };
 
@@ -54,38 +87,44 @@ const CreatePostScreen = ({ route, navigation }) => {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setModalVisible(true);
-    }, 1500);
 
     const requestBody = {
       text: postContent.trim(),
-      media_url: media, // Assuming you have the media URL stored in the 'media' state
+      media_url: mediaUrl,
       tags: customTags,
     };
 
     try {
-      const response = await fetch('http://34.118.44.165:80/api/posts', {
-        method: 'POST',
+      const response = await fetch("http://34.118.44.165/api/posts", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          "Content-Length": JSON.stringify(requestBody).length.toString(),
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(requestBody),
       });
-      console.log('token:', token)
+
       if (response.ok) {
         const responseData = await response.json();
-        console.log('Post created successfully. Post ID:', responseData.post_id);
+        console.log(
+          "Post created successfully. Post ID:",
+          responseData.post_id
+        );
         setModalVisible(true);
       } else {
-        console.error('Failed to create post:', response.status);
+        console.error("Failed to create post:", response.status);
+        if (response.status === 401) {
+          setErrorMessage("Unauthorized. Please check your token.");
+        } else {
+          setErrorMessage(
+            `Failed to create post. Status code: ${response.status}`
+          );
+        }
+        setModalVisible(true);
       }
     } catch (error) {
-      console.error('Error creating post:', error);
-      setErrorMessage('Failed to create post. Please try again.');
+      console.error("Error creating post:", error);
+      setErrorMessage("Failed to create post. Please try again.");
       setModalVisible(true);
     } finally {
       setLoading(false);
@@ -125,21 +164,13 @@ const CreatePostScreen = ({ route, navigation }) => {
       </View>
       <TouchableOpacity style={styles.mediaButton} onPress={pickMedia}>
         <Ionicons name="attach" size={24} color="white" />
-        <Text style={styles.mediaButtonText}>Attach Media</Text>
+        <Text style={styles.mediaButtonText}>Attach Image</Text>
       </TouchableOpacity>
+      {uploading && <ActivityIndicator size="large" color="#00ff00" />}
       {media && (
         <View style={styles.mediaPreviewContainer}>
-          <Text style={styles.mediaPreviewText}>Media Preview:</Text>
-          {media.match(/\.(jpeg|jpg|png)$/) ? (
-            <Image source={{ uri: media }} style={styles.imagePreview} />
-          ) : (
-            <Video
-              source={{ uri: media }}
-              style={styles.videoPreview}
-              useNativeControls
-              resizeMode={ResizeMode.CONTAIN} // Correct usage of ResizeMode
-            />
-          )}
+          <Text style={styles.mediaPreviewText}>Image Preview:</Text>
+          <Image source={{ uri: media }} style={styles.imagePreview} />
         </View>
       )}
       <View style={styles.tagContainer}>
@@ -173,7 +204,9 @@ const CreatePostScreen = ({ route, navigation }) => {
         message={errorMessage}
         onClose={() => {
           setModalVisible(false);
-          navigation.goBack();
+          if (!errorMessage) {
+            navigation.goBack();
+          }
         }}
       />
     </ScrollView>
@@ -227,11 +260,6 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     borderRadius: 10,
   },
-  videoPreview: {
-    width: 200,
-    height: 200,
-    borderRadius: 10,
-  },
   tagContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -262,6 +290,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 50,
   },
   buttonText: {
     color: "white",

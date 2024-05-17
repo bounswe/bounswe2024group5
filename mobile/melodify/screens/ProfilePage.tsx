@@ -93,16 +93,16 @@ const ProfilePage = ({ route, navigation }) => {
         </View>
       </View>
       <View style={styles.separator}></View>
-      <ScrollView>
+      {/* <ScrollView>
         <View style={styles.bottomSection}>
           <Text style={styles.activityTitle}>Your Posts</Text>
           <View style={styles.postsSection}>
           {posts.map((post) => (
             <View key={post.id} style={styles.postItem}>
-              <Text style={styles.author}>@{post.author}</Text>
+            <Text style={styles.author}>@{post.author}</Text>
             <Text style={styles.createdAt}>{post.created_at}</Text>
             <Text style={styles.text}>{post.text}</Text>
-            {/* {imageUrl && <Image source={imageUrl} style={styles.image} />} */}
+            {post.media_url && <Image source={{ uri: post.media_url }} style={styles.image} />}
             <View style={styles.tagsContainer}>
               {post.tags.map((tag, index) => (
                 <Text key={index} style={styles.tag}>
@@ -110,12 +110,11 @@ const ProfilePage = ({ route, navigation }) => {
                 </Text>
               ))}
             </View>
-              <Text>{post.text}</Text>
             </View>
           ))}
         </View>
         </View>
-      </ScrollView>
+      </ScrollView> */}
       <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate("CreatePostScreen", {registeredUser: registeredUser})}
@@ -253,8 +252,8 @@ const styles = StyleSheet.create({
     marginTop: 50,
     flex: 1,
     // justifyContent: 'center',
-    // alignItems: 'flex-start',
-    alignItems: "center",
+    alignItems: 'flex-start',
+    // alignItems: "center",
     justifyContent: "center",
   },
   postsTitle: {
@@ -265,7 +264,7 @@ const styles = StyleSheet.create({
   postItem: {
     backgroundColor: "#192f6a",
     borderRadius: 10,
-    padding: 10,
+    padding: 20,
     marginBottom: 10,
     // alignItems: "center",
     justifyContent: "center",
