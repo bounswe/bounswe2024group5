@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.melodify.melodify.model.Profile;
+import com.melodify.melodify.repository.ProfileRepository;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +40,15 @@ public class AuthenticationController {
 
     @Autowired
     UserRepository userRepository;
-    
+
     @Autowired
     PasswordEncoder encoder;
 
     @Autowired
     JwtUtils jwtUtils;
-    
+    @Autowired
+    private ProfileRepository profileRepository;
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         if(userRepository.existsByUsername(request.getUsername())) {
@@ -59,6 +63,8 @@ public class AuthenticationController {
                              request.getName(), 
                              request.getSurname());
         userRepository.save(user);
+        Profile profile = new Profile(user);
+        profileRepository.save(profile);
 
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
