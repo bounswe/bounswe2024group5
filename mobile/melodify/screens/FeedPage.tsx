@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
 import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
 import Post from "../components/Post";
+import { useFocusEffect } from "@react-navigation/native";
 
 const localImage1 = require("../assets/content.jpg");
 
@@ -55,7 +56,10 @@ const FeedPage = ({ route, navigation }) => {
       const data = await response.json();
       console.log("Received data:", data);
 
-      navigation.navigate("SearchResultPage", { registeredUser: registeredUser, searchResults: data});
+      navigation.navigate("SearchResultPage", {
+        registeredUser: registeredUser,
+        searchResults: data,
+      });
     } catch (error) {
       console.error("Error fetching search results:", error.message);
     } finally {
@@ -63,28 +67,35 @@ const FeedPage = ({ route, navigation }) => {
     }
   };
 
-  useEffect(() => {
-    // const token = sessionStorage.getItem("token");
+  const fetchPosts = useCallback(() => {
     console.log("Getting posts with token: ", token);
-    fetch(`http://34.118.44.165/api/feed?page=0&limit=1000`, {
+    fetch(`http://34.118.44.165/api/feed?page=1&limit=1000`, {
       method: "GET",
       headers: {
-        // "Host": hostURL.split("://")[1],
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     })
-    .then((response: Response) => response.json())
-    .then((response: Post[]) => {
-      console.log(response);
-      setPosts(response);
-    })
-    .catch((error: Error) => {
-      console.error(error);
-    });
-  }, []);
+      .then((response) => response.json())
+      .then((response) => {
+        console.log(response);
+        setPosts(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [token]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPosts();
+    }, [fetchPosts])
+  );
 
   const handlePostPress = (post) => {
-    navigation.navigate("SeePostScreen", { post, username: registeredUser.username});
+    navigation.navigate("SeePostScreen", {
+      post,
+      username: registeredUser.username,
+    });
   };
 
   return (
@@ -130,7 +141,11 @@ const FeedPage = ({ route, navigation }) => {
       />
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => navigation.navigate("CreatePostScreen", {registeredUser: registeredUser})}
+        onPress={() =>
+          navigation.navigate("CreatePostScreen", {
+            registeredUser: registeredUser,
+          })
+        }
       >
         <Ionicons name="add" size={24} color="#111927" />
       </TouchableOpacity>
