@@ -31,7 +31,7 @@ const FeedPage = ({ route, navigation }) => {
   const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [posts, setPosts] = useState([mockPost, mockPost, mockPost]);
+  const [posts, setPosts] = useState([]);
 
   const handleSearch = async () => {
     console.log("Searching for:", inputValue);
@@ -69,7 +69,7 @@ const FeedPage = ({ route, navigation }) => {
 
   const fetchPosts = useCallback(() => {
     console.log("Getting posts with token: ", token);
-    fetch(`http://34.118.44.165/api/feed?page=1&limit=1000`, {
+    fetch(`http://34.118.44.165/api/feed?page=0&limit=1000`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
