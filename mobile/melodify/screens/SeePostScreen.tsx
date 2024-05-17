@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
+import { useAuth } from "../screens/AuthProvider";
 
 const SeePostScreen = ({ route, navigation }) => {
   const { post, username } = route.params;
@@ -9,11 +10,27 @@ const SeePostScreen = ({ route, navigation }) => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes);
   const imageUrl = media_url;
-  const toggleLike = () => {
+  const { token } = useAuth();
+
+  const toggleLike = async () => {
     setLiked(!liked);
     setLikeCount((prevCount) =>
       liked ? Math.max(0, prevCount - 1) : prevCount + 1
     );
+    try {
+      const response = await fetch(`http://34.118.44.165/api/posts/${postData.id}/like`, {
+        method: liked ? "DELETE" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error liking post:", error.message);
+    }
   };
 
   const handleCommentPress = () => {

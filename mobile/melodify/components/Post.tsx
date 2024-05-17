@@ -3,18 +3,36 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../database/NavigationTypes";
+import { useAuth } from "../screens/AuthProvider";
 
 const Post = ({ username, postData, onPress }) => {
   const { author, created_at, text, media_url, tags } = postData; //TODO: Add likes
   const [liked, setLiked] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [likeCount, setLikeCount] = useState(0); //TODO: useState(postData.likes);
+  const [likeCount, setLikeCount] = useState(postData.likes); //TODO: useState(postData.likes);
+  const { token } = useAuth();
 
-  const toggleLike = () => {
+  const toggleLike = async () => {
     setLiked(!liked);
     setLikeCount((prevCount) =>
       liked ? Math.max(0, prevCount - 1) : prevCount + 1
     );
+
+    try {
+      const response = await fetch(`http://34.118.44.165/api/posts/${postData.id}/like`, {
+        method: liked ? "DELETE" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+    } catch (error) {
+      console.error("Error liking post:", error.message);
+    }
   };
 
   const handleCommentPress = () => {
