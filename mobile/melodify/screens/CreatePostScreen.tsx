@@ -93,7 +93,7 @@ const CreatePostScreen = ({ route, navigation }) => {
       media_url: mediaUrl,
       tags: customTags,
     };
-
+    console.log("Creating post with data:", requestBody);
     try {
       const response = await fetch("http://34.118.44.165/api/posts", {
         method: "POST",
@@ -132,6 +132,7 @@ const CreatePostScreen = ({ route, navigation }) => {
   };
 
   const addCustomTag = () => {
+    console.log("Adding custom tag:", tagInput);
     if (tagInput.trim()) {
       setCustomTags([...customTags, tagInput.trim()]);
       setTagInput("");
@@ -175,22 +176,28 @@ const CreatePostScreen = ({ route, navigation }) => {
       )}
       <View style={styles.tagContainer}>
         {customTags.map((tag, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.tag}
-            onPress={() => removeCustomTag(index)}
-          >
+          <View key={index} style={styles.tag}>
             <Text style={styles.tagText}>{tag}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => removeCustomTag(index)}
+              style={styles.removeTagButton}
+            >
+              <Ionicons name="close" size={16} color="white" />
+            </TouchableOpacity>
+          </View>
         ))}
+      </View>
+      <View style={styles.tagInputContainer}>
         <TextInput
           style={styles.tagInput}
           placeholder="Add custom tag"
           placeholderTextColor="#ccc"
           value={tagInput}
           onChangeText={setTagInput}
-          onSubmitEditing={addCustomTag}
         />
+        <TouchableOpacity onPress={addCustomTag} style={styles.addTagButton}>
+          <Text style={styles.addTagButtonText}>Add Tag</Text>
+        </TouchableOpacity>
       </View>
       <TouchableOpacity
         style={styles.button}
@@ -266,6 +273,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tag: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#192f6a",
     borderRadius: 10,
     paddingVertical: 5,
@@ -274,15 +283,33 @@ const styles = StyleSheet.create({
   },
   tagText: {
     color: "white",
+    marginRight: 5,
+  },
+  removeTagButton: {
+    padding: 5,
+  },
+  tagInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
   },
   tagInput: {
+    flex: 1,
     backgroundColor: "white",
     color: "black",
     fontSize: 16,
     borderRadius: 10,
     padding: 10,
     marginRight: 10,
-    marginBottom: 10,
+  },
+  addTagButton: {
+    backgroundColor: "#192f6a",
+    borderRadius: 10,
+    padding: 10,
+  },
+  addTagButtonText: {
+    color: "white",
+    fontSize: 16,
   },
   button: {
     backgroundColor: "#192f6a",
