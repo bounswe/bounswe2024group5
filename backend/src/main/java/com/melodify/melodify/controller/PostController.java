@@ -6,6 +6,7 @@ import com.melodify.melodify.model.request.PostCreateRequest;
 import com.melodify.melodify.model.request.PostUpdateRequest;
 import com.melodify.melodify.model.response.PostResponse;
 import com.melodify.melodify.security.jwt.JwtUtils;
+import com.melodify.melodify.service.PostLikeService;
 import com.melodify.melodify.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,11 +27,11 @@ public class PostController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
     private PostService postService;
 
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
+    @Autowired
+    private PostLikeService postLikeService;
 
     @GetMapping()
     public List<PostResponse> getPosts(@RequestParam(required = false) String author, @RequestParam(required = false) String tag) {
@@ -102,5 +103,28 @@ public class PostController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the author of this post");
         }
     }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<?> likePost(@RequestHeader("Authorization") String jwt, @PathVariable Long postId) {
+        String username = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
+        try {
+            postLikeService.likePost(postId, username);
+            return ResponseEntity.ok().body("Post liked");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
+    }
+
+    @DeleteMapping("/{postId}/like")
+    public ResponseEntity<?> unlikePost(@RequestHeader("Authorization") String jwt, @PathVariable Long postId) {
+        String username = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
+        try {
+            postLikeService.unlikePost(postId, username);
+            return ResponseEntity.ok().body("Post unliked");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
+    }
+
 
 }
