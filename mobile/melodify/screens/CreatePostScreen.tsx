@@ -93,7 +93,7 @@ const CreatePostScreen = ({ route, navigation }) => {
       media_url: mediaUrl,
       tags: customTags,
     };
-
+    console.log("Creating post with body:", requestBody);
     try {
       const response = await fetch("http://34.118.44.165/api/posts", {
         method: "POST",
@@ -132,7 +132,9 @@ const CreatePostScreen = ({ route, navigation }) => {
   };
 
   const addCustomTag = () => {
+    console.log("Adding custom tag:", tagInput);
     if (tagInput.trim()) {
+      console.log('adding tag', tagInput.trim());
       setCustomTags([...customTags, tagInput.trim()]);
       setTagInput("");
     }
