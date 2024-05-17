@@ -5,7 +5,7 @@ import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../database/NavigationTypes";
 
 const Post = ({ username, postData, onPress }) => {
-  const { author, created_at, text, imageUrl, tags, likes } = postData;
+  const { author, created_at, text, media_url, tags, likes } = postData;
   const [liked, setLiked] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [likeCount, setLikeCount] = useState(postData.likes);
@@ -25,7 +25,7 @@ const Post = ({ username, postData, onPress }) => {
         <Text style={styles.author}>{author}</Text>
         <Text style={styles.createdAt}>{created_at}</Text>
         <Text style={styles.text}>{text}</Text>
-        {imageUrl && <Image source={imageUrl} style={styles.image} />}
+        {media_url && <Image source={{ uri: media_url }} style={styles.image} />}
         <View style={styles.tagsContainer}>
           {tags.map((tag, index) => (
             <Text key={index} style={styles.tag}>

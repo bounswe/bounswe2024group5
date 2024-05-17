@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -62,6 +62,26 @@ const FeedPage = ({ route, navigation }) => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // const token = sessionStorage.getItem("token");
+    console.log("Getting posts with token: ", token);
+    fetch(`http://34.118.44.165/api/feed?page=1&limit=1000`, {
+      method: "GET",
+      headers: {
+        // "Host": hostURL.split("://")[1],
+        "Authorization": `Bearer ${token}`,
+      },
+    })
+    .then((response: Response) => response.json())
+    .then((response: Post[]) => {
+      console.log(response);
+      setPosts(response);
+    })
+    .catch((error: Error) => {
+      console.error(error);
+    });
+  }, []);
 
   const handlePostPress = (post) => {
     navigation.navigate("SeePostScreen", { post, username: registeredUser.username});

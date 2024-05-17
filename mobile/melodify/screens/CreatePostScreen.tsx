@@ -134,6 +134,7 @@ const CreatePostScreen = ({ route, navigation }) => {
   const addCustomTag = () => {
     console.log("Adding custom tag:", tagInput);
     if (tagInput.trim()) {
+      console.log("adding tag", tagInput.trim());
       setCustomTags([...customTags, tagInput.trim()]);
       setTagInput("");
     }
