@@ -2,11 +2,15 @@ package com.melodify.melodify.service;
 
 import com.melodify.melodify.model.Following;
 import com.melodify.melodify.model.User;
+import com.melodify.melodify.model.response.UserResponse;
 import com.melodify.melodify.repository.FollowingRepository;
 import com.melodify.melodify.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -56,9 +60,29 @@ public class FollowingService {
         return followingRepository.findByFollower(user).size();
     }
 
+    public List<UserResponse> getFollowers(String username) {
+        User user = userService.getOneUserByUsername(username);
+        List<Following> followings = followingRepository.findByFollowed(user);
+        // map into users
+        List<User> users = followings.stream().map(following -> following.getFollower()).collect(Collectors.toList());
+        List<UserResponse> userResponses = users.stream().map(user1 -> new UserResponse(user1.getUsername())).collect(Collectors.toList());
+        return userResponses;
+    }
+
+    public List<UserResponse> getFollowings(String username) {
+        User user = userService.getOneUserByUsername(username);
+        List<Following> followings = followingRepository.findByFollower(user);
+        // map into users
+        List<User> users = followings.stream().map(following -> following.getFollowed()).collect(Collectors.toList());
+        List<UserResponse> userResponses = users.stream().map(user1 -> new UserResponse(user1.getUsername())).collect(Collectors.toList());
+        return userResponses;
+    }
+
     public boolean isFollowing(User follower, User followed) {
         return followingRepository.findByFollowerAndFollowed(follower, followed) != null;
     }
+
+
 
 
 }
