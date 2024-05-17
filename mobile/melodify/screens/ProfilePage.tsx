@@ -1,49 +1,38 @@
-import React, {useEffect, useState} from "react";
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { useAuth } from "./AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
-import { RegisteredUser } from '../database/types';
+import { RegisteredUser } from "../database/types";
 
 const ProfilePage = ({ route, navigation }) => {
   const { registeredUser } = route.params;
-  const { token } = useAuth(); // Assume useAuth provides user details
+  const { token, logout } = useAuth(); // Assume useAuth provides user details and logout function
   const [posts, setPosts] = useState([]);
-  // const registeredUser: RegisteredUser = {
-  //   username: "melodymelinda",
-  //   password: "password",
-  //   profile: {
-  //     followingList: [],
-  //     followerList: [],
-  //     sharedPosts: [],
-  //     bio: "I love music!",
-  //     publicName: "Melody Melinda",
-  //     profilePicture: "profile_pic.png",
-  //     socialPlatforms: [],
-  //     private: true,
-  //   },
-  //   blockedUsers: [],
-  //   likedPosts: [],
-  // };
-  console.log('REGISTERED:\n', registeredUser);
 
   useEffect(() => {
     fetchUserPosts();
   }, []);
 
   const fetchUserPosts = async () => {
-    console.log('here!!')
     try {
-      console.log('token is:', token)
-      const response = await fetch(`http://34.118.44.165:80/api/posts?author=${registeredUser.username}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `http://34.118.44.165:80/api/posts?author=${registeredUser.username}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await response.json();
-      // console.log("User profile data:", user);
       if (response.ok) {
-        console.log(data);
         setPosts(data);
       } else {
         console.error("Failed to fetch user posts", response);
@@ -53,9 +42,19 @@ const ProfilePage = ({ route, navigation }) => {
     }
   };
 
+  const handleLogout = () => {
+    logout(); // Clear user data and token
+    navigation.replace("Login"); // Navigate to login screen
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.platformName}>Melodify</Text>
+      <View style={styles.header}>
+        <Text style={styles.platformName}>Melodify</Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Ionicons name="log-out" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.separator}></View>
       <View style={styles.topSection}>
         <View style={styles.leftSection}>
@@ -63,17 +62,21 @@ const ProfilePage = ({ route, navigation }) => {
             source={require("../assets/profile_pic.png")}
             style={styles.profileImage}
           />
-          <Text style={styles.name}>{ registeredUser.profile.name } {registeredUser.profile.surname}</Text>
-          <Text style={styles.username}>
-            @{ registeredUser.username }
+          <Text style={styles.name}>
+            {registeredUser.profile.name} {registeredUser.profile.surname}
           </Text>
+          <Text style={styles.username}>@{registeredUser.username}</Text>
           <Text style={styles.online}>online</Text>
         </View>
         <View style={styles.rightSection}>
           <View style={styles.followContainer}>
-            <Text style={styles.followerNumber}>{registeredUser.profile.followers}</Text>
+            <Text style={styles.followerNumber}>
+              {registeredUser.profile.followers}
+            </Text>
             <Text style={styles.followerText}>followers</Text>
-            <Text style={styles.followingNumber}>{registeredUser.profile.following}</Text>
+            <Text style={styles.followingNumber}>
+              {registeredUser.profile.following}
+            </Text>
             <Text style={styles.followingText}>following</Text>
           </View>
           <View style={styles.bioContainer}>
@@ -117,7 +120,11 @@ const ProfilePage = ({ route, navigation }) => {
       </ScrollView> */}
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => navigation.navigate("CreatePostScreen", {registeredUser: registeredUser})}
+        onPress={() =>
+          navigation.navigate("CreatePostScreen", {
+            registeredUser: registeredUser,
+          })
+        }
       >
         <Ionicons name="add" size={24} color="#111927" />
       </TouchableOpacity>
@@ -132,12 +139,37 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     backgroundColor: "#111927",
   },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
   platformName: {
     fontSize: 40,
     fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 10,
     color: "#ffffff",
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#192f6a",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  logoutButtonText: {
+    color: "white",
+    fontSize: 16,
+    marginLeft: 5,
+  },
+  separator: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#888888",
+    marginTop: 10,
+    marginBottom: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   topSection: {
     flexDirection: "row",
@@ -168,18 +200,6 @@ const styles = StyleSheet.create({
   online: {
     color: "#02BC02",
     marginBottom: 15,
-  },
-  buttonContainer_edit: {
-    backgroundColor: "#192f6a",
-    borderRadius: 10,
-    padding: 10,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  editprofileButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   rightSection: {
     flex: 1,
@@ -217,27 +237,21 @@ const styles = StyleSheet.create({
   bio: {
     color: "#ffffff",
   },
-  buttonContainer_share: {
+  buttonContainer_edit: {
     backgroundColor: "#192f6a",
     borderRadius: 10,
     padding: 10,
     alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  separator: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#888888",
     marginTop: 10,
-    marginBottom: 20,
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  editprofileButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   bottomSection: {
     flexDirection: "row",
-    // justifyContent: 'center',
-    alignItems: 'flex-start',
-    // alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
   },
   activityTitle: {
@@ -251,9 +265,7 @@ const styles = StyleSheet.create({
   postsSection: {
     marginTop: 50,
     flex: 1,
-    // justifyContent: 'center',
-    alignItems: 'flex-start',
-    // alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
   },
   postsTitle: {
@@ -266,7 +278,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     marginBottom: 10,
-    // alignItems: "center",
     justifyContent: "center",
   },
   fab: {
