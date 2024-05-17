@@ -50,7 +50,7 @@ function Post({postData}) {
         fetch(`${hostURL}/api/posts/${postData.id}`, {
             method: "DELETE",
             headers: {
-                "Host": "localhost:80",
+                "Host": hostURL.split("://")[1],
                 "Authorization": `Bearer ${token}`,
             },
         }).then((response) => {
@@ -70,7 +70,7 @@ function Post({postData}) {
                 {dialogOpen && <div onClick={handleDelete} className="w-[100px] hover:bg-[#111b29] transition-colors duration-300 text-red-500 text-center hover:cursor-pointer bg-[#0D1520] absolute top-3 right-14 px-4 py-2 rounded-lg z-10">
                     <div>Delete</div>
                 </div>}
-                <img src={"pp2.jpeg"} alt="Profile" className="w-12 h-12 rounded-full object-cover"/>
+                <img src={"pp-generic.png"} alt="Profile" className="w-12 h-12 rounded-full object-cover"/>
                 <div className="ps-4 grow">
                     <div className="flex items-center justify-between pb-2">
                         <p className="font-medium horizontal-break-after grow">
@@ -83,7 +83,7 @@ function Post({postData}) {
                     <p className="pb-2">
                         {postData.textBody}
                     </p>
-                    {postData && postData.imageURL && <img src={postData.imageURL} className="rounded-xl"></img>}
+                    {postData && postData.imageURL && <img src={postData.imageURL} alt="Post Content" className="rounded-xl"></img>}
                     <div className="flex flex-wrap gap-2">
                         {postData.tags && postData.tags.map((tag, index) => <div key={index} className="text-white bg-[#0D2847] w-fit px-3 py-1 rounded-md">#{tag}</div>)}
                     </div>

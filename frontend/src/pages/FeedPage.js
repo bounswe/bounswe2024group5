@@ -33,7 +33,7 @@ function FeedPage() {
         fetch(`${hostURL}/api/posts`, {
             method: "GET",
             headers: {
-                "Host": "localhost:80",
+                "Host": hostURL.split("://")[1],
                 "Authorization": `Bearer ${token}`,
             },
         }).then((response) => {
@@ -57,7 +57,7 @@ function FeedPage() {
         fetch(`${hostURL}/api/search?` + params.toString(), {
             method: "GET",
             headers: {
-                "Host": "localhost:80",
+                "Host": hostURL.split("://")[1],
                 "Authorization": `Bearer ${token}`,
             },
         }).then((response) => {

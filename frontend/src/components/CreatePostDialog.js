@@ -59,14 +59,15 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
         const token = sessionStorage.getItem("token");
 
         console.log("Posting with, ", token);
+
         /*
         const formData = new FormData();
         formData.append('file', selectedImage);
         fetch(`${hostURL}/api/file/upload`, {
             method: "POST",
             headers: {
-                "Host": "localhost:80",
-                "Content-Type": "multipart/form-data",
+                "Host": hostURL.split("://")[1],
+                "Content-Type": `multipart/form-data`,
                 "Authorization": `Bearer ${token}`,
             },
             body: formData,
@@ -76,14 +77,14 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
             console.log(response);
         }).catch((error) => {
             console.error(error);
-        });
-        */
+        });*/
+        
         fetch(`${hostURL}/api/posts`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Content-Length": JSON.stringify(requestBody).length.toString(),
-                "Host": "localhost:80",
+                "Host": hostURL.split("://")[1],
                 "Authorization": `Bearer ${token}`,
             },
             body: JSON.stringify(requestBody)
