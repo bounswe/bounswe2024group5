@@ -34,6 +34,9 @@ public class SearchService {
     @Autowired
     private WikiDataRepository wikiDataRepository;
 
+    @Autowired
+    private PostService postService;
+
     private final String WIKIDATA_URL = "https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&language=en&search=";
 
     public SearchResponse search(String text) {
@@ -41,11 +44,8 @@ public class SearchService {
         List<PostResponse> posts = new ArrayList<>();
         for (PostSearch postSearch : postSearchs) {
             Post post = postRepository.findById((long)postSearch.getId()).get();
-            List<String> tags = new ArrayList<>();
-            for (Tag tag : tagRepository.findByPost(post)) {
-                tags.add(tag.getTag());
-            }
-            posts.add(new PostResponse(post, tags));
+            PostResponse postResponse = postService.convertToResponse(post);
+            posts.add(postResponse);
         }
         List<WikiResponse> wiki = searchWikiData(text);
         return new SearchResponse(posts, wiki);

@@ -34,10 +34,14 @@ public class PostService {
     @Autowired
     private PostSearchRepository postSearchRepository;
 
+    @Autowired
+    private PostLikeService postLikeService;
+
     private List<PostResponse> mapper(List<Post> posts) {
         return posts.stream().map(post -> {
             List<String> tags = tagService.getTagsByPost(post).stream().map(Tag::getTag).collect(Collectors.toList());
-            return new PostResponse(post, tags);
+            int likes = postLikeService.numberOfLikes(post.getId());
+            return new PostResponse(post, tags, likes);
         }).collect(Collectors.toList());
     }
 
@@ -82,9 +86,10 @@ public class PostService {
         return id;
     }
 
-    private PostResponse convertToResponse(Post post) {
+    public PostResponse convertToResponse(Post post) {
         List<String> tags = tagService.getTagsByPost(post).stream().map(Tag::getTag).collect(Collectors.toList());
-        return new PostResponse(post, tags);
+        int likes = postLikeService.numberOfLikes(post.getId());
+        return new PostResponse(post, tags, likes);
     }
 
     public PostResponse getOnePostById(Long postId) {
