@@ -9,19 +9,23 @@ import {
   Text,
   ActivityIndicator,
 } from "react-native";
+import { useAuth } from "./AuthProvider";
 import CustomButton from "../components/CustomButton";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
+import CustomModal from "../components/CustomModal";
 
 const ProfileSettingsScreen = ({ route, navigation }) => {
-  const { user } = route.params;
-
+  const {user} = route.params;
+  const {token} = useAuth();
   const [profileImage, setProfileImage] = useState(user.profile.profilePicture);
   const [username, setUsername] = useState(user.username);
   const [bio, setBio] = useState(user.profile.bio);
   const [publicName, setPublicName] = useState(user.profile.publicName);
   const [isPrivate, setIsPrivate] = useState(user.profile.private);
   const [saving, setSaving] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -36,8 +40,53 @@ const ProfileSettingsScreen = ({ route, navigation }) => {
     }
   };
 
-  const saveChanges = () => {
+  const saveChanges = async () => {
+  
+    const requestBody = {
+      bio: bio,
+      publicName: publicName,
+      spotifyAcc : "",
+      instagramAcc: "",
+      profilePictureUrl: "",
+    };
+    console.log('Updating the user profile with:', requestBody);  
+    console.log('Updating profile with token is:', token);
+    try {
+      const response = await fetch(`http://34.118.44.165/api/users/${username}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Host: '34.118.44.165',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+      console.log('response is:', response);
+    if (response.ok) {
+      const responseData = await response.json();
+      console.log(
+        "Profile updated successfully."
+      );
+      setModalVisible(true);
+    } else {
+      console.error("Failed to update profile:", response.status);
+      if (response.status === 401) {
+        setErrorMessage("Unauthorized. Please check your token.");
+      } else {
+        setErrorMessage(
+          `Failed to update profile. Status code: ${response.status}`
+        );
+      }
+      setModalVisible(true);
+    }
+  } catch (error) {
+    console.error("Error creating post:", error);
+    setErrorMessage("Failed to create post. Please try again.");
+    setModalVisible(true);
+  } finally {
     setSaving(true);
+  }
+
     setTimeout(() => {
       setSaving(false);
       navigation.goBack();
@@ -110,6 +159,16 @@ const ProfileSettingsScreen = ({ route, navigation }) => {
           <ActivityIndicator size="large" color="#00ff00" />
         </View>
       )}
+      <CustomModal
+        visible={modalVisible}
+        message={errorMessage}
+        onClose={() => {
+          setModalVisible(false);
+          if (!errorMessage) {
+            navigation.goBack();
+          }
+        }}
+      />
     </ScrollView>
   );
 };
