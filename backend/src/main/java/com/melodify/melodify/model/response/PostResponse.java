@@ -1,9 +1,11 @@
 package com.melodify.melodify.model.response;
 
 import com.melodify.melodify.model.Post;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 public class PostResponse {
     private Long id;
     private String text;
@@ -11,9 +13,10 @@ public class PostResponse {
     private String media_url;
     private String createdAt;
     private String editedAt;
+    private int likes;
     private List<String> tags;
 
-    public PostResponse(Post post, List<String> tags) {
+    public PostResponse(Post post, List<String> tags, int likes) {
         this.id = post.getId();
         this.text = post.getText();
         this.author = post.getAuthor().getUsername();
@@ -21,33 +24,8 @@ public class PostResponse {
         this.media_url = post.getMedia_url();
         this.createdAt = post.getCreatedAt().toString();
         this.editedAt = post.getEditedAt().toString();
+        this.likes = likes;
     }
 
-    public Long getId() {
-        return id;
-    }
 
-    public String getText() {
-        return text;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getMedia_url() {
-        return media_url;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getEditedAt() {
-        return editedAt;
-    }
-
-    public List<String> getTags() {
-        return tags;
-    }
 }

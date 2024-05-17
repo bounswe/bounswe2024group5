@@ -44,4 +44,10 @@ public class PostLikeService {
         postLikeRepository.delete(postLike);
     }
 
+    public int numberOfLikes(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(()
+                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
+        return postLikeRepository.findByPost(post).size();
+    }
+
 }

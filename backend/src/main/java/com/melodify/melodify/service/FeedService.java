@@ -24,6 +24,8 @@ public class FeedService {
     
     @Autowired
     private final TagService tagService;
+    @Autowired
+    private PostService postService;
 
     public FeedService(PostRepository postRepository, TagService tagService) {
         this.postRepository = postRepository;
@@ -37,8 +39,7 @@ public class FeedService {
         Pageable pageable = PageRequest.of(page, limit, Sort.by("createdAt").descending());
         List<Post> posts = postRepository.findAll(pageable).getContent();
         List<PostResponse> postResponses = posts.stream().map(post -> {
-            List<String> tags = tagService.getTagsByPost(post).stream().map(Tag::getTag).collect(Collectors.toList());
-            return new PostResponse(post, tags);
+            return postService.convertToResponse(post);
         }).collect(Collectors.toList());
         return postResponses;
     }
