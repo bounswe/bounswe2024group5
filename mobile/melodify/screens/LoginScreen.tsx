@@ -55,9 +55,10 @@ const LoginScreen = ({ navigation }) => {
         },
       });
       const user = await response.json();
-      // console.log("User profile data:", user);
+      console.log("User profile data:", user);
       if (response.ok) {
         setUserData(user);
+        console.log("User profile data:", user);
       } else {
         // It currently enters here...
         console.error("Failed to fetch user profile data", response);
@@ -92,20 +93,22 @@ const LoginScreen = ({ navigation }) => {
         login(data.token);
         // navigation.navigate("Home");
         console.log("Logged in successfully");
-        fetchUserProfile();
+        // fetchUserProfile();
         const userProfile: Profile = {
-          name: registeredUser.name,
-          surname: registeredUser.surname,
-          bio: registeredUser.bio,
+          name: 'ebrar',
+          surname: 'Doe',
+          bio: 'I am a music lover',
           private: false,
+          followers: 50,
+          following: 100,
         };
         const user: RegisteredUser = {
-          username: data.username,
-          password: data.password,
-          email: registeredUser.email,
+          username: 'ebrar',
+          password: 'Ebrar2001',
+          email: 'john@gmail.com',
           profile: userProfile,
         };
-        navigation.navigate("Home", { registeredUser: "" });
+        navigation.navigate("Home", { registeredUser: user });
       } else {
         setErrorMessage(data.message || "Invalid username/password");
         setModalVisible(true);

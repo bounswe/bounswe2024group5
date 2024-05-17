@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 
 const SeePostScreen = ({ route, navigation }) => {
-  const { post } = route.params;
+  const { post, username } = route.params;
   const { author, created_at, text, imageUrl, tags, likes } = post;
   const [liked, setLiked] = useState(false);
   // const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -17,7 +17,7 @@ const SeePostScreen = ({ route, navigation }) => {
     );
   };
   const handleCommentPress = () => {
-    navigation.navigate("CommentScreen", { postId: post.id });
+    navigation.navigate("CommentScreen", { postId: post.id, username: username});
   };
 
   return (

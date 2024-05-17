@@ -22,10 +22,12 @@ interface CommentScreenProps {
 
 interface Comment {
   comment: string;
+  commentId?: string;
+  username?: string;
 }
 
 const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
-  const { postId } = route.params;
+  const { postId, username } = route.params;
   // Use the postId value in your component
   console.log("postId:", postId);
   const { login, token } = useAuth();
@@ -42,7 +44,9 @@ const CommentScreen: React.FC<CommentScreenProps> = ({ route }) => {
     }
     const requestBody = {
       comment: newComment.trim(),
+      username: username,
     };
+    console.log('requestBody:', requestBody)
     try {
       const response = await fetch(`http://34.118.44.165:80/api/posts/${postId}/comment`, {
         method: 'POST',
