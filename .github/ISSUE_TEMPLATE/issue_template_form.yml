@@ -1,0 +1,54 @@
+name: Issue Template Form
+description: General template for all issues as form
+title: "Issue: "
+labels: ["status: new"]
+assignees:
+  - 
+
+body:
+  - type: markdown
+    attributes:
+      value: "## Description\nThe issue description."
+
+  - type: textarea
+    attributes:
+      label: Issue Description
+      description: Describe the issue in detail.
+      placeholder: Add a detailed description of your issue here.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Tasks
+      description: Edit and check off the tasks as needed.
+      placeholder: |
+        - [x] ~Task 1~
+        - [ ] Task 2
+        - [ ] Task 3
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Estimated Time
+      description: Time estimation in minutes.
+      placeholder: Enter time in minutes
+    validations:
+      required: true
+      
+  - type: input
+    attributes:
+      label: Deadline
+      description: Specify the deadline for this issue.
+      placeholder: "dd/mm/yyyy - Hour"
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Reviewer
+      description: Assign a reviewer for this issue. Speciy the deadline for the review.
+      placeholder: "@username - Deadline of the review (dd/mm/yyyy - hour)"
+    validations:
+      required: true
