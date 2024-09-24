@@ -7,7 +7,6 @@ We are a group of students from Boğaziçi University, Department of Computer En
 
 ### About the Project
 
-## English learning platform for Turkish speakers
 The project aims to create an application where Turkish speakers can learn English words with quizzes and accumulate points in a time interval, much like Duolingo. The users will be grouped by their English levels (e.g. advanced).
 
 Users will be able to create their own quizzes and share them with the others. Creation of quizzes will utilize Linked Data, such as Lexvo, to get the words, senses and translations. The users will see words that are predicted to be just in their reach, i.e. not too easy / difficult, in their quizzes. Quizzes should be in multiple formats: 1) matching an English word with its Turkish counterpart, 2) vice versa, 3) matching an English word with a sense out of choices. An example for the 1st quiz would be matching "demure" with "ağırbaşlı" out of choices "serin", "ağırbaşlı" and "temiz". An example for the 3rd quiz would be matching "demure" with "reserved, modest, and shy" out of choices "neither warm nor very cold", "reserved, modest, and shy" and "free from dirt or impurities".
