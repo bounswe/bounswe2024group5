@@ -28,13 +28,13 @@ There will be a forum where users can ask questions and get answers from other u
   </tr>
 
   <tr>
-    <td><img src="" alt="Fahreddin Özcan" height ="200" width="200"></td>
+    <td><img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/fahreddin_square.JPG" alt="Fahreddin Özcan" height ="200" width="200"></td>
     <td><img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/HalilUtkuCelik.jpg" alt="Halil Utku Celik" height ="200" width="200"></td>  
     <td><img src="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/Deniz_square.jpg" alt="Özgür Deniz Demir" height ="200" width="200"></td>  
   </tr>
   
   <tr>
-    <td><a href="https://github.com/bounswe/bounswe2024group5/blob/main/.github/images/members/fahreddin_square.JPG">FAHREDDİN ÖZCAN</a></td>
+    <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/Fahreddin-%C3%96zcan">FAHREDDİN ÖZCAN</a></td>
     <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/Halil-Utku-%C3%87elik">HALIL UTKU ÇELİK</a></td>
     <td><a href="https://github.com/bounswe/bounswe2024group5/wiki/%C3%96zg%C3%BCr-Deniz-Demir">ÖZGÜR DENİZ DEMİR</a></td>
   </tr>
