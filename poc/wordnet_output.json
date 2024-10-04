@@ -121,8 +121,8 @@
             "well": 2,
             "commodity": 1,
             "trade_good": 1,
-            "bang-up": 1,
-            "goodish": 1
+            "well-behaved": 1,
+            "redeeming": 1
         }
     },
     {
@@ -295,12 +295,12 @@
         ],
         "Similar words": {
             "fresh": 3,
-            "young": 2,
             "novel": 2,
+            "young": 2,
             "original": 2,
             "late": 2,
-            "hot": 1,
-            "brand-new": 1
+            "recent": 1,
+            "revolutionary": 1
         }
     },
     {
@@ -361,8 +361,8 @@
             "pocket-size": 2,
             "minuscule": 2,
             "small-scale": 2,
-            "dwarfish": 1,
-            "bantam": 1
+            "atomic": 1,
+            "microscopic": 1
         }
     },
     {
@@ -377,13 +377,13 @@
             "(of surfaces) conducive to rapid speeds"
         ],
         "Similar words": {
-            "rapid": 2,
             "quick": 2,
+            "rapid": 2,
             "firm": 2,
             "fasting": 1,
-            "fast-breaking": 1,
-            "alacritous": 1,
-            "fleet": 1
+            "double-quick": 1,
+            "windy": 1,
+            "smart": 1
         }
     },
     {
@@ -396,11 +396,11 @@
         ],
         "Similar words": {
             "felicitous": 2,
+            "blissful": 1,
             "golden": 1,
             "bright": 1,
             "blessed": 1,
             "laughing": 1,
-            "blissful": 1,
             "fortunate": 1
         }
     },
@@ -419,10 +419,10 @@
             "unsound": 2,
             "badly": 2,
             "badness": 1,
-            "incompetent": 1,
-            "rubber": 1,
-            "poor": 1,
-            "icky": 1
+            "corked": 1,
+            "ill": 1,
+            "hard": 1,
+            "deplorable": 1
         }
     },
     {
@@ -458,8 +458,8 @@
             "United States baseball player and famous pitcher (1867-1955)"
         ],
         "Similar words": {
-            "youthful": 2,
             "early": 2,
+            "youthful": 2,
             "new": 2,
             "offspring": 1,
             "loretta_young": 1,

@@ -1,5 +1,5 @@
 import json
-# 1. install the library: pip install nltk
+# First install the library: pip install nltk
 import nltk
 # nltk.download('wordnet')
 from nltk.corpus import wordnet as wn
@@ -27,6 +27,7 @@ for word in most_common_words_in_english_according_to_polysemy + words_to_check:
         for sim in ss.similar_tos():
             similar_word = sim.name().split(".")[0].lower()
             if similar_word != word:
+                # print(similar_word)
                 if similar_word not in similar_words:
                     similar_words[similar_word] = 1
                 else:
@@ -52,4 +53,5 @@ for word, similar_words in similarity_database.items():
 
 # Convert the output list to JSON format and print it
 json_output = json.dumps(output, indent=4)
-print(json_output)
+with open('wordnet_output.json', 'w') as json_file:
+    json_file.write(json_output)
