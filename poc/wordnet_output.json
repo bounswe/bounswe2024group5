@@ -1,0 +1,491 @@
+[
+    {
+        "Word": "take",
+        "Definitions": [
+            "the income or profit arising from such transactions as the sale of land or other property",
+            "the act of photographing a scene or part of a scene without interruption",
+            "carry out",
+            "require (time or space)",
+            "take somebody somewhere",
+            "get into one's hands, take physically",
+            "take on a certain form, attribute, or aspect"
+        ],
+        "Similar words": {
+            "accept": 4,
+            "have": 3,
+            "occupy": 2,
+            "direct": 2,
+            "assume": 2,
+            "take_on": 2,
+            "read": 2
+        }
+    },
+    {
+        "Word": "go",
+        "Definitions": [
+            "a time for working (after which you will be relieved by someone else)",
+            "street names for methylenedioxymethamphetamine",
+            "a usually brief attempt",
+            "a board game for two players who place counters on a grid; the object is to surround and so capture the opponent's counters",
+            "change location; move, travel, or proceed, also metaphorically",
+            "follow a procedure or take a course",
+            "move away from a place into another direction"
+        ],
+        "Similar words": {
+            "move": 4,
+            "run": 4,
+            "pass": 3,
+            "proceed": 2,
+            "lead": 2,
+            "die": 2,
+            "spell": 1
+        }
+    },
+    {
+        "Word": "make",
+        "Definitions": [
+            "a recognizable kind",
+            "the act of mixing cards haphazardly",
+            "engage in",
+            "give certain properties to something",
+            "make or cause to be or to become",
+            "cause to do; cause to act in a specified manner",
+            "give rise to; cause to happen or occur, not always intentionally"
+        ],
+        "Similar words": {
+            "do": 3,
+            "get": 3,
+            "create": 3,
+            "have": 3,
+            "cause": 2,
+            "gain": 2,
+            "reach": 2
+        }
+    },
+    {
+        "Word": "get",
+        "Definitions": [
+            "a return on a shot that seemed impossible to reach and would normally have resulted in a point for the opponent",
+            "come into the possession of something concrete or abstract",
+            "enter or assume a certain state or condition",
+            "cause to move; cause to be in a certain position or condition",
+            "receive a specified treatment (abstract)",
+            "reach a destination; arrive by movement or progress",
+            "go or come after and bring or take back"
+        ],
+        "Similar words": {
+            "catch": 7,
+            "have": 5,
+            "receive": 3,
+            "make": 3,
+            "acquire": 2,
+            "become": 1,
+            "go": 1
+        }
+    },
+    {
+        "Word": "back",
+        "Definitions": [
+            "the posterior part of a human (or animal) body from the neck to the end of the spine",
+            "the side that goes last or is not normally seen",
+            "the part of something that is furthest from the normal viewer",
+            "(football) a person who plays in the backfield",
+            "the series of vertebrae forming the axis of the skeleton and protecting the spinal cord",
+            "the protective covering on the front, back, and spine of a book",
+            "the part of a garment that covers the back of your body"
+        ],
+        "Similar words": {
+            "rear": 3,
+            "endorse": 2,
+            "indorse": 2,
+            "backward": 2,
+            "dorsum": 1,
+            "spinal_column": 1,
+            "vertebral_column": 1
+        }
+    },
+    {
+        "Word": "good",
+        "Definitions": [
+            "benefit",
+            "moral excellence or admirableness",
+            "that which is pleasing or valuable or useful",
+            "articles of commerce",
+            "having desirable or positive qualities especially those suitable for a thing specified",
+            "having the normally expected amount",
+            "morally admirable"
+        ],
+        "Similar words": {
+            "goodness": 2,
+            "sound": 2,
+            "well": 2,
+            "commodity": 1,
+            "trade_good": 1,
+            "bang-up": 1,
+            "goodish": 1
+        }
+    },
+    {
+        "Word": "work",
+        "Definitions": [
+            "activity directed toward making or doing something",
+            "a product produced or accomplished through the effort or activity or agency of a person or thing",
+            "the occupation for which you are paid",
+            "applying the mind to learning and understanding a subject (especially by reading)",
+            "(physics) a manifestation of energy; the transfer of energy from one physical system to another expressed as the product of a force and the distance through which it moves a body in the direction of that force",
+            "a place where work is done",
+            "the total output of a writer or artist (or a substantial part of it)"
+        ],
+        "Similar words": {
+            "work_out": 2,
+            "ferment": 2,
+            "piece_of_work": 1,
+            "employment": 1,
+            "study": 1,
+            "workplace": 1,
+            "oeuvre": 1
+        }
+    },
+    {
+        "Word": "have",
+        "Definitions": [
+            "a person who possesses great material wealth",
+            "have or possess, either in a concrete or an abstract sense",
+            "have as a feature",
+            "go through (mental or physical states or experiences)",
+            "have ownership or possession of",
+            "cause to move; cause to be in a certain position or condition",
+            "serve oneself to, or consume regularly"
+        ],
+        "Similar words": {
+            "get": 5,
+            "take": 3,
+            "make": 3,
+            "hold": 2,
+            "experience": 2,
+            "receive": 2,
+            "rich_person": 1
+        }
+    },
+    {
+        "Word": "one",
+        "Definitions": [
+            "the smallest whole number or a numeral representing this number",
+            "a single person or thing",
+            "used of a single unit or thing; not two or more",
+            "having the indivisible character of a unit",
+            "of the same kind or quality",
+            "used informally as an intensifier",
+            "indefinite in time or position"
+        ],
+        "Similar words": {
+            "1": 2,
+            "i": 2,
+            "ace": 1,
+            "single": 1,
+            "unity": 1,
+            "ane": 1,
+            "cardinal": 1
+        }
+    },
+    {
+        "Word": "even",
+        "Definitions": [
+            "the latter part of the day (the period of decreasing daylight from late afternoon until nightfall)",
+            "make level or straight",
+            "become even or more even",
+            "make even or more even",
+            "divisible by two",
+            "equal in degree or extent or amount; or equally matched or balanced",
+            "being level or straight or regular and without variation as e.g. in shape or texture; or being in the same plane or at the same height as something else (i.e. even with)"
+        ],
+        "Similar words": {
+            "level": 3,
+            "even_out": 3,
+            "flush": 2,
+            "equal": 2,
+            "regular": 2,
+            "evening": 1,
+            "eve": 1
+        }
+    },
+    {
+        "Word": "come",
+        "Definitions": [
+            "the thick white fluid containing spermatozoa that is ejaculated by the male genital tract",
+            "move toward, travel toward something or somebody or approach something or somebody",
+            "reach a destination; arrive by movement or progress",
+            "come to pass; arrive, as in due course",
+            "reach or enter a state, relation, condition, use, or position",
+            "to be the product or result",
+            "be found or available"
+        ],
+        "Similar words": {
+            "add_up": 2,
+            "amount": 2,
+            "semen": 1,
+            "seed": 1,
+            "seminal_fluid": 1,
+            "ejaculate": 1,
+            "cum": 1
+        }
+    },
+    {
+        "Word": "for",
+        "Definitions": [],
+        "Similar words": {}
+    },
+    {
+        "Word": "what",
+        "Definitions": [],
+        "Similar words": {}
+    },
+    {
+        "Word": "about",
+        "Definitions": [
+            "on the move",
+            "(of quantities) imprecise but fairly close to correct",
+            "all around or on all sides",
+            "in the area or vicinity",
+            "used of movement to or among many different places or in no particular direction",
+            "in or to a reversed position or direction",
+            "in rotation or succession"
+        ],
+        "Similar words": {
+            "around": 5,
+            "astir": 1,
+            "active": 1,
+            "approximately": 1,
+            "close_to": 1,
+            "just_about": 1,
+            "some": 1
+        }
+    },
+    {
+        "Word": "give",
+        "Definitions": [
+            "the elasticity of something that can be stretched and returns to its original length",
+            "cause to have, in the abstract sense or physical sense",
+            "be the cause or source of",
+            "transfer possession of something concrete or abstract to somebody",
+            "convey or reveal information",
+            "convey, as of a compliment, regards, attention, etc.; bestow",
+            "organize or be responsible for"
+        ],
+        "Similar words": {
+            "yield": 5,
+            "afford": 2,
+            "pay": 2,
+            "throw": 2,
+            "devote": 2,
+            "render": 2,
+            "pass_on": 2
+        }
+    },
+    {
+        "Word": "new",
+        "Definitions": [
+            "not of long duration; having just (or relatively recently) come into being or been made or acquired or discovered",
+            "original and of a kind not seen before",
+            "lacking training or experience",
+            "having no previous example or precedent or parallel",
+            "other than the former one(s); different",
+            "unaffected by use or exposure",
+            "(of a new kind or fashion) gratuitously new"
+        ],
+        "Similar words": {
+            "fresh": 3,
+            "young": 2,
+            "novel": 2,
+            "original": 2,
+            "late": 2,
+            "hot": 1,
+            "brand-new": 1
+        }
+    },
+    {
+        "Word": "win",
+        "Definitions": [
+            "a victory (as in a race or other competition)",
+            "something won (especially money)",
+            "be the winner in a contest or competition; be victorious",
+            "win something through one's efforts",
+            "obtain advantages, such as points, etc.",
+            "attain success or reach a desired goal"
+        ],
+        "Similar words": {
+            "gain": 2,
+            "winnings": 1,
+            "profits": 1,
+            "acquire": 1,
+            "advance": 1,
+            "pull_ahead": 1,
+            "make_headway": 1
+        }
+    },
+    {
+        "Word": "dog",
+        "Definitions": [
+            "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds",
+            "a dull unattractive unpleasant girl or woman",
+            "informal term for a man",
+            "someone who is morally reprehensible",
+            "a smooth-textured sausage of minced beef or pork usually smoked; often served on a bread roll",
+            "a hinged catch that fits into a notch of a ratchet to move a wheel forward or prevent it from moving backward",
+            "metal supports for logs in a fireplace"
+        ],
+        "Similar words": {
+            "domestic_dog": 1,
+            "canis_familiaris": 1,
+            "frump": 1,
+            "cad": 1,
+            "bounder": 1,
+            "blackguard": 1,
+            "hound": 1
+        }
+    },
+    {
+        "Word": "small",
+        "Definitions": [
+            "the slender part of the back",
+            "a garment size for a small person",
+            "limited or below average in number or quantity or magnitude or extent",
+            "limited in size or scope",
+            "(of children and animals) young, immature",
+            "slight or limited; especially in degree or intensity or scope",
+            "low or inferior in station or quality"
+        ],
+        "Similar words": {
+            "little": 5,
+            "modest": 3,
+            "pocket-size": 2,
+            "minuscule": 2,
+            "small-scale": 2,
+            "dwarfish": 1,
+            "bantam": 1
+        }
+    },
+    {
+        "Word": "fast",
+        "Definitions": [
+            "abstaining from food",
+            "abstain from certain foods, as for religious or medical reasons",
+            "abstain from eating",
+            "acting or moving or capable of acting or moving quickly",
+            "(used of timepieces) indicating a time ahead of or later than the correct time",
+            "at a rapid tempo",
+            "(of surfaces) conducive to rapid speeds"
+        ],
+        "Similar words": {
+            "rapid": 2,
+            "quick": 2,
+            "firm": 2,
+            "fasting": 1,
+            "fast-breaking": 1,
+            "alacritous": 1,
+            "fleet": 1
+        }
+    },
+    {
+        "Word": "happy",
+        "Definitions": [
+            "enjoying or showing or marked by joy or pleasure",
+            "marked by good fortune",
+            "eagerly disposed to act or to be of service",
+            "well expressed and to the point"
+        ],
+        "Similar words": {
+            "felicitous": 2,
+            "golden": 1,
+            "bright": 1,
+            "blessed": 1,
+            "laughing": 1,
+            "blissful": 1,
+            "fortunate": 1
+        }
+    },
+    {
+        "Word": "bad",
+        "Definitions": [
+            "that which is below standard or expectations as of ethics or decency",
+            "having undesirable or negative qualities",
+            "very intense",
+            "feeling physical discomfort or pain (`tough' is occasionally used colloquially for `bad')",
+            "(of foodstuffs) not in an edible or usable condition",
+            "feeling or expressing regret or sorrow or a sense of loss over something done or undone",
+            "not capable of being collected"
+        ],
+        "Similar words": {
+            "unsound": 2,
+            "badly": 2,
+            "badness": 1,
+            "incompetent": 1,
+            "rubber": 1,
+            "poor": 1,
+            "icky": 1
+        }
+    },
+    {
+        "Word": "rich",
+        "Definitions": [
+            "people who have possessions and wealth (considered as a group)",
+            "possessing material wealth",
+            "having an abundant supply of desirable qualities or substances (especially natural resources)",
+            "of great worth or quality",
+            "marked by great fruitfulness",
+            "strong; intense",
+            "very productive"
+        ],
+        "Similar words": {
+            "productive": 2,
+            "rich_people": 1,
+            "affluent": 1,
+            "comfortable": 1,
+            "valuable": 1,
+            "fat": 1,
+            "fertile": 1
+        }
+    },
+    {
+        "Word": "young",
+        "Definitions": [
+            "any immature animal",
+            "United States film and television actress (1913-2000)",
+            "United States civil rights leader (1921-1971)",
+            "British physicist and Egyptologist; he revived the wave theory of light and proposed a three-component theory of color vision; he also played an important role in deciphering the hieroglyphics on the Rosetta Stone (1773-1829)",
+            "United States jazz tenor saxophonist (1909-1959)",
+            "English poet (1683-1765)",
+            "United States baseball player and famous pitcher (1867-1955)"
+        ],
+        "Similar words": {
+            "youthful": 2,
+            "early": 2,
+            "new": 2,
+            "offspring": 1,
+            "loretta_young": 1,
+            "whitney_young": 1,
+            "whitney_moore_young_jr.": 1
+        }
+    },
+    {
+        "Word": "play",
+        "Definitions": [
+            "a dramatic work intended for performance by actors on a stage",
+            "a theatrical performance of a drama",
+            "a preset plan of action in team sports",
+            "a deliberate coordinated movement requiring dexterity and skill",
+            "a state in which action is feasible",
+            "utilization or exercise",
+            "an attempt to get something"
+        ],
+        "Similar words": {
+            "act": 3,
+            "toy": 3,
+            "dally": 2,
+            "drama": 1,
+            "dramatic_play": 1,
+            "maneuver": 1,
+            "manoeuvre": 1
+        }
+    }
+]
