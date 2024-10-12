@@ -1,27 +1,33 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { quizzes } from "../types/question";
-import { IconCheck } from "@tabler/icons-react";
-
+import { Question, quizzes } from "../types/question";
+import { IconCheck, IconX } from "@tabler/icons-react";
+import { cx } from "class-variance-authority";
+import Confetti from "react-confetti";
+const optionLabels = ["A", "B", "C", "D"];
 export const SolveQuizPage = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | undefined>(
     undefined
   );
+  const [isQuizFinished, setIsQuizFinished] = useState(false);
+  const [confettiEnabled, setConfettiEnabled] = useState(false);
   const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(undefined);
+  // const [isCorrect, setIsCorrect] = useState<boolean | undefined>(undefined);
   const [score, setScore] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
 
   const handleAnswer = (answer: string) => {
-    setSelectedAnswer(answer);
+    if (!showResult) {
+      setSelectedAnswer(answer);
+    }
   };
 
   const handleSubmit = () => {
-    if (selectedAnswer) {
+    if (selectedAnswer && !showResult) {
       setShowResult(true);
       const correct = selectedAnswer === questions[currentQuestion].answer;
-      setIsCorrect(undefined);
+      // setIsCorrect(correct);
       if (correct) {
         setScore(score + 1);
       }
@@ -33,22 +39,29 @@ export const SolveQuizPage = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(undefined);
-      setIsCorrect(undefined);
+      // setIsCorrect(undefined);
       setShowResult(false);
     } else {
-      // Quiz finished
-      alert(`Quiz completed! Your score: ${score}/${questions.length}`);
+      setIsQuizFinished(true);
     }
   };
+
+  useEffect(() => {
+    if (isQuizFinished) {
+      setConfettiEnabled(true);
+      setInterval(() => {
+        setConfettiEnabled(false);
+      }, 5000);
+    }
+  }, [isQuizFinished]);
 
   const questions = quizzes[0].questions;
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
-  const optionLabels = ["A", "B", "C", "D"];
-
   return (
     <div className="flex">
+      {confettiEnabled && <Confetti />}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -69,85 +82,55 @@ export const SolveQuizPage = () => {
         <p className="mb-6 text-lg">{questions[currentQuestion].question}</p>
         <div className="grid grid-cols-2 gap-4 ">
           {questions[currentQuestion].options.map((option, index) => (
-            <motion.button
-              key={index}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleAnswer(option)}
-              className={`p-4 text-left text-violet-500 font-semibold rounded-lg transition-colors flex items-center border-2 border-transparent ${
-                selectedAnswer === option
-                  ? "!border-violet-500 font-bold"
-                  : "hover:opacity-90"
-              } bg-violet-200 text-white`}
-            >
-              <span className="flex items-center justify-center w-8 h-8 mr-3 text-black bg-white rounded-full">
-                {optionLabels[index]}
-              </span>
-              {option}
-            </motion.button>
+            <Option
+              index={index}
+              option={option}
+              selectedAnswer={selectedAnswer}
+              handleAnswer={handleAnswer}
+              showResult={showResult}
+              question={questions[currentQuestion]}
+            />
           ))}
         </div>
         <motion.button
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.95 }}
-          onClick={handleSubmit}
+          onClick={() => {
+            if (showResult) {
+              nextQuestion();
+            } else {
+              handleSubmit();
+            }
+          }}
           disabled={!selectedAnswer}
           className={`mt-6 w-full py-3 rounded-lg transition-colors ${
             selectedAnswer
-              ? "bg-blue-500 text-white hover:bg-blue-600"
+              ? "bg-violet-500 text-white hover:bg-violet-600"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
-          Submit Answer
+          {currentQuestion === questions.length - 1
+            ? "Finish Quiz"
+            : showResult
+            ? "Next Question"
+            : "Submit Answer"}
         </motion.button>
-        {showResult && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center mt-6"
-          >
-            {/* {isCorrect ? (
-                <IconCheck className="mr-2 text-green-500" />
-              ) : (
-                <XCircle className="mr-2 text-red-500" />
-              )} */}
-            <IconCheck className="mr-2 text-green-500" />
-            <p className={isCorrect ? "text-green-500" : "text-red-500"}>
-              {isCorrect
-                ? "Correct!"
-                : "Incorrect. The correct answer is: " +
-                  questions[currentQuestion].answer}
-            </p>
-          </motion.div>
-        )}
-        {showResult && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={nextQuestion}
-            className="px-6 py-2 mt-6 text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600"
-          >
-            {currentQuestion < questions.length - 1
-              ? "Next Question"
-              : "Finish Quiz"}
-          </motion.button>
-        )}
       </motion.div>
       <div className="w-px h-full mx-4 bg-zinc-400"></div>
-      <div className="w-1/4 p-4 rounded-xl bg-violet-50 ">
-        <h3 className="mb-4 text-xl font-semibold">Question Overview</h3>
-        <div className="grid grid-cols-5 gap-2">
+      <div className="flex flex-col items-center w-1/4 p-4 rounded-xl bg-violet-50">
+        <h3 className="mt-2 mb-4 text-xl font-semibold">Question Overview</h3>
+        <div className="grid grid-cols-5 gap-4">
           {questions.map((_, index) => (
             <div
               key={index}
               className={`w-8 h-8 rounded-full flex items-center justify-center text-white ${
                 index === currentQuestion
-                  ? "bg-blue-500"
+                  ? "bg-violet-500"
                   : index < answers.length
                   ? answers[index]
-                    ? "bg-green-500"
+                    ? "bg-emerald-500"
                     : "bg-red-500"
-                  : "bg-gray-300"
+                  : "bg-zinc-300"
               }`}
             >
               {index + 1}
@@ -161,5 +144,61 @@ export const SolveQuizPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const Option = ({
+  question,
+  handleAnswer,
+  showResult,
+  selectedAnswer,
+  option,
+  index,
+}: {
+  question: Question;
+  handleAnswer: (answer: string) => void;
+  showResult: boolean;
+  selectedAnswer: string | undefined;
+  option: string;
+  index: number;
+}) => {
+  const isThisOptionCorrectlySelected = option === question.answer;
+  const isThisOptionIncorrectlySelected =
+    showResult && option !== question.answer;
+  return (
+    <motion.button
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={() => handleAnswer(option)}
+      className={cx(
+        "p-4 text-left  font-semibold rounded-lg transition-colors flex items-center border-2 border-transparent text-white",
+        showResult && isThisOptionCorrectlySelected
+          ? "bg-emerald-200 border-none"
+          : showResult && selectedAnswer === option
+          ? "bg-red-200 border-none"
+          : "bg-violet-200 hover:bg-violet-300",
+
+        selectedAnswer === option
+          ? "border-violet-500 font-bold"
+          : "hover:opacity-90"
+      )}
+    >
+      {showResult && isThisOptionCorrectlySelected ? (
+        <div className="flex items-center justify-center w-8 h-8 mr-2 rounded-full bg-emerald-500">
+          <IconCheck className="text-white" />
+        </div>
+      ) : showResult &&
+        selectedAnswer === option &&
+        isThisOptionIncorrectlySelected ? (
+        <div className="flex items-center justify-center w-8 h-8 mr-2 bg-red-500 rounded-full">
+          <IconX className="text-white" />
+        </div>
+      ) : (
+        <span className="flex items-center justify-center w-8 h-8 mr-2 text-black bg-white rounded-full">
+          {optionLabels[index]}
+        </span>
+      )}
+      {option}
+    </motion.button>
   );
 };
