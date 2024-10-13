@@ -19,7 +19,7 @@ const BaseLayout = ({ children, navigation }) => {
             <Ionicons name="person-outline" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton} onPress={handleLogout}>
-            <Ionicons name="power-outline" size={24} color="black" />
+            <Ionicons name="log-out-outline" size={24} color="black" />
           </TouchableOpacity>
         </View>
       </View>

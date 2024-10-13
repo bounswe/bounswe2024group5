@@ -1,28 +1,87 @@
-// LeftPage.tsx
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import BaseLayout from './BaseLayout';
 
 const HomePage = ({ navigation }) => {
+  const navigateToQuizCreation = () => {
+    // Navigate to Quiz Creation page
+    navigation.navigate('QuizCreation');
+  };
+
   return (
     <BaseLayout navigation={navigation}>
-      <Text style={styles.title}>Welcome Home</Text>
-      <Text style={styles.subtitle}>You are logged in!</Text>
+      {/* Quizzes For You Section */}
+      <View style={styles.quizzesForYouHeader}>
+        <Text style={styles.sectionTitle}>Quizzes For You</Text>
+        <TouchableOpacity style={styles.addQuizButton} onPress={navigateToQuizCreation}>
+          <Text style={styles.addQuizButtonText}>+ Add Quiz</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Placeholder for Quizzes For You content */}
+      <View style={styles.quizSection}>
+        <View style={styles.sectionDivider} />
+        <Text style={styles.quizPlaceholderText}>No quizzes available yet.</Text>
+      </View>
+
+      {/* Other Quizzes Section */}
+      <View style={styles.otherQuizzesContainer}>
+        <Text style={styles.sectionTitle}>Other Quizzes</Text>
+        <View style={styles.sectionDivider} />
+        <View style={styles.quizSection}>
+          <Text style={styles.quizPlaceholderText}>No other quizzes available yet.</Text>
+        </View>
+      </View>
     </BaseLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#6a0dad',
-    marginBottom: 16,
+  quizzesForYouHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+    alignSelf: 'stretch',
   },
-  subtitle: {
+  sectionTitle: {
     fontSize: 20,
-    color: '#6a0dad',
-    marginBottom: 40,
+    fontWeight: 'bold',
+    color: '#333',
+    marginLeft: 20,
+  },
+  addQuizButton: {
+    backgroundColor: '#6a0dad',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+    flexShrink: 0,  // Prevents the button from shrinking
+    marginRight: 20, // Adds space to the right of the button
+  },
+  addQuizButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  sectionDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    marginBottom: 10,
+    marginRight: 25,
+    marginLeft: 25,
+  },
+  quizSection: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  quizPlaceholderText: {
+    fontSize: 16,
+    color: '#888',
+  },
+  otherQuizzesContainer: {
+    flex: 1,  // Take up remaining space in the container
+    alignSelf: 'stretch',
+    justifyContent: 'center',  // Align vertically in the middle
   },
 });
 
