@@ -2,27 +2,45 @@ import { Question } from "../../types/question";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
 import { motion } from "framer-motion";
+import { OPTION_LABELS } from "./types";
 
-const optionLabels = ["A", "B", "C", "D"];
-
-export const Option = ({
+export const OptionButton = ({
   question,
   handleAnswer,
-  showResult,
   selectedAnswer,
   option,
   index,
+  answers,
+  currentQuestion,
 }: {
   question: Question;
   handleAnswer: (answer: string) => void;
-  showResult: boolean;
   selectedAnswer: string | undefined;
   option: string;
   index: number;
+  answers: (string | undefined)[];
+  currentQuestion: number;
 }) => {
-  const isThisOptionCorrectlySelected = option === question.answer;
-  const isThisOptionIncorrectlySelected =
-    showResult && option !== question.answer;
+  const isThisQuestionAnswered = answers[currentQuestion] !== undefined;
+  const isThisOptionSubmitted = answers[currentQuestion] === option;
+  const isThisOptionCorrect = option === question.answer;
+
+  const renderCorrect = isThisQuestionAnswered && isThisOptionCorrect;
+  const renderIncorrect =
+    isThisQuestionAnswered && isThisOptionSubmitted && !isThisOptionCorrect;
+
+  //   console.log(renderCorrect, renderIncorrect);
+  console.log({
+    isThisQuestionAnswered,
+    isThisOptionSubmitted,
+    isThisOptionCorrect,
+    renderCorrect,
+    renderIncorrect,
+    selectedAnswer,
+    option,
+    answers,
+  });
+  console.log(option, answers[index]);
   return (
     <motion.button
       whileHover={{ scale: 1.03 }}
@@ -30,10 +48,10 @@ export const Option = ({
       onClick={() => handleAnswer(option)}
       className={cx(
         "p-4 text-left  font-semibold rounded-lg transition-colors flex items-center border-2 border-transparent text-white",
-        showResult && isThisOptionCorrectlySelected
-          ? "bg-emerald-200 border-none"
-          : showResult && selectedAnswer === option
-          ? "bg-red-200 border-none"
+        renderCorrect
+          ? "bg-emerald-200"
+          : renderIncorrect
+          ? "bg-red-200 "
           : "bg-violet-200 hover:bg-violet-300",
 
         selectedAnswer === option
@@ -41,19 +59,17 @@ export const Option = ({
           : "hover:opacity-90"
       )}
     >
-      {showResult && isThisOptionCorrectlySelected ? (
+      {renderCorrect ? (
         <div className="flex items-center justify-center w-8 h-8 mr-2 rounded-full bg-emerald-500">
           <IconCheck className="text-white" />
         </div>
-      ) : showResult &&
-        selectedAnswer === option &&
-        isThisOptionIncorrectlySelected ? (
+      ) : renderIncorrect ? (
         <div className="flex items-center justify-center w-8 h-8 mr-2 bg-red-500 rounded-full">
           <IconX className="text-white" />
         </div>
       ) : (
         <span className="flex items-center justify-center w-8 h-8 mr-2 text-black bg-white rounded-full">
-          {optionLabels[index]}
+          {OPTION_LABELS[index]}
         </span>
       )}
       {option}

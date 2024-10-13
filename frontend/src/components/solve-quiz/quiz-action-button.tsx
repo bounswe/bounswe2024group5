@@ -8,6 +8,7 @@ export const QuizActionButton = ({
   selectedAnswer,
   nextQuestion,
   submitAnswer,
+  answers,
 }: {
   showResult: boolean;
   questions: Question[];
@@ -15,7 +16,10 @@ export const QuizActionButton = ({
   selectedAnswer: string | undefined;
   nextQuestion: () => void;
   submitAnswer: () => void;
+  answers: (string | undefined)[];
 }) => {
+  const isThisQuestionAnswered = answers[currentQuestion] !== undefined;
+
   return (
     <motion.button
       whileHover={{ scale: 1.03 }}
@@ -29,12 +33,12 @@ export const QuizActionButton = ({
       }}
       disabled={!selectedAnswer}
       className={`mt-6 w-full py-3 rounded-lg transition-colors ${
-        selectedAnswer
+        selectedAnswer || isThisQuestionAnswered
           ? "bg-violet-500 text-white hover:bg-violet-600"
           : "bg-gray-300 text-gray-500 cursor-not-allowed"
       }`}
     >
-      {currentQuestion === questions.length - 1
+      {isThisQuestionAnswered && currentQuestion === questions.length - 1
         ? "Finish Quiz"
         : showResult
         ? "Next Question"
