@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -96,25 +96,26 @@ const QuizCreationPage = ({ navigation }) => {
       {/* Render all question boxes */}
       {questions.map((question, index) => (
         <View key={index} style={styles.questionBox}>
-          {/* Question Title Input */}
-          <TextInput
-            style={styles.questionInput}
-            placeholder="Question Title"
-            value={question.title}
-            onChangeText={(text) => updateQuestion(index, 'title', text)}
-          />
-
-          {/* Dropdown for Question Type */}
-          <View style={styles.dropdown}>
-            <Picker
-              selectedValue={question.type}
-              onValueChange={(value) => updateQuestion(index, 'type', value)}
-              mode="dropdown"
-            >
-              <Picker.Item label="Eng -> Tr" value="Eng -> Tr" />
-              <Picker.Item label="Tr -> Eng" value="Tr -> Eng" />
-              <Picker.Item label="Meaning" value="meaning" />
-            </Picker>
+          {/* Header with Title and Dropdown */}
+          <View style={styles.headerContainer}>
+            <TextInput
+              style={styles.questionTitle}
+              placeholder="Question Title"
+              value={question.title}
+              onChangeText={(text) => updateQuestion(index, 'title', text)}
+            />
+            <View style={styles.dropdownContainer}>
+              <Picker
+                selectedValue={question.type}
+                onValueChange={(value) => updateQuestion(index, 'type', value)}
+                mode="dropdown"
+                style={styles.dropdown}
+              >
+                <Picker.Item label="Eng -> Tr" value="Eng -> Tr" />
+                <Picker.Item label="Tr -> Eng" value="Tr -> Eng" />
+                <Picker.Item label="Meaning" value="meaning" />
+              </Picker>
+            </View>
           </View>
 
           {/* Answer Choices */}
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
     height: 150,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
+    borderRadius: 10, // Rounded corners for cleaner look
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#eee',
@@ -199,7 +200,7 @@ const styles = StyleSheet.create({
   descriptionInput: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
+    borderRadius: 10,
     padding: 10,
     marginBottom: 20,
     fontSize: 16,
@@ -209,22 +210,38 @@ const styles = StyleSheet.create({
   questionBox: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
+    borderRadius: 10,
+    padding: 15,
     marginBottom: 20,
+    backgroundColor: '#f9f9f9',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  questionInput: {
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  questionTitle: {
+    flex: 1,
+    fontSize: 16,
     borderBottomWidth: 1,
     borderColor: '#ccc',
     padding: 10,
-    marginBottom: 10,
-    fontSize: 16,
+    marginRight: 10,
   },
-  dropdown: {
-    marginBottom: 10,
+  dropdownContainer: {
+    width: '40%',
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
+    borderRadius: 8,
+  },
+  dropdown: {
+    height: 40,
   },
   choiceInput: {
     borderBottomWidth: 1,
@@ -237,7 +254,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#6a0dad',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 8,
     alignSelf: 'flex-end',
     marginBottom: 40,
   },
@@ -255,7 +272,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#555',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 8,
   },
   cancelButtonText: {
     color: '#fff',
@@ -266,7 +283,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#6a0dad',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 8,
   },
   submitButtonText: {
     color: '#fff',
