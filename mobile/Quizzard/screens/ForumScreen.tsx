@@ -1,4 +1,4 @@
-// RightPage.tsx
+// ForumScreen.tsx
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import BaseLayout from './BaseLayout';
