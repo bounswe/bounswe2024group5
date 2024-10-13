@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from "../screens/RegisterScreen";
 import HomeScreen from "../screens/HomeScreen";
+import ForumScreen from "../screens/ForumScreen";
 import { AuthProvider } from "../screens/AuthProvider";
 
 export type RootStackParamList = {
@@ -28,6 +29,11 @@ function MyStack() {
       <Stack.Screen
         name="Home"
         component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Forum"
+        component={ForumScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
