@@ -16,6 +16,7 @@ const QuizViewComponent = ({ quiz }) => {
         </View>
         <View style={styles.quizInfo}>
           <Text style={styles.difficultyLevel}>{quiz.level}</Text>
+          <Text style={styles.difficultyLevel}>{quiz.elo}</Text>
           <View style={styles.likesContainer}>
             <Ionicons name="heart-outline" size={16} color="#6a0dad" />
             <Text style={styles.likeCount}>{quiz.likes}</Text>

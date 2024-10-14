@@ -6,6 +6,7 @@ const mockQuizData = [
       questions: 43,
       level: 'A2',
       likes: 451,
+      elo: 1400,
     },
     {
       image: 'https://i.pinimg.com/236x/35/6f/6f/356f6fa46cd2cb61a612e2d8fd427b9d.jpg',
@@ -13,6 +14,7 @@ const mockQuizData = [
       questions: 12,
       level: 'A2',
       likes: 352,
+      elo: 1360,
     },
     {
       image: 'https://cdn.icon-icons.com/icons2/1736/PNG/512/4043233-anime-away-face-no-nobody-spirited_113254.png',
@@ -20,6 +22,7 @@ const mockQuizData = [
       questions: 25,
       level: 'A2',
       likes: 128,
+      elo: 1340,
     },
   ];
 
