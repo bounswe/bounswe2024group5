@@ -9,11 +9,17 @@ const BaseLayout = ({ children, navigation }) => {
     navigation.navigate('Login');
   };
 
+  const navigateToHome = () => {
+    navigation.navigate('Home');
+  };
+
   return (
     <View style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={styles.appName}>Quizzard</Text>
+        <TouchableOpacity onPress={navigateToHome}>
+            <Text style={styles.appName}>Quizzard</Text>
+         </TouchableOpacity>
         <View style={styles.icons}>
           <TouchableOpacity style={styles.iconButton}>
             <Ionicons name="person-outline" size={24} color="black" />
