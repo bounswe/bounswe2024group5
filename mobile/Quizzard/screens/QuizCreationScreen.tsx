@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import DropdownComponent from '../components/DropdownComponent';  // Adjust path if necessary
+
+
+
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -105,16 +108,7 @@ const QuizCreationPage = ({ navigation }) => {
               onChangeText={(text) => updateQuestion(index, 'title', text)}
             />
             <View style={styles.dropdownContainer}>
-              <Picker
-                selectedValue={question.type}
-                onValueChange={(value) => updateQuestion(index, 'type', value)}
-                mode="dropdown"
-                style={styles.dropdown}
-              >
-                <Picker.Item label="Eng -> Tr" value="Eng -> Tr" />
-                <Picker.Item label="Tr -> Eng" value="Tr -> Eng" />
-                <Picker.Item label="Meaning" value="meaning" />
-              </Picker>
+                <DropdownComponent />
             </View>
           </View>
 
@@ -228,17 +222,18 @@ const styles = StyleSheet.create({
   },
   questionTitle: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     borderBottomWidth: 1,
     borderColor: '#ccc',
     padding: 10,
     marginRight: 10,
   },
   dropdownContainer: {
-    width: '40%',
+    width: '42%',
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 8,
+    borderRadius: 10,
+    fontSize: 14,
   },
   dropdown: {
     height: 40,
@@ -248,7 +243,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     padding: 10,
     marginBottom: 10,
-    fontSize: 16,
+    fontSize: 14,
   },
   addQuestionButton: {
     backgroundColor: '#6a0dad',
