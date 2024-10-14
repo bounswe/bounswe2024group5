@@ -1,13 +1,46 @@
 // HomeScreen.tsx
 import React from 'react';
-import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, View, TouchableOpacity, FlatList } from 'react-native';
 import BaseLayout from './BaseLayout';
+import HomeScreenQuiz from '@/components/HomeScreenQuiz';
+
+const quizData = [
+  {
+    id: '1',
+    title: 'Animals',
+    eloScore: 1200,
+    imageSource: { uri: 'https://via.placeholder.com/100' },
+  },
+  {
+    id: '2',
+    title: 'Travelling',
+    eloScore: 1350,
+    imageSource: { uri: 'https://via.placeholder.com/100' },
+  },
+  {
+    id: '3',
+    title: 'History',
+    eloScore: 1100,
+    imageSource: { uri: 'https://via.placeholder.com/100' },
+  },
+  // Add more quiz data as needed
+];
 
 const HomePage = ({ navigation }) => {
   const navigateToQuizCreation = () => {
     // Navigate to Quiz Creation page
     navigation.navigate('QuizCreation');
   };
+
+  const handlePress = () => {}
+  const renderQuizItem = ({ item }) => (
+    <HomeScreenQuiz
+      imageSource={item.imageSource}
+      title={item.title}
+      eloScore={item.eloScore}
+      onPress={() => alert(`Selected ${item.title}`)}
+    />
+  );
 
   return (
     <BaseLayout navigation={navigation}>
@@ -22,7 +55,12 @@ const HomePage = ({ navigation }) => {
       {/* Placeholder for Quizzes For You content */}
       <View style={styles.quizSection}>
         <View style={styles.sectionDivider} />
-        <Text style={styles.quizPlaceholderText}>No quizzes available yet.</Text>
+        <FlatList
+          data={quizData} 
+          renderItem={renderQuizItem} 
+          keyExtractor={item => item.id} 
+          contentContainerStyle={styles.list}
+        />
       </View>
 
       {/* Other Quizzes Section */}
@@ -72,6 +110,7 @@ const styles = StyleSheet.create({
     marginLeft: 25,
   },
   quizSection: {
+    height : "50%",
     marginBottom: 20,
     alignItems: 'center',
   },
@@ -83,6 +122,9 @@ const styles = StyleSheet.create({
     flex: 1,  // Take up remaining space in the container
     alignSelf: 'stretch',
     justifyContent: 'center',  // Align vertically in the middle
+  },
+  list: {
+    paddingBottom: 20,
   },
 });
 
