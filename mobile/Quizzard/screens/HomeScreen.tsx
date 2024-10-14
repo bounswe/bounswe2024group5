@@ -6,6 +6,7 @@ import QuizViewComponent from '../components/QuizViewComponent';  // Adjust the 
 import mockQuizData from '../mockdata/mockQuizData';  // Adjust the path if necessary
 import DropdownComponent from '../components/DifficultyLevelDropdown';  // Adjust path if necessary
 
+
 const HomePage = ({ navigation }) => {
   const navigateToQuizCreation = () => {
     navigation.navigate('QuizCreation');
@@ -122,6 +123,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 15,
     width: '100%',
+
   },
   quizGrid: {
     paddingTop: 10,
@@ -133,6 +135,9 @@ const styles = StyleSheet.create({
   quizWrapper: {
     flex: 1,
     padding: 10,
+  },
+  list: {
+    paddingBottom: 20,
   },
 });
 
