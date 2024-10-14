@@ -10,7 +10,14 @@ const languageData = [
 ];
 
 const LanguageTypeDropdown = () => {
-  return <BaseDropdown data={languageData} placeholder="Select type" />;
+
+  const customStyles = {
+    dropdown: {
+      borderBottomWidth: 0.5,
+    },
+  };
+
+  return <BaseDropdown data={languageData} placeholder="Select type" styleOverrides={customStyles}/>;
 };
 
 export default LanguageTypeDropdown;

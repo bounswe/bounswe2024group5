@@ -12,7 +12,22 @@ const difficultyData = [
 ];
 
 const DifficultyLevelDropdown = () => {
-  return <BaseDropdown data={difficultyData} placeholder="Select level" />;
+  const customStyles = {
+    dropdown: {
+    height: 8,
+    width: 100,
+    margin: 8,
+    },
+    placeholderStyle: {
+      fontSize: 14,
+    },
+    selectedTextStyle: {
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
+  };
+
+  return <BaseDropdown data={difficultyData} placeholder="Select level" styleOverrides={customStyles} />;
 };
 
 export default DifficultyLevelDropdown;

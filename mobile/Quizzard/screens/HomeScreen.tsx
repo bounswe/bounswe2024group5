@@ -76,19 +76,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
-  dropdownContainer: {
-    width: '42%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    fontSize: 14,
-  },
   addQuizButton: {
     backgroundColor: '#6a0dad',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 5,
     flexShrink: 0,
+    width: '30%',
   },
   addQuizButtonText: {
     color: '#fff',
@@ -117,6 +111,13 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     alignSelf: 'stretch',
+  },
+  dropdownContainer: {
+    width: '32%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    fontSize: 14,
   },
   otherQuizzesContainer: {
     flexGrow: 1,
