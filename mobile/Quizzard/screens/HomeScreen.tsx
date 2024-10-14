@@ -12,6 +12,10 @@ const HomePage = ({ navigation }) => {
     navigation.navigate('QuizCreation');
   };
 
+  const navigateToMockQuiz = () => {
+    navigation.navigate('QuizSolving')
+  };
+
   const renderOtherQuizzes = ({ item }) => (
     <View style={styles.quizWrapper}>
       <QuizViewComponent quiz={item} />
@@ -33,7 +37,7 @@ const HomePage = ({ navigation }) => {
       <View style={styles.quizSection}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.quizScroll}>
           {mockQuizData.map((quiz, index) => (
-            <QuizViewComponent key={index} quiz={quiz} />
+            <QuizViewComponent key={index} quiz={quiz} onPress={navigateToMockQuiz}/>
           ))}
         </ScrollView>
       </View>
