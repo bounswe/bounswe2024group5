@@ -1,48 +1,25 @@
 // HomeScreen.tsx
 import React from 'react';
-import { Text, StyleSheet, View, TouchableOpacity, FlatList } from 'react-native';
+import { Text, StyleSheet, View, ScrollView, TouchableOpacity, FlatList, SafeAreaView } from 'react-native';
 import BaseLayout from './BaseLayout';
-import HomeScreenQuiz from '@/components/HomeScreenQuiz';
+import QuizViewComponent from '../components/QuizViewComponent';  // Adjust the path if necessary
+import mockQuizData from '../mockdata/mockQuizData';  // Adjust the path if necessary
+import DropdownComponent from '../components/DifficultyLevelDropdown';  // Adjust path if necessary
 
-const quizData = [
-  {
-    id: '1',
-    title: 'Animals',
-    eloScore: 1200,
-    imageSource: { uri: 'https://via.placeholder.com/100' },
-  },
-  {
-    id: '2',
-    title: 'Travelling',
-    eloScore: 1350,
-    imageSource: { uri: 'https://via.placeholder.com/100' },
-  },
-  {
-    id: '3',
-    title: 'History',
-    eloScore: 1100,
-    imageSource: { uri: 'https://via.placeholder.com/100' },
-  },
-  // Add more quiz data as needed
-];
 
 const HomePage = ({ navigation }) => {
   const navigateToQuizCreation = () => {
-    // Navigate to Quiz Creation page
     navigation.navigate('QuizCreation');
   };
 
-  const handlePress = () => {}
-  const renderQuizItem = ({ item }) => (
-    <HomeScreenQuiz
-      imageSource={item.imageSource}
-      title={item.title}
-      eloScore={item.eloScore}
-      onPress={() => alert(`Selected ${item.title}`)}
-    />
+  const renderOtherQuizzes = ({ item }) => (
+    <View style={styles.quizWrapper}>
+      <QuizViewComponent quiz={item} />
+    </View>
   );
 
   return (
+    // <SafeAreaView style={styles.safeArea}> 
     <BaseLayout navigation={navigation}>
       {/* Quizzes For You Section */}
       <View style={styles.quizzesForYouHeader}>
@@ -52,27 +29,36 @@ const HomePage = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Placeholder for Quizzes For You content */}
+      {/* Horizontally Scrollable Quizzes For You */}
       <View style={styles.quizSection}>
-        <View style={styles.sectionDivider} />
-        <FlatList
-          data={quizData} 
-          renderItem={renderQuizItem} 
-          keyExtractor={item => item.id} 
-          contentContainerStyle={styles.list}
-        />
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.quizScroll}>
+          {mockQuizData.map((quiz, index) => (
+            <QuizViewComponent key={index} quiz={quiz} />
+          ))}
+        </ScrollView>
+      </View>
+
+      <View style={styles.otherQuizzesHeader}>
+        <Text style={styles.sectionTitle}>Other Quizzes</Text>
+        <View style={styles.dropdownContainer}>
+                <DropdownComponent />
+            </View>
       </View>
 
       {/* Other Quizzes Section */}
       <View style={styles.otherQuizzesContainer}>
-        <Text style={styles.sectionTitle}>Other Quizzes</Text>
-        <View style={styles.sectionDivider} />
-        <View style={styles.quizSection}>
-          <Text style={styles.quizPlaceholderText}>No other quizzes available yet.</Text>
-        </View>
+      <View style={styles.sectionDivider} />
+        <FlatList
+          data={mockQuizData}
+          renderItem={renderOtherQuizzes}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={2}  // To show two items per row
+          contentContainerStyle={styles.quizGrid}
+          columnWrapperStyle={styles.columnWrapper}
+        />
       </View>
-    </BaseLayout>
-  );
+    </BaseLayout> 
+    );
 };
 
 const styles = StyleSheet.create({
@@ -80,48 +66,75 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 320,
     marginBottom: 10,
+    paddingLeft: 15,
+    paddingRight: 15,
     alignSelf: 'stretch',
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-    marginLeft: 20,
   },
   addQuizButton: {
     backgroundColor: '#6a0dad',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 5,
-    flexShrink: 0,  // Prevents the button from shrinking
-    marginRight: 20, // Adds space to the right of the button
+    flexShrink: 0,
+    width: '30%',
   },
   addQuizButtonText: {
     color: '#fff',
     fontWeight: 'bold',
   },
+  quizSection: {
+    height: '45%',
+  },
+  quizScroll: {
+    paddingLeft: 15,
+    paddingRight: 15,
+  },
+  otherQuizzesHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    alignSelf: 'stretch',
+  },
+  dropdownContainer: {
+    width: '32%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    fontSize: 14,
+  },
   sectionDivider: {
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    marginBottom: 10,
-    marginRight: 25,
-    marginLeft: 25,
-  },
-  quizSection: {
-    height : "50%",
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  quizPlaceholderText: {
-    fontSize: 16,
-    color: '#888',
+    marginLeft: 15,
+    paddingTop: 5,
+    marginRight: 15,
   },
   otherQuizzesContainer: {
-    flex: 1,  // Take up remaining space in the container
-    alignSelf: 'stretch',
-    justifyContent: 'center',  // Align vertically in the middle
+    flexGrow: 1,
+    paddingHorizontal: 15,
+    width: '100%',
+
+  },
+  quizGrid: {
+    paddingTop: 10,
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  quizWrapper: {
+    flex: 1,
+    padding: 10,
   },
   list: {
     paddingBottom: 20,

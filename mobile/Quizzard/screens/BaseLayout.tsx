@@ -9,11 +9,17 @@ const BaseLayout = ({ children, navigation }) => {
     navigation.navigate('Login');
   };
 
+  const navigateToHome = () => {
+    navigation.navigate('Home');
+  };
+
   return (
     <View style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={styles.appName}>Quizzard</Text>
+        <TouchableOpacity onPress={navigateToHome}>
+            <Text style={styles.appName}>Quizzard</Text>
+         </TouchableOpacity>
         <View style={styles.icons}>
           <TouchableOpacity style={styles.iconButton}>
             <Ionicons name="person-outline" size={24} color="black" />
@@ -32,10 +38,10 @@ const BaseLayout = ({ children, navigation }) => {
       {/* Bottom Navigation Bar */}
       <View style={styles.navBar}>
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="home" size={28} color="black" />
+          <Ionicons name="home" size={24} color="#6a0dad" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Forum')}>
-          <Ionicons name="chatbox-outline" size={28} color="black" />
+          <Ionicons name="chatbox-outline" size={24} color="#6a0dad" />
         </TouchableOpacity>
       </View>
     </View>
@@ -74,7 +80,7 @@ const styles = StyleSheet.create({
   navBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    height: 45,
     paddingHorizontal: 40,
     backgroundColor: '#f2f2f2',
     borderTopWidth: 1,

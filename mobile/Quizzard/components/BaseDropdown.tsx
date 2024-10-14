@@ -1,29 +1,23 @@
-// components/DropdownComponent.tsx
+// components/BaseDropdown.tsx
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
-const data = [
-  { label: 'Eng -> Tr', value: 'eng-tr' },
-  { label: 'Tr -> Eng', value: 'tr-eng' },
-  { label: 'Meaning', value: 'meaning' },
-];
-
-const DropdownComponent = () => {
+const BaseDropdown = ({ data, placeholder, styleOverrides = {} }) => {
   const [value, setValue] = useState(null);
 
   return (
     <Dropdown
-      style={styles.dropdown}
-      placeholderStyle={styles.placeholderStyle}
-      selectedTextStyle={styles.selectedTextStyle}
-      iconStyle={styles.iconStyle}
-      itemTextStyle={styles.itemTextStyle} 
+      style={[styles.dropdown, styleOverrides.dropdown]}
+      placeholderStyle={[styles.placeholderStyle, styleOverrides.placeholderStyle]}
+      selectedTextStyle={[styles.selectedTextStyle, styleOverrides.selectedTextStyle]}
+      iconStyle={[styles.iconStyle, styleOverrides.iconStyle]}
+      itemTextStyle={[styles.itemTextStyle, styleOverrides.itemTextStyle]} 
       data={data}
       maxHeight={300}
       labelField="label"
       valueField="value"
-      placeholder="Select type"
+      placeholder={placeholder}
       value={value}
       onChange={(item) => {
         setValue(item.value);
@@ -32,17 +26,13 @@ const DropdownComponent = () => {
   );
 };
 
-export default DropdownComponent;
+export default BaseDropdown;
 
 const styles = StyleSheet.create({
   dropdown: {
     margin: 16,
     height: 16,
     borderBottomColor: 'gray',
-    borderBottomWidth: 0.5,
-  },
-  icon: {
-    marginRight: 5,
   },
   placeholderStyle: {
     fontSize: 12,
@@ -50,6 +40,8 @@ const styles = StyleSheet.create({
   },
   selectedTextStyle: {
     fontSize: 12,
+    color: '#5b0996',
+    fontWeight: 'bold',
   },
   iconStyle: {
     width: 20,

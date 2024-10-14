@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import DropdownComponent from '../components/DropdownComponent';  // Adjust path if necessary
+import DropdownComponent from '../components/QuestionTypeDropdown';  // Adjust path if necessary
 
 
 
@@ -16,6 +16,11 @@ const QuizCreationPage = ({ navigation }) => {
   const handleLogout = () => {
     navigation.navigate('Login');
   };
+
+  const navigateToHome = () => {
+    navigation.navigate('Home');
+  };
+
 
   // Function to handle image picking
   const pickImage = async () => {
@@ -61,7 +66,9 @@ const QuizCreationPage = ({ navigation }) => {
     <ScrollView style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={styles.appName}>Quizzard</Text>
+        <TouchableOpacity onPress={navigateToHome}>
+            <Text style={styles.appName}>Quizzard</Text>
+         </TouchableOpacity>
         <View style={styles.icons}>
           <TouchableOpacity style={styles.iconButton}>
             <Ionicons name="person-outline" size={24} color="black" />
