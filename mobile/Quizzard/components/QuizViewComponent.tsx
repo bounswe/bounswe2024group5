@@ -10,12 +10,14 @@ const QuizViewComponent = ({ quiz }) => {
 
       {/* Quiz Details */}
       <View style={styles.quizDetails}>
+      <View style={styles.quizInfoHeader}>
         <Text style={styles.quizTitle}>{quiz.title}</Text>
         <Text style={styles.quizQuestions}>{quiz.questions} Questions</Text>
+        </View>
         <View style={styles.quizInfo}>
           <Text style={styles.difficultyLevel}>{quiz.level}</Text>
           <View style={styles.likesContainer}>
-            <Ionicons name="heart-outline" size={18} color="red" />
+            <Ionicons name="heart-outline" size={16} color="#6a0dad" />
             <Text style={styles.likeCount}>{quiz.likes}</Text>
           </View>
         </View>
@@ -26,7 +28,8 @@ const QuizViewComponent = ({ quiz }) => {
 
 const styles = StyleSheet.create({
   quizContainer: {
-    width: 150,
+    width: 140,
+    height: 220,
     marginRight: 16,
     backgroundColor: '#fff',
     borderRadius: 8,
@@ -36,22 +39,30 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     overflow: 'hidden',
+    borderWidth: 0.5,
+    borderColor: '#ccc',
   },
   quizImage: {
     width: '100%',
-    height: 150,
+    height: 110,
   },
   quizDetails: {
     padding: 10,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    height: 110,
+  },
+  quizInfoHeader: {
+    flexDirection: 'column',
   },
   quizTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 5,
   },
   quizQuestions: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#888',
     marginBottom: 5,
   },
@@ -70,7 +81,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   likeCount: {
-    marginLeft: 4,
+    marginLeft: 3,
     fontSize: 14,
     color: '#888',
   },

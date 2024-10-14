@@ -46,7 +46,7 @@ const HomePage = ({ navigation }) => {
 
       {/* Other Quizzes Section */}
       <View style={styles.otherQuizzesContainer}>
-        <View style={styles.sectionDivider} />
+      <View style={styles.sectionDivider} />
         <FlatList
           data={mockQuizData}
           renderItem={renderOtherQuizzes}
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 380,
+    marginTop: 320,
     marginBottom: 10,
     paddingLeft: 15,
     paddingRight: 15,
@@ -88,16 +88,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  sectionDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    marginBottom: 10,
-    marginLeft: 15,
-    marginRight: 15,
-  },
   quizSection: {
-    marginBottom: 0,
-    height: '50%',
+    height: '45%',
   },
   quizScroll: {
     paddingLeft: 15,
@@ -107,7 +99,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 5,
     paddingLeft: 15,
     paddingRight: 15,
     alignSelf: 'stretch',
@@ -119,9 +111,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     fontSize: 14,
   },
+  sectionDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    marginLeft: 15,
+    paddingTop: 5,
+    marginRight: 15,
+  },
   otherQuizzesContainer: {
     flexGrow: 1,
-    // marginTop: 10,
     paddingHorizontal: 15,
     width: '100%',
   },
