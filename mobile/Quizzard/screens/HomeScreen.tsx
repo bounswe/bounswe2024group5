@@ -5,6 +5,7 @@ import BaseLayout from './BaseLayout';
 import QuizViewComponent from '../components/QuizViewComponent';  // Adjust the path if necessary
 import mockQuizData from '../mockdata/mockQuizData';  // Adjust the path if necessary
 import DropdownComponent from '../components/DifficultyLevelDropdown';  // Adjust path if necessary
+import questions from '@/mockdata/mockQuizQuestionData';
 
 
 const HomePage = ({ navigation }) => {
@@ -13,7 +14,7 @@ const HomePage = ({ navigation }) => {
   };
 
   const navigateToMockQuiz = () => {
-    navigation.navigate('QuizSolving')
+    navigation.navigate('QuizSolving', {questions: questions})
   };
 
   const renderOtherQuizzes = ({ item }) => (
