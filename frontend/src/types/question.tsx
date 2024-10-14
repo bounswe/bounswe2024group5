@@ -7,14 +7,26 @@ export type Question = {
 
 export type Quiz = {
   id: number;
-  name: string;
+  title: string;
+  description: string;
+  level: "beginner" | "intermediate" | "advanced";
+  category: "fruits" | "animals" | "colors" | "numbers";
+  questionCount: number;
+  imageUrl: string;
+  highlighted: boolean;
   questions: Question[];
 };
 
 export const quizzes: Quiz[] = [
   {
     id: 1,
-    name: "Basic English Vocabulary",
+    title: "Basic English Vocabulary",
+    description: "Learn fundamental English words and their meanings",
+    level: "beginner",
+    category: "colors",
+    questionCount: 5,
+    imageUrl: "/api/placeholder/250/250",
+    highlighted: true,
     questions: [
       {
         id: 101,
@@ -50,7 +62,13 @@ export const quizzes: Quiz[] = [
   },
   {
     id: 2,
-    name: "Intermediate Grammar",
+    title: "Intermediate Grammar",
+    description: "Improve your understanding of English grammar rules",
+    level: "intermediate",
+    category: "animals",
+    questionCount: 5,
+    imageUrl: "/api/placeholder/250/250",
+    highlighted: true,
     questions: [
       {
         id: 201,
@@ -101,7 +119,13 @@ export const quizzes: Quiz[] = [
   },
   {
     id: 3,
-    name: "Advanced English Idioms",
+    title: "Advanced English Idioms",
+    description: "Master complex English expressions and idioms",
+    level: "advanced",
+    category: "fruits",
+    questionCount: 5,
+    imageUrl: "/api/placeholder/250/250",
+    highlighted: false,
     questions: [
       {
         id: 301,
