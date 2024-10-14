@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import DropdownComponent from '../components/DropdownComponent';  // Adjust path if necessary
+import DropdownComponent from '../components/QuestionTypeDropdown';  // Adjust path if necessary
 
 
 

@@ -4,6 +4,7 @@ import { Text, StyleSheet, View, ScrollView, TouchableOpacity, FlatList, SafeAre
 import BaseLayout from './BaseLayout';
 import QuizViewComponent from '../components/QuizViewComponent';  // Adjust the path if necessary
 import mockQuizData from '../mockdata/mockQuizData';  // Adjust the path if necessary
+import DropdownComponent from '../components/DifficultyLevelDropdown';  // Adjust path if necessary
 
 const HomePage = ({ navigation }) => {
   const navigateToQuizCreation = () => {
@@ -38,6 +39,9 @@ const HomePage = ({ navigation }) => {
 
       <View style={styles.otherQuizzesHeader}>
         <Text style={styles.sectionTitle}>Other Quizzes</Text>
+        <View style={styles.dropdownContainer}>
+                <DropdownComponent />
+            </View>
       </View>
 
       {/* Other Quizzes Section */}
@@ -61,7 +65,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 350,
+    marginTop: 380,
     marginBottom: 10,
     paddingLeft: 15,
     paddingRight: 15,
@@ -71,6 +75,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
+  },
+  dropdownContainer: {
+    width: '42%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    fontSize: 14,
   },
   addQuizButton: {
     backgroundColor: '#6a0dad',

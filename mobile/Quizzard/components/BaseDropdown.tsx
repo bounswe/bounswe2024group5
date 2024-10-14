@@ -1,15 +1,9 @@
-// components/DropdownComponent.tsx
+// components/BaseDropdown.tsx
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
-const data = [
-  { label: 'Eng -> Tr', value: 'eng-tr' },
-  { label: 'Tr -> Eng', value: 'tr-eng' },
-  { label: 'Meaning', value: 'meaning' },
-];
-
-const DropdownComponent = () => {
+const BaseDropdown = ({ data, placeholder }) => {
   const [value, setValue] = useState(null);
 
   return (
@@ -23,7 +17,7 @@ const DropdownComponent = () => {
       maxHeight={300}
       labelField="label"
       valueField="value"
-      placeholder="Select type"
+      placeholder={placeholder}
       value={value}
       onChange={(item) => {
         setValue(item.value);
@@ -32,7 +26,7 @@ const DropdownComponent = () => {
   );
 };
 
-export default DropdownComponent;
+export default BaseDropdown;
 
 const styles = StyleSheet.create({
   dropdown: {
