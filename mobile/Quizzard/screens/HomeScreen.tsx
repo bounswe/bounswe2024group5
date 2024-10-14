@@ -1,7 +1,11 @@
 // HomeScreen.tsx
 import React from 'react';
-import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import BaseLayout from './BaseLayout';
+import QuizViewComponent from '../components/QuizViewComponent';  // Adjust the path if necessary
+import mockQuizData from '../mockdata/mockQuizData';  // Adjust the path if necessary
+// delete the following mock data later:
+
 
 const HomePage = ({ navigation }) => {
   const navigateToQuizCreation = () => {
@@ -22,7 +26,11 @@ const HomePage = ({ navigation }) => {
       {/* Placeholder for Quizzes For You content */}
       <View style={styles.quizSection}>
         <View style={styles.sectionDivider} />
-        <Text style={styles.quizPlaceholderText}>No quizzes available yet.</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.quizScroll}>
+        {mockQuizData.map((quiz, index) => (
+          <QuizViewComponent key={index} quiz={quiz} />
+        ))}
+      </ScrollView>
       </View>
 
       {/* Other Quizzes Section */}
@@ -42,7 +50,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 60,
     marginBottom: 10,
     alignSelf: 'stretch',
   },
@@ -70,6 +78,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginRight: 25,
     marginLeft: 25,
+  },
+  quizScroll: {
+    marginBottom: 20,
+    marginLeft: 20,
   },
   quizSection: {
     marginBottom: 20,
