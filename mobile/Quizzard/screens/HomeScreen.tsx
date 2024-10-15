@@ -5,11 +5,16 @@ import BaseLayout from './BaseLayout';
 import QuizViewComponent from '../components/QuizViewComponent';  // Adjust the path if necessary
 import mockQuizData from '../mockdata/mockQuizData';  // Adjust the path if necessary
 import DropdownComponent from '../components/DifficultyLevelDropdown';  // Adjust path if necessary
+import questions from '@/mockdata/mockQuizQuestionData';
 
 
 const HomePage = ({ navigation }) => {
   const navigateToQuizCreation = () => {
     navigation.navigate('QuizCreation');
+  };
+
+  const navigateToMockQuiz = () => {
+    navigation.navigate('QuizSolving', {questions: questions})
   };
 
   const renderOtherQuizzes = ({ item }) => (
@@ -33,7 +38,7 @@ const HomePage = ({ navigation }) => {
       <View style={styles.quizSection}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.quizScroll}>
           {mockQuizData.map((quiz, index) => (
-            <QuizViewComponent key={index} quiz={quiz} />
+            <QuizViewComponent key={index} quiz={quiz} onPress={navigateToMockQuiz}/>
           ))}
         </ScrollView>
       </View>
