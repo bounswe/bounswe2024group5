@@ -1,0 +1,14 @@
+package com.quizzard.quizzard.model.request;
+
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class PostCreateRequest {
+
+    private List<String> tags;
+    private String text;
+    private String media_url;
+
+}
