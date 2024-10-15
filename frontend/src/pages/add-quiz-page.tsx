@@ -56,7 +56,7 @@ const QuestionView: React.FC<{ question: Question, quiz: Quiz, setQuiz: Dispatch
             <div className="w-[600px] rounded-lg overflow-hidden border border-1 border-slate-300">
                 <div className="flex bg-slate-300 justify-between px-4 py-2">
                     <div className="bg-transparent">
-                        <input className="bg-transparent outline-none border-b border-b-black w-[300px]" type="text" value={question.word} onChange={(e) => {setWord(e.target.value)}}/>
+                        <input placeholder="Enter Word" className="bg-transparent outline-none border-b border-b-black w-[300px]" type="text" value={question.word} onChange={(e) => {setWord(e.target.value)}}/>
                     </div>
                     <div className="bg-transparent">
                         <select onChange={(e) => {setType(e.target.value)}} name="question-type" id={"question-type" + question.id.toString()} className="outline-none bg-transparent appearance-none border border-slate-500 px-8">
@@ -130,7 +130,7 @@ export const AddQuizPage = () => {
         </div>
         <div className="flex gap-4">
             <button onClick={addEmptyQuestion} className="bg-slate-300 px-4 py-2 rounded-sm mt-4 mb-6">Add Question</button>
-            <button onClick={() => {console.log(quiz)}} className="bg-slate-300 px-4 py-2 rounded-sm mt-4 mb-6">Submit Quiz</button>
+            <button onClick={() => {alert("Quiz submitted.")}} className="bg-slate-300 px-4 py-2 rounded-sm mt-4 mb-6">Submit Quiz</button>
         </div>
         {false && <Link to="/">Submit Quiz</Link>}
       </div>
