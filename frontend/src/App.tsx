@@ -20,7 +20,7 @@ const App = () => {
           <Route path="quizzes" element={<ListQuizzesPage />} />
           <Route path="quiz/:quizId" element={<SolveQuizPage />} />
           <Route path="forum" element={<ForumPage />} />
-          <Route path="addQuiz" element={<AddQuizPage/>} />
+          <Route path="add-quiz" element={<AddQuizPage />} />
         </Route>
       </Routes>
     </Router>

@@ -13,11 +13,14 @@ const NavBar = () => {
     <div className="w-[%80] mx-auto bg-violet-200 border border-violet-400 rounded-3xl h-16 flex items-center justify-between px-8">
       <Logo />
       <div className="flex items-center gap-4">
-        <Link to="/quiz/3" className="font-semibold text-violet-700">
-          Solve a Quiz
+        <Link to="/quizzes" className="font-semibold text-violet-700">
+          Home
         </Link>
         <Link to="/quizzes" className="font-semibold text-violet-700">
-          All quizzes
+          Quizzes
+        </Link>
+        <Link to="/forum" className="font-semibold text-violet-700">
+          Forum
         </Link>
       </div>
       <div className="flex gap-4">

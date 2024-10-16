@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Pagination } from "antd";
 import { RegularQuizCard } from "../components/list-quizzes/regular-quiz-card";
 import { FeaturedQuizCard } from "../components/list-quizzes/featured-quiz-card";
+import { Link } from "react-router-dom";
 
 const allQuizzes: Quiz[] = Array(20)
   .fill(null)
@@ -41,7 +42,7 @@ export const ListQuizzesPage = () => {
   };
 
   return (
-    <div className="min-h-screen border border-purple-300 bg-purple-50 rounded-3xl">
+    <div className="min-h-screen px-4 border border-purple-300 bg-purple-50 rounded-3xl">
       <div className="container px-4 py-8 mx-auto">
         <motion.section
           initial={{ opacity: 0 }}
@@ -53,9 +54,11 @@ export const ListQuizzesPage = () => {
             <h2 className="mb-4 text-2xl font-semibold text-purple-800">
               Featured Quizzes
             </h2>
-            <button className="px-4 py-2 text-white bg-violet-500 rounded-3xl">
-              Create a quiz
-            </button>
+            <Link to="/add-quiz">
+              <button className="px-4 py-2 text-white bg-violet-500 rounded-3xl">
+                Create a quiz
+              </button>
+            </Link>
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {highlightedQuizzes.map((quiz) => (
@@ -69,9 +72,18 @@ export const ListQuizzesPage = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          <h2 className="mb-4 text-2xl font-semibold text-purple-800">
-            All Quizzes
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="mb-4 text-2xl font-semibold text-purple-800">
+              All Quizzes
+            </h2>
+
+            <div className="flex gap-2">
+              <input
+                className="w-48 px-4 py-2 border-2 rounded-full outline-none border-violet-500"
+                placeholder="Search a quiz..."
+              />
+            </div>
+          </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {currentQuizzes.map((quiz) => (
               <RegularQuizCard key={quiz.id} quiz={quiz} />
