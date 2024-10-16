@@ -84,7 +84,7 @@ const QuestionView: React.FC<{
   return (
     <>
       <div className="w-[600px] rounded-lg overflow-hidden border border-1 border-slate-300">
-        <div className="flex bg-slate-300 justify-between px-4 py-2">
+        <div className="flex justify-between px-4 py-2 bg-slate-300">
           <div className="bg-transparent">
             <input
               placeholder="Enter Word"
@@ -103,21 +103,18 @@ const QuestionView: React.FC<{
               }}
               name="question-type"
               id={"question-type" + question.id.toString()}
-              className="outline-none bg-transparent appearance-none border border-slate-500 px-8"
+              className="px-8 bg-transparent border outline-none appearance-none border-slate-500"
             >
               <option value="1">{"Eng -> Tr"}</option>
               <option value="2">{"Tr -> Eng"}</option>
               <option value="3">{"Meaning"}</option>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"></div>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 pointer-events-none"></div>
             </select>
           </div>
         </div>
         <div className="px-4 pb-4">
-          <QuestionSentence
-            type={question.type}
-            word={question.word}
-          />
-          <div className="text-left flex flex-col gap-1">
+          <QuestionSentence type={question.type} word={question.word} />
+          <div className="flex flex-col gap-1 text-left">
             {optionNames.map((optionName, index) => {
               return (
                 <div>
@@ -182,7 +179,7 @@ export const AddQuizPage = () => {
               className="w-[444px] text-2xl font-medium text-black placeholder:text-[#777] outline-none bg-slate-300 px-2 py-2 rounded-sm"
             />
           </div>
-          <div className="flex-grow flex items-start">
+          <div className="flex items-start flex-grow">
             <textarea
               onChange={(e) => {
                 setQuiz({ ...quiz, description: e.target.value });
@@ -194,7 +191,7 @@ export const AddQuizPage = () => {
         </div>
       </div>
       <div>
-        <div className="text-left text-2xl border-b-2 border-b-black mb-4">
+        <div className="mb-4 text-2xl text-left border-b-2 border-b-black">
           Questions
         </div>
         <div className="flex flex-col gap-4">
@@ -212,7 +209,7 @@ export const AddQuizPage = () => {
       <div className="flex gap-4">
         <button
           onClick={addEmptyQuestion}
-          className="bg-slate-300 px-4 py-2 rounded-sm mt-4 mb-6"
+          className="px-4 py-2 mt-4 mb-6 rounded-sm bg-slate-300"
         >
           Add Question
         </button>
@@ -220,7 +217,7 @@ export const AddQuizPage = () => {
           onClick={() => {
             alert("Quiz submitted.");
           }}
-          className="bg-slate-300 px-4 py-2 rounded-sm mt-4 mb-6"
+          className="px-4 py-2 mt-4 mb-6 rounded-sm bg-slate-300"
         >
           Submit Quiz
         </button>
