@@ -1,17 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
-
-type Question = {
-  id: number;
-  word: string;
-  options: string[];
-  type: string;
-};
-
-type Quiz = {
-  name: string;
-  description: string;
-  questions: Question[];
-};
+import { Question, Quiz } from "../types/question";
 
 const QuestionSentence: React.FC<{ type: string; word: string }> = ({
   type,
@@ -74,7 +62,7 @@ const QuestionView: React.FC<{
     setQuiz({ ...quiz, questions: newQuestions });
   };
 
-  const setType = (newType: string) => {
+  const setType = (newType: Question["type"]) => {
     const newQuestions = quiz.questions.map((q) => {
       return q.id === question.id ? { ...q, type: newType } : q;
     });
@@ -99,7 +87,7 @@ const QuestionView: React.FC<{
           <div className="bg-transparent">
             <select
               onChange={(e) => {
-                setType(e.target.value);
+                setType(e.target.value as Question["type"]);
               }}
               name="question-type"
               id={"question-type" + question.id.toString()}
@@ -138,11 +126,12 @@ const QuestionView: React.FC<{
 };
 
 export const AddQuizPage = () => {
-  const exampleQuestion = {
+  const exampleQuestion: Question = {
     id: 1,
     word: "Fast",
     options: ["Hızlı", "Normal", "Tatlı", "Yoğun"],
-    type: "1",
+    answer: "Hızlı",
+    type: "en-tr",
   };
 
   function addEmptyQuestion() {
@@ -151,13 +140,20 @@ export const AddQuizPage = () => {
       id: Math.floor(Math.random() * 10000),
       word: "",
       options: ["", "", "", ""],
-      type: "1",
+      answer: "",
+      type: "en-tr",
     });
     setQuiz({ ...quiz, questions: newQuestions });
   }
 
   const [quiz, setQuiz] = useState<Quiz>({
-    name: "",
+    id: 1,
+    highlighted: false,
+    imageUrl: "/api/placeholder/250/250",
+    questionCount: 5,
+    level: "beginner",
+    category: "colors",
+    title: "",
     description: "",
     questions: [exampleQuestion],
   });
@@ -172,7 +168,7 @@ export const AddQuizPage = () => {
           <div className="flex items-start mb-2">
             <input
               onChange={(e) => {
-                setQuiz({ ...quiz, name: e.target.value });
+                setQuiz({ ...quiz, title: e.target.value });
               }}
               type="text"
               placeholder="Quiz Name"
@@ -195,15 +191,9 @@ export const AddQuizPage = () => {
           Questions
         </div>
         <div className="flex flex-col gap-4">
-          {quiz.questions.map((question) => {
-            return (
-              <QuestionView
-                question={question}
-                quiz={quiz}
-                setQuiz={setQuiz}
-              ></QuestionView>
-            );
-          })}
+          {quiz.questions.map((question) => (
+            <QuestionView question={question} quiz={quiz} setQuiz={setQuiz} />
+          ))}
         </div>
       </div>
       <div className="flex gap-4">
