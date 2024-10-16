@@ -9,6 +9,7 @@ import { SolveQuizPage } from "./pages/solve-quiz-page";
 import { RootLayout } from "./layouts/root-layout";
 
 import "./App.css";
+import { AddQuizPage } from "./pages/add-quiz-page";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="quizzes" element={<ListQuizzesPage />} />
           <Route path="quiz/:quizId" element={<SolveQuizPage />} />
           <Route path="forum" element={<ForumPage />} />
+          <Route path="addQuiz" element={<AddQuizPage/>} />
         </Route>
       </Routes>
     </Router>

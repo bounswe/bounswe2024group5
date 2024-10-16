@@ -6,6 +6,8 @@ import RegisterScreen from "../screens/RegisterScreen";
 import HomeScreen from "../screens/HomeScreen";
 import ForumScreen from "../screens/ForumScreen";
 import QuizCreationScreen from "../screens/QuizCreationScreen";
+import QuizSolvingScreen from "../screens/QuizSolvingScreen";
+
 import { AuthProvider } from "../screens/AuthProvider";
 
 export type RootStackParamList = {
@@ -40,6 +42,11 @@ function MyStack() {
       <Stack.Screen
       name="QuizCreation"
       component={QuizCreationScreen}
+      options={{ headerShown: false }}
+      />
+      <Stack.Screen
+      name="QuizSolving"
+      component={QuizSolvingScreen}
       options={{ headerShown: false }}
       />
     </Stack.Navigator>

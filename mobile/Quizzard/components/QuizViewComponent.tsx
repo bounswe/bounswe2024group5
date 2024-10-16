@@ -1,27 +1,30 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const QuizViewComponent = ({ quiz }) => {
+const QuizViewComponent = ({ quiz, onPress }) => {
   return (
     <View style={styles.quizContainer}>
-      {/* Quiz Image */}
-      <Image source={{ uri: quiz.image }} style={styles.quizImage} />
+      <TouchableOpacity onPress={onPress}>
+        {/* Quiz Image */}
+        <Image source={{ uri: quiz.image }} style={styles.quizImage} />
 
-      {/* Quiz Details */}
-      <View style={styles.quizDetails}>
-      <View style={styles.quizInfoHeader}>
-        <Text style={styles.quizTitle}>{quiz.title}</Text>
-        <Text style={styles.quizQuestions}>{quiz.questions} Questions</Text>
-        </View>
-        <View style={styles.quizInfo}>
-          <Text style={styles.difficultyLevel}>{quiz.level}</Text>
-          <View style={styles.likesContainer}>
-            <Ionicons name="heart-outline" size={16} color="#6a0dad" />
-            <Text style={styles.likeCount}>{quiz.likes}</Text>
+        {/* Quiz Details */}
+        <View style={styles.quizDetails}>
+        <View style={styles.quizInfoHeader}>
+          <Text style={styles.quizTitle}>{quiz.title}</Text>
+          <Text style={styles.quizQuestions}>{quiz.questions} Questions</Text>
+          </View>
+          <View style={styles.quizInfo}>
+            <Text style={styles.difficultyLevel}>{quiz.level}</Text>
+            <Text style={styles.difficultyLevel}>{quiz.elo}</Text>
+            <View style={styles.likesContainer}>
+              <Ionicons name="heart-outline" size={16} color="#6a0dad" />
+              <Text style={styles.likeCount}>{quiz.likes}</Text>
+            </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };
