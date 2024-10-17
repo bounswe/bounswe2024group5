@@ -1,13 +1,11 @@
 package com.quizzard.quizzard.security.jwt;
 
-import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.security.services.UserDetailsImpl;
 
 import java.security.Key;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.*;

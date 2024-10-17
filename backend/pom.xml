@@ -5,8 +5,8 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.5</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>3.2.10</version>
+		<relativePath/>
 	</parent>
 	<groupId>com.quizzard</groupId>
 	<artifactId>quizzard</artifactId>
@@ -20,7 +20,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>3.2.5</version>
 		</dependency>
 
 		<dependency>
@@ -66,7 +65,6 @@
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
-			<version>3.1.1.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -92,13 +90,11 @@
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
-			<version>3.0.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.32</version>
 			<scope>provided</scope>
 		</dependency>
 
