@@ -1,5 +1,5 @@
 // HomeScreen.tsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   StyleSheet,
@@ -10,18 +10,74 @@ import {
   SafeAreaView,
 } from "react-native";
 import BaseLayout from "./BaseLayout";
-import QuizViewComponent from "../components/QuizViewComponent"; // Adjust the path if necessary
+import QuizViewComponent from "../components/QuizViewComponent";
 import mockQuizData from "../mockdata/mockQuizData"; // Adjust the path if necessary
-import DropdownComponent from "../components/DifficultyLevelDropdown"; // Adjust path if necessary
-import questions from "@/mockdata/mockQuizQuestionData";
+
+import DropdownComponent from "../components/DifficultyLevelDropdown";
+import { useAuth } from "./AuthProvider";
 
 const HomePage = ({ navigation }) => {
+  const [quizzesForYou, setQuizzesForYou] = useState([]);
+  const [otherQuizzes, setOtherQuizzes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const authContext = useAuth();  // Get the authentication context
+  const token = authContext ? authContext.token : null;  // Get the token if authContext is not null
+
+  useEffect(() => {
+    fetchQuizzesForYou();
+    fetchOtherQuizzes();
+  }, []);
+
+  const fetchQuizzesForYou = async () => {
+    try {
+      const response = await fetch(
+        "http://34.118.44.165:80/api/quizzes",    // Change to the correct host
+        {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      const data = await response.json();
+      if (response.ok) {
+        setQuizzesForYou(data.quizzes);
+      } else {
+        console.error("Failed to fetch quizzes for you", data);
+      }
+    } catch (error) {
+      console.error("Error fetching quizzes for you:", error);
+    }
+  };
+
+  const fetchOtherQuizzes = async () => {
+    try {
+      const response = await fetch(
+        "http://34.118.44.165:80/api/quizzes",    // Change to the correct host
+        {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      const data = await response.json();
+      if (response.ok) {
+        setOtherQuizzes(data.quizzes);
+      } else {
+        console.error("Failed to fetch other quizzes", data);
+      }
+    } catch (error) {
+      console.error("Error fetching other quizzes:", error);
+    }
+  };
+
   const navigateToQuizCreation = () => {
     navigation.navigate("QuizCreation");
   };
 
   const navigateToMockQuiz = () => {
-    navigation.navigate("QuizSolving", { questions: questions });
+    navigation.navigate("QuizSolving");
   };
 
   const renderOtherQuizzes = ({ item }) => (
@@ -31,7 +87,6 @@ const HomePage = ({ navigation }) => {
   );
 
   return (
-    // <SafeAreaView style={styles.safeArea}>
     <BaseLayout navigation={navigation}>
       {/* Quizzes For You Section */}
       <View style={styles.quizzesForYouHeader}>
@@ -51,6 +106,7 @@ const HomePage = ({ navigation }) => {
           showsHorizontalScrollIndicator={false}
           style={styles.quizScroll}
         >
+          {/* {quizzesForYou.map((quiz, index) => ( */}
           {mockQuizData.map((quiz, index) => (
             <QuizViewComponent
               key={index}
@@ -72,6 +128,7 @@ const HomePage = ({ navigation }) => {
       <View style={styles.otherQuizzesContainer}>
         <View style={styles.sectionDivider} />
         <FlatList
+          // data={otherQuizzes}
           data={mockQuizData}
           renderItem={renderOtherQuizzes}
           keyExtractor={(item, index) => index.toString()}
