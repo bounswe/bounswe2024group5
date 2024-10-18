@@ -6,25 +6,24 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  FlatList,
 } from "react-native";
 import DropdownComponent from "../components/QuestionTypeDropdown"; // Adjust path if necessary
-
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "./AuthProvider";
 
 const QuizCreationPage = ({ navigation }) => {
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
   const [image, setImage] = useState(null);
   const [questions, setQuestions] = useState([]);
+  const [suggestions, setSuggestions] = useState([]); // Store word suggestions
+  const [selectedWord, setSelectedWord] = useState(""); // To store input word
+  const [selectedType, setSelectedType] = useState("Eng -> Tr"); // Default type
 
-  const handleLogout = () => {
-    navigation.navigate("Login");
-  };
-
-  const navigateToHome = () => {
-    navigation.navigate("Home");
-  };
+  const authContext = useAuth(); // Get the authentication context
+  const token = authContext ? authContext.token : null; // Get the token if authContext is not null
 
   // Function to handle image picking
   const pickImage = async () => {
@@ -40,12 +39,86 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-  // Add a new question to the questions array
+  // Function to handle adding a new question
   const handleAddQuestion = () => {
     setQuestions([
-      ...questions,
-      { title: "", choices: { A: "", B: "", C: "", D: "" }, type: "Eng -> Tr" },
+      ...questions, 
+      { title: "", choices: { A: "", B: "", C: "", D: "" }, type: selectedType }
     ]);
+  };
+
+  // Fetch question word suggestions
+  const fetchQuestionWord = async (word, type) => {
+    const apiUrl = `http://your-api-url.com/question_word?word=${word}&type=${type}`;
+    try {
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSuggestions(data); // Store the suggestions
+        console.log("Suggestions:", data);
+      } else {
+        console.error("Failed to fetch suggestions", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+    }
+  };
+
+  // Fetch question answers
+  const fetchQuestionAnswers = async (
+    word: string, 
+    type: 'english_to_turkish' | 'turkish_to_english' | 'english_to_sense', 
+    token: string
+  ): Promise<void> => {
+    try {
+      const apiUrl = `http://your-api-url.com/question_answers?word=${encodeURIComponent(word)}&type=${type}`;
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data) {
+          const updatedQuestions = [...questions];
+          const newChoices = {
+            A: data.correct_answer,
+            B: data.wrong_answer1,
+            C: data.wrong_answer2,
+            D: data.wrong_answer3,
+          };
+          updatedQuestions[questions.length - 1].choices = newChoices; // Update choices for the latest question
+          setQuestions(updatedQuestions);
+        }
+      } else {
+        console.error("Failed to fetch question answers:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching question answers:", error);
+    }
+  };
+
+  // Handle input change to fetch word suggestions and question answers
+  const handleInputChange = (word) => {
+    setSelectedWord(word);
+    fetchQuestionWord(word, selectedType);
+    fetchQuestionAnswers(word, selectedType, token); // Fetch answers based on word and type
+  };
+
+  // Update question data
+  const updateQuestion = (index, field, value) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[index][field] = value;
+    setQuestions(updatedQuestions);
   };
 
   const handleCreateQuiz = () => {
@@ -57,30 +130,18 @@ const QuizCreationPage = ({ navigation }) => {
     navigation.goBack(); // Navigate back to the home page
   };
 
-  const updateQuestion = (index, field, value) => {
-    const updatedQuestions = [...questions];
-    if (field === "title") {
-      updatedQuestions[index].title = value;
-    } else if (field === "type") {
-      updatedQuestions[index].type = value;
-    } else {
-      updatedQuestions[index].choices[field] = value;
-    }
-    setQuestions(updatedQuestions);
-  };
-
   return (
     <ScrollView style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={navigateToHome}>
+        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
           <Text style={styles.appName}>Quizzard</Text>
         </TouchableOpacity>
         <View style={styles.icons}>
           <TouchableOpacity style={styles.iconButton}>
             <Ionicons name="person-outline" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton} onPress={handleLogout}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate("Login")}>
             <Ionicons name="log-out-outline" size={24} color="black" />
           </TouchableOpacity>
         </View>
@@ -117,14 +178,28 @@ const QuizCreationPage = ({ navigation }) => {
           <View style={styles.headerContainer}>
             <TextInput
               style={styles.questionTitle}
-              placeholder="Question Title"
-              value={question.title}
-              onChangeText={(text) => updateQuestion(index, "title", text)}
+              placeholder="Enter a word"
+              value={selectedWord}
+              onChangeText={handleInputChange}
             />
             <View style={styles.dropdownContainer}>
-              <DropdownComponent />
+              <DropdownComponent
+                selectedValue={selectedType}
+                onValueChange={(type) => setSelectedType(type)}
+              />
             </View>
           </View>
+
+          {/* Display suggestions */}
+          {suggestions.length > 0 && (
+            <FlatList
+              data={suggestions}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <Text style={styles.suggestionText}>{item}</Text>
+              )}
+            />
+          )}
 
           {/* Answer Choices */}
           {["A", "B", "C", "D"].map((option) => (
@@ -132,7 +207,7 @@ const QuizCreationPage = ({ navigation }) => {
               key={option}
               style={styles.choiceInput}
               placeholder={`Choice ${option}`}
-              value={question.choices[option]}
+              value={question.choices[option]} // Now choices will be populated from the API response
               onChangeText={(text) => updateQuestion(index, option, text)}
             />
           ))}
@@ -149,13 +224,12 @@ const QuizCreationPage = ({ navigation }) => {
 
       {/* Bottom Cancel and Submit Buttons */}
       <View style={styles.bottomButtons}>
-        <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleCreateQuiz}
-        >
+        style={styles.submitButton}
+        onPress={() => console.log("Quiz Created:", quizTitle, quizDescription, questions)}>
           <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
       </View>

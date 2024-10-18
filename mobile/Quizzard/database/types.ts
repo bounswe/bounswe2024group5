@@ -8,7 +8,11 @@ export type RegisteredUser = {
     username: string;
     password: string;
     email?: string;
-    profile: Profile
+    profile: Profile;
+    createdQuizzes: Quiz[];
+    favoritedQuizzes: Quiz[];
+    favoritedQuestions: Question[];
+    posts: ForumPost[];
 };
 export type GuestUser = {
     username: string;
@@ -18,9 +22,9 @@ export type GuestUser = {
 export type Profile = {
     name: string;
     surname: string;
-    level: string;
+    level: string;        // a1, a2, b1, b2, c1, c2
     elo: number,
-    // profilePicture: string;
+    profilePicture: string;
 }
 
 // Quiz types:
@@ -46,12 +50,12 @@ export type Question = {
 }
 
 // Forum types:
-export type Post = {
+export type ForumPost = {
     id: number;
     title: string;
     content: Content;
-    replies: Reply[];
-    upvotes: number;
+    replies: ForumReply[];
+    upvote: number;
     tags: string[];
 }
 export type Content = {
@@ -59,13 +63,13 @@ export type Content = {
     creationTimestamp: number;
     text: string;
 };
-export type Reply = {
+export type ForumReply = {
     id: number;
     postId: number;
     content: Content;
 }
 export type ForumFeed = {
-    posts: Post[];
+    posts: ForumPost[];
 }
 // export type SearchEngine = {
 //     searchHistory: string[];
