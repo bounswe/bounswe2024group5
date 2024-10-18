@@ -12,7 +12,6 @@ import {
 import BaseLayout from "./BaseLayout";
 import QuizViewComponent from "../components/QuizViewComponent";
 import mockQuizData from "../mockdata/mockQuizData"; // Adjust the path if necessary
-
 import DropdownComponent from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 
