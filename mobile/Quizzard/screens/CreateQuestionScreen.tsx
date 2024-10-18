@@ -9,6 +9,7 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../app/index";
 import { Ionicons } from "@expo/vector-icons"; // Ensure you have expo/vector-icons installed
+import { useAuth } from "./AuthProvider";
 
 type CreateQuestionScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -22,6 +23,41 @@ type Props = {
 const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const authContext = useAuth();  // Get the authentication context
+  const token = authContext ? authContext.token : null;  // Get the token if authContext is not null
+
+  const fetchQuestionWord = async (word, type) => {
+  
+    const requestBody = {
+      word: word,
+      type: type,
+    };
+
+    // Change to the correct host:
+    const apiUrl = 'http://your-api-url.com/question_word?word=' + word + '&type=' + type;
+
+    try {
+      const response = await fetch(
+        apiUrl,
+        {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Suggestions:", data);
+        } else {
+          console.error("Failed to fetch suggestions", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+      }
+  }
+  };
 
   const handleSubmit = () => {
     // Submit the question to your backend
