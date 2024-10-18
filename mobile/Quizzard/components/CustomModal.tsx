@@ -13,7 +13,7 @@ const CustomModal = ({ visible, message, onClose }) => {
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <Text style={styles.modalText}>{message}</Text>
-          <CustomButton title="Return to Feed" onPress={onClose} />
+          <CustomButton title="Close" onPress={onClose} />
         </View>
       </View>
     </Modal>
@@ -26,13 +26,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",  // semi-transparent background
   },
   modalView: {
     margin: 20,
-    backgroundColor: "#111927",
+    backgroundColor: "#22005d",  // lighter purple background for the modal
     borderRadius: 20,
-    padding: 35,
+    padding: 30,
     alignItems: "center",
     shadowColor: "#000",
     shadowOpacity: 0.25,
@@ -42,9 +42,20 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
-    color: "white",
+    color: "white",  // white text
     fontSize: 18,
     fontWeight: "bold",
+  },
+  buttonClose: {
+    backgroundColor: "#22005d",  // dark purple button background
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  textStyle: {
+    color: "white",  // white button text
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

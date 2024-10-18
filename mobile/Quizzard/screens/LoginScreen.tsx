@@ -1,20 +1,111 @@
 // LoginScreen.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { useAuth } from "./AuthProvider";
+// import CustomButton from "../components/CustomButton";
+// import GradientBackground from "../components/GradientBackground";
+import { LinearGradient } from "expo-linear-gradient";
+import { RegisteredUser } from '../database/types';
+import { Profile } from '../database/types';
+import CustomModal from '../components/CustomModal';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
+  const { login, token } = useAuth();
+  const [registeredUser, setUserData] = useState(null);
 
-  const handleLogin = () => {
-    // Simulate successful login and navigate to HomeScreen
+  const fetchUserProfile = async (token) => {
+    try {
+      console.log('token is:', token)
+      const response = await fetch(
+        `http://34.118.44.165:80/api/users/${username}`,   // Change to the correct host
+        {
+          method: "GET",
+          headers: {
+            Host: '34.118.44.165',    // Change to the correct host
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      const user = await response.json();
+      if (response.ok) {
+        setUserData(user);
+        console.log("User profile data:", user);
+        return user;
+      } else {
+        console.error("Failed to fetch user profile data", response);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      return null;
+    }
+  };
+
+  const handleLogin = async () => {
+
+    // Delete the following line, once the API is ready:
     navigation.navigate('Home');
+
+    if (password === "" || username === "") {
+      setErrorMessage("Username and password cannot be empty.");
+      setModalVisible(true);
+      return;
+    }
+    const requestBody = {
+      username: username,
+      password: password,
+    };
+    try {
+      const response = await fetch(
+        "http://34.118.44.165:80/api/auth/login",      // Change to the correct host
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Content-Length": JSON.stringify(requestBody).length.toString(),
+            Host: "34.118.44.165:80",     // Change to the correct host
+          },
+          body: JSON.stringify(requestBody),
+        });
+      const data = await response.json();
+      if (response.ok) {
+        await login(data.token);
+        console.log("Logged in successfully");
+        fetchUserProfile(data.token);
+        const registeredUser = await fetchUserProfile(data.token);
+        const userProfile: Profile = {
+          name: registeredUser.name,
+          surname: registeredUser.surname,
+          level: registeredUser.level,
+          elo: registeredUser.elo,
+        };
+        const user: RegisteredUser = {
+          username: registeredUser.username,
+          password: registeredUser.password,
+          email: registeredUser.email,
+          profile: userProfile,
+        };
+        console.log("Registered user data:", user);
+        navigation.navigate("Home", { registeredUser: user });
+      } else {
+        setErrorMessage(data.message || "Invalid username/password");
+        setModalVisible(true);
+      }
+    } catch (error) {
+      console.error("Network or other error:", error);
+      setErrorMessage("Network error. Please try again.");
+      setModalVisible(true);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      
+      <Text style={styles.title}>Quizzard</Text>
+      <Text style={styles.infoText}>Login to your account to access Quizzard.</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -23,7 +114,7 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={setUsername}
         autoCapitalize="none"
       />
-      
+
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -32,7 +123,7 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      
+
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
@@ -43,6 +134,12 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.registerButton}>Register here</Text>
         </TouchableOpacity>
       </View>
+
+      <CustomModal
+        visible={modalVisible}
+        message={errorMessage}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 };
@@ -60,6 +157,12 @@ const styles = StyleSheet.create({
     color: '#6a0dad',
     textAlign: 'center',
     marginBottom: 24,
+  },
+  infoText: {
+    fontSize: 16,
+    color: '#22005d',     // dark purple color
+    textAlign: 'center',
+    marginBottom: 16,
   },
   input: {
     borderWidth: 1,
@@ -90,11 +193,11 @@ const styles = StyleSheet.create({
   },
   normalText: {
     fontSize: 16,
-    color: '#6a0dad',
+    color: '#22005d',
   },
   registerButton: {
     fontSize: 16,
-    color: '#6a0dad',
+    color: '#22005d',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
   },
