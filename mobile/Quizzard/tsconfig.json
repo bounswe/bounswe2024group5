@@ -1,6 +1,8 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "esModuleInterop": true,
+    "noImplicitAny": false,
     "strict": true,
     "paths": {
       "@/*": [

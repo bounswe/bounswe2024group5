@@ -1,26 +1,30 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import DropdownComponent from '../components/QuestionTypeDropdown';  // Adjust path if necessary
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
+import DropdownComponent from "../components/QuestionTypeDropdown"; // Adjust path if necessary
 
-
-
-import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from "expo-image-picker";
+import { Ionicons } from "@expo/vector-icons";
 
 const QuizCreationPage = ({ navigation }) => {
-  const [quizTitle, setQuizTitle] = useState('');
-  const [quizDescription, setQuizDescription] = useState('');
+  const [quizTitle, setQuizTitle] = useState("");
+  const [quizDescription, setQuizDescription] = useState("");
   const [image, setImage] = useState(null);
   const [questions, setQuestions] = useState([]);
 
   const handleLogout = () => {
-    navigation.navigate('Login');
+    navigation.navigate("Login");
   };
 
   const navigateToHome = () => {
-    navigation.navigate('Home');
+    navigation.navigate("Home");
   };
-
 
   // Function to handle image picking
   const pickImage = async () => {
@@ -38,11 +42,14 @@ const QuizCreationPage = ({ navigation }) => {
 
   // Add a new question to the questions array
   const handleAddQuestion = () => {
-    setQuestions([...questions, { title: '', choices: { A: '', B: '', C: '', D: '' }, type: 'Eng -> Tr' }]);
+    setQuestions([
+      ...questions,
+      { title: "", choices: { A: "", B: "", C: "", D: "" }, type: "Eng -> Tr" },
+    ]);
   };
 
   const handleCreateQuiz = () => {
-    console.log('Quiz Created:', quizTitle, quizDescription, questions);
+    console.log("Quiz Created:", quizTitle, quizDescription, questions);
     navigation.goBack(); // Navigate back to the home page after quiz creation
   };
 
@@ -52,9 +59,9 @@ const QuizCreationPage = ({ navigation }) => {
 
   const updateQuestion = (index, field, value) => {
     const updatedQuestions = [...questions];
-    if (field === 'title') {
+    if (field === "title") {
       updatedQuestions[index].title = value;
-    } else if (field === 'type') {
+    } else if (field === "type") {
       updatedQuestions[index].type = value;
     } else {
       updatedQuestions[index].choices[field] = value;
@@ -67,8 +74,8 @@ const QuizCreationPage = ({ navigation }) => {
       {/* Header Section */}
       <View style={styles.header}>
         <TouchableOpacity onPress={navigateToHome}>
-            <Text style={styles.appName}>Quizzard</Text>
-         </TouchableOpacity>
+          <Text style={styles.appName}>Quizzard</Text>
+        </TouchableOpacity>
         <View style={styles.icons}>
           <TouchableOpacity style={styles.iconButton}>
             <Ionicons name="person-outline" size={24} color="black" />
@@ -90,7 +97,7 @@ const QuizCreationPage = ({ navigation }) => {
       {/* Image Upload Box */}
       <TouchableOpacity style={styles.imageUploadBox} onPress={pickImage}>
         <Text style={styles.imageUploadText}>
-          {image ? 'Image Uploaded' : '+ Upload Image'}
+          {image ? "Image Uploaded" : "+ Upload Image"}
         </Text>
       </TouchableOpacity>
 
@@ -112,15 +119,15 @@ const QuizCreationPage = ({ navigation }) => {
               style={styles.questionTitle}
               placeholder="Question Title"
               value={question.title}
-              onChangeText={(text) => updateQuestion(index, 'title', text)}
+              onChangeText={(text) => updateQuestion(index, "title", text)}
             />
             <View style={styles.dropdownContainer}>
-                <DropdownComponent />
+              <DropdownComponent />
             </View>
           </View>
 
           {/* Answer Choices */}
-          {['A', 'B', 'C', 'D'].map((option) => (
+          {["A", "B", "C", "D"].map((option) => (
             <TextInput
               key={option}
               style={styles.choiceInput}
@@ -133,7 +140,10 @@ const QuizCreationPage = ({ navigation }) => {
       ))}
 
       {/* + Question Button */}
-      <TouchableOpacity style={styles.addQuestionButton} onPress={handleAddQuestion}>
+      <TouchableOpacity
+        style={styles.addQuestionButton}
+        onPress={handleAddQuestion}
+      >
         <Text style={styles.addQuestionButtonText}>+ Question</Text>
       </TouchableOpacity>
 
@@ -142,7 +152,10 @@ const QuizCreationPage = ({ navigation }) => {
         <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.submitButton} onPress={handleCreateQuiz}>
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={handleCreateQuiz}
+        >
           <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
       </View>
@@ -154,91 +167,91 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   appName: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#6a0dad', // Dark purple color for the app name
+    fontWeight: "bold",
+    color: "#6a0dad", // Dark purple color for the app name
   },
   icons: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconButton: {
     marginLeft: 16,
   },
   input: {
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 20,
   },
   imageUploadBox: {
-    width: '100%',
+    width: "100%",
     height: 150,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 10, // Rounded corners for cleaner look
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#eee',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#eee",
     marginBottom: 20,
   },
   imageUploadText: {
     fontSize: 16,
-    color: '#888',
+    color: "#888",
   },
   descriptionInput: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 10,
     padding: 10,
     marginBottom: 20,
     fontSize: 16,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
     height: 100,
   },
   questionBox: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
-    backgroundColor: '#f9f9f9',
-    shadowColor: '#000',
+    backgroundColor: "#f9f9f9",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 3,
   },
   headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
   },
   questionTitle: {
     flex: 1,
     fontSize: 14,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 10,
     marginRight: 10,
   },
   dropdownContainer: {
-    width: '42%',
+    width: "42%",
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 10,
     fontSize: 14,
   },
@@ -247,49 +260,49 @@ const styles = StyleSheet.create({
   },
   choiceInput: {
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 10,
     marginBottom: 10,
     fontSize: 14,
   },
   addQuestionButton: {
-    backgroundColor: '#6a0dad',
+    backgroundColor: "#6a0dad",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginBottom: 40,
   },
   addQuestionButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 16,
   },
   bottomButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   cancelButton: {
-    backgroundColor: '#555',
+    backgroundColor: "#555",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
   },
   cancelButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: '#6a0dad',
+    backgroundColor: "#6a0dad",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
   },
   submitButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 16,
   },
 });
