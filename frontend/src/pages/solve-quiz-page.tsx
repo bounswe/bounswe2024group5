@@ -6,6 +6,7 @@ import Confetti from "react-confetti";
 import { QuizOverview } from "../components/solve-quiz/quiz-overview";
 import { ProgressBar } from "../components/solve-quiz/progress-bar";
 import { QuizActionButton } from "../components/solve-quiz/quiz-action-button";
+import { questionTemplate } from "../utils";
 
 export const SolveQuizPage = () => {
   const questions = quizzes[0].questions;
@@ -105,7 +106,10 @@ export const SolveQuizPage = () => {
             />
 
             <p className="mb-6 text-lg">
-              {questions[currentQuestion].question}
+              {questionTemplate({
+                word: questions[currentQuestion].word,
+                type: questions[currentQuestion].type,
+              })}
             </p>
 
             <div className="grid grid-cols-2 gap-4 ">

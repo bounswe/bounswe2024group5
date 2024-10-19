@@ -1,17 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
-
-type Question = {
-  id: number;
-  word: string;
-  options: string[];
-  type: string;
-};
-
-type Quiz = {
-  name: string;
-  description: string;
-  questions: Question[];
-};
+import { Question, Quiz } from "../types/question";
 
 const QuestionSentence: React.FC<{ type: string; word: string }> = ({
   type,
@@ -74,7 +62,7 @@ const QuestionView: React.FC<{
     setQuiz({ ...quiz, questions: newQuestions });
   };
 
-  const setType = (newType: string) => {
+  const setType = (newType: Question["type"]) => {
     const newQuestions = quiz.questions.map((q) => {
       return q.id === question.id ? { ...q, type: newType } : q;
     });
@@ -84,7 +72,7 @@ const QuestionView: React.FC<{
   return (
     <>
       <div className="w-[600px] rounded-lg overflow-hidden border border-1 border-slate-300">
-        <div className="flex bg-slate-300 justify-between px-4 py-2">
+        <div className="flex justify-between px-4 py-2 bg-slate-300">
           <div className="bg-transparent">
             <input
               placeholder="Enter Word"
@@ -99,25 +87,22 @@ const QuestionView: React.FC<{
           <div className="bg-transparent">
             <select
               onChange={(e) => {
-                setType(e.target.value);
+                setType(e.target.value as Question["type"]);
               }}
               name="question-type"
               id={"question-type" + question.id.toString()}
-              className="outline-none bg-transparent appearance-none border border-slate-500 px-8"
+              className="px-8 bg-transparent border outline-none appearance-none border-slate-500"
             >
               <option value="1">{"Eng -> Tr"}</option>
               <option value="2">{"Tr -> Eng"}</option>
               <option value="3">{"Meaning"}</option>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"></div>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 pointer-events-none"></div>
             </select>
           </div>
         </div>
         <div className="px-4 pb-4">
-          <QuestionSentence
-            type={question.type}
-            word={question.word}
-          />
-          <div className="text-left flex flex-col gap-1">
+          <QuestionSentence type={question.type} word={question.word} />
+          <div className="flex flex-col gap-1 text-left">
             {optionNames.map((optionName, index) => {
               return (
                 <div>
@@ -141,11 +126,12 @@ const QuestionView: React.FC<{
 };
 
 export const AddQuizPage = () => {
-  const exampleQuestion = {
+  const exampleQuestion: Question = {
     id: 1,
     word: "Fast",
     options: ["Hızlı", "Normal", "Tatlı", "Yoğun"],
-    type: "1",
+    answer: "Hızlı",
+    type: "en-tr",
   };
 
   function addEmptyQuestion() {
@@ -154,13 +140,20 @@ export const AddQuizPage = () => {
       id: Math.floor(Math.random() * 10000),
       word: "",
       options: ["", "", "", ""],
-      type: "1",
+      answer: "",
+      type: "en-tr",
     });
     setQuiz({ ...quiz, questions: newQuestions });
   }
 
   const [quiz, setQuiz] = useState<Quiz>({
-    name: "",
+    id: 1,
+    highlighted: false,
+    imageUrl: "/api/placeholder/250/250",
+    questionCount: 5,
+    level: "beginner",
+    category: "colors",
+    title: "",
     description: "",
     questions: [exampleQuestion],
   });
@@ -175,14 +168,14 @@ export const AddQuizPage = () => {
           <div className="flex items-start mb-2">
             <input
               onChange={(e) => {
-                setQuiz({ ...quiz, name: e.target.value });
+                setQuiz({ ...quiz, title: e.target.value });
               }}
               type="text"
               placeholder="Quiz Name"
               className="w-[444px] text-2xl font-medium text-black placeholder:text-[#777] outline-none bg-slate-300 px-2 py-2 rounded-sm"
             />
           </div>
-          <div className="flex-grow flex items-start">
+          <div className="flex items-start flex-grow">
             <textarea
               onChange={(e) => {
                 setQuiz({ ...quiz, description: e.target.value });
@@ -194,25 +187,19 @@ export const AddQuizPage = () => {
         </div>
       </div>
       <div>
-        <div className="text-left text-2xl border-b-2 border-b-black mb-4">
+        <div className="mb-4 text-2xl text-left border-b-2 border-b-black">
           Questions
         </div>
         <div className="flex flex-col gap-4">
-          {quiz.questions.map((question) => {
-            return (
-              <QuestionView
-                question={question}
-                quiz={quiz}
-                setQuiz={setQuiz}
-              ></QuestionView>
-            );
-          })}
+          {quiz.questions.map((question) => (
+            <QuestionView question={question} quiz={quiz} setQuiz={setQuiz} />
+          ))}
         </div>
       </div>
       <div className="flex gap-4">
         <button
           onClick={addEmptyQuestion}
-          className="bg-slate-300 px-4 py-2 rounded-sm mt-4 mb-6"
+          className="px-4 py-2 mt-4 mb-6 rounded-sm bg-slate-300"
         >
           Add Question
         </button>
@@ -220,7 +207,7 @@ export const AddQuizPage = () => {
           onClick={() => {
             alert("Quiz submitted.");
           }}
-          className="bg-slate-300 px-4 py-2 rounded-sm mt-4 mb-6"
+          className="px-4 py-2 mt-4 mb-6 rounded-sm bg-slate-300"
         >
           Submit Quiz
         </button>
