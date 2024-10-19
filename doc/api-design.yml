@@ -90,6 +90,10 @@ components:
         difficulty:
           type: number
           format: float
+        description:
+          type: string
+        image:
+          type: string
         created_at:
           type: string
           format: date-time
@@ -321,7 +325,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /question_word:
+  /word_suggestions:
     get:
       summary: Get question word suggestions
       tags:
@@ -346,9 +350,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                type: object
+                properties:
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+                    example: ["fast", "fasten", "faster"]
         '400':
           description: Invalid input
           content:
