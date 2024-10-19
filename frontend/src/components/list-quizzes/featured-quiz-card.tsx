@@ -13,7 +13,7 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => (
       className="flex flex-col overflow-hidden bg-purple-100 shadow-md cursor-pointer rounded-3xl"
     >
       <div className="w-full h-32 bg-white rounded-t-3xl" />
-      <div className="flex flex-col justify-between flex-grow h-32 p-4">
+      <div className="flex flex-col justify-between flex-grow h-40 p-4">
         <div>
           <h3 className="mb-2 text-xl font-bold text-purple-800">
             {quiz.title}
