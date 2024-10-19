@@ -25,7 +25,9 @@ const NavBar = () => {
       </div>
       <div className="flex gap-4">
         <div className="w-8 h-8 bg-white rounded-full cursor-pointer" />
-        <IconLogout size={32} className="cursor-pointer text-violet-700" />
+        <Link to="/login">
+          <IconLogout size={32} className="cursor-pointer text-violet-700" />
+        </Link>
       </div>
     </div>
   );
