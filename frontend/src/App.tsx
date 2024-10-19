@@ -17,9 +17,9 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<RootLayout />} errorElement={<ErrorPage />}>
-          <Route path="signup" element={<SignUpPage />} />
-          <Route path="login" element={<LoginPage />} />
+        <Route path="signup" element={<SignUpPage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route element={<RootLayout />} errorElement={<ErrorPage />}>
           <Route index element={<ListQuizzesPage />} />
           <Route path="quizzes" element={<ListQuizzesPage />} />
           <Route path="quiz/:quizId" element={<SolveQuizPage />} />

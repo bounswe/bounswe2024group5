@@ -14,7 +14,7 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 rounded-3xl bg-purple-50">
+    <div className="flex items-center justify-center min-h-screen p-4 bg-purple-50 rounded-3xl">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
