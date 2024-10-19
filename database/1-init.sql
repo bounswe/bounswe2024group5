@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS questions (
 );
 
 -- Create a quiz_history table
-CREATE TABLE IF NOT EXISTS quiz_history (
+CREATE TABLE IF NOT EXISTS quiz_attempts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     quiz_id INT NOT NULL,
@@ -59,14 +59,14 @@ CREATE TABLE IF NOT EXISTS quiz_history (
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS quiz_answers (
+CREATE TABLE IF NOT EXISTS question_answers (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    quiz_attempt_id INT NOT NULL,
     question_id INT NOT NULL,
     answer VARCHAR(255),
     correct BOOLEAN,
     answered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (quiz_attempt_id) REFERENCES quiz_attempts(id) ON DELETE CASCADE,
     FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
 );
 
@@ -123,3 +123,26 @@ CREATE TABLE IF NOT EXISTS favorite_questions (
 -- Add indexes on the email and username columns in the users table
 CREATE INDEX idx_email ON users(email);
 CREATE INDEX idx_username ON users(username);
+
+DELIMITER //
+
+CREATE TRIGGER update_created_quizzes
+AFTER INSERT ON quizzes
+FOR EACH ROW
+BEGIN
+    UPDATE users
+    SET created_quizzes = created_quizzes + 1
+    WHERE id = NEW.user_id;
+END //
+
+CREATE TRIGGER update_created_quizzes_after_delete
+AFTER DELETE ON quizzes
+FOR EACH ROW
+BEGIN
+    UPDATE users
+    SET created_quizzes = created_quizzes - 1
+    WHERE id = OLD.user_id;
+END //
+
+DELIMITER ;
+
