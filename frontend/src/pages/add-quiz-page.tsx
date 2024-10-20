@@ -1,213 +1,223 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import { Question, Quiz } from "../types/question";
+import { IconCirclePlus, IconImageInPicture } from "@tabler/icons-react";
+import React, { useState } from "react";
+import type { Quiz, Question } from "../types/question";
+import { QuestionInputWithTemplate } from "../components/create-quiz/word-input-with-question-template";
 
-const QuestionSentence: React.FC<{ type: string; word: string }> = ({
-  type,
-  word,
-}) => {
-  const divClasses = "text-left py-2";
-  const spanClasses = "font-medium";
-  if (type === "1")
-    return (
-      <>
-        <div className={divClasses}>
-          How do you say <span className={spanClasses}>{word}</span> in English?
-        </div>
-      </>
-    );
-  else if (type === "2")
-    return (
-      <>
-        <div className={divClasses}>
-          How do you say <span className={spanClasses}>{word}</span> in Turkish?
-        </div>
-      </>
-    );
-  else if (type === "3")
-    return (
-      <>
-        <div className={divClasses}>
-          What is the meaning of <span className={spanClasses}>{word}</span>?
-        </div>
-      </>
-    );
-  else
-    return (
-      <>
-        <div className={divClasses}></div>
-      </>
-    );
-};
-
-const QuestionView: React.FC<{
-  question: Question;
-  quiz: Quiz;
-  setQuiz: Dispatch<SetStateAction<Quiz>>;
-}> = ({ question, quiz, setQuiz }) => {
-  const optionNames = ["A) ", "B) ", "C) ", "D) "];
-
-  const setWord = (newWord: string) => {
-    const newQuestions = quiz.questions.map((q) => {
-      return q.id === question.id ? { ...q, word: newWord } : q;
-    });
-    setQuiz({ ...quiz, questions: newQuestions });
-  };
-
-  const setOption = (optionIndex: number, newOption: string) => {
-    const newOptions = [...question.options];
-    newOptions[optionIndex] = newOption;
-    const newQuestions = quiz.questions.map((q) => {
-      return q.id === question.id ? { ...q, options: newOptions } : q;
-    });
-    setQuiz({ ...quiz, questions: newQuestions });
-  };
-
-  const setType = (newType: Question["type"]) => {
-    const newQuestions = quiz.questions.map((q) => {
-      return q.id === question.id ? { ...q, type: newType } : q;
-    });
-    setQuiz({ ...quiz, questions: newQuestions });
-  };
-
-  return (
-    <>
-      <div className="w-[600px] rounded-lg overflow-hidden border border-1 border-slate-300">
-        <div className="flex justify-between px-4 py-2 bg-slate-300">
-          <div className="bg-transparent">
-            <input
-              placeholder="Enter Word"
-              className="bg-transparent outline-none border-b border-b-black w-[300px]"
-              type="text"
-              value={question.word}
-              onChange={(e) => {
-                setWord(e.target.value);
-              }}
-            />
-          </div>
-          <div className="bg-transparent">
-            <select
-              onChange={(e) => {
-                setType(e.target.value as Question["type"]);
-              }}
-              name="question-type"
-              id={"question-type" + question.id.toString()}
-              className="px-8 bg-transparent border outline-none appearance-none border-slate-500"
-            >
-              <option value="1">{"Eng -> Tr"}</option>
-              <option value="2">{"Tr -> Eng"}</option>
-              <option value="3">{"Meaning"}</option>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 pointer-events-none"></div>
-            </select>
-          </div>
-        </div>
-        <div className="px-4 pb-4">
-          <QuestionSentence type={question.type} word={question.word} />
-          <div className="flex flex-col gap-1 text-left">
-            {optionNames.map((optionName, index) => {
-              return (
-                <div>
-                  <span>{optionName}</span>
-                  <input
-                    onChange={(e) => {
-                      setOption(index, e.target.value);
-                    }}
-                    className="outline-none w-[300px] border-b border-black"
-                    type="text"
-                    value={question.options[index]}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-export const AddQuizPage = () => {
-  const exampleQuestion: Question = {
-    id: 1,
-    word: "Fast",
-    options: ["Hızlı", "Normal", "Tatlı", "Yoğun"],
-    answer: "Hızlı",
-    type: "en-tr",
-  };
-
-  function addEmptyQuestion() {
-    const newQuestions = [...quiz.questions];
-    newQuestions.push({
-      id: Math.floor(Math.random() * 10000),
-      word: "",
-      options: ["", "", "", ""],
-      answer: "",
-      type: "en-tr",
-    });
-    setQuiz({ ...quiz, questions: newQuestions });
-  }
-
+export const AddQuizPage: React.FC = () => {
   const [quiz, setQuiz] = useState<Quiz>({
-    id: 1,
-    highlighted: false,
-    imageUrl: "/api/placeholder/250/250",
-    questionCount: 5,
-    level: "beginner",
-    category: "colors",
+    id: Math.floor(Math.random() * 1000),
     title: "",
     description: "",
-    questions: [exampleQuestion],
+    level: "beginner",
+    category: "colors",
+    questionCount: 0,
+    imageUrl: "/api/placeholder/250/250",
+    highlighted: false,
+    questions: [],
   });
 
+  const addQuestion = () => {
+    const newQuestion: Question = {
+      id: Math.floor(Math.random() * 1000),
+      word: "",
+      type: "en-tr",
+      options: ["", "", "", ""],
+      answer: "",
+    };
+
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      questions: [...prevQuiz.questions, newQuestion],
+      questionCount: prevQuiz.questionCount + 1,
+    }));
+  };
+
+  const updateQuestion = (id: number, field: keyof Question, value: string) => {
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      questions: prevQuiz.questions.map((q) =>
+        q.id === id ? { ...q, [field]: value } : q
+      ),
+    }));
+  };
+
+  const updateOption = (
+    questionId: number,
+    optionIndex: number,
+    value: string
+  ) => {
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      questions: prevQuiz.questions.map((q) =>
+        q.id === questionId
+          ? {
+              ...q,
+              options: q.options.map((opt, idx) =>
+                idx === optionIndex ? value : opt
+              ),
+            }
+          : q
+      ),
+    }));
+  };
+
   return (
-    <div className="px-8">
-      <div className="flex pb-4">
-        <div className="w-[140px] h-[140px] bg-slate-300 flex items-center justify-center text-[#777] cursor-pointer">
-          + Photo
-        </div>
-        <div className="flex flex-col px-4 flex-grow h-[140px]">
-          <div className="flex items-start mb-2">
-            <input
-              onChange={(e) => {
-                setQuiz({ ...quiz, title: e.target.value });
-              }}
-              type="text"
-              placeholder="Quiz Name"
-              className="w-[444px] text-2xl font-medium text-black placeholder:text-[#777] outline-none bg-slate-300 px-2 py-2 rounded-sm"
-            />
+    <div className="min-h-screen p-8 bg-purple-50 rounded-3xl">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="mb-8 text-3xl font-bold text-purple-800">
+          Create a Quiz
+        </h1>
+
+        <div className="p-6 mb-8 bg-white rounded-lg shadow-md">
+          <div className="flex items-center mb-6">
+            <div className="flex items-center justify-center mr-6 bg-purple-200 rounded-lg cursor-pointer w-36 h-36">
+              <IconImageInPicture className="text-purple-500" size={32} />
+            </div>
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Quiz Title"
+                className="w-full p-2 mb-4 text-2xl font-semibold text-purple-900 border-b-2 border-purple-200 outline-none focus:border-purple-500"
+                value={quiz.title}
+                onChange={(e) => setQuiz({ ...quiz, title: e.target.value })}
+              />
+              <textarea
+                placeholder="Quiz Description"
+                className="w-full h-20 p-2 text-purple-700 border-2 border-purple-200 rounded-lg outline-none resize-none focus:border-purple-500"
+                value={quiz.description}
+                onChange={(e) =>
+                  setQuiz({ ...quiz, description: e.target.value })
+                }
+              />
+            </div>
           </div>
-          <div className="flex items-start flex-grow">
-            <textarea
-              onChange={(e) => {
-                setQuiz({ ...quiz, description: e.target.value });
-              }}
-              placeholder="Quiz Description"
-              className="outline-none bg-slate-300 resize-none p-2 placeholder:text-[#777] h-full w-full rounded-sm"
-            ></textarea>
+          <div className="flex justify-between">
+            <div>
+              <label className="block mb-1 text-sm font-medium text-purple-700 place-self-start">
+                Level
+              </label>
+              <select
+                className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none w-36"
+                value={quiz.level}
+                onChange={(e) =>
+                  setQuiz({ ...quiz, level: e.target.value as Quiz["level"] })
+                }
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium text-purple-700 place-self-start">
+                Category
+              </label>
+              <select
+                className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none w-36 "
+                value={quiz.category}
+                onChange={(e) =>
+                  setQuiz({
+                    ...quiz,
+                    category: e.target.value as Quiz["category"],
+                  })
+                }
+              >
+                <option value="fruits">Fruits</option>
+                <option value="animals">Animals</option>
+                <option value="colors">Colors</option>
+                <option value="numbers">Numbers</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
-      <div>
-        <div className="mb-4 text-2xl text-left border-b-2 border-b-black">
+
+        <h2 className="mb-4 text-2xl font-semibold text-purple-800">
           Questions
-        </div>
-        <div className="flex flex-col gap-4">
-          {quiz.questions.map((question) => (
-            <QuestionView question={question} quiz={quiz} setQuiz={setQuiz} />
-          ))}
-        </div>
-      </div>
-      <div className="flex gap-4">
+        </h2>
+
+        {quiz.questions.map((question, index) => (
+          <div
+            key={question.id}
+            className="p-6 mb-6 bg-white rounded-lg shadow-md"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-purple-800">
+                Question {index + 1}
+              </h3>
+              <select
+                className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none"
+                value={question.type}
+                onChange={(e) =>
+                  updateQuestion(
+                    question.id,
+                    "type",
+                    e.target.value as Question["type"]
+                  )
+                }
+              >
+                <option value="en-tr">Eng -&gt; Tr</option>
+                <option value="tr-en">Tr -&gt; Eng</option>
+                <option value="meaning">Meaning</option>
+              </select>
+            </div>
+
+            <QuestionInputWithTemplate
+              word={question.word}
+              type={question.type}
+              onWordChange={(word) => updateQuestion(question.id, "word", word)}
+            />
+
+            {question.options.map((option, optionIndex) => (
+              <div key={optionIndex} className="flex items-center mb-2">
+                <span className="mr-2 font-semibold text-purple-800">
+                  {String.fromCharCode(65 + optionIndex)})
+                </span>
+                <input
+                  type="text"
+                  placeholder={`Option ${optionIndex + 1}`}
+                  className="flex-1 p-2 border-b border-purple-200 outline-none focus:border-purple-500"
+                  value={option}
+                  onChange={(e) =>
+                    updateOption(question.id, optionIndex, e.target.value)
+                  }
+                />
+              </div>
+            ))}
+            <div className="mt-4">
+              <label className="block mb-1 text-sm font-medium text-purple-700">
+                Correct Answer
+              </label>
+              <select
+                className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none"
+                value={question.answer}
+                onChange={(e) =>
+                  updateQuestion(question.id, "answer", e.target.value)
+                }
+              >
+                <option value="">Select correct answer</option>
+                {question.options.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        ))}
+
         <button
-          onClick={addEmptyQuestion}
-          className="px-4 py-2 mt-4 mb-6 rounded-sm bg-slate-300"
+          onClick={addQuestion}
+          className="flex items-center justify-center w-full p-4 mb-8 text-purple-800 transition-colors bg-purple-100 rounded-lg hover:bg-purple-200"
         >
+          {<IconCirclePlus className="mr-2" />}
           Add Question
         </button>
+
         <button
           onClick={() => {
-            alert("Quiz submitted.");
+            alert("Quiz submitted successfully!");
           }}
-          className="px-4 py-2 mt-4 mb-6 rounded-sm bg-slate-300"
+          className="w-full p-4 font-semibold text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700"
         >
           Submit Quiz
         </button>
