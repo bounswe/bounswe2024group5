@@ -94,14 +94,35 @@ components:
           type: string
         image:
           type: string
-        created_at:
+        createdAt:
           type: string
           format: date-time
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
-        solved:
-          type: boolean
+        questions:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              quizId:
+                type: integer
+              questionType:
+                type: string
+                enum: [english_to_turkish, turkish_to_english, english_to_sense]
+              word:
+                type: string
+              correctAnswer:
+                type: string
+              wrongAnswers:
+                type: array
+                items:
+                    type: string
+              difficulty:
+                type: number
+                format: float
       required:
         - user_id
         - title
@@ -111,21 +132,19 @@ components:
       properties:
         id:
           type: integer
-        quiz_id:
+        quizId:
           type: integer
-        question_type:
+        questionType:
           type: string
           enum: [english_to_turkish, turkish_to_english, english_to_sense]
         word:
           type: string
-        correct_answer:
+        correctAnswer:
           type: string
-        wrong_answer1:
-          type: string
-        wrong_answer2:
-          type: string
-        wrong_answer3:
-          type: string
+        wrongAnswers:
+          type: array
+          items:
+              type: string
         difficulty:
           type: number
           format: float
@@ -152,10 +171,10 @@ components:
           type: array
           items:
             type: string
-        created_at:
+        createdAt:
           type: string
           format: date-time
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
       required:
@@ -174,10 +193,10 @@ components:
           type: string
         content:
           type: string
-        created_at:
+        createdAt:
           type: string
           format: date-time
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
       required:
@@ -392,14 +411,12 @@ paths:
                 items:
                   type: object
                   properties:
-                    correct_answer:
+                    correctAnswer:
                       type: string
-                    wrong_answer1:
-                      type: string
-                    wrong_answer2:
-                      type: string
-                    wrong_answer3:
-                      type: string
+                    wrongAnswers:
+                      type: array
+                      items:
+                        type: string
         '400':
           description: Invalid input
   /quizzes:
@@ -428,14 +445,14 @@ paths:
                   items:
                     type: object
                     properties:
-                      question_type:
+                      questionType:
                         type: string
                         enum: [english_to_turkish, turkish_to_english, english_to_sense]
                       word:
                         type: string
-                      correct_answer:
+                      correctAnswer:
                         type: string
-                      wrong_answers:
+                      wrongAnswers:
                         type: array
                         items:
                           type: string
@@ -529,10 +546,6 @@ paths:
                 properties:
                   quiz:
                     $ref: '#/components/schemas/Quiz'
-                  questions:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Question'
         '404':
           description: Quiz not found
           content:
@@ -570,14 +583,14 @@ paths:
                   items:
                     type: object
                     properties:
-                      question_type:
+                      questionType:
                         type: string
                         enum: [english_to_turkish, turkish_to_english, english_to_sense]
                       word:
                         type: string
-                      correct_answer:
+                      correctAnswer:
                         type: string
-                      wrong_answers:
+                      wrongAnswers:
                         type: array
                         items:
                           type: string

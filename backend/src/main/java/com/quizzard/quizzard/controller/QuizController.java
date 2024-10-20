@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -28,16 +29,16 @@ public class QuizController {
 
     // Tüm quizleri listeleme
     @GetMapping
-    public List<QuizResponse> getAllQuizzes() {
-        return quizService.getAllQuizzes();
+    public Map<String, Object> getAllQuizzes() {
+        return Map.of("quizzes", quizService.getAllQuizzes());
     }
 
     // ID'ye göre quiz getirme
     @GetMapping("/{id}")
-    public ResponseEntity<QuizResponse> getQuizById(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> getQuizById(@PathVariable Long id) {
         QuizResponse quiz = quizService.getQuizById(id);
         if (quiz != null) {
-            return ResponseEntity.ok(quiz);
+            return ResponseEntity.ok(Map.of("quiz", quiz));
         } else {
             return ResponseEntity.notFound().build();
         }
