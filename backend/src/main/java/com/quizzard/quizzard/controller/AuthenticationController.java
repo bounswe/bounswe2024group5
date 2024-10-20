@@ -47,8 +47,7 @@ public class AuthenticationController {
         User user = new User(request.getUsername(), 
                              encoder.encode(request.getPassword()), 
                              request.getEmail(), 
-                             request.getName(), 
-                             request.getSurname());
+                             request.getName());
         userRepository.save(user);
 
         Authentication authentication = authenticationManager.authenticate(
