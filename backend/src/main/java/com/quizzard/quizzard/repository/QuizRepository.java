@@ -12,11 +12,7 @@ public interface QuizRepository extends JpaRepository <Quiz, Long> {
 
     boolean existsByTitle(String title);
 
+    boolean existsById(Long id);
+
     Quiz findByTitle(String title);
-
-    Quiz findByTitleAndUserId(String title, Long userId);
-
-    List<Quiz> findByUserId(Long userId);
-
-
 }

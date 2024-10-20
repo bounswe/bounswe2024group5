@@ -3,8 +3,12 @@ package com.quizzard.quizzard.service;
 import com.quizzard.quizzard.model.Question;
 import com.quizzard.quizzard.model.QuestionType;
 import com.quizzard.quizzard.model.Quiz;
+import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.model.request.CreateQuizRequest;
+import com.quizzard.quizzard.model.request.QuestionRequest;
 import com.quizzard.quizzard.model.request.SolveQuizRequest;
+import com.quizzard.quizzard.model.response.QuestionResponse;
+import com.quizzard.quizzard.model.response.QuizResponse;
 import com.quizzard.quizzard.model.response.SolveQuizResponse;
 import com.quizzard.quizzard.repository.QuestionRepository;
 import com.quizzard.quizzard.repository.QuizRepository;
@@ -24,46 +28,67 @@ public class QuizService {
     @Autowired
     private QuestionRepository questionRepository;
 
+    @Autowired
+    private UserService userService;
+
+    private List<QuestionResponse> mapQuestionsToQuestionResponses(List<Question> questions) {
+        return questions.stream().map(QuestionResponse::new).toList();
+    }
+
+    private QuizResponse mapQuizToQuizResponse(Quiz quiz) {
+        List<Question> questions = questionRepository.findByQuizId(quiz.getId());
+        return new QuizResponse(quiz, mapQuestionsToQuestionResponses(questions));
+    }
+
+    private List<QuizResponse> mapQuizzesToQuizResponses(List<Quiz> quizzes) {
+        return quizzes.stream().map(quiz -> mapQuizToQuizResponse(quiz)).toList();
+    }
+
     @Transactional
-    public Quiz createQuiz(CreateQuizRequest request) {
+    public QuizResponse createQuiz(String authorUsername, CreateQuizRequest request) {
+        User author = userService.getOneUserByUsername(authorUsername);
         // 1. Quiz oluştur
         Quiz quiz = new Quiz();
         quiz.setTitle(request.getTitle());
         quiz.setDescription(request.getDescription());
         quiz.setImage(request.getImage());
-        quiz.setUserId(request.getUserId());
+        quiz.setAuthor(author);
         quizRepository.save(quiz);
 
         // 2. Soruları oluştur ve quiz'e ekle
-        List<Question> questions = request.getQuestions();
-        for (Question questionRequest : questions) {
+        List<QuestionRequest> questionRequests = request.getQuestions();
+        for (QuestionRequest questionRequest : questionRequests) {
             Question question = new Question();
             question.setQuizId(quiz.getId()); // quiz_id ile ilişkilendir
-            question.setQuestionType(QuestionType.valueOf(questionRequest.getQuestionType().toString()));
+            question.setQuestionType(QuestionType.valueOf(questionRequest.getQuestionType().toString().toLowerCase()));
             question.setWord(questionRequest.getWord());
             question.setCorrectAnswer(questionRequest.getCorrectAnswer());
-            question.setWrongAnswer1(questionRequest.getWrongAnswer1());
-            question.setWrongAnswer2(questionRequest.getWrongAnswer2());
-            question.setWrongAnswer3(questionRequest.getWrongAnswer3());
+            question.setWrongAnswer1(questionRequest.getWrongAnswers().get(0));
+            question.setWrongAnswer2(questionRequest.getWrongAnswers().get(1));
+            question.setWrongAnswer3(questionRequest.getWrongAnswers().get(2));
             questionRepository.save(question);
         }
-        return quiz;
+        return mapQuizToQuizResponse(quiz);
     }
 
     // Tüm quizleri listeleme
-    public List<Quiz> getAllQuizzes() {
-        return quizRepository.findAll();
+    public List<QuizResponse> getAllQuizzes() {
+        return mapQuizzesToQuizResponses(quizRepository.findAll());
     }
 
     // ID ile quiz bulma
-    public Optional<Quiz> getQuizById(Long id) {
-        return quizRepository.findById(id);
+    public QuizResponse getQuizById(Long id) {
+        if(quizRepository.existsById(id)) {
+            Quiz quiz = quizRepository.findById(id).get();
+            return mapQuizToQuizResponse(quiz);
+        }
+        return null;
     }
 
     // Kullanıcı ID'sine göre quizleri listeleme
-    public List<Quiz> getQuizzesByUserId(Long userId) {
-        return quizRepository.findByUserId(userId);
-    }
+//    public List<Quiz> getQuizzesByUserId(Long userId) {
+//        return quizRepository.findByUserId(userId);
+//    }
 
 
     // Quiz güncelleme

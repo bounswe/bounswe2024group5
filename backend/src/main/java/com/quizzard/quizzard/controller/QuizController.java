@@ -4,8 +4,10 @@ import com.quizzard.quizzard.model.Quiz;
 import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.model.request.CreateQuizRequest;
 import com.quizzard.quizzard.model.request.SolveQuizRequest;
+import com.quizzard.quizzard.model.response.QuizResponse;
 import com.quizzard.quizzard.model.response.SolveQuizResponse;
 import com.quizzard.quizzard.service.QuizService;
+import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,29 +17,37 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/quizzes")
+@RequestMapping("/quizzes")
 public class QuizController {
 
     @Autowired
     private QuizService quizService;
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
     // Tüm quizleri listeleme
     @GetMapping
-    public List<Quiz> getAllQuizzes() {
+    public List<QuizResponse> getAllQuizzes() {
         return quizService.getAllQuizzes();
     }
 
     // ID'ye göre quiz getirme
     @GetMapping("/{id}")
-    public ResponseEntity<Quiz> getQuizById(@PathVariable Long id) {
-        Optional<Quiz> quizOptional = quizService.getQuizById(id);
-        return quizOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<QuizResponse> getQuizById(@PathVariable Long id) {
+        QuizResponse quiz = quizService.getQuizById(id);
+        if (quiz != null) {
+            return ResponseEntity.ok(quiz);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // Yeni quiz oluşturma
     @PostMapping
-    public ResponseEntity<Quiz> createQuiz(@RequestBody CreateQuizRequest quiz) {
-        Quiz createdQuiz = quizService.createQuiz(quiz);
+    public ResponseEntity<QuizResponse> createQuiz(@RequestHeader("Authorization") String jwt, @RequestBody CreateQuizRequest quizRequest) {
+        String authorUsername = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
+        QuizResponse createdQuiz = quizService.createQuiz(authorUsername, quizRequest);
         return ResponseEntity.ok(createdQuiz);
     }
 

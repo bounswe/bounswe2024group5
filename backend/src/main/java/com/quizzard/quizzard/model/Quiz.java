@@ -25,8 +25,9 @@ public class Quiz {
     @Column(name = "difficulty")
     private double difficulty;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User author;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -39,15 +40,15 @@ public class Quiz {
     // Constructors
 
     public Quiz() {
-        // Default constructor required for JPA
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
     }
 
-    public Quiz(String title, String description, String image, double difficulty, Long userId) {
+    public Quiz(String title, String description, String image, double difficulty) {
         this.title = title;
         this.description = description;
         this.image = image;
         this.difficulty = difficulty;
-        this.userId = userId;
         this.createdAt = new Date();
     }
 
@@ -73,8 +74,8 @@ public class Quiz {
         return difficulty;
     }
 
-    public Long getUserId() {
-        return userId;
+    public User getAuthor() {
+        return author;
     }
 
     public Date getCreatedAt() {
@@ -104,8 +105,8 @@ public class Quiz {
         this.difficulty = difficulty;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
     public void setUpdatedAt(Date updatedAt) {
@@ -122,7 +123,7 @@ public class Quiz {
                 ", description='" + description + '\'' +
                 ", image='" + image + '\'' +
                 ", difficulty=" + difficulty +
-                ", userId=" + userId +
+                ", userId=" + author.getId() +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

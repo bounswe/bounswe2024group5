@@ -13,6 +13,7 @@ public class Question {
     @Column(name = "quiz_id", nullable = false)
     private Long quizId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "question_type", nullable = false)
     private QuestionType questionType;
 
