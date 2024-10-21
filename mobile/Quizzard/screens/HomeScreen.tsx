@@ -91,15 +91,15 @@ const HomePage = ({ navigation }) => {
     navigation.navigate("QuizCreation");
   };
 
-  const navigateToMockQuiz = (questions) => {
-    navigation.navigate("QuizSolving", { questions });
+  const navigateToMockQuiz = (quiz, questions) => {
+    navigation.navigate("QuizSolving", { quiz, questions });
   };
   // do noth
   const renderOtherQuizzes = ({ item }: { item: Quiz }) => (
     <View style={styles.quizWrapper}>
       <QuizViewComponent
         quiz={item}
-        onPress={() => navigateToMockQuiz(item.questions)}
+        onPress={() => navigateToMockQuiz(item, item.questions)}
       />
     </View>
   );
@@ -140,7 +140,7 @@ const HomePage = ({ navigation }) => {
               <QuizViewComponent
                 key={quiz.id}
                 quiz={quiz}
-                onPress={() => navigateToMockQuiz(quiz.questions)}
+                onPress={() => navigateToMockQuiz(quiz, quiz.questions)}
               />
             ))
           ) : (
@@ -187,7 +187,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 40, // Adjusted from 320 for better layout
     marginBottom: 10,
     paddingLeft: 15,
     paddingRight: 15,
@@ -212,7 +211,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   quizSection: {
-    height: 220, // Adjusted for better visibility
+    height: 240, // Adjusted for better visibility
   },
   quizScroll: {
     paddingLeft: 15,

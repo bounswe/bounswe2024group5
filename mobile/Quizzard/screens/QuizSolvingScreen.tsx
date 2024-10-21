@@ -5,7 +5,7 @@ import Icon from "react-native-vector-icons/MaterialIcons"; // Import the icon
 import QuizHeader from "../components/QuizSolveQuizHeader";
 
 const QuizSolvingScreen = ({ route, navigation }) => {
-  const { questions } = route.params; // Access the passed data
+  const { quiz, questions } = route.params; // Access the passed data
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [curentQuestionIsAnswered, setCurentQuestionIsAnswered] =
@@ -47,7 +47,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <QuizHeader
-        quizName={"Demo Quiz"} //TODO: add laters
+        quizName={quiz.title} //TODO: add laters
         questionIndex={questionIndex}
         totalQuestions={questions.length}
       />
@@ -60,7 +60,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
             backgroundColor = "#FFFFFF"; // Match the background color
           } else {
             if (answer === question.correctAnswer) {
-              backgroundColor = "green"; // Correct answer
+              backgroundColor = "#6a0dad"; // Correct answer
             } else if (answer === selectedAnswers[selectedAnswers.length - 1]) {
               backgroundColor = "red"; // Selected answer
             } else {
@@ -89,6 +89,20 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           {/* Replace text with right-pointing arrow icon */}
           <Icon name="arrow-forward" size={24} color="#000" />
         </TouchableOpacity>
+
+      </View>
+        {/* Cancel and Submit Buttons */}
+        <View style={styles.bottomButtons}>
+        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.cancelButtonText}>Cancel</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+        style={styles.submitButton}
+        onPress={() => navigation.goBack()}>
+         {/*Upon submission of the quiz, navigate back to the home screen for now*/}
+          <Text style={styles.submitButtonText}>Submit</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -107,6 +121,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 10, // Rounded corners
     opacity: 0.9, // Slight opacity
+    marginTop: 40,
   },
   questionText: {
     fontSize: 20,
@@ -137,6 +152,33 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 60, // Adjust for smaller button size
+  },
+  bottomButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 25,
+  },
+  cancelButton: {
+    backgroundColor: "#555",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  cancelButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  submitButton: {
+    backgroundColor: "#6a0dad",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  submitButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
 
