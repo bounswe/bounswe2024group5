@@ -11,7 +11,7 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => (
       transition={{ duration: 0.5 }}
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.98 }}
-      className="flex flex-col bg-purple-100 shadow-md cursor-pointer rounded-3xl"
+      className="flex flex-col pb-6 bg-purple-100 shadow-md cursor-pointer rounded-3xl"
     >
       <div className="w-full bg-white min-h-32 rounded-t-3xl" />
       <div className="flex flex-col justify-between flex-grow h-40 p-4">
@@ -42,6 +42,9 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => (
               {QUIZ_DIFFICULTIES[quiz.difficulty]}
             </motion.span>
           </motion.div>
+          <p className="text-sm text-gray-600">
+            created by <span className="font-semibold">{quiz.username} </span>
+          </p>
           <p className="text-sm text-gray-600">
             {quiz.questions.length} questions
           </p>

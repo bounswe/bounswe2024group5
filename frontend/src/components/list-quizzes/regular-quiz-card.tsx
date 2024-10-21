@@ -44,6 +44,9 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => (
             </motion.span>
           </motion.div>
           <p className="text-sm text-gray-600">
+            created by <span className="font-semibold">{quiz.username} </span>
+          </p>
+          <p className="text-sm text-gray-600">
             {quiz.questions.length} questions
           </p>
         </div>
