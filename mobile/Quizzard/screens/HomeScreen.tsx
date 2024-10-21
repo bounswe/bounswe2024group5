@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 20, // Adjusted from 320 for better layout
+    marginTop: 40, // Adjusted from 320 for better layout
     marginBottom: 10,
     paddingLeft: 15,
     paddingRight: 15,
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   quizSection: {
-    height: 200, // Adjusted for better visibility
+    height: 220, // Adjusted for better visibility
   },
   quizScroll: {
     paddingLeft: 15,

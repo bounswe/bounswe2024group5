@@ -29,17 +29,30 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     }
   };
 
+  const generateQuestionSentence = (question): string => {
+    // const generateQuestionSentence = (question_type: 'english_to_turkish' | 'turkish_to_english' | 'english_to_sense', word: string): string => {
+    console.log("Question: ", question.questionType, question.word);
+    if (question.questionType === 'english_to_turkish') {
+      return `How do you say '${question.word}' in Turkish?`;
+    } else if (question.questionType === 'turkish_to_english') {
+      return `How do you say '${question.word}' in English?`;
+    } else {
+      return "Invalid question type";
+    }
+  };
+  
   let answers = [question.correctAnswer];
   question.wrongAnswers.forEach((answer) => answers.push(answer));
   console.log("Answers:", answers);
   return (
     <View style={styles.container}>
       <QuizHeader
-        quizName={"Quiz"} //TODO: add laters
+        quizName={"Demo Quiz"} //TODO: add laters
         questionIndex={questionIndex}
         totalQuestions={questions.length}
       />
       <View style={styles.roundQuestionContainer}>
+        <Text style={styles.questionText}>{generateQuestionSentence(question)}</Text>
         <Text style={styles.questionText}>{question.body}</Text>
         {answers.map((answer, index) => {
           let backgroundColor;
