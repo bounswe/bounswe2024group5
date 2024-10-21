@@ -37,3 +37,21 @@
    ```
 
 6. Access the application by opening a web browser and navigating to `http://<VM-IP>/`
+
+### Local Deployment for Mobile
+
+## Instractions for installation
+
+1. Install dependencies
+
+   ```bash
+   npm install
+   npm install expo
+   npm update
+   ```
+
+2. Start the app
+
+   ```bash
+    npm start
+   ```
