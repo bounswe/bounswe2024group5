@@ -15,7 +15,7 @@ export const ListQuizzesPage = () => {
   const [difficultyFilter, setDifficultyFilter] =
     useState<DifficultyFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const pageSize = 6;
+  const pageSize = 4;
 
   const highlightedQuizzes = quizzes?.slice(0, 4) || [];
 
@@ -39,7 +39,6 @@ export const ListQuizzesPage = () => {
     indexOfFirstQuiz,
     indexOfLastQuiz
   );
-  console.log(indexOfFirstQuiz, indexOfLastQuiz);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -98,9 +97,9 @@ export const ListQuizzesPage = () => {
                 onChange={handleDifficultyChange}
               >
                 <option value="all">All Levels</option>
-                <option value="1">Beginner</option>
-                <option value="2">Intermediate</option>
-                <option value="3">Advanced</option>
+                <option value="0">Beginner</option>
+                <option value="1">Intermediate</option>
+                <option value="2">Advanced</option>
               </select>
               <input
                 className="w-48 px-4 py-2 border-2 rounded-full outline-none border-violet-500"

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Quiz } from "../../types/question";
 import { motion } from "framer-motion";
 
-export const QUIZ_DIFFICULTIES = ["Easy", "Medium", "Hard"];
+export const QUIZ_DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"];
 
 export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => (
   <Link to={`/quiz/${quiz.id}`}>

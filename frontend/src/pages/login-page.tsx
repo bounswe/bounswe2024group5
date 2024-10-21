@@ -35,7 +35,6 @@ export const LoginPage = () => {
         sessionStorage.setItem("token", response.token);
 
         navigate("/quizzes");
-        window.location.href = "/quizzes";
       })
       .catch((error) => {
         // TODO: Display error in the UI.
