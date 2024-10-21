@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import type { Quiz, Question, QuestionType } from "../types/question";
 import { QuestionInputWithTemplate } from "../components/create-quiz/word-input-with-question-template";
 import { useCreateQuiz } from "../hooks/api/create-quiz";
+import { useNavigate } from "react-router-dom";
 
 export const AddQuizPage: React.FC = () => {
+  const navigate = useNavigate();
   const { mutateAsync: createQuiz } = useCreateQuiz();
   const [quiz, setQuiz] = useState<Quiz>({
     id: Math.floor(Math.random() * 1000),
@@ -65,8 +67,9 @@ export const AddQuizPage: React.FC = () => {
     }));
   };
 
-  const onSubmit = () => {
-    createQuiz(quiz);
+  const onSubmit = async () => {
+    await createQuiz(quiz);
+    navigate("/quizzes");
   };
 
   return (
