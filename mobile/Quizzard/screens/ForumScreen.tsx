@@ -15,19 +15,85 @@ const ForumScreen = ({ navigation }) => {
   const [questions, setQuestions] = useState([
     {
       id: 1,
-      title: "Question 1",
-      description: "This is the description for question 1...",
+      title: "What’s the difference between 'affect' and 'effect'?",
+      description:
+        "I often confuse 'affect' and 'effect'. Can someone explain the difference with examples?",
+      createdAt: "1h ago",
+      commentCount: 8,
+    },
+    {
+      id: 2,
+      title: "How do I use 'since' and 'for' correctly in sentences?",
+      description:
+        "I'm having trouble using 'since' and 'for' when talking about time. Can anyone give clear examples of when to use each?",
       createdAt: "2h ago",
       commentCount: 5,
     },
     {
-      id: 2,
-      title: "Question 2",
-      description: "This is the description for question 2...",
-      createdAt: "4h ago",
+      id: 3,
+      title: "What’s the meaning of the word 'ubiquitous'?",
+      description:
+        "I came across the word 'ubiquitous' in an article. Can someone explain what it means and how to use it in a sentence?",
+      createdAt: "3h ago",
       commentCount: 3,
     },
-    // Add more dummy questions...
+    {
+      id: 4,
+      title:
+        "How can I remember the difference between 'their', 'there', and 'they’re'?",
+      description:
+        "I often get confused with 'their', 'there', and 'they’re'. What are some tips or tricks to remember the differences?",
+      createdAt: "5h ago",
+      commentCount: 10,
+    },
+    {
+      id: 5,
+      title: "What is the past tense of 'buy'?",
+      description:
+        "I'm trying to understand irregular verbs. Is 'buyed' the correct past tense of 'buy'?",
+      createdAt: "6h ago",
+      commentCount: 2,
+    },
+    {
+      id: 6,
+      title: "What’s the difference between 'lend' and 'borrow'?",
+      description:
+        "I'm confused about when to use 'lend' vs. 'borrow'. Can someone clarify with examples?",
+      createdAt: "7h ago",
+      commentCount: 6,
+    },
+    {
+      id: 7,
+      title: "How do I use 'could', 'would', and 'should' in polite requests?",
+      description:
+        "I'm learning modal verbs but struggle with using 'could', 'would', and 'should' correctly in polite requests. Any advice?",
+      createdAt: "8h ago",
+      commentCount: 7,
+    },
+    {
+      id: 8,
+      title: "Can someone explain the phrase 'kick the bucket'?",
+      description:
+        "I heard someone say 'kick the bucket' in a movie. What does this phrase mean?",
+      createdAt: "9h ago",
+      commentCount: 4,
+    },
+    {
+      id: 9,
+      title: "How do I form a question in the present perfect tense?",
+      description:
+        "I’m having difficulty forming questions in the present perfect tense. Can someone give examples?",
+      createdAt: "10h ago",
+      commentCount: 5,
+    },
+    {
+      id: 10,
+      title: "What’s the difference between 'few' and 'a few'?",
+      description:
+        "I’ve seen both 'few' and 'a few' used in sentences, but I’m not sure when to use each. Can anyone explain?",
+      createdAt: "12h ago",
+      commentCount: 6,
+    },
   ]);
 
   const navigateToCreateQuestion = () => {
@@ -38,8 +104,12 @@ const ForumScreen = ({ navigation }) => {
     navigation.navigate("SearchWords");
   };
 
-  const navigateToQuestionDetail = (questionId: number) => {
-    navigation.navigate("QuestionDetail", { questionId });
+  const navigateToQuestionDetail = (
+    questionId: number,
+    title: string,
+    description: string
+  ) => {
+    navigation.navigate("QuestionDetail", { questionId, title, description });
   };
 
   return (
@@ -65,7 +135,9 @@ const ForumScreen = ({ navigation }) => {
           renderItem={({ item }) => (
             <QuestionItem
               question={item}
-              onPress={() => navigateToQuestionDetail(item.id)}
+              onPress={() =>
+                navigateToQuestionDetail(item.id, item.title, item.description)
+              }
             />
           )}
           keyExtractor={(item) => item.id.toString()}

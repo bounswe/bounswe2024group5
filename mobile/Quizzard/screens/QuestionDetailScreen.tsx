@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons"; // For the back button icon
-import { RootStackParamList } from "../app/index";
+import { Ionicons } from "@expo/vector-icons";
+import { RootStackParamList } from "../app/index"; // Importing types for navigation params
 
 type QuestionDetailScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -21,14 +21,14 @@ type Props = {
 };
 
 const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
-  const { questionId } = route.params;
+  // Destructure the questionId, title, and description from the route parameters
+  const { questionId, title, description } = route.params;
 
-  // Fetch question details based on questionId
-  // This is a placeholder, replace with actual data fetching logic
+  // You can still fetch the question details based on the questionId if necessary
   const question = {
     id: questionId,
-    title: "Question Title",
-    description: "Full description of the question...",
+    title: title, // Use the passed title
+    description: description, // Use the passed description
     createdAt: "2h ago",
     commentCount: 5,
     user: {
@@ -38,12 +38,19 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     comments: [
       {
         id: 1,
-        user: { name: "User 1", avatar: "https://example.com/avatar1.jpg" },
+        user: {
+          name: "Tsukasa Itsuki",
+          avatar: "https://avatars.githubusercontent.com/u/18108223?v=4",
+        },
         text: "Comment 1",
       },
       {
         id: 2,
-        user: { name: "User 2", avatar: "https://example.com/avatar2.jpg" },
+        user: {
+          name: "Yazhu Katsuhito",
+          avatar:
+            "https://camo.githubusercontent.com/31e59a6f219a99c429691cec62f185414a440f2807623b928c387eff9e4b7937/68747470733a2f2f692e70696e696d672e636f6d2f373336782f31362f37662f32642f31363766326462373263333331633636336161383035613939653266346466302e6a7067",
+        },
         text: "Comment 2",
       },
     ],
@@ -51,6 +58,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
+      {/* Back button to return to the previous screen */}
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={styles.backButton}
@@ -58,13 +66,21 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
 
+      {/* Display the passed title */}
       <Text style={styles.title}>{question.title}</Text>
+
+      {/* Display the passed description */}
       <Text style={styles.description}>{question.description}</Text>
+
+      {/* Display metadata like creation time and number of comments */}
       <Text style={styles.metadata}>
         {question.createdAt} • {question.commentCount} comments
       </Text>
 
+      {/* Header for the comments section */}
       <Text style={styles.commentsHeader}>Comments</Text>
+
+      {/* Loop through the comments and display each */}
       {question.comments.map((comment) => (
         <View key={comment.id} style={styles.commentContainer}>
           <Text style={styles.commentUserName}>{comment.user.name}</Text>

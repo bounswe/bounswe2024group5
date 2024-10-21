@@ -1,5 +1,5 @@
 // HomeScreen.tsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   StyleSheet,
@@ -7,31 +7,115 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
-  SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import BaseLayout from "./BaseLayout";
-import QuizViewComponent from "../components/QuizViewComponent"; // Adjust the path if necessary
-import mockQuizData from "../mockdata/mockQuizData"; // Adjust the path if necessary
-import DropdownComponent from "../components/DifficultyLevelDropdown"; // Adjust path if necessary
-import questions from "@/mockdata/mockQuizQuestionData";
+import QuizViewComponent from "../components/QuizViewComponent";
+import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
+import { useAuth } from "./AuthProvider";
+import { Quiz, Question } from "../database/types";
 
 const HomePage = ({ navigation }) => {
+  const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
+  const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [difficulty, setDifficulty] = useState("a1"); // Default difficulty
+  const authContext = useAuth(); // Get the authentication context
+  const token = authContext ? authContext.token : null; // Get the token if authContext is not null
+
+  useEffect(() => {
+    // Fetch both quizzes whenever difficulty changes
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([fetchQuizzesForYou(), fetchOtherQuizzes()]);
+      } catch (error) {
+        console.error("Error fetching quizzes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [difficulty]); // Dependency array includes 'difficulty'
+
+  const fetchQuizzesForYou = async () => {
+    try {
+      const response = await fetch(
+        `http://34.55.188.177/api/quizzes?page=1&limit=10`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setQuizzesForYou(data.quizzes);
+        console.log("Quizzes for you:", data.quizzes); // TODO: Remove or comment out after debugging
+      } else {
+        console.error("Failed to fetch quizzes for you", data);
+      }
+    } catch (error) {
+      console.error("Error fetching quizzes for you:", error);
+    }
+  };
+
+  const fetchOtherQuizzes = async () => {
+    try {
+      const response = await fetch(
+        `http://34.55.188.177/api/quizzes?page=1&limit=10`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setOtherQuizzes(data.quizzes);
+        console.log("Other quizzes:", data.quizzes); // TODO: Remove or comment out after debugging
+      } else {
+        console.error("Failed to fetch other quizzes", data);
+      }
+    } catch (error) {
+      console.error("Error fetching other quizzes:", error);
+    }
+  };
+
   const navigateToQuizCreation = () => {
     navigation.navigate("QuizCreation");
   };
 
-  const navigateToMockQuiz = () => {
-    navigation.navigate("QuizSolving", { questions: questions });
+  const navigateToMockQuiz = (questions) => {
+    navigation.navigate("QuizSolving", { questions });
   };
-
-  const renderOtherQuizzes = ({ item }) => (
+  // do noth
+  const renderOtherQuizzes = ({ item }: { item: Quiz }) => (
     <View style={styles.quizWrapper}>
-      <QuizViewComponent quiz={item} onPress={navigateToMockQuiz} />
+      <QuizViewComponent
+        quiz={item}
+        onPress={() => navigateToMockQuiz(item.questions)}
+      />
     </View>
   );
 
+  if (loading) {
+    return (
+      <BaseLayout navigation={navigation}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#6a0dad" />
+          <Text style={styles.loadingText}>Loading quizzes...</Text>
+        </View>
+      </BaseLayout>
+    );
+  }
+
   return (
-    // <SafeAreaView style={styles.safeArea}>
     <BaseLayout navigation={navigation}>
       {/* Quizzes For You Section */}
       <View style={styles.quizzesForYouHeader}>
@@ -51,34 +135,48 @@ const HomePage = ({ navigation }) => {
           showsHorizontalScrollIndicator={false}
           style={styles.quizScroll}
         >
-          {mockQuizData.map((quiz, index) => (
-            <QuizViewComponent
-              key={index}
-              quiz={quiz}
-              onPress={navigateToMockQuiz}
-            />
-          ))}
+          {quizzesForYou.length > 0 ? (
+            quizzesForYou.map((quiz) => (
+              <QuizViewComponent
+                key={quiz.id}
+                quiz={quiz}
+                onPress={() => navigateToMockQuiz(quiz.questions)}
+              />
+            ))
+          ) : (
+            <Text style={styles.noQuizzesText}>
+              No quizzes available for you.
+            </Text>
+          )}
         </ScrollView>
       </View>
 
+      {/* Other Quizzes Header with Dropdown */}
       <View style={styles.otherQuizzesHeader}>
         <Text style={styles.sectionTitle}>Other Quizzes</Text>
         <View style={styles.dropdownContainer}>
-          <DropdownComponent />
+          <DifficultyLevelDropdown
+            selectedValue={difficulty}
+            onValueChange={(value) => setDifficulty(value)}
+          />
         </View>
       </View>
 
       {/* Other Quizzes Section */}
       <View style={styles.otherQuizzesContainer}>
         <View style={styles.sectionDivider} />
-        <FlatList
-          data={mockQuizData}
-          renderItem={renderOtherQuizzes}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={2} // To show two items per row
-          contentContainerStyle={styles.quizGrid}
-          columnWrapperStyle={styles.columnWrapper}
-        />
+        {otherQuizzes.length > 0 ? (
+          <FlatList
+            data={otherQuizzes}
+            renderItem={renderOtherQuizzes}
+            keyExtractor={(item) => item.id.toString()} // Assuming each quiz has a unique 'id'
+            numColumns={2} // To show two items per row
+            contentContainerStyle={styles.quizGrid}
+            columnWrapperStyle={styles.columnWrapper}
+          />
+        ) : (
+          <Text style={styles.noQuizzesText}>No other quizzes available.</Text>
+        )}
       </View>
     </BaseLayout>
   );
@@ -89,7 +187,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 320,
+    marginTop: 40, // Adjusted from 320 for better layout
     marginBottom: 10,
     paddingLeft: 15,
     paddingRight: 15,
@@ -111,9 +209,10 @@ const styles = StyleSheet.create({
   addQuizButtonText: {
     color: "#fff",
     fontWeight: "bold",
+    textAlign: "center",
   },
   quizSection: {
-    height: "45%",
+    height: 220, // Adjusted for better visibility
   },
   quizScroll: {
     paddingLeft: 15,
@@ -130,10 +229,8 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     width: "32%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    fontSize: 14,
+    // Adjusted styles for better appearance
+    // Removed border styles as they are handled in DifficultyLevelDropdown
   },
   sectionDivider: {
     borderBottomWidth: 1,
@@ -160,6 +257,22 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#6a0dad",
+  },
+  noQuizzesText: {
+    textAlign: "center",
+    color: "#666",
+    marginTop: 20,
+    fontSize: 16,
   },
 });
 
