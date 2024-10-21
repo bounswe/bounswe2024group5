@@ -12,7 +12,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3000"
+      - "5173"
     networks:
       - app-network
     depends_on:
