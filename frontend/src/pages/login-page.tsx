@@ -18,30 +18,30 @@ export const LoginPage = () => {
       password: password,
     };
 
-    console.log('Sending', requestBody)
-
     fetch(`${hostURL}/api/auth/login`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(requestBody),
     })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((response) => {
-      sessionStorage.setItem("token", response.token);
-      navigate("/");
-    })
-    .catch((error) => {
-      // TODO: Display error in the UI.
-      console.log('Error:')
-      console.log(error)
-    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((response) => {
+        sessionStorage.setItem("token", response.token);
+
+        navigate("/quizzes");
+        window.location.href = "/quizzes";
+      })
+      .catch((error) => {
+        // TODO: Display error in the UI.
+        console.log("Error:");
+        console.log(error);
+      });
   };
 
   return (
@@ -63,7 +63,7 @@ export const LoginPage = () => {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Email"
+            placeholder="Username"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
             required
           />
