@@ -5,7 +5,7 @@ import Icon from "react-native-vector-icons/MaterialIcons"; // Import the icon
 import QuizHeader from "../components/QuizSolveQuizHeader";
 
 const QuizSolvingScreen = ({ route, navigation }) => {
-  const { questions, title } = route.params; // Access the passed data
+  const { questions } = route.params; // Access the passed data
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [curentQuestionIsAnswered, setCurentQuestionIsAnswered] =
@@ -35,7 +35,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <QuizHeader
-        quizName={title}
+        quizName={"Quiz"} //TODO: add laters
         questionIndex={questionIndex}
         totalQuestions={questions.length}
       />
