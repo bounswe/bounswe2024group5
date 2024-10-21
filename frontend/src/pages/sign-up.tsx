@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import HostContext from "../HostContext";
 
 export const SignUpPage = () => {
   const [firstName, setFirstName] = useState("");
@@ -11,9 +12,44 @@ export const SignUpPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
+  const hostURL = useContext(HostContext);
+
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/");
+
+    // TODO: Confirm password match.
+
+    const requestBody = {
+      username: username,
+      name: firstName + lastName,
+      email: email,
+      password: password,
+      english_proficiency: "0"
+    };
+
+    fetch(`${hostURL}/api/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(requestBody)
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((response) => {
+      console.log("Registration successfull.")
+      sessionStorage.setItem("token", response.token);
+      navigate("/");
+    })
+    .catch((error) => {
+      // TODO: Display error in the UI.
+      console.log('Error:')
+      console.log(error)
+    }) 
   };
 
   return (
