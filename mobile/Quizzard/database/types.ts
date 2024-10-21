@@ -44,8 +44,8 @@ export type Question = {
     quizId: number;
     questionType: number;
     word: string;
-    correct_answer: string;
-    wrong_answers: string[];
+    correctAnswer: string;
+    wrongAnswers: string[];
     difficulty: number;         // elo
 }
 

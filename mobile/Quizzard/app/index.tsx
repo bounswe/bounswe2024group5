@@ -18,7 +18,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   MainTabs: undefined;
-  QuestionDetail: { questionId: number };
+  QuestionDetail: { questionId: number; title: string; description: string };
   SearchWords: undefined;
   CreateQuestion: undefined;
   Home: undefined;

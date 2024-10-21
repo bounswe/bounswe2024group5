@@ -1,17 +1,24 @@
 // RegisterScreen.tsx
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+} from "react-native";
 // import { CustomModal } from './LoginScreen';
 import { LinearGradient } from "expo-linear-gradient";
-import CustomModal from '../components/CustomModal';
+import CustomModal from "../components/CustomModal";
 
 const RegisterScreen = ({ navigation }) => {
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -59,9 +66,6 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   const handleRegister = async () => {
-    // Simulate successful registration and navigate to HomeScreen
-    navigation.navigate('Home');
-
     if (!validateInputs()) return;
 
     const requestBody = {
@@ -72,18 +76,15 @@ const RegisterScreen = ({ navigation }) => {
       password: password,
     };
     try {
-      const response = await fetch(
-        "http://34.118.44.165:80/api/auth/register",    // Change to the correct host
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Content-Length": JSON.stringify(requestBody).length.toString(),
-            Host: "34.118.44.165:80",     // Change to the correct host
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
+      const response = await fetch("http://34.55.188.177/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Length": JSON.stringify(requestBody).length.toString(),
+          Host: "34.55.188.177",
+        },
+        body: JSON.stringify(requestBody),
+      });
 
       const rawData = await response.text();
 
@@ -114,12 +115,10 @@ const RegisterScreen = ({ navigation }) => {
       console.log("Registration failed:", error);
       showError(error.message || "An unexpected error occurred.");
     }
-
   };
 
   return (
     <View style={styles.container}>
-
       <CustomModal
         visible={modalVisible}
         message={errorMessage}
@@ -197,7 +196,7 @@ const RegisterScreen = ({ navigation }) => {
 
       <View style={styles.registerText}>
         <Text style={styles.normalText}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={styles.loginButton}>Login here</Text>
         </TouchableOpacity>
       </View>
@@ -208,59 +207,59 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#6a0dad',
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: "#6a0dad",
+    textAlign: "center",
     marginBottom: 24,
   },
   infoText: {
     fontSize: 16,
-    color: '#22005d',     // dark purple color
-    textAlign: 'center',
+    color: "#22005d", // dark purple color
+    textAlign: "center",
     marginBottom: 16,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#6a0dad',
+    borderColor: "#6a0dad",
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
-    backgroundColor: '#fff',
-    color: '#6a0dad',
+    backgroundColor: "#fff",
+    color: "#6a0dad",
   },
   registerButton: {
-    backgroundColor: '#6a0dad',
+    backgroundColor: "#6a0dad",
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 16,
   },
   registerButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   registerText: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 20,
   },
   normalText: {
     fontSize: 16,
-    color: '#22005d',
+    color: "#22005d",
   },
   loginButton: {
     fontSize: 16,
-    color: '#22005d',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
+    color: "#22005d",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
 });
 

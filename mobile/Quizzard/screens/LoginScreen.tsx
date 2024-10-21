@@ -1,17 +1,24 @@
 // LoginScreen.tsx
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+} from "react-native";
 import { useAuth } from "./AuthProvider";
 // import CustomButton from "../components/CustomButton";
 // import GradientBackground from "../components/GradientBackground";
 import { LinearGradient } from "expo-linear-gradient";
-import { RegisteredUser } from '../database/types';
-import { Profile } from '../database/types';
-import CustomModal from '../components/CustomModal';
+import { RegisteredUser } from "../database/types";
+import { Profile } from "../database/types";
+import CustomModal from "../components/CustomModal";
 
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
   const { login, token } = useAuth();
@@ -19,16 +26,17 @@ const LoginScreen = ({ navigation }) => {
 
   const fetchUserProfile = async (token) => {
     try {
-      console.log('token is:', token)
+      console.log("token is:", token);
       const response = await fetch(
-        `http://34.118.44.165:80/api/users/${username}`,   // Change to the correct host
+        `http://34.55.188.177/api/users/${username}`, // TODO: fix when endpoint added, Change to the correct host
         {
           method: "GET",
           headers: {
-            Host: '34.118.44.165',    // Change to the correct host
+            Host: "34.55.188.177", // Change to the correct host
             Authorization: `Bearer ${token}`,
           },
-        });
+        }
+      );
       const user = await response.json();
       if (response.ok) {
         setUserData(user);
@@ -45,10 +53,6 @@ const LoginScreen = ({ navigation }) => {
   };
 
   const handleLogin = async () => {
-
-    // Delete the following line, once the API is ready:
-    navigation.navigate('Home');
-
     if (password === "" || username === "") {
       setErrorMessage("Username and password cannot be empty.");
       setModalVisible(true);
@@ -60,33 +64,51 @@ const LoginScreen = ({ navigation }) => {
     };
     try {
       const response = await fetch(
-        "http://34.118.44.165:80/api/auth/login",      // Change to the correct host
+        "http://34.55.188.177/api/auth/login", // Change to the correct host
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Content-Length": JSON.stringify(requestBody).length.toString(),
-            Host: "34.118.44.165:80",     // Change to the correct host
+            Host: "34.55.188.177", // Change to the correct host
           },
           body: JSON.stringify(requestBody),
-        });
+        }
+      );
       const data = await response.json();
       if (response.ok) {
         await login(data.token);
         console.log("Logged in successfully");
-        fetchUserProfile(data.token);
-        const registeredUser = await fetchUserProfile(data.token);
+        // fetchUserProfile(data.token); // TODO: uncomment when endpoint added
+        // const registeredUser = await fetchUserProfile(data.token);
+        // const userProfile: Profile = { //
+        //   name: registeredUser.name,
+        //   surname: registeredUser.surname,
+        //   level: registeredUser.level,
+        //   elo: registeredUser.elo,
+        // };
+        // const user: RegisteredUser = {
+        //   username: registeredUser.username,
+        //   password: registeredUser.password,
+        //   email: registeredUser.email,
+        //   profile: userProfile,
+        // };
         const userProfile: Profile = {
-          name: registeredUser.name,
-          surname: registeredUser.surname,
-          level: registeredUser.level,
-          elo: registeredUser.elo,
+          name: "John",
+          surname: "Doe",
+          level: "Beginner",
+          elo: 1000,
+          profilePicture: "demo",
         };
         const user: RegisteredUser = {
-          username: registeredUser.username,
-          password: registeredUser.password,
-          email: registeredUser.email,
+          username: "demo",
+          password: "demo",
+          email: "demo",
           profile: userProfile,
+          createdQuizzes: [],
+          favoritedQuizzes: [],
+          favoritedQuestions: [],
+          posts: [],
         };
         console.log("Registered user data:", user);
         navigation.navigate("Home", { registeredUser: user });
@@ -104,7 +126,9 @@ const LoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Quizzard</Text>
-      <Text style={styles.infoText}>Login to your account to access Quizzard.</Text>
+      <Text style={styles.infoText}>
+        Login to your account to access Quizzard.
+      </Text>
 
       <TextInput
         style={styles.input}
@@ -130,7 +154,7 @@ const LoginScreen = ({ navigation }) => {
 
       <View style={styles.registerText}>
         <Text style={styles.normalText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={styles.registerButton}>Register here</Text>
         </TouchableOpacity>
       </View>
@@ -147,59 +171,59 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#6a0dad',
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: "#6a0dad",
+    textAlign: "center",
     marginBottom: 24,
   },
   infoText: {
     fontSize: 16,
-    color: '#22005d',     // dark purple color
-    textAlign: 'center',
+    color: "#22005d", // dark purple color
+    textAlign: "center",
     marginBottom: 16,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#6a0dad',
+    borderColor: "#6a0dad",
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
-    backgroundColor: '#fff',
-    color: '#6a0dad',
+    backgroundColor: "#fff",
+    color: "#6a0dad",
   },
   loginButton: {
-    backgroundColor: '#6a0dad',
+    backgroundColor: "#6a0dad",
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 16,
   },
   loginButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   registerText: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 20,
   },
   normalText: {
     fontSize: 16,
-    color: '#22005d',
+    color: "#22005d",
   },
   registerButton: {
     fontSize: 16,
-    color: '#22005d',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
+    color: "#22005d",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
 });
 
