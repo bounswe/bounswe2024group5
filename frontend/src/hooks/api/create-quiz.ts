@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Quiz } from '../../types/question';
-import { TOKEN } from './get-quizzes';
+
 
 type CreateQuizPayload = Omit<Quiz, 'id' | 'username' | 'createdAt' | 'updatedAt'>;
 
 const createQuiz = async (quizData: CreateQuizPayload): Promise<Quiz> => {
+	const TOKEN = sessionStorage.getItem('token');
 	const response = await fetch('http://localhost:80/api/quizzes', {
 		method: 'POST',
 		headers: {

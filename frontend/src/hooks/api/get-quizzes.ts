@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { Quiz } from '../../types/question'
 
-export const TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuZXd1c2VyIiwiaWF0IjoxNzI5NTI1NjY2LCJleHAiOjE3Mjk2MTIwNjZ9.gMGU3HrdYE7oQ6jukRBRBbir1JPZwk6NH374AMjeSog"
 export const useFetchQuizzes = () => {
+	const TOKEN = sessionStorage.getItem('token')
 	const context = useQuery({
 		queryKey: ['quizzes'],
 		queryFn: async () => {
