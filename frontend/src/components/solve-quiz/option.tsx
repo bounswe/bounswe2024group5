@@ -23,24 +23,12 @@ export const OptionButton = ({
 }) => {
   const isThisQuestionAnswered = answers[currentQuestion] !== undefined;
   const isThisOptionSubmitted = answers[currentQuestion] === option;
-  const isThisOptionCorrect = option === question.answer;
+  const isThisOptionCorrect = option === question.correctAnswer;
 
   const renderCorrect = isThisQuestionAnswered && isThisOptionCorrect;
   const renderIncorrect =
     isThisQuestionAnswered && isThisOptionSubmitted && !isThisOptionCorrect;
 
-  //   console.log(renderCorrect, renderIncorrect);
-  console.log({
-    isThisQuestionAnswered,
-    isThisOptionSubmitted,
-    isThisOptionCorrect,
-    renderCorrect,
-    renderIncorrect,
-    selectedAnswer,
-    option,
-    answers,
-  });
-  console.log(option, answers[index]);
   return (
     <motion.button
       whileHover={{ scale: 1.03 }}

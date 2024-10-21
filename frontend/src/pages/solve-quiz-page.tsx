@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { quizzes } from "../types/question";
 import { OptionButton } from "../components/solve-quiz/option";
 import Confetti from "react-confetti";
 import { QuizOverview } from "../components/solve-quiz/quiz-overview";
 import { ProgressBar } from "../components/solve-quiz/progress-bar";
-import { QuizActionButton } from "../components/solve-quiz/quiz-action-button";
+import { QuizActionButtons } from "../components/solve-quiz/quiz-action-buttons";
 import { questionTemplate } from "../utils";
-
+import { useLocation } from "react-router-dom";
+import { useFetchQuizzes } from "../hooks/api/get-quizzes";
+import { Spin } from "antd";
 export const SolveQuizPage = () => {
-  const questions = quizzes[0].questions;
+  const currentPath = useLocation().pathname;
+
+  const quizId = currentPath.split("/").pop();
+
+  const { data: quizzes, isLoading } = useFetchQuizzes();
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
 
   const [selectedAnswer, setSelectedAnswer] = useState<string | undefined>(
@@ -22,9 +28,39 @@ export const SolveQuizPage = () => {
 
   const [score, setScore] = useState(0);
 
-  const [answers, setAnswers] = useState<(string | undefined)[]>(
-    Array(questions.length).fill(undefined)
-  );
+  const [answers, setAnswers] = useState<(string | undefined)[]>([]);
+
+  useEffect(() => {
+    if (quizzes) {
+      const quiz = quizzes.find((q) => q.id === quizId);
+      if (quiz) {
+        setAnswers(Array(quiz.questions.length).fill(undefined));
+      }
+    }
+  }, [quizzes, quizId]);
+
+  useEffect(() => {
+    if (isQuizFinished) {
+      setConfettiEnabled(true);
+      setInterval(() => {
+        setConfettiEnabled(false);
+      }, 7000);
+    }
+  }, [isQuizFinished]);
+
+  if (isLoading || !quizzes) {
+    return <Spin />;
+  }
+
+  const quiz = quizzes?.find((q) => q.id?.toString() === quizId);
+
+  if (!quiz) {
+    return <div>Quiz not found</div>;
+  }
+
+  if (quiz.questions.length === 0) {
+    return <div>Quiz has no questions</div>;
+  }
 
   const handleAnswer = (answer: string) => {
     if (!showResult) {
@@ -32,7 +68,7 @@ export const SolveQuizPage = () => {
     }
   };
 
-  console.log(answers);
+  // console.log(answers);
   const handleNavigateToQuestion = (questionIndex: number) => {
     setCurrentQuestion(questionIndex);
 
@@ -46,7 +82,12 @@ export const SolveQuizPage = () => {
   const submitAnswer = () => {
     if (selectedAnswer && !showResult) {
       setShowResult(true);
-      const correct = selectedAnswer === questions[currentQuestion].answer;
+      console.log(
+        quiz.questions[currentQuestion].correctAnswer,
+        selectedAnswer
+      );
+      const correct =
+        selectedAnswer === quiz.questions[currentQuestion].correctAnswer;
       if (correct) {
         setScore((prev) => prev + 1);
       }
@@ -60,7 +101,7 @@ export const SolveQuizPage = () => {
   };
 
   const nextQuestion = () => {
-    if (currentQuestion < questions.length - 1) {
+    if (currentQuestion < (quiz.questions.length ?? 0) - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(undefined);
 
@@ -70,14 +111,13 @@ export const SolveQuizPage = () => {
     }
   };
 
-  useEffect(() => {
-    if (isQuizFinished) {
-      setConfettiEnabled(true);
-      setInterval(() => {
-        setConfettiEnabled(false);
-      }, 7000);
+  const previousQuestion = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+      setSelectedAnswer(undefined);
+      setShowResult(false);
     }
-  }, [isQuizFinished]);
+  };
 
   return (
     <div className="flex w-full">
@@ -87,7 +127,7 @@ export const SolveQuizPage = () => {
           <div className="flex flex-col items-center p-6 rounded-xl bg-violet-50">
             <h1 className="text-4xl font-bold">Quiz Finished!</h1>
             <p className="mt-4 text-lg">
-              You scored {score} out of {questions.length}
+              You scored {score} out of {quiz.questions.length}
             </p>
           </div>
         </div>
@@ -101,36 +141,37 @@ export const SolveQuizPage = () => {
           >
             <ProgressBar
               currentQuestion={currentQuestion}
-              questions={questions}
+              questions={quiz.questions}
               answers={answers}
             />
 
             <p className="mb-6 text-lg">
               {questionTemplate({
-                word: questions[currentQuestion].word,
-                type: questions[currentQuestion].type,
+                word: quiz.questions[currentQuestion].word,
+                type: quiz.questions[currentQuestion].questionType,
               })}
             </p>
 
             <div className="grid grid-cols-2 gap-4 ">
-              {questions[currentQuestion].options.map((option, index) => (
+              {quiz.questions[currentQuestion].options.map((option, index) => (
                 <OptionButton
+                  key={index}
                   index={index}
                   option={option}
                   selectedAnswer={selectedAnswer}
                   handleAnswer={handleAnswer}
-                  question={questions[currentQuestion]}
+                  question={quiz.questions[currentQuestion]}
                   answers={answers}
                   currentQuestion={currentQuestion}
                 />
               ))}
             </div>
 
-            <QuizActionButton
-              showResult={showResult}
-              questions={questions}
+            <QuizActionButtons
+              questions={quiz.questions}
               submitAnswer={submitAnswer}
               nextQuestion={nextQuestion}
+              previousQuestion={previousQuestion}
               currentQuestion={currentQuestion}
               selectedAnswer={selectedAnswer}
               answers={answers}
@@ -138,7 +179,7 @@ export const SolveQuizPage = () => {
           </motion.div>
 
           <QuizOverview
-            questions={questions}
+            questions={quiz.questions}
             currentQuestion={currentQuestion}
             score={score}
             answers={answers}

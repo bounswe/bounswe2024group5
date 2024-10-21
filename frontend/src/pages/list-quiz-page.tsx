@@ -1,41 +1,54 @@
-import { Quiz } from "../types/question";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 import { useState } from "react";
 import { Pagination } from "antd";
 import { RegularQuizCard } from "../components/list-quizzes/regular-quiz-card";
 import { FeaturedQuizCard } from "../components/list-quizzes/featured-quiz-card";
 import { Link } from "react-router-dom";
+import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 
-const allQuizzes: Quiz[] = Array(20)
-  .fill(null)
-  .map((_, index) => ({
-    id: index + 1,
-    title: `Quiz ${index + 1}`,
-    description: `Description for Quiz ${index + 1}`,
-    level: ["beginner", "intermediate", "advanced"][
-      Math.floor(Math.random() * 3)
-    ] as Quiz["level"],
-    category: ["fruits", "animals", "colors", "numbers"][
-      Math.floor(Math.random() * 4)
-    ] as Quiz["category"],
-    questionCount: Math.floor(Math.random() * 30) + 10,
-    imageUrl: "/api/placeholder/250/250",
-    highlighted: index < 4,
-    questions: [],
-  }));
+type DifficultyFilter = "all" | string;
 export const ListQuizzesPage = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 6;
+  const { data: quizzes } = useFetchQuizzes();
 
-  const highlightedQuizzes = allQuizzes.filter((quiz) => quiz.highlighted);
-  const regularQuizzes = allQuizzes.filter((quiz) => !quiz.highlighted);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [difficultyFilter, setDifficultyFilter] =
+    useState<DifficultyFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const pageSize = 4;
+
+  const highlightedQuizzes = quizzes?.slice(0, 4) || [];
+
+  const filteredQuizzes = useMemo(() => {
+    return (quizzes || []).filter((quiz) => {
+      const matchesSearch = quiz.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesDifficulty =
+        difficultyFilter === "all" ||
+        quiz.difficulty.toString() === difficultyFilter;
+      return matchesSearch && matchesDifficulty;
+    });
+  }, [quizzes, searchQuery, difficultyFilter]);
+
+  const regularQuizzes = quizzes || [];
 
   const indexOfLastQuiz = currentPage * pageSize;
   const indexOfFirstQuiz = indexOfLastQuiz - pageSize;
-  const currentQuizzes = regularQuizzes.slice(
+  const currentQuizzes = filteredQuizzes.slice(
     indexOfFirstQuiz,
     indexOfLastQuiz
   );
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleDifficultyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDifficultyFilter(e.target.value);
+    setCurrentPage(1);
+  };
 
   const onPageChange = (page: number) => {
     setCurrentPage(page);
@@ -78,9 +91,20 @@ export const ListQuizzesPage = () => {
             </h2>
 
             <div className="flex gap-2">
+              <select
+                className="px-4 py-2 bg-white border-2 rounded-full outline-none border-violet-500"
+                value={difficultyFilter}
+                onChange={handleDifficultyChange}
+              >
+                <option value="all">All Levels</option>
+                <option value="0">Beginner</option>
+                <option value="1">Intermediate</option>
+                <option value="2">Advanced</option>
+              </select>
               <input
                 className="w-48 px-4 py-2 border-2 rounded-full outline-none border-violet-500"
                 placeholder="Search a quiz..."
+                onChange={handleSearch}
               />
             </div>
           </div>

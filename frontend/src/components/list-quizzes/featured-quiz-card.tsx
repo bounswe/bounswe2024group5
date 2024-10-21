@@ -1,19 +1,20 @@
 import { Quiz } from "../../types/question";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { QUIZ_DIFFICULTIES } from "./regular-quiz-card";
 
 export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => (
-  <Link to="/quiz/3">
+  <Link to={`/quiz/${quiz.id}`}>
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.98 }}
-      className="flex flex-col overflow-hidden bg-purple-100 shadow-md cursor-pointer rounded-3xl"
+      className="flex flex-col pb-2 bg-purple-100 shadow-md cursor-pointer rounded-3xl"
     >
-      <div className="w-full h-32 bg-white rounded-t-3xl" />
-      <div className="flex flex-col justify-between flex-grow h-40 p-4">
+      <div className="w-full bg-white min-h-32 rounded-t-3xl" />
+      <div className="flex flex-col justify-between flex-grow p-4 min-h-40">
         <div>
           <h3 className="mb-2 text-xl font-bold text-purple-800">
             {quiz.title}
@@ -30,25 +31,22 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => (
             <motion.span
               className={`px-2 py-1 rounded-full text-sm font-semibold 
 				${
-          quiz.level === "beginner"
+          quiz.difficulty === 0
             ? "bg-green-200 text-green-800"
-            : quiz.level === "intermediate"
+            : quiz.difficulty === 1
             ? "bg-yellow-200 text-yellow-800"
             : "bg-red-200 text-red-800"
         }`}
               whileHover={{ scale: 1.1 }}
             >
-              {quiz.level}
-            </motion.span>
-            <motion.span
-              className="px-2 py-1 text-sm font-semibold text-purple-800 bg-purple-200 rounded-full"
-              whileHover={{ scale: 1.1 }}
-            >
-              {quiz.category}
+              {QUIZ_DIFFICULTIES[quiz.difficulty]}
             </motion.span>
           </motion.div>
           <p className="text-sm text-gray-600">
-            {quiz.questionCount} questions
+            created by <span className="font-semibold">{quiz.username} </span>
+          </p>
+          <p className="text-sm text-gray-600">
+            {quiz.questions.length} questions
           </p>
         </div>
       </div>

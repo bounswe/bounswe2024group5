@@ -2,16 +2,16 @@ import type { Question } from "../../types/question";
 
 type QuestionInputWithTemplateProps = {
   word: Question["word"];
-  type: Question["type"];
+  questionType: Question["questionType"];
   onWordChange: (word: Question["word"]) => void;
 };
 
 export const QuestionInputWithTemplate = ({
   word,
-  type,
+  questionType,
   onWordChange,
 }: QuestionInputWithTemplateProps) => {
-  const [before, after] = getTemplate(type);
+  const [before, after] = getTemplate(questionType);
 
   return (
     <div className="flex items-center mb-4">
@@ -28,13 +28,13 @@ export const QuestionInputWithTemplate = ({
   );
 };
 
-const getTemplate = (type: Question["type"]) => {
-  switch (type) {
-    case "en-tr":
+const getTemplate = (questionType: Question["questionType"]) => {
+  switch (questionType) {
+    case "english_to_turkish":
       return ["How do you say ", " in Turkish?"];
-    case "tr-en":
+    case "turkish_to_english":
       return ["How do you say ", " in English?"];
-    case "meaning":
+    case "english_to_sense":
       return ["What is the meaning of ", "?"];
   }
 };

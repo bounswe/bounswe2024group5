@@ -1,18 +1,19 @@
 import { IconCirclePlus, IconImageInPicture } from "@tabler/icons-react";
 import React, { useState } from "react";
-import type { Quiz, Question } from "../types/question";
+import type { Quiz, Question, QuestionType } from "../types/question";
 import { QuestionInputWithTemplate } from "../components/create-quiz/word-input-with-question-template";
+import { useCreateQuiz } from "../hooks/api/create-quiz";
+import { useNavigate } from "react-router-dom";
 
 export const AddQuizPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { mutateAsync: createQuiz } = useCreateQuiz();
   const [quiz, setQuiz] = useState<Quiz>({
     id: Math.floor(Math.random() * 1000),
     title: "",
     description: "",
-    level: "beginner",
-    category: "colors",
-    questionCount: 0,
-    imageUrl: "/api/placeholder/250/250",
-    highlighted: false,
+    difficulty: 1,
+    image: "/api/placeholder/250/250",
     questions: [],
   });
 
@@ -20,19 +21,24 @@ export const AddQuizPage: React.FC = () => {
     const newQuestion: Question = {
       id: Math.floor(Math.random() * 1000),
       word: "",
-      type: "en-tr",
-      options: ["", "", "", ""],
-      answer: "",
+      questionType: "english_to_turkish",
+      correctAnswer: "",
+      wrongAnswers: ["", "", ""],
+      options: [],
+      difficulty: 1,
     };
 
     setQuiz((prevQuiz) => ({
       ...prevQuiz,
       questions: [...prevQuiz.questions, newQuestion],
-      questionCount: prevQuiz.questionCount + 1,
     }));
   };
 
-  const updateQuestion = (id: number, field: keyof Question, value: string) => {
+  const updateQuestion = (
+    id: number,
+    field: keyof Question,
+    value: unknown
+  ) => {
     setQuiz((prevQuiz) => ({
       ...prevQuiz,
       questions: prevQuiz.questions.map((q) =>
@@ -41,9 +47,9 @@ export const AddQuizPage: React.FC = () => {
     }));
   };
 
-  const updateOption = (
+  const updateWrongAnswer = (
     questionId: number,
-    optionIndex: number,
+    answerIndex: number,
     value: string
   ) => {
     setQuiz((prevQuiz) => ({
@@ -52,13 +58,18 @@ export const AddQuizPage: React.FC = () => {
         q.id === questionId
           ? {
               ...q,
-              options: q.options.map((opt, idx) =>
-                idx === optionIndex ? value : opt
+              wrongAnswers: q.wrongAnswers.map((ans, idx) =>
+                idx === answerIndex ? value : ans
               ),
             }
           : q
       ),
     }));
+  };
+
+  const onSubmit = async () => {
+    await createQuiz(quiz);
+    navigate("/quizzes");
   };
 
   return (
@@ -91,43 +102,21 @@ export const AddQuizPage: React.FC = () => {
               />
             </div>
           </div>
-          <div className="flex justify-between">
-            <div>
-              <label className="block mb-1 text-sm font-medium text-purple-700 place-self-start">
-                Level
-              </label>
-              <select
-                className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none w-36"
-                value={quiz.level}
-                onChange={(e) =>
-                  setQuiz({ ...quiz, level: e.target.value as Quiz["level"] })
-                }
-              >
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-              </select>
-            </div>
-            <div>
-              <label className="block mb-1 text-sm font-medium text-purple-700 place-self-start">
-                Category
-              </label>
-              <select
-                className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none w-36 "
-                value={quiz.category}
-                onChange={(e) =>
-                  setQuiz({
-                    ...quiz,
-                    category: e.target.value as Quiz["category"],
-                  })
-                }
-              >
-                <option value="fruits">Fruits</option>
-                <option value="animals">Animals</option>
-                <option value="colors">Colors</option>
-                <option value="numbers">Numbers</option>
-              </select>
-            </div>
+          <div className="place-self-start">
+            <label className="block mb-1 text-sm font-medium text-purple-700 place-self-start">
+              Difficulty
+            </label>
+            <select
+              className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none w-36"
+              value={quiz.difficulty}
+              onChange={(e) =>
+                setQuiz({ ...quiz, difficulty: Number(e.target.value) })
+              }
+            >
+              <option value={1}>Beginner</option>
+              <option value={2}>Intermediate</option>
+              <option value={3}>Advanced</option>
+            </select>
           </div>
         </div>
 
@@ -146,61 +135,84 @@ export const AddQuizPage: React.FC = () => {
               </h3>
               <select
                 className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none"
-                value={question.type}
+                value={question.questionType}
                 onChange={(e) =>
                   updateQuestion(
-                    question.id,
-                    "type",
-                    e.target.value as Question["type"]
+                    question.id ?? 0,
+                    "questionType",
+                    e.target.value as QuestionType
                   )
                 }
               >
-                <option value="en-tr">Eng -&gt; Tr</option>
-                <option value="tr-en">Tr -&gt; Eng</option>
-                <option value="meaning">Meaning</option>
+                <option value="english_to_turkish">Eng -&gt; Tr</option>
+                <option value="turkish_to_english">Tr -&gt; Eng</option>
+                <option value="english_to_sense">Meaning</option>
               </select>
             </div>
 
             <QuestionInputWithTemplate
               word={question.word}
-              type={question.type}
-              onWordChange={(word) => updateQuestion(question.id, "word", word)}
+              questionType={question.questionType}
+              onWordChange={(word) =>
+                updateQuestion(question.id ?? 0, "word", word)
+              }
             />
 
-            {question.options.map((option, optionIndex) => (
-              <div key={optionIndex} className="flex items-center mb-2">
+            <div className="mt-4">
+              <input
+                type="text"
+                placeholder="Correct Answer"
+                className="w-full p-2 mb-2 border-b border-purple-200 outline-none focus:border-purple-500"
+                value={question.correctAnswer}
+                onChange={(e) =>
+                  updateQuestion(
+                    question.id ?? 0,
+                    "correctAnswer",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+
+            {question.wrongAnswers.map((answer, answerIndex) => (
+              <div key={answerIndex} className="flex items-center mb-2">
                 <span className="mr-2 font-semibold text-purple-800">
-                  {String.fromCharCode(65 + optionIndex)})
+                  Wrong Answer {answerIndex + 1}:
                 </span>
                 <input
                   type="text"
-                  placeholder={`Option ${optionIndex + 1}`}
+                  placeholder={`Wrong Answer ${answerIndex + 1}`}
                   className="flex-1 p-2 border-b border-purple-200 outline-none focus:border-purple-500"
-                  value={option}
+                  value={answer}
                   onChange={(e) =>
-                    updateOption(question.id, optionIndex, e.target.value)
+                    updateWrongAnswer(
+                      question.id ?? 0,
+                      answerIndex,
+                      e.target.value
+                    )
                   }
                 />
               </div>
             ))}
+
             <div className="mt-4">
               <label className="block mb-1 text-sm font-medium text-purple-700">
-                Correct Answer
+                Question Difficulty
               </label>
-              <select
+              <input
+                type="number"
+                min="1"
+                max="3"
                 className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none"
-                value={question.answer}
+                value={question.difficulty}
                 onChange={(e) =>
-                  updateQuestion(question.id, "answer", e.target.value)
+                  updateQuestion(
+                    question.id ?? 0,
+                    "difficulty",
+                    Number(e.target.value)
+                  )
                 }
-              >
-                <option value="">Select correct answer</option>
-                {question.options.map((option, index) => (
-                  <option key={index} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           </div>
         ))}
@@ -209,14 +221,12 @@ export const AddQuizPage: React.FC = () => {
           onClick={addQuestion}
           className="flex items-center justify-center w-full p-4 mb-8 text-purple-800 transition-colors bg-purple-100 rounded-lg hover:bg-purple-200"
         >
-          {<IconCirclePlus className="mr-2" />}
+          <IconCirclePlus className="mr-2" />
           Add Question
         </button>
 
         <button
-          onClick={() => {
-            alert("Quiz submitted successfully!");
-          }}
+          onClick={onSubmit}
           className="w-full p-4 font-semibold text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700"
         >
           Submit Quiz
