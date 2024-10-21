@@ -7,14 +7,14 @@ public class RegisterRequest {
     private String password;
     private String email;
     private String name;
-    private String surname;
+    private int english_proficiency;
 
-    public RegisterRequest(String username, String password, String email, String name, String surname) {
+    public RegisterRequest(String username, String password, String email, String name, int english_proficiency) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.name = name;
-        this.surname = surname;
+        this.english_proficiency = english_proficiency;
     }
 
     public String getUsername() {
@@ -33,7 +33,7 @@ public class RegisterRequest {
         return name;
     }
 
-    public String getSurname() {
-        return surname;
+    public int getEnglish_proficiency() {
+        return english_proficiency;
     }
 }

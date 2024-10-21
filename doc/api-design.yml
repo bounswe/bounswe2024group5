@@ -1,0 +1,924 @@
+openapi: 3.0.3
+info:
+  title: Quizzard API
+  description: API documentation for the Quizzard application.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        profile_picture:
+          type: string
+          format: uri
+        english_proficiency:
+          type: string
+          enum: [a1,a2,b1,b2,c1,c2]
+        points:
+          type: integer
+        created_quizzes:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - username
+        - name
+        - email
+        - password
+        - english_proficiency
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        english_proficiency:
+          type: string
+          enum: [a1,a2,b1,b2,c1,c2]
+      required:
+        - username
+        - name
+        - email
+        - password
+        - english_proficiency
+    LoginRequest:
+      type: object
+      properties:
+        username_or_email:
+          type: string
+        password:
+          type: string
+      required:
+        - username_or_email
+        - password
+    Quiz:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        title:
+          type: string
+        difficulty:
+          type: number
+          format: float
+        description:
+          type: string
+        image:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        questions:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              quizId:
+                type: integer
+              questionType:
+                type: string
+                enum: [english_to_turkish, turkish_to_english, english_to_sense]
+              word:
+                type: string
+              correctAnswer:
+                type: string
+              wrongAnswers:
+                type: array
+                items:
+                    type: string
+              difficulty:
+                type: number
+                format: float
+      required:
+        - user_id
+        - title
+        - difficulty
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+        quizId:
+          type: integer
+        questionType:
+          type: string
+          enum: [english_to_turkish, turkish_to_english, english_to_sense]
+        word:
+          type: string
+        correctAnswer:
+          type: string
+        wrongAnswers:
+          type: array
+          items:
+              type: string
+        difficulty:
+          type: number
+          format: float
+      required:
+        - quiz_id
+        - question_type
+        - word
+        - correct_answer
+        - difficulty
+    ForumPost:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        upvote:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - username
+        - title
+        - content
+        - tags
+    ForumReply:
+      type: object
+      properties:
+        id:
+          type: integer
+        post_id:
+          type: integer
+        username:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - post_id
+        - username
+        - content
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/login:
+    post:
+      summary: User login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{id}:
+    get:
+      summary: Get user profile
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update user profile
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                profile_picture:
+                  type: string
+                  format: uri
+                english_proficiency:
+                  type: string
+                  enum: [beginner, intermediate, advanced]
+                password:
+                  type: string
+                new_password:
+                  type: string
+              # Add other updatable fields as needed
+      responses:
+        '200':
+          description: User profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /word_suggestions:
+    get:
+      summary: Get question word suggestions
+      tags:
+        - Questions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: word
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [english_to_turkish, turkish_to_english, english_to_sense]
+      responses:
+        '200':
+          description: Question word retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+                    example: ["fast", "fasten", "faster"]
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /question_answers:
+    get:
+      summary: Get question answers
+      tags:
+        - Questions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: word
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [english_to_turkish, turkish_to_english, english_to_sense]
+      responses:
+        '200':
+          description: Question answers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    correctAnswer:
+                      type: string
+                    wrongAnswers:
+                      type: array
+                      items:
+                        type: string
+        '400':
+          description: Invalid input
+  /quizzes:
+    post:
+      summary: Create a new quiz
+      tags:
+        - Quizzes
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+                  format: base64
+                questions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      questionType:
+                        type: string
+                        enum: [english_to_turkish, turkish_to_english, english_to_sense]
+                      word:
+                        type: string
+                      correctAnswer:
+                        type: string
+                      wrongAnswers:
+                        type: array
+                        items:
+                          type: string
+              required:
+                - title
+                - questions
+      responses:
+        '201':
+          description: Quiz created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quiz'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: Get list of quizzes
+      tags:
+        - Quizzes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: Number of items per page
+        - name: filter
+          in: query
+          schema:
+            type: string
+            enum: [own, others, all]
+          description: Filter quizzes by ownership (own, others, or all)
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+            enum: [a1,a2,b1,b2,c1,c2]
+          description: Filter quizzes by difficulty
+      responses:
+        '200':
+          description: A list of quizzes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quizzes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Quiz'
+                  total_count:
+                    type: integer
+                  page:
+                    type: integer
+                  total_pages:
+                    type: integer
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /quizzes/{id}:
+    get:
+      summary: Get quiz details
+      tags:
+        - Quizzes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Quiz details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quiz:
+                    $ref: '#/components/schemas/Quiz'
+        '404':
+          description: Quiz not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update a quiz
+      tags:
+        - Quizzes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+                  format: base64
+                questions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      questionType:
+                        type: string
+                        enum: [english_to_turkish, turkish_to_english, english_to_sense]
+                      word:
+                        type: string
+                      correctAnswer:
+                        type: string
+                      wrongAnswers:
+                        type: array
+                        items:
+                          type: string
+      responses:
+        '200':
+          description: Quiz updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quiz'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Quiz not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a quiz
+      tags:
+        - Quizzes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Quiz deleted successfully
+        '404':
+          description: Quiz not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /quizzes/{id}/solve:
+    post:
+      summary: Solve a quiz
+      tags:
+        - Quizzes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      question_id:
+                        type: integer
+                      selected_answer:
+                        type: string
+              required:
+                - answers
+      responses:
+        '200':
+          description: Quiz solved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    type: integer
+                  correct_answers:
+                    type: integer
+                  total_questions:
+                    type: integer
+                  points_awarded:
+                    type: integer
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Quiz not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /forum/posts:
+    post:
+      summary: Create a forum post
+      tags:
+        - Forum
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                lexvo_link:
+                  type: string
+                  format: uri
+                tags:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - title
+                - content
+                - tags
+      responses:
+        '201':
+          description: Forum post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumPost'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: Get list of forum posts
+      tags:
+        - Forum
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: Number of items per page
+      responses:
+        '200':
+          description: A list of forum posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForumPost'
+  /forum/posts/{id}:
+    get:
+      summary: Get forum post details
+      tags:
+        - Forum
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Forum post details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  post:
+                    $ref: '#/components/schemas/ForumPost'
+                  replies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ForumReply'
+                  suggestions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ForumPost'
+        '404':
+          description: Forum post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /forum/posts/{id}/replies:
+    post:
+      summary: Reply to a forum post
+      tags:
+        - Forum
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+              required:
+                - content
+      responses:
+        '201':
+          description: Reply added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumReply'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Forum post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /forum/posts/{id}/upvote:
+    post:
+      summary: Upvote a forum post
+      tags:
+        - Forum
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post upvoted successfully
+        '404':
+          description: Forum post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Remove upvote from a forum post
+      tags:
+        - Forum
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post downvoted successfully
+        '404':
+          description: Forum post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /search:
+    get:
+      summary: Search forum posts
+      tags:
+        - Search
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+        - name: page
+          in: query
+          schema:
+            type: integer
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: Number of items per page
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ForumPost'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+security:
+  - bearerAuth: []
