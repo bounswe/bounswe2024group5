@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@tabler/icons-react':
-        specifier: ^3.19.0
-        version: 3.19.0(react@18.3.1)
+        specifier: 3.17.0
+        version: 3.17.0(react@18.3.1)
       '@tanstack/react-query':
         specifier: ^5.59.15
         version: 5.59.15(react@18.3.1)
@@ -589,13 +589,13 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@tabler/icons-react@3.19.0':
-    resolution: {integrity: sha512-AqEWGI0tQWgqo6ZjMO5yJ9sYT8oXLuAM/up0hN9iENS6IdtNZryKrkNSiMgpwweNTpl8wFFG/dAZ959S91A/uQ==}
+  '@tabler/icons-react@3.17.0':
+    resolution: {integrity: sha512-Ndm9Htv7KpIU1PYYrzs5EMhyA3aZGcgaxUp9Q1XOxcRZ+I0X+Ub2WS5f4bkRyDdL1s0++k2T9XRgmg2pG113sw==}
     peerDependencies:
       react: '>= 16'
 
-  '@tabler/icons@3.19.0':
-    resolution: {integrity: sha512-A4WEWqpdbTfnpFEtwXqwAe9qf9sp1yRPvzppqAuwcoF0q5YInqB+JkJtSFToCyBpPVeLxJUxxkapLvt2qQgnag==}
+  '@tabler/icons@3.17.0':
+    resolution: {integrity: sha512-sCSfAQ0w93KSnSL7tS08n73CdIKpuHP8foeLMWgDKiZaCs8ZE//N3ytazCk651ZtruTtByI3b+ZDj7nRf+hHvA==}
 
   '@tanstack/query-core@5.59.13':
     resolution: {integrity: sha512-Oou0bBu/P8+oYjXsJQ11j+gcpLAMpqW42UlokQYEz4dE7+hOtVO9rVuolJKgEccqzvyFzqX4/zZWY+R/v1wVsQ==}
@@ -2302,12 +2302,12 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.24.0':
     optional: true
 
-  '@tabler/icons-react@3.19.0(react@18.3.1)':
+  '@tabler/icons-react@3.17.0(react@18.3.1)':
     dependencies:
-      '@tabler/icons': 3.19.0
+      '@tabler/icons': 3.17.0
       react: 18.3.1
 
-  '@tabler/icons@3.19.0': {}
+  '@tabler/icons@3.17.0': {}
 
   '@tanstack/query-core@5.59.13': {}
 
