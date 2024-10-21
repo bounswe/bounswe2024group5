@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import { Quiz } from "../../types/question";
 import { motion } from "framer-motion";
 
+export const QUIZ_DIFFICULTIES = ["Easy", "Medium", "Hard"];
+
 export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => (
-  <Link to="/quiz/3">
+  <Link to={`/quiz/${quiz.id}`}>
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -30,25 +32,19 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => (
             <motion.span
               className={`px-2 py-1 rounded-full text-sm font-semibold 
               ${
-                quiz.level === "beginner"
+                quiz.difficulty === 0
                   ? "bg-green-200 text-green-800"
-                  : quiz.level === "intermediate"
+                  : quiz.difficulty === 1
                   ? "bg-yellow-200 text-yellow-800"
                   : "bg-red-200 text-red-800"
               }`}
               whileHover={{ scale: 1.1 }}
             >
-              {quiz.level}
-            </motion.span>
-            <motion.span
-              className="px-2 py-1 text-sm font-semibold text-purple-800 bg-purple-200 rounded-full"
-              whileHover={{ scale: 1.1 }}
-            >
-              {quiz.category}
+              {QUIZ_DIFFICULTIES[quiz.difficulty]}
             </motion.span>
           </motion.div>
           <p className="text-sm text-gray-600">
-            {quiz.questionCount} questions
+            {quiz.questions.length} questions
           </p>
         </div>
       </div>

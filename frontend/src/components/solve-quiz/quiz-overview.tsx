@@ -59,7 +59,7 @@ const getButtonColor = ({
 }) => {
   const isQuestionAnswered = answers[questionIndex] !== undefined;
   const isAnswerCorrect =
-    answers[questionIndex] === questions[questionIndex].answer;
+    answers[questionIndex] === questions[questionIndex].correctAnswer;
   const isQuestionCorrectlyAnswered = isQuestionAnswered && isAnswerCorrect;
 
   if (!isQuestionAnswered) {
