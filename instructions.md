@@ -40,8 +40,6 @@
 
 ### Local Deployment for Mobile
 
-## Instractions for installation
-
 1. Install dependencies
 
    ```bash
