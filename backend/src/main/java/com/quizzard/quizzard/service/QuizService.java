@@ -47,7 +47,7 @@ public class QuizService {
     @Transactional
     public QuizResponse createQuiz(String authorUsername, CreateQuizRequest request) {
         User author = userService.getOneUserByUsername(authorUsername);
-        // 1. Quiz oluştur
+        // 1. Create Quiz
         Quiz quiz = new Quiz();
         quiz.setTitle(request.getTitle());
         quiz.setDescription(request.getDescription());
@@ -55,7 +55,7 @@ public class QuizService {
         quiz.setAuthor(author);
         quizRepository.save(quiz);
 
-        // 2. Soruları oluştur ve quiz'e ekle
+        // 2. Create questions and add them to quiz
         List<QuestionRequest> questionRequests = request.getQuestions();
         for (QuestionRequest questionRequest : questionRequests) {
             Question question = new Question();
@@ -71,12 +71,12 @@ public class QuizService {
         return mapQuizToQuizResponse(quiz);
     }
 
-    // Tüm quizleri listeleme
+    // List all quizzes
     public List<QuizResponse> getAllQuizzes() {
         return mapQuizzesToQuizResponses(quizRepository.findAll());
     }
 
-    // ID ile quiz bulma
+    // Find specific quiz with its ID
     public QuizResponse getQuizById(Long id) {
         if(quizRepository.existsById(id)) {
             Quiz quiz = quizRepository.findById(id).get();
@@ -85,13 +85,13 @@ public class QuizService {
         return null;
     }
 
-    // Kullanıcı ID'sine göre quizleri listeleme
+    // Getting quizzes with specific userID
 //    public List<Quiz> getQuizzesByUserId(Long userId) {
 //        return quizRepository.findByUserId(userId);
 //    }
 
 
-    // Quiz güncelleme
+    // Update quiz
     public Quiz updateQuiz(Long id, Quiz updatedQuiz) {
         Optional<Quiz> quizOptional = quizRepository.findById(id);
         if (quizOptional.isPresent()) {
@@ -107,7 +107,7 @@ public class QuizService {
         }
     }
 
-    // Quiz silme
+    // Delete a quiz
     public void deleteQuiz(Long id) {
         quizRepository.deleteById(id);
     }
