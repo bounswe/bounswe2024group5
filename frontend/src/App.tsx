@@ -62,9 +62,9 @@ const App = () => {
             <Route
               path="forum"
               element={
-                <ProtectedRoute>
+                
                   <ForumPage />
-                </ProtectedRoute>
+                
               }
             />
             <Route
