@@ -9,7 +9,22 @@ export type ForumPost = {
     updatedAt: string
 }
 
-export type ForumPostProps = ForumPost;
+export type ForumPostProps = { 
+  post: ForumPost 
+};
+
+export type ForumReply = {
+    id: number,
+    username: string,
+    content: string,
+    upvote: number,
+    createdAt: string,
+    updatedAt: string
+}
+
+export type ForumReplyProps = {
+  reply: ForumReply
+}
 
 export const mockForumPosts: ForumPost[] = [
     {
@@ -92,5 +107,63 @@ export const mockForumPosts: ForumPost[] = [
       createdAt: "1 month ago",
       updatedAt: ""
     }
-  ]
+]
   
+export const mockForumReplies: ForumReply[] = [
+  {
+    id: 1,
+    username: "language_expert",
+    content: "Affection is a lovely word to describe warm feelings toward someone or something. For example: 'She showed affection for her cat by petting it gently every morning.'",
+    upvote: 18,
+    createdAt: "1 hour ago",
+    updatedAt: ""
+  },
+  {
+    id: 2,
+    username: "grammar_guru",
+    content: "You can use 'affection' to show fondness. For example, 'He has a deep affection for his hometown, even though he moved away years ago.'",
+    upvote: 22,
+    createdAt: "45 minutes ago",
+    updatedAt: ""
+  },
+  {
+    id: 3,
+    username: "word_enthusiast",
+    content: "Another example could be: 'Their affection for each other was obvious in the way they held hands and laughed together.'",
+    upvote: 13,
+    createdAt: "30 minutes ago",
+    updatedAt: ""
+  },
+  {
+    id: 4,
+    username: "student_helper",
+    content: "You can use it in different contexts, like 'affection for a hobby'. Example: 'She has a strong affection for painting landscapes.'",
+    upvote: 9,
+    createdAt: "25 minutes ago",
+    updatedAt: ""
+  },
+  {
+    id: 5,
+    username: "english_pro",
+    content: "Here's a simple sentence: 'He looked at her with great affection.' It's a good way to show warmth or love without being overly expressive.",
+    upvote: 15,
+    createdAt: "15 minutes ago",
+    updatedAt: ""
+  },
+  {
+    id: 6,
+    username: "native_speaker",
+    content: "Affection is usually used to express a friendly, caring feeling. For instance: 'She expressed her affection by writing him a letter.'",
+    upvote: 20,
+    createdAt: "10 minutes ago",
+    updatedAt: ""
+  },
+  {
+    id: 7,
+    username: "literature_lover",
+    content: "If you're reading books, you might find a sentence like: 'His affection for her grew every day, despite the distance between them.'",
+    upvote: 12,
+    createdAt: "5 minutes ago",
+    updatedAt: ""
+  },
+];
