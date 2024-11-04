@@ -15,7 +15,7 @@ export const ForumReplyComponent = ({ reply }: ForumReplyProps) => {
 
     return (
         <>
-            <div className="w-full max-w-2xl h-fit bg-violet-200 text-left rounded-xl overflow-hidden shadow-md ">
+            <div className="w-full max-w-2xl h-fit bg-amber-100 text-left rounded-xl overflow-hidden shadow-md ">
                 <div className="py-4 px-4">{reply.content}</div>
                 <div className="px-4 py-1 pb-2 text-sm text-gray-500 flex justify-between items-center">
                     <div className="w-fit">
