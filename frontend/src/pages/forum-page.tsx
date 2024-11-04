@@ -1,15 +1,14 @@
 import { ForumPostComponent } from "../components/forum/ForumPost";
-import { ForumReplyComponent } from "../components/forum/ForumReply";
-import { mockForumPosts, mockForumReplies } from "../types/forum-post";
+import { mockForumPosts } from "../types/forum-post";
 
 export const ForumPage = () => {  
   return (
-    <div className="flex flex-col gap-8 mx-auto items-center">
+    <div className="max-w-fit flex flex-col gap-8 mx-auto items-center">
+      <div className="flex justify-end items-end w-full">
+        <button className="bg-violet-600 text-white p-2 px-8 rounded-lg">Create Post</button>
+      </div>
       { mockForumPosts.map(mockPost => {
         return <ForumPostComponent post={mockPost} />
-      })}
-      { mockForumReplies.map(mockReply => {
-        return <ForumReplyComponent reply={mockReply} />
       })}
     </div>
   );
