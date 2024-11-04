@@ -18,6 +18,7 @@ import { AddQuizPage } from "./pages/add-quiz-page";
 import { LoginPage } from "./pages/login-page";
 import { SignUpPage } from "./pages/sign-up";
 import HostContext from "./HostContext";
+import { PostDetailsPage } from "./pages/post-details-page";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = sessionStorage.getItem("token");
@@ -64,6 +65,14 @@ const App = () => {
               element={
                 
                   <ForumPage />
+                
+              }
+            />
+            <Route
+              path="post/:postId"
+              element={
+                
+                  <PostDetailsPage />
                 
               }
             />

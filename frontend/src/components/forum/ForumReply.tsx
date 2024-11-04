@@ -3,7 +3,7 @@ import { ForumReplyProps } from "../../types/forum-post";
 import { IconHeart } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
 
-export const ForumReply = ({ reply }: ForumReplyProps) => {
+export const ForumReplyComponent = ({ reply }: ForumReplyProps) => {
 
     const [liked, setLiked] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(reply.upvote);

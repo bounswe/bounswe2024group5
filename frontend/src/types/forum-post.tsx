@@ -26,6 +26,11 @@ export type ForumReplyProps = {
   reply: ForumReply
 }
 
+export type ForumPostDetails = {
+  post: ForumPost[],
+  replies: ForumReply[]
+}
+
 export const mockForumPosts: ForumPost[] = [
     {
         id: 1,

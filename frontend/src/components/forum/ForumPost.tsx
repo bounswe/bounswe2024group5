@@ -2,20 +2,31 @@ import { useState } from "react";
 import { ForumPostProps } from "../../types/forum-post";
 import { IconHeart, IconMessageDots } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
+import { useLocation, useNavigate } from "react-router-dom";
 
-export const ForumPost = ({ post }: ForumPostProps) => {
+export const ForumPostComponent = ({ post }: ForumPostProps) => {
 
     const [liked, setLiked] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(post.upvote);
 
-    const handleLikes = () => {
+    const navigate = useNavigate()
+    const currentPath = useLocation().pathname;
+
+    const handleLikes = (e: React.MouseEvent) => {
+        e.stopPropagation()
         setLikeCount(likeCount + (liked ? -1 : 1))
         setLiked(!liked);
     }
 
+    const handleClick = () => {
+        if (currentPath.split("/").pop() === "forum") {
+            navigate(`/post/${post.id}`)
+        }
+    }
+
     return (
         <>
-            <div className="w-full max-w-2xl h-fit bg-violet-200 text-left rounded-xl overflow-hidden shadow-md ">
+            <div onClick={handleClick} className="w-full max-w-2xl h-fit bg-violet-200 text-left rounded-xl overflow-hidden shadow-md cursor-pointer">
                 <div className="bg-violet-300 p-4">
                     <div className="text-xl font-medium">{post.title}</div>
                 </div>
@@ -30,8 +41,8 @@ export const ForumPost = ({ post }: ForumPostProps) => {
                                 <IconMessageDots className="stroke-red-500"></IconMessageDots>
                             </span>
                         </div>
-                        <div className="w-fit flex items-center gap-2">
-                            <span className="cursor-pointer" onClick={handleLikes}>
+                        <div className="w-fit flex items-center gap-2" onClick={handleLikes}>
+                            <span className="cursor-pointer">
                                 <IconHeart className={cx("stroke-red-500", 
                                     {"fill-red-500": liked, "hover:fill-red-300 ": !liked}
                                 )}></IconHeart>
