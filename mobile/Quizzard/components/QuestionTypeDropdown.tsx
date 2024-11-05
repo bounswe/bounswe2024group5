@@ -9,7 +9,7 @@ const languageData = [
   { label: 'Meaning', value: 'meaning' },
 ];
 
-const LanguageTypeDropdown = () => {
+const LanguageTypeDropdown = ({selectedValue, onValueChange}) => {
 
   const customStyles = {
     dropdown: {
@@ -17,7 +17,11 @@ const LanguageTypeDropdown = () => {
     },
   };
 
-  return <BaseDropdown data={languageData} placeholder="Select type" styleOverrides={customStyles}/>;
+  return <BaseDropdown data={languageData} 
+  selectedValue={selectedValue}
+  onValueChange={onValueChange}
+  placeholder="Select type" 
+  styleOverrides={customStyles}/>;
 };
 
 export default LanguageTypeDropdown;
