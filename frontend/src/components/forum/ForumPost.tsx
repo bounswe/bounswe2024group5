@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ForumPostProps } from "../../types/forum-post";
-import { IconHeart, IconMessageDots } from "@tabler/icons-react";
+import { IconHeart } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
 import { useLocation, useNavigate } from "react-router-dom";
 
