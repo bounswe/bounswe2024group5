@@ -36,11 +36,6 @@ export const ForumPostComponent = ({ post }: ForumPostProps) => {
                         <span>{`@${post.username} - ${post.createdAt}`}</span>
                     </div>
                     <div className="w-fit flex items-center gap-4">
-                        <div className="border-r border-r-gray-500 pr-4">
-                            <span className="cursor-pointer">
-                                <IconMessageDots className="stroke-red-500"></IconMessageDots>
-                            </span>
-                        </div>
                         <div className="w-fit flex items-center gap-2" onClick={handleLikes}>
                             <span className="cursor-pointer">
                                 <IconHeart className={cx("stroke-red-500", 
