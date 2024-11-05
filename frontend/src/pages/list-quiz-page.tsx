@@ -55,7 +55,7 @@ export const ListQuizzesPage = () => {
   };
 
   return (
-    <div className="min-h-screen px-4 border border-purple-300 bg-purple-50 rounded-3xl">
+    <main className="min-h-screen px-4 border border-purple-300 bg-purple-50 rounded-3xl" role="main" aria-label="Quiz listing page">
       <div className="container px-4 py-8 mx-auto">
         <motion.section
           initial={{ opacity: 0 }}
@@ -124,6 +124,6 @@ export const ListQuizzesPage = () => {
           </div>
         </motion.section>
       </div>
-    </div>
+    </main>
   );
 };
