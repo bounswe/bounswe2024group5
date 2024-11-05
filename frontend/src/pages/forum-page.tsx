@@ -13,6 +13,9 @@ export const ForumPage = () => {
 
   return (
     <div className="max-w-fit flex flex-col gap-8 mx-auto items-center">
+      <div className="w-full">
+        <input type="text" placeholder="Search posts." className="border-b-2 border-b-violet-300 focus:border-b-violet-600 w-full text-xl px-2 py-1 outline-none"/>
+      </div>
       <div className="flex justify-end items-end w-full">
         <button onClick={() => {setPostComponent(true)}} className="bg-violet-600 text-white p-2 px-8 rounded-lg">Create Post</button>
       </div>
