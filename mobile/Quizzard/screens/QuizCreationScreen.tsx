@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   FlatList,
+  Alert
 } from "react-native";
 import DropdownComponent from "../components/QuestionTypeDropdown"; 
 import * as ImagePicker from "expo-image-picker";
@@ -28,7 +29,8 @@ const QuizCreationPage = ({ navigation }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
   const [selectedWord, setSelectedWord] = useState(""); // To store input word
-  const [selectedType, setSelectedType] = useState("Eng -> Tr"); // Default type
+  const [selectedType, setSelectedType] = useState(null); // Default type
+  const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
 
   const authContext = useAuth(); 
   const token = authContext ? authContext.token : null; 
@@ -173,10 +175,47 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-  const handleInputChange = (word: string) => {
-    setSelectedWord(word);
-    fetchQuestionWord(word, selectedType);
-    fetchQuestionAnswers(word, selectedType, token);
+  const checkInputWord = async (word: string) => {
+    try {
+      const response = await fetch(
+        `http://34.55.188.177/api/word-checker?word=${word}&type=${selectedType}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      const data = await response.json();
+  
+      if (!data.isValid) {
+        Alert.alert("Invalid Word", "Please enter a valid word!");
+      } else {
+        setSelectedWord(word);
+        fetchQuestionWord(word, selectedType);
+        fetchQuestionAnswers(word, selectedType, token);
+      }
+    } catch (error) {
+      console.error("Error validating word:", error);
+      Alert.alert("Error", "Failed to validate the word. Please try again.");
+    }
+  }
+
+  const handleInputChange = async (word: string) => {
+    if (!selectedType) {
+      Alert.alert("Select Type", "Please select a type first.");
+      return;
+    }
+    if (checkInputTimeoutId != -1) {
+      clearTimeout(checkInputTimeoutId);
+    }
+    Console.console.log('====================================');
+    console.log();
+    console.log('====================================');
+    let timeOutId = setTimeout(checkInputWord, 2000)
+    setCheckInputTimeoutId(timeOutId);
   };
 
 

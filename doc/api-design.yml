@@ -119,7 +119,7 @@ components:
               wrongAnswers:
                 type: array
                 items:
-                    type: string
+                  type: string
               difficulty:
                 type: number
                 format: float
@@ -144,7 +144,7 @@ components:
         wrongAnswers:
           type: array
           items:
-              type: string
+            type: string
         difficulty:
           type: number
           format: float
@@ -344,6 +344,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  /word-checker:
+    get:
+      summary: Check if a word is valid
+      tags:
+        - Questions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: word
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The word to be validated for existence in the database.
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The type of word check (e.g., language or category).
+      responses:
+        '200':
+          description: Word validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isValid:
+                    type: boolean
+                    description: Whether the word exists in the database.
   /word_suggestions:
     get:
       summary: Get question word suggestions
