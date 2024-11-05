@@ -176,11 +176,9 @@ const QuizCreationPage = ({ navigation }) => {
   };
 
   const checkInputWord = async (word: string) => {
-    Alert.alert("Invalid Word", "A message is sent to the backend");
-    return;
     try {
       const response = await fetch(
-        `http://34.55.188.177/api/is_valid_word?word=${word}&type=${selectedType}`,
+        `http://34.55.188.177/api/word-checker?word=${word}&type=${selectedType}`,
         {
           method: "POST",
           headers: {
