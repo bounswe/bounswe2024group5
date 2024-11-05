@@ -62,18 +62,19 @@ export const ListQuizzesPage = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
           className="mb-12"
+          aria-label="featured-section"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="mb-4 text-2xl font-semibold text-purple-800">
+            <h2 className="mb-4 text-2xl font-semibold text-purple-800" id="featured-section">
               Featured Quizzes
             </h2>
-            <Link to="/add-quiz">
+            <Link to="/add-quiz" aria-label="Create a new quiz">
               <button className="px-4 py-2 text-white bg-violet-500 rounded-3xl">
                 Create a quiz
               </button>
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4" aria-label="Featured quizzes grid">
             {highlightedQuizzes.map((quiz) => (
               <FeaturedQuizCard key={quiz.id} quiz={quiz} />
             ))}
@@ -84,17 +85,19 @@ export const ListQuizzesPage = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
+          aria-labelledby="all-quizzes-section"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="mb-4 text-2xl font-semibold text-purple-800">
+            <h2 className="mb-4 text-2xl font-semibold text-purple-800" id="all-quizzes-section">
               All Quizzes
             </h2>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2" aria-label="Quiz filters">
               <select
                 className="px-4 py-2 bg-white border-2 rounded-full outline-none border-violet-500"
                 value={difficultyFilter}
                 onChange={handleDifficultyChange}
+                aria-label="Filter quizzes by difficulty level"
               >
                 <option value="all">All Levels</option>
                 <option value="0">Beginner</option>
@@ -105,21 +108,27 @@ export const ListQuizzesPage = () => {
                 className="w-48 px-4 py-2 border-2 rounded-full outline-none border-violet-500"
                 placeholder="Search a quiz..."
                 onChange={handleSearch}
+                aria-label="Search quizzes"
+                role="searchbox"
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2" aria-label="All quizzes grid">
             {currentQuizzes.map((quiz) => (
-              <RegularQuizCard key={quiz.id} quiz={quiz} />
+              <div role="listitem" key={quiz.id}>
+                <RegularQuizCard  quiz={quiz} />
+              </div>
+              
             ))}
           </div>
-          <div className="flex justify-center mt-8">
+          <div className="flex justify-center mt-8" aria-label="Quiz pagination">
             <Pagination
               current={currentPage}
               total={regularQuizzes.length}
               pageSize={pageSize}
               onChange={onPageChange}
               showSizeChanger={false}
+              aria-label={`Page ${currentPage} of ${Math.ceil(regularQuizzes.length / pageSize)}`}
             />
           </div>
         </motion.section>
