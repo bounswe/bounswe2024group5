@@ -9,6 +9,15 @@ import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 
 type DifficultyFilter = "all" | string;
 export const ListQuizzesPage = () => {
+  const getDifficultyAnnouncement = (level: string) => {
+    const levels = {
+      "0": "Beginner friendly quiz",
+      "1": "Intermediate level quiz",
+      "2": "Advanced level quiz",
+      "all": "Quizzes of all difficulty levels"
+    } as const;
+    return levels[level as keyof typeof levels] || levels["all"];
+  };
   const { data: quizzes } = useFetchQuizzes();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,7 +85,13 @@ export const ListQuizzesPage = () => {
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4" aria-label="Featured quizzes grid">
             {highlightedQuizzes.map((quiz) => (
-              <FeaturedQuizCard key={quiz.id} quiz={quiz} />
+              <div 
+                key={quiz.id} 
+                role="listitem"
+                aria-label={`${quiz.title} - ${getDifficultyAnnouncement(quiz.difficulty.toString())}`}
+              >
+                <FeaturedQuizCard quiz={quiz} />
+              </div>
             ))}
           </div>
         </motion.section>
@@ -98,11 +113,12 @@ export const ListQuizzesPage = () => {
                 value={difficultyFilter}
                 onChange={handleDifficultyChange}
                 aria-label="Filter quizzes by difficulty level"
+                aria-description="Filter quizzes by learning difficulty: beginner, intermediate, or advanced"
               >
-                <option value="all">All Levels</option>
-                <option value="0">Beginner</option>
-                <option value="1">Intermediate</option>
-                <option value="2">Advanced</option>
+                <option value="all">All Difficulty Levels</option>
+                <option value="0">Beginner - Perfect for New Learners</option>
+                <option value="1">Intermediate - For Growing Skills</option>
+                <option value="2">Advanced - Challenge Yourself</option>
               </select>
               <input
                 className="w-48 px-4 py-2 border-2 rounded-full outline-none border-violet-500"
@@ -115,7 +131,7 @@ export const ListQuizzesPage = () => {
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2" aria-label="All quizzes grid">
             {currentQuizzes.map((quiz) => (
-              <div role="listitem" key={quiz.id}>
+              <div role="listitem" key={quiz.id} aria-label={`Educational quiz: ${quiz.title} - ${getDifficultyAnnouncement(quiz.difficulty.toString())}`}>
                 <RegularQuizCard  quiz={quiz} />
               </div>
               
