@@ -29,7 +29,8 @@ const QuizCreationPage = ({ navigation }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
   const [selectedWord, setSelectedWord] = useState(""); // To store input word
-  const [selectedType, setSelectedType] = useState("Eng -> Tr"); // Default type
+  const [selectedType, setSelectedType] = useState(null); // Default type
+  const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
 
   const authContext = useAuth(); 
   const token = authContext ? authContext.token : null; 
@@ -174,12 +175,9 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-  const handleInputChange = async (word: string) => {
-    if (!selectedType) {
-      Alert.alert("Select Type", "Please select a type first.");
-      return;
-    }
-  
+  const checkInputWord = async (word: string) => {
+    Alert.alert("Invalid Word", "A message is sent to the backend");
+    return;
     try {
       const response = await fetch(
         `http://34.55.188.177/api/is_valid_word?word=${word}&type=${selectedType}`,
@@ -205,6 +203,21 @@ const QuizCreationPage = ({ navigation }) => {
       console.error("Error validating word:", error);
       Alert.alert("Error", "Failed to validate the word. Please try again.");
     }
+  }
+
+  const handleInputChange = async (word: string) => {
+    if (!selectedType) {
+      Alert.alert("Select Type", "Please select a type first.");
+      return;
+    }
+    if (checkInputTimeoutId != -1) {
+      clearTimeout(checkInputTimeoutId);
+    }
+    Console.console.log('====================================');
+    console.log();
+    console.log('====================================');
+    let timeOutId = setTimeout(checkInputWord, 2000)
+    setCheckInputTimeoutId(timeOutId);
   };
 
 
