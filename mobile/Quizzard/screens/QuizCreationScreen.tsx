@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   FlatList,
+  Alert
 } from "react-native";
 import DropdownComponent from "../components/QuestionTypeDropdown"; 
 import * as ImagePicker from "expo-image-picker";
@@ -173,10 +174,37 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-  const handleInputChange = (word: string) => {
-    setSelectedWord(word);
-    fetchQuestionWord(word, selectedType);
-    fetchQuestionAnswers(word, selectedType, token);
+  const handleInputChange = async (word: string) => {
+    if (!selectedType) {
+      Alert.alert("Select Type", "Please select a type first.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(
+        `http://34.55.188.177/api/is_valid_word?word=${word}&type=${selectedType}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      const data = await response.json();
+  
+      if (!data.isValid) {
+        Alert.alert("Invalid Word", "Please enter a valid word!");
+      } else {
+        setSelectedWord(word);
+        fetchQuestionWord(word, selectedType);
+        fetchQuestionAnswers(word, selectedType, token);
+      }
+    } catch (error) {
+      console.error("Error validating word:", error);
+      Alert.alert("Error", "Failed to validate the word. Please try again.");
+    }
   };
 
 
