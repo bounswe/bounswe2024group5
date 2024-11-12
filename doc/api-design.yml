@@ -344,7 +344,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  /autocomplete:
+    get:
+      summary: "Returns word auto complete suggestions"
+      description: "It returns a list that contains at most 5 words that start with prefix."
+      parameters:
+        - name: "prefix"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            example: "ca"
+      responses:
+        200:
+          description: "Successfully returned words."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "string"
+                example: [ "car", "care", "carry", "carrier", "cat" ]
+        400:
+          description: "Geçersiz parametre veya eksik prefix."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                example:
+                  error: "Prefix parameter is required"
   /word-checker:
     get:
       summary: Check if a word is valid
