@@ -141,7 +141,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           style={styles.cancelButton}
           onPress={() => navigation.goBack()}
         >
-        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
 
