@@ -9,17 +9,19 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const { quiz, questions } = route.params; // Access the passed data
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
-  const [curentQuestionIsAnswered, setCurentQuestionIsAnswered] =
-    useState(false);
+  const [isQuestionAnswered, setIsQuestionAnswered] = useState(questions.map(() => false));
   const question = questions[questionIndex];
   const authContext = useAuth(); // Get the authentication context
   const token = authContext ? authContext.token : null;
 
   const handleAnswer = async (answer) => {
-    if (curentQuestionIsAnswered) return;
+    if (isQuestionAnswered[questionIndex]) return;
     selectedAnswers.push(answer);
     setSelectedAnswers(selectedAnswers);
-    setCurentQuestionIsAnswered(true);
+    const updatedIsQuestionAnswered = [...isQuestionAnswered];
+    updatedIsQuestionAnswered[questionIndex] = true;
+    setIsQuestionAnswered(updatedIsQuestionAnswered);
+    console.log(`Is answered? ${isQuestionAnswered}`);
 
     const answerData = {
       questionID: questionIndex,
@@ -44,22 +46,22 @@ const QuizSolvingScreen = ({ route, navigation }) => {
 };
 
   const handlePrevious = () => {
+    console.log('handling previous');
     if (questionIndex > 0) {
       setQuestionIndex(questionIndex - 1);
-      setCurentQuestionIsAnswered(false);
+      console.log(`Is answered? ${isQuestionAnswered}`);
     } else {
-      Alert.alert("Quiz Starts!", "This is the first question of the quiz.");
-      // navigation.goBack(); // Navigate back when quiz is completed
+      Alert.alert("Start of the Quiz:", "This is the first question of the quiz.");
     }
   };
 
   const handleNext = () => {
+    console.log('handling next');
     if (questionIndex < questions.length - 1) {
       setQuestionIndex(questionIndex + 1);
-      setCurentQuestionIsAnswered(false);
+      console.log(`Is answered? ${isQuestionAnswered}`);
     } else {
-      Alert.alert("Quiz Completed!", "You have finished the quiz!");
-      navigation.goBack(); // Navigate back when quiz is completed
+      Alert.alert("End of the Quiz:", "This is the last question of the quiz.");
     }
   };
 
@@ -92,7 +94,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         <Text style={styles.questionText}>{question.body}</Text>
         {answers.map((answer, index) => {
           let backgroundColor;
-          if (!curentQuestionIsAnswered) {
+          if (!isQuestionAnswered[questionIndex]) {
             backgroundColor = "#ddd6fe"; // Match the background color
           } else {
             if (answer === question.correctAnswer) {
@@ -120,7 +122,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         <TouchableOpacity
           style={styles.nextButton}
           onPress={handlePrevious}
-          disabled={!curentQuestionIsAnswered}
         >
           {/* Replace text with right-pointing arrow icon */}
           <Icon name="arrow-back" size={24} color="#000" />
@@ -129,7 +130,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         <TouchableOpacity
           style={styles.nextButton}
           onPress={handleNext}
-          disabled={!curentQuestionIsAnswered}
         >
           {/* Replace text with right-pointing arrow icon */}
           <Icon name="arrow-forward" size={24} color="#000" />
