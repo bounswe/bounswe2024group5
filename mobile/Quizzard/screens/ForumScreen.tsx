@@ -115,20 +115,22 @@ const ForumScreen = ({ navigation }) => {
   return (
     <BaseLayout navigation={navigation}>
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={navigateToCreateQuestion}
-        >
-          <Ionicons name="add" size={24} color="white" />
-        </TouchableOpacity>
+        <View style={styles.headerRow}>
+          <TouchableOpacity
+            style={styles.searchBar}
+            onPress={navigateToSearchWords}
+          >
+            <Ionicons name="search" size={20} color="#888" />
+            <Text style={styles.searchText}>Search For Words...</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.searchBar}
-          onPress={navigateToSearchWords}
-        >
-          <Ionicons name="search" size={20} color="#888" />
-          <Text style={styles.searchText}>Search For Words...</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={navigateToCreateQuestion}
+          >
+            <Ionicons name="add" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
 
         <FlatList
           data={questions}
@@ -152,29 +154,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#FFFFFF",
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+    marginTop: - 180,
   },
   addButton: {
-    position: "absolute",
-    top: 16,
-    right: 16,
     backgroundColor: "#6a0dad",
     borderRadius: 30,
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
     justifyContent: "center",
     alignItems: "center",
     elevation: 5,
     zIndex: 1,
+    marginLeft: 16,
   },
   searchBar: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: "#f3e8ff",
     borderRadius: 8,
     padding: 12,
-    marginTop: 80,
-    marginBottom: 16,
   },
   searchText: {
     marginLeft: 8,

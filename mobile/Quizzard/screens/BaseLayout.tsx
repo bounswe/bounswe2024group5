@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     backgroundColor: "#fff",
-    paddingBottom: 180,
+    paddingBottom: 0,
   },
   appName: {
     fontSize: 24,

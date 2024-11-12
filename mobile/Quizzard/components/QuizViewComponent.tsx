@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     width: 140,
     height: 220,
     marginRight: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#f3e8ff",
     borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   quizTitle: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#333",
+    color: "#6b21a8",
     marginBottom: 5,
   },
   quizQuestions: {

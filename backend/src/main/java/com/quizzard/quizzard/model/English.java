@@ -12,4 +12,13 @@ public class English {
 
     @Column(name = "word", nullable = false)
     private String word;
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getWord() {
+        return word;
+    }
 }
