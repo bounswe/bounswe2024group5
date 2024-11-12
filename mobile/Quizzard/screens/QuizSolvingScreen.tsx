@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons"; // Import the icon
 import QuizHeader from "../components/QuizSolveQuizHeader";
+import { useAuth } from "./AuthProvider";
 
 const QuizSolvingScreen = ({ route, navigation }) => {
   const { quiz, questions } = route.params; // Access the passed data
@@ -11,12 +12,45 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const [curentQuestionIsAnswered, setCurentQuestionIsAnswered] =
     useState(false);
   const question = questions[questionIndex];
+  const authContext = useAuth(); // Get the authentication context
+  const token = authContext ? authContext.token : null;
 
-  const handleAnswer = (answer) => {
+  const handleAnswer = async (answer) => {
     if (curentQuestionIsAnswered) return;
     selectedAnswers.push(answer);
     setSelectedAnswers(selectedAnswers);
     setCurentQuestionIsAnswered(true);
+
+    const answerData = {
+      questionID: questionIndex,
+      selectedChoice: answer,
+    };
+    console.log(`question ID is ${questionIndex} and selected ${answer}.`);
+    try {
+    const uploadResponse = await fetch(
+      "http://34.55.188.177/quiz-solve",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/quiz-data",
+        },
+        body: JSON.stringify(answerData),
+      }
+    );
+  } catch(err) {
+    console.error("Error sending answer to backend:", err);
+  }
+};
+
+  const handlePrevious = () => {
+    if (questionIndex > 0) {
+      setQuestionIndex(questionIndex - 1);
+      setCurentQuestionIsAnswered(false);
+    } else {
+      Alert.alert("Quiz Starts!", "This is the first question of the quiz.");
+      // navigation.goBack(); // Navigate back when quiz is completed
+    }
   };
 
   const handleNext = () => {
@@ -47,7 +81,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <QuizHeader
-        quizName={quiz.title} //TODO: add laters
+        quizName={quiz.title}
         questionIndex={questionIndex}
         totalQuestions={questions.length}
       />
@@ -82,7 +116,16 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         })}
       </View>
       {/* Container for Next Button */}
-      <View style={styles.nextButtonContainer}>
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={styles.nextButton}
+          onPress={handlePrevious}
+          disabled={!curentQuestionIsAnswered}
+        >
+          {/* Replace text with right-pointing arrow icon */}
+          <Icon name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.nextButton}
           onPress={handleNext}
@@ -93,11 +136,12 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       {/* Cancel and Submit Buttons */}
-      <View style={styles.bottomButtons}>
+            <View style={styles.bottomButtons}>
         <TouchableOpacity
           style={styles.cancelButton}
           onPress={() => navigation.goBack()}
         >
+        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
 
@@ -106,7 +150,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           onPress={() => navigation.goBack()}
         >
           {/*Upon submission of the quiz, navigate back to the home screen for now*/}
-          <Text style={styles.submitButtonText}>Submit</Text>
+          <Text style={styles.submitButtonText}>Finish</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -145,10 +189,10 @@ const styles = StyleSheet.create({
     color: "#000000", // Text color
     fontSize: 16,
   },
-  nextButtonContainer: {
+  buttonsContainer: {
     marginTop: 20,
     flexDirection: "row",
-    justifyContent: "flex-end", // Aligns the button to the right
+    justifyContent: "space-between",
   },
   nextButton: {
     backgroundColor: "#FFFFFF",
