@@ -30,7 +30,8 @@ const QuizCreationPage = ({ navigation }) => {
   const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
   const [selectedWord, setSelectedWord] = useState(""); // To store input word
   const [selectedType, setSelectedType] = useState(null); // Default type
-  const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
+  const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(null);
+  const [typedQuestionWord, setTypedQuestionWord] = useState("");
 
   const authContext = useAuth(); 
   const token = authContext ? authContext.token : null; 
@@ -175,7 +176,8 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-  const checkInputWord = async (word: string) => {
+  const checkInputWord = async () => {
+    let word = typedQuestionWord;
     try {
       const response = await fetch(
         `http://34.55.188.177/api/word-checker?word=${word}&type=${selectedType}`,
@@ -204,6 +206,7 @@ const QuizCreationPage = ({ navigation }) => {
   }
 
   const handleInputChange = async (word: string) => {
+    setTypedQuestionWord(word);
     if (!selectedType) {
       Alert.alert("Select Type", "Please select a type first.");
       return;
@@ -211,9 +214,6 @@ const QuizCreationPage = ({ navigation }) => {
     if (checkInputTimeoutId != -1) {
       clearTimeout(checkInputTimeoutId);
     }
-    Console.console.log('====================================');
-    console.log();
-    console.log('====================================');
     let timeOutId = setTimeout(checkInputWord, 2000)
     setCheckInputTimeoutId(timeOutId);
   };
@@ -268,7 +268,7 @@ const QuizCreationPage = ({ navigation }) => {
             <TextInput
               style={styles.questionTitle}
               placeholder="Enter a word"
-              value={selectedWord}
+              value={typedQuestionWord}
               onChangeText={handleInputChange}
             />
             <View style={styles.dropdownContainer}>
