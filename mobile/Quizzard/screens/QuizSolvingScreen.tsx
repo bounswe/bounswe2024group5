@@ -32,15 +32,15 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const generateQuestionSentence = (question): string => {
     // const generateQuestionSentence = (question_type: 'english_to_turkish' | 'turkish_to_english' | 'english_to_sense', word: string): string => {
     console.log("Question: ", question.questionType, question.word);
-    if (question.questionType === 'english_to_turkish') {
+    if (question.questionType === "english_to_turkish") {
       return `How do you say '${question.word}' in Turkish?`;
-    } else if (question.questionType === 'turkish_to_english') {
+    } else if (question.questionType === "turkish_to_english") {
       return `How do you say '${question.word}' in English?`;
     } else {
       return "Invalid question type";
     }
   };
-  
+
   let answers = [question.correctAnswer];
   question.wrongAnswers.forEach((answer) => answers.push(answer));
   console.log("Answers:", answers);
@@ -52,19 +52,21 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         totalQuestions={questions.length}
       />
       <View style={styles.roundQuestionContainer}>
-        <Text style={styles.questionText}>{generateQuestionSentence(question)}</Text>
+        <Text style={styles.questionText}>
+          {generateQuestionSentence(question)}
+        </Text>
         <Text style={styles.questionText}>{question.body}</Text>
         {answers.map((answer, index) => {
           let backgroundColor;
           if (!curentQuestionIsAnswered) {
-            backgroundColor = "#FFFFFF"; // Match the background color
+            backgroundColor = "#ddd6fe"; // Match the background color
           } else {
             if (answer === question.correctAnswer) {
-              backgroundColor = "#6a0dad"; // Correct answer
+              backgroundColor = "green"; // Correct answer
             } else if (answer === selectedAnswers[selectedAnswers.length - 1]) {
               backgroundColor = "red"; // Selected answer
             } else {
-              backgroundColor = "#FFFFFF"; // Match the background color
+              backgroundColor = "#ddd6fe"; // Match the background color
             }
           }
 
@@ -89,18 +91,21 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           {/* Replace text with right-pointing arrow icon */}
           <Icon name="arrow-forward" size={24} color="#000" />
         </TouchableOpacity>
-
       </View>
-        {/* Cancel and Submit Buttons */}
-        <View style={styles.bottomButtons}>
-        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+      {/* Cancel and Submit Buttons */}
+      <View style={styles.bottomButtons}>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => navigation.goBack()}
+        >
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-        style={styles.submitButton}
-        onPress={() => navigation.goBack()}>
-         {/*Upon submission of the quiz, navigate back to the home screen for now*/}
+          style={styles.submitButton}
+          onPress={() => navigation.goBack()}
+        >
+          {/*Upon submission of the quiz, navigate back to the home screen for now*/}
           <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
       </View>
@@ -116,7 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF", // Set the background color
   },
   roundQuestionContainer: {
-    backgroundColor: "#d3d3d3", // Light grey background color
+    backgroundColor: "#f5f3ff", // Light grey background color
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 10, // Rounded corners
@@ -128,7 +133,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    borderColor: "#000000", // Dark outline
+    borderColor: "#8b5c56", // Dark outline
     borderWidth: 1,
     borderRadius: 20, // Rounded corners
     paddingVertical: 10,

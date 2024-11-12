@@ -124,7 +124,7 @@ const HomePage = ({ navigation }) => {
           style={styles.addQuizButton}
           onPress={navigateToQuizCreation}
         >
-          <Text style={styles.addQuizButtonText}>+ Add Quiz</Text>
+          <Text style={styles.addQuizButtonText}>Create a quiz</Text>
         </TouchableOpacity>
       </View>
 
@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
+    marginTop: 260,
     paddingLeft: 15,
     paddingRight: 15,
     alignSelf: "stretch",
@@ -209,9 +210,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
+    fontSize: 12,
   },
   quizSection: {
-    height: 240, // Adjusted for better visibility
+    height: 240,
   },
   quizScroll: {
     paddingLeft: 15,

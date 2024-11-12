@@ -31,7 +31,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({ question, onPress }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    backgroundColor: "#f3e8ff",
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
