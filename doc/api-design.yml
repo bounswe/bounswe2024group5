@@ -210,6 +210,40 @@ components:
           type: string
       required:
         - message
+    QuizAttemptRequest:
+      type: object
+      properties:
+        quizId:
+          type: integer
+          description: ID of the quiz to attempt.
+      required:
+        - quizId
+    QuizAttemptResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Quiz attempt ID.
+        userId:
+          type: integer
+          description: User ID.
+        quizId:
+          type: integer
+          description: Quiz ID.
+        score:
+          type: integer
+          description: Score obtained in the quiz attempt.
+        completed:
+          type: boolean
+          description: Whether the quiz attempt is completed.
+        completedAt:
+          type: string
+          format: date-time
+          description: Time when the quiz attempt was completed.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last updated time of the quiz attempt.
 paths:
   /auth/register:
     post:
@@ -756,6 +790,121 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /quiz-attempts:
+    post:
+      summary: Attempt a quiz
+      description: Creates a new quiz attempt for a user if they don't have an incomplete attemp. Returns the existing one otherwise.
+      operationId: addQuizAttempt
+      tags:
+        - Quiz Attempts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuizAttemptRequest'
+      responses:
+        '201':
+          description: Quiz attempt created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttemptResponse'
+    get:
+      summary: Get all quiz attempts optionally by quizID and isCompleted fields.
+      description: Retrieves all quiz attempts for the authenticated user with optional filters.
+      operationId: getAllQuizAttempts
+      tags:
+        - Quiz Attempts
+      parameters:
+        - name: isCompleted
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by completion status.
+        - name: quizId
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filter by quiz ID.
+      responses:
+        '200':
+          description: List of quiz attempts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuizAttemptResponse'
+  /quiz-attempts/{id}:
+    get:
+      summary: Get a quiz attempt by ID
+      description: Retrieves a specific quiz attempt by its ID.
+      operationId: getQuizAttempt
+      tags:
+        - Quiz Attempts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Quiz attempt ID.
+      responses:
+        '200':
+          description: Quiz attempt details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttemptResponse'
+    delete:
+      summary: Delete a quiz attempt
+      description: Deletes a quiz attempt by its ID.
+      operationId: deleteQuizAttempt
+      tags:
+        - Quiz Attempts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Quiz attempt ID.
+      responses:
+        '204':
+          description: Quiz attempt deleted successfully.
+    put:
+      summary: Update a quiz attempt
+      description: Updates completed field to true if it is false.
+      operationId: updateQuizAttempt
+      tags:
+        - Quiz Attempts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Quiz attempt ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                completed:
+                  type: boolean
+                  description: Whether the quiz attempt is completed.
+      responses:
+        '200':
+          description: Quiz attempt updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttemptResponse'
   /forum/posts:
     post:
       summary: Create a forum post
