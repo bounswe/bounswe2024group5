@@ -54,7 +54,9 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     user_id INT NOT NULL,
     quiz_id INT NOT NULL,
     score INT,
-    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_completed BOOLEAN DEFAULT FALSE,
+    completed_at TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
 );
@@ -66,6 +68,7 @@ CREATE TABLE IF NOT EXISTS question_answers (
     answer VARCHAR(255),
     correct BOOLEAN,
     answered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (quiz_attempt_id, question_id),
     FOREIGN KEY (quiz_attempt_id) REFERENCES quiz_attempts(id) ON DELETE CASCADE,
     FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
 );
