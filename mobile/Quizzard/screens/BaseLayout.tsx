@@ -16,6 +16,10 @@ const BaseLayout = ({ children, navigation }) => {
     navigation.navigate("Home");
   };
 
+  const navigateToProfile = () => {
+    navigation.navigate("Profile");
+  };
+
   // Determine which icon should be filled based on the current route
   const isHome = route.name === "Home";
   const isForum = route.name === "Forum";
@@ -28,7 +32,10 @@ const BaseLayout = ({ children, navigation }) => {
           <Text style={styles.appName}>Quizzard</Text>
         </TouchableOpacity>
         <View style={styles.icons}>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={navigateToProfile}
+          >
             <Ionicons name="person-outline" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton} onPress={handleLogout}>
@@ -37,7 +44,7 @@ const BaseLayout = ({ children, navigation }) => {
         </View>
       </View>
 
-      {/* Dynamic Content Section */}
+      {/* Dynamic Content Section - Modified styles */}
       <View style={styles.body}>{children}</View>
 
       {/* Bottom Navigation Bar */}
@@ -94,8 +101,6 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
   navBar: {
     flexDirection: "row",
