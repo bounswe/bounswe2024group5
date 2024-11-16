@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: rgb(107 33 168) !important; /* purple-800 */
+}
+
+.ant-tabs-ink-bar {
+  background: rgb(107 33 168) !important; /* purple-800 */
+}
