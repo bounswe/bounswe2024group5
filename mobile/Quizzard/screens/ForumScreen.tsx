@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 16,
-    marginTop: - 180,
   },
   addButton: {
     backgroundColor: "#6a0dad",
