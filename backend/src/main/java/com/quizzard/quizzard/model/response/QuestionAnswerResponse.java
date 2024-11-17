@@ -2,7 +2,9 @@ package com.quizzard.quizzard.model.response;
 
 
 import com.quizzard.quizzard.model.QuestionAnswer;
+import lombok.Getter;
 
+@Getter
 public class QuestionAnswerResponse {
     private Long id;
     private Long quizAttemptId;
