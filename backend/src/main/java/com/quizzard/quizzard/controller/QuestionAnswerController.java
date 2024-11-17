@@ -3,6 +3,7 @@ package com.quizzard.quizzard.controller;
 import com.quizzard.quizzard.model.QuestionAnswer;
 import com.quizzard.quizzard.model.request.QuestionAnswerRequest;
 import com.quizzard.quizzard.model.request.QuizAttemptRequest;
+import com.quizzard.quizzard.model.request.UpdateAnswerRequest;
 import com.quizzard.quizzard.model.response.QuestionAnswerResponse;
 import com.quizzard.quizzard.service.QuestionAnswerService;
 import jakarta.validation.Valid;
@@ -44,10 +45,13 @@ public class QuestionAnswerController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateQuestionAnswer(@RequestHeader("Authorization") String jwtToken, @PathVariable Long id,
-                                                  @RequestBody QuestionAnswerRequest questionAnswerRequest) {
-        return ResponseEntity.ok(questionAnswerService.updateQuestionAnswer(jwtToken, id, questionAnswerRequest));
+    @PutMapping("/{id}/update-answer")
+    public ResponseEntity<QuestionAnswerResponse> updateAnswer(
+            @RequestHeader("Authorization") String jwtToken,
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateAnswerRequest updateAnswerRequest) {
+        QuestionAnswerResponse response = questionAnswerService.updateAnswer(jwtToken, id, updateAnswerRequest.getNewAnswer());
+        return ResponseEntity.ok(response);
     }
 
 }

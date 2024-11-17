@@ -1,5 +1,7 @@
 package com.quizzard.quizzard.service;
 
+import com.quizzard.quizzard.exception.AccessDeniedException;
+import com.quizzard.quizzard.exception.ResourceNotFoundException;
 import com.quizzard.quizzard.model.*;
 import com.quizzard.quizzard.model.request.QuestionAnswerRequest;
 import com.quizzard.quizzard.model.response.QuestionAnswerResponse;
@@ -116,32 +118,42 @@ public class QuestionAnswerService {
         questionAnswerRepository.delete(questionAnswer);
     }
 
-    public QuestionAnswerResponse updateQuestionAnswer(String jwtToken, Long id, QuestionAnswerRequest questionAnswerRequest) {
+    public QuestionAnswerResponse updateAnswer(String jwtToken, Long questionAnswerId, String newAnswer) {
+        // Step 1: Authenticate User
         User user = getUserFromJwtToken(jwtToken);
-        QuestionAnswer questionAnswer = questionAnswerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Question answer not found with id: " + id));
+
+        // Step 2: Fetch the QuestionAnswer and validate existence
+        QuestionAnswer questionAnswer = questionAnswerRepository.findById(questionAnswerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Question answer not found with id: " + questionAnswerId));
+
+        // Step 3: Verify ownership
         if (!questionAnswer.getQuizAttempt().getUser().equals(user)) {
-            throw new RuntimeException("You are not authorized to update this question answer.");
+            throw new AccessDeniedException("You are not authorized to update this question answer.");
         }
-        if(questionAnswer.getQuizAttempt().getIsCompleted())
-            throw new RuntimeException("Quiz attempt is already completed");
-        if(questionAnswerRepository.existsByQuizAttemptIdAndQuestionId(questionAnswer.getQuizAttempt().getId(), questionAnswerRequest.getQuestionId())){
-            // maybe update the answer instead of throwing an exception
-            throw new RuntimeException("Question already answered");
+
+        // Step 4: Prevent updates to completed quiz attempts
+        if (questionAnswer.getQuizAttempt().getIsCompleted()) {
+            throw new RuntimeException("Quiz attempt is already completed; cannot update answers.");
         }
-        Question question = questionRepository.findById(questionAnswerRequest.getQuestionId()).orElse(null);
-        if(!questionRepository.existsByIdAndQuizId(questionAnswerRequest.getQuestionId(), questionAnswer.getQuizAttempt().getQuiz().getId()))
-            throw new RuntimeException("Question not found in the quiz");
-        if(!questionAnswerRequest.getAnswer().equals(question.getCorrectAnswer()) &&
-                !questionAnswerRequest.getAnswer().equals(question.getWrongAnswer1()) &&
-                !questionAnswerRequest.getAnswer().equals(question.getWrongAnswer2()) &&
-                !questionAnswerRequest.getAnswer().equals(question.getWrongAnswer3()))  {   // answer not from the options
-            throw new RuntimeException("Invalid answer");
+
+        // Step 5: Validate the new answer
+        Question question = questionAnswer.getQuestion();
+        if (!newAnswer.equals(question.getCorrectAnswer()) &&
+                !newAnswer.equals(question.getWrongAnswer1()) &&
+                !newAnswer.equals(question.getWrongAnswer2()) &&
+                !newAnswer.equals(question.getWrongAnswer3())) {
+            throw new RuntimeException("Invalid answer; must be one of the predefined options.");
         }
-        questionAnswer.setQuestion(question);
-        questionAnswer.setAnswer(questionAnswerRequest.getAnswer());
-        questionAnswer.setIsCorrect(questionAnswerRequest.getAnswer().equals(question.getCorrectAnswer()));
+
+        // Step 6: Update the answer and correctness
+        questionAnswer.setAnswer(newAnswer);
+        questionAnswer.setIsCorrect(newAnswer.equals(question.getCorrectAnswer()));
+
+        // Step 7: Save the updated QuestionAnswer
         questionAnswerRepository.save(questionAnswer);
+
+        // Step 8: Return a structured response
         return new QuestionAnswerResponse(questionAnswer);
     }
+
 }
