@@ -1,6 +1,8 @@
 package com.quizzard.quizzard.service;
 
 import com.quizzard.quizzard.exception.AccessDeniedException;
+import com.quizzard.quizzard.exception.DuplicateResourceException;
+import com.quizzard.quizzard.exception.InvalidRequestException;
 import com.quizzard.quizzard.exception.ResourceNotFoundException;
 import com.quizzard.quizzard.model.*;
 import com.quizzard.quizzard.model.request.QuestionAnswerRequest;
@@ -29,9 +31,6 @@ public class QuestionAnswerService {
     private QuestionRepository questionRepository;
 
     @Autowired
-    private QuizAttemptService quizAttemptService;
-
-    @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
@@ -45,35 +44,57 @@ public class QuestionAnswerService {
 
     public QuestionAnswerResponse createQuestionAnswer(String jwtToken, QuestionAnswerRequest questionAnswerRequest) {
         User user = getUserFromJwtToken(jwtToken);
-        QuizAttempt quizAttempt = quizAttemptRepository.findById(questionAnswerRequest.getQuizAttemptId()).orElse(null);
-        if(quizAttempt == null)
-            throw new RuntimeException("Quiz attempt not found");
-        if(quizAttempt.getUser().getId() != user.getId())
-            throw new RuntimeException("User does not own the quiz attempt");
-        Quiz quiz = quizAttempt.getQuiz();
-        Question question = questionRepository.findById(questionAnswerRequest.getQuestionId()).orElse(null);
-        if(!questionRepository.existsByIdAndQuizId(questionAnswerRequest.getQuestionId(), quiz.getId()))
-            throw new RuntimeException("Question not found in the quiz");
-        if(quizAttempt.getIsCompleted())
-            throw new RuntimeException("Quiz attempt is already completed");
-        if(questionAnswerRepository.existsByQuizAttemptIdAndQuestionId(quizAttempt.getId(), questionAnswerRequest.getQuestionId())){
-            // maybe update the answer instead of throwing an exception
-            throw new RuntimeException("Question already answered");
+
+        // Fetch the QuizAttempt
+        QuizAttempt quizAttempt = quizAttemptRepository.findById(questionAnswerRequest.getQuizAttemptId())
+                .orElseThrow(() -> new ResourceNotFoundException("Quiz attempt not found with id: " + questionAnswerRequest.getQuizAttemptId()));
+
+        // Check if the QuizAttempt belongs to the user
+        if (!quizAttempt.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("User does not own the quiz attempt.");
         }
-        if(!questionAnswerRequest.getAnswer().equals(question.getCorrectAnswer()) &&
+
+        // Fetch the Quiz and Question
+        Quiz quiz = quizAttempt.getQuiz();
+        Question question = questionRepository.findById(questionAnswerRequest.getQuestionId())
+                .orElseThrow(() -> new ResourceNotFoundException("Question not found with id: " + questionAnswerRequest.getQuestionId()));
+
+        // Verify the Question belongs to the Quiz
+        if (!questionRepository.existsByIdAndQuizId(questionAnswerRequest.getQuestionId(), quiz.getId())) {
+            throw new InvalidRequestException("The question does not belong to the quiz.");
+        }
+
+        // Check if the QuizAttempt is already completed
+        if (quizAttempt.getIsCompleted()) {
+            throw new InvalidRequestException("Quiz attempt is already completed.");
+        }
+
+        // Prevent duplicate answers for the same question
+        if (questionAnswerRepository.existsByQuizAttemptIdAndQuestionId(quizAttempt.getId(), questionAnswerRequest.getQuestionId())) {
+            throw new DuplicateResourceException("Question already answered in this quiz attempt.");
+        }
+
+        // Validate the provided answer
+        if (!questionAnswerRequest.getAnswer().equals(question.getCorrectAnswer()) &&
                 !questionAnswerRequest.getAnswer().equals(question.getWrongAnswer1()) &&
                 !questionAnswerRequest.getAnswer().equals(question.getWrongAnswer2()) &&
-                !questionAnswerRequest.getAnswer().equals(question.getWrongAnswer3()))  {   // answer not from the options
-            throw new RuntimeException("Invalid answer");
+                !questionAnswerRequest.getAnswer().equals(question.getWrongAnswer3())) {
+            throw new InvalidRequestException("The provided answer is invalid.");
         }
+
+        // Create the QuestionAnswer record
         QuestionAnswer questionAnswer = new QuestionAnswer();
         questionAnswer.setQuizAttempt(quizAttempt);
-        questionAnswer.setQuestion(questionRepository.findById(questionAnswerRequest.getQuestionId()).get());
+        questionAnswer.setQuestion(question);
         questionAnswer.setAnswer(questionAnswerRequest.getAnswer());
         questionAnswer.setIsCorrect(questionAnswerRequest.getAnswer().equals(question.getCorrectAnswer()));
+
+        // Save to the database
         questionAnswerRepository.save(questionAnswer);
+
         return new QuestionAnswerResponse(questionAnswer);
     }
+
 
     public List<QuestionAnswerResponse> getAllQuestionAnswers(String jwtToken, Optional<Long> quizAttemptId, Optional<Long> questionId) {
         User user = getUserFromJwtToken(jwtToken);
@@ -101,9 +122,9 @@ public class QuestionAnswerService {
     public QuestionAnswerResponse getQuestionAnswer(String jwtToken, Long id) {
         User user = getUserFromJwtToken(jwtToken);
         QuestionAnswer questionAnswer = questionAnswerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Question answer not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Question answer not found with id: " + id));
         if (!questionAnswer.getQuizAttempt().getUser().equals(user)) {
-            throw new RuntimeException("You are not authorized to view this question answer.");
+            throw new AccessDeniedException("You are not authorized to view this question answer.");
         }
         return new QuestionAnswerResponse(questionAnswer);
     }
@@ -111,9 +132,9 @@ public class QuestionAnswerService {
     public void deleteQuestionAnswer(String jwtToken, Long id) {
         User user = getUserFromJwtToken(jwtToken);
         QuestionAnswer questionAnswer = questionAnswerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Question answer not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Question answer not found with id: " + id));
         if (!questionAnswer.getQuizAttempt().getUser().equals(user)) {
-            throw new RuntimeException("You are not authorized to delete this question answer.");
+            throw new AccessDeniedException("You are not authorized to delete this question answer.");
         }
         questionAnswerRepository.delete(questionAnswer);
     }
@@ -133,7 +154,7 @@ public class QuestionAnswerService {
 
         // Step 4: Prevent updates to completed quiz attempts
         if (questionAnswer.getQuizAttempt().getIsCompleted()) {
-            throw new RuntimeException("Quiz attempt is already completed; cannot update answers.");
+            throw new InvalidRequestException("Quiz attempt is already completed; cannot update answers.");
         }
 
         // Step 5: Validate the new answer
@@ -142,7 +163,7 @@ public class QuestionAnswerService {
                 !newAnswer.equals(question.getWrongAnswer1()) &&
                 !newAnswer.equals(question.getWrongAnswer2()) &&
                 !newAnswer.equals(question.getWrongAnswer3())) {
-            throw new RuntimeException("Invalid answer; must be one of the predefined options.");
+            throw new InvalidRequestException("Invalid answer; must be one of the predefined options.");
         }
 
         // Step 6: Update the answer and correctness
