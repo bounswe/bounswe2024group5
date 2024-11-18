@@ -123,7 +123,9 @@ const QuizCreationPage = ({ navigation }) => {
       id: Math.floor(Math.random() * 1000),
       title: quizTitle,
       description: quizDescription,
-      // image: imageUrl,
+      difficulty: 1,
+      image: "/api/placeholder/250/250",
+      // image: imageUrl || "/api/placeholder/250/250",
       questions: formattedQuestions,
     };
 
@@ -143,16 +145,17 @@ const QuizCreationPage = ({ navigation }) => {
     });
 
     console.log("Token:", token);
-      const response1 = await fetch("http://34.55.188.177/api/quizzes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Content-Length": JSON.stringify(quizData).length.toString(),
-          Authorization: `Bearer ${token}`,
-          Host: "34.55.188.177",
-        },
-        body: JSON.stringify(quizData),
-      });
+    console.log("Request Body:", JSON.stringify(quizData)); // Log the payload
+    const response = await fetch("http://34.55.188.177/api/quizzes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": JSON.stringify(quizData).length.toString(),
+        Authorization: `Bearer ${token}`,
+        Host: "34.55.188.177",
+      },
+      body: JSON.stringify(quizData),
+    });
 
     if (response.ok) {
       Alert.alert("Success", "Quiz created successfully!");
