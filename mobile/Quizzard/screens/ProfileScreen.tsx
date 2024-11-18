@@ -6,8 +6,13 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert
 } from "react-native";
 import BaseLayout from "./BaseLayout";
+import QuizViewComponent from "../components/QuizViewComponent";
+import questions from "@/mockdata/mockQuizQuestionData";
+import { useAuth } from "./AuthProvider";
+
 
 const ProfileScreen = ({ navigation }) => {
   // Example data - in a real application, this would come from an API
@@ -18,13 +23,57 @@ const ProfileScreen = ({ navigation }) => {
       { id: 2, title: "React Native", score: 92, date: "2024-03-14" },
     ],
     createdQuizzes: [
-      { id: 1, title: "TypeScript Quiz", isPublic: true },
-      { id: 2, title: "Mobile Dev Quiz", isPublic: false },
+      { id: 1, title: "TypeScript Quiz", difficulty: 1, image: null , description: "string", elo: 7, likes: 3 , questions: [questions[0], questions[1], questions[2]]},
+      { id: 2, title: "Mobile Dev Quiz", difficulty: 2, image: null , description: "string", elo: 7, likes: 3 , questions: [questions[0], questions[1], questions[2]]},
+      { id: 3, title: "Fruits", difficulty: 3, image: null , description: "string", elo: 7, likes: 3 , questions: [questions[0], questions[1], questions[2]]},
     ],
     posts: [
       { id: 1, title: "React Native Tips", likes: 24 },
       { id: 2, title: "JavaScript Best Practices", likes: 15 },
     ],
+  };
+
+  const authContext = useAuth(); // Get the authentication context
+  const token = authContext ? authContext.token : null;
+
+  const handleEditQuiz = (quizId) => {
+    // Navigate to the edit screen or open an edit modal
+    navigation.navigate("EditQuizScreen", { quizId: quizId });
+  };
+  
+  const handleDeleteQuiz = async (quizId) => {
+    // Add your delete logic here
+    Alert.alert(
+      "Delete Quiz",
+      "Are you sure you want to delete this quiz?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const response = await fetch(`http://34.55.188.177/api/quizzes/${quizId}`, {
+                method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              });
+              if (response.status === 204) {
+                Alert.alert("Success", "Quiz deleted successfully!");
+                navigation.goBack();
+              } else {
+                const error = await response.json();
+                Alert.alert("Error", error.message || "Failed to delete quiz.");
+              }
+            } catch (error) {
+              Alert.alert("Error", "Could not delete quiz.");
+            }
+            console.log(`Quiz with ID ${quizId} deleted.`);
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -63,17 +112,42 @@ const ProfileScreen = ({ navigation }) => {
           ))}
         </View>
 
-        <View style={styles.section}>
+        <View style={styles.quizSection}>
           <Text style={styles.sectionTitle}>Created Quizzes</Text>
-          {userStats.createdQuizzes.map((quiz) => (
-            <View key={quiz.id} style={styles.card}>
-              <Text style={styles.itemTitle}>{quiz.title}</Text>
-              <Text style={styles.itemDetail}>
-                {quiz.isPublic ? "Public" : "Private"}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.quizScroll}
+            contentContainerStyle={styles.quizScrollContent}
+          >
+            {userStats.createdQuizzes.length > 0 ? (
+              userStats.createdQuizzes.map((quiz) => (
+                <QuizViewComponent
+                  key={quiz.id}
+                  quiz={{
+                    id: quiz.id,
+                    image: quiz.image || "https://via.placeholder.com/150", // Fallback image URL
+                    title: quiz.title,
+                    questions: quiz.questions || [],
+                    difficulty: quiz.difficulty || "Unknown",
+                    elo: quiz.elo || 0,
+                    likes: quiz.likes || 0,
+                  }}
+                  onPress={() =>
+                    navigation.navigate("MyQuizPreviewScreen", { quizId: quiz.id })
+                  }
+                  onEdit={() => handleEditQuiz(quiz.id)}
+                  onDelete={() => handleDeleteQuiz(quiz.id)}
+                  showActions={true} // Show buttons on the profile page
+                />
+              ))
+            ) : (
+              <Text style={styles.noQuizzesText}>
+                You haven't created any quizzes yet.
               </Text>
-            </View>
-          ))}
-        </View>
+            )}
+          </ScrollView>
+        </View> 
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Posts</Text>
@@ -146,12 +220,27 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     width: "100%",
   },
+  quizSection: {
+    height: 400,
+  },
   sectionTitle: {
     fontSize: 22,
     fontWeight: "600",
     color: "#333",
     marginBottom: 15,
     textAlign: "left",
+  },
+  quizScroll: {
+    paddingVertical: 8,
+  },
+  quizScrollContent: {
+    paddingHorizontal: 16,
+  },
+  noQuizzesText: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+    marginVertical: 20,
   },
   card: {
     backgroundColor: "#fff",
