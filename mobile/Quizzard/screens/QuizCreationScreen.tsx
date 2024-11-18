@@ -94,60 +94,6 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission denied", "Camera roll permission is needed.");
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const selectedMedia = result.assets[0].uri;
-      setMedia(selectedMedia);
-
-      const formData = new FormData();
-      formData.append("file", {
-        uri: selectedMedia,
-        name: "upload.jpg",
-        type: "image/jpeg",
-      });
-
-      setUploading(true); // Start uploading
-      try {
-        const uploadResponse = await fetch(
-          `${hostUrl}/api/file/upload`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: 'application/json',
-              'Content-Type': 'multipart/form-data',
-            },
-            body: formData,
-          }
-        );
-
-        if (!uploadResponse.ok) {
-          const errorMessage = await uploadResponse.text();
-          throw new Error(`HTTP error! Status: ${uploadResponse.status}. Message: ${errorMessage}`);
-        }
-        const uploadData = await uploadResponse.text();
-        setMediaUrl(uploadData);
-        console.log("Media file uploaded successfully: ", uploadData);
-      } catch (error) {
-        console.error("Error uploading media file:", error);
-        Alert.alert("Error", "Failed to upload media file. Please try again.");
-      } finally {
-        setUploading(false); // End uploading
-      }
-    }
-  };
-
   const handleAddQuestion = () => {
     setQuestions([
       ...questions, 
@@ -177,9 +123,7 @@ const QuizCreationPage = ({ navigation }) => {
       id: Math.floor(Math.random() * 1000),
       title: quizTitle,
       description: quizDescription,
-      difficulty: 1,
-      // image: "/api/placeholder/250/250",
-      image: imageUrl || "/api/placeholder/250/250",
+      // image: imageUrl,
       questions: formattedQuestions,
     };
 
@@ -199,19 +143,16 @@ const QuizCreationPage = ({ navigation }) => {
     });
 
     console.log("Token:", token);
-    console.log("Request Body:", JSON.stringify(quizData)); // Log the payload
-    const response = await fetch(
-      `${hostUrl}/api/quizzes`, 
-      {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Content-Length": JSON.stringify(quizData).length.toString(),
-        Authorization: `Bearer ${token}`,
-        // Host: "34.55.188.177",
-      },
-      body: JSON.stringify(quizData),
-    });
+      const response1 = await fetch("http://34.55.188.177/api/quizzes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Length": JSON.stringify(quizData).length.toString(),
+          Authorization: `Bearer ${token}`,
+          Host: "34.55.188.177",
+        },
+        body: JSON.stringify(quizData),
+      });
 
     if (response.ok) {
       Alert.alert("Success", "Quiz created successfully!");
