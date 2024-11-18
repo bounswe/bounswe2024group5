@@ -32,56 +32,29 @@ const QuizCreationPage = ({ navigation }) => {
   // TODO: Complete the implemenation of the following function once the `api/file/upload` endpoint is ready.
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Permission denied", "Camera roll permission is needed.");
-          return;
-        }
-        const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
-
-        if (!result.canceled && result.assets && result.assets.length > 0) {
-          const selectedMedia = result.assets[0].uri;
-          setImage(selectedMedia);
-          return;
-
-          const quizData = new FormData();
-          quizData.append("file", {
-            uri: selectedMedia,
-            name: "upload.jpg",
-            type: "image/jpeg",
-          });
-
-          setUploading(true); // Start uploading
-          try {
-            const uploadResponse = await fetch(
-              "http://34.55.188.177/api/file/upload",
-              {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "multipart/quiz-data",
-                },
-                body: quizData,
-              }
-            );
-
-            if (!uploadResponse.ok) {
-              throw new Error(`HTTP error! Status: ${uploadResponse.status}`);
-            }
-            console.log("Media file uploaded successfully");
-            const uploadData = await uploadResponse.text();
-            setImageUrl(uploadData);
-          } catch (error) {
-            console.error("Error uploading image file:", error);
-            Alert.alert("Error", "Failed to upload image file. Please try again.");
-          } finally {
-            setUploading(false); // End uploading
-          }
-        }
+    if (status !== "granted") {
+      Alert.alert("Permission denied", "Camera roll permission is needed.");
+      return;
+    }
+    
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const selectedMedia = result.assets[0].uri;
+      
+      // Convert image to base64
+      const base64 = await FileSystem.readAsStringAsync(selectedMedia, {
+        encoding: FileSystem.EncodingType.Base64
+      });
+  
+      setImage(selectedMedia);
+      setImageUrl(base64); // Store base64 encoded image
+    }
   };
 
   const handleAddQuestion = () => {
@@ -102,6 +75,7 @@ const QuizCreationPage = ({ navigation }) => {
     }
 
     const formattedQuestions = questions.map((question) => ({
+      id: Math.floor(Math.random() * 1000),
       questionType: question.questionType,
       word: question.word,
       correctAnswer: question.options.A,
@@ -109,9 +83,12 @@ const QuizCreationPage = ({ navigation }) => {
     }));
 
     const quizData = {
+      id: Math.floor(Math.random() * 1000),
       title: quizTitle,
       description: quizDescription,
-      // image: imageUrl,
+      difficulty: 1,
+      image: "/api/placeholder/250/250",
+      // image: imageUrl || "/api/placeholder/250/250",
       questions: formattedQuestions,
     };
 
@@ -121,6 +98,7 @@ const QuizCreationPage = ({ navigation }) => {
     }
 
     console.log(`quiz title is: ${quizData.title} `);
+    console.log(`quiz image is: ${quizData.image} `);
     quizData.questions.forEach((question, index) => {
       console.log(`Question ${index + 1}:`);
       console.log(`  Type: ${question.questionType}`);
@@ -130,25 +108,25 @@ const QuizCreationPage = ({ navigation }) => {
     });
 
     console.log("Token:", token);
-      const response1 = await fetch("http://34.55.188.177/api/quizzes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Content-Length": JSON.stringify(quizData).length.toString(),
-          Authorization: `Bearer ${token}`,
-          Host: "34.55.188.177",
-        },
-        body: JSON.stringify(quizData),
-      });
+    console.log("Request Body:", JSON.stringify(quizData)); // Log the payload
+    const response = await fetch("http://34.55.188.177/api/quizzes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": JSON.stringify(quizData).length.toString(),
+        Authorization: `Bearer ${token}`,
+        Host: "34.55.188.177",
+      },
+      body: JSON.stringify(quizData),
+    });
 
-      if (response1.ok) {
-        Alert.alert("Success", "Quiz created successfully!");
-        navigation.navigate("Home");
-      } else {
-        const errorMessage = await response1.text();
-        Alert.alert("Error", `Failed to create quiz: ${errorMessage}`);
-        console.log("Error", `Failed to create quiz: ${errorMessage}`);
-      }
+    if (response.ok) {
+      Alert.alert("Success", "Quiz created successfully!");
+      navigation.navigate("Home");
+    } else {
+      const errorMessage = await response.text();
+      Alert.alert("Error", `Failed to create quiz: ${errorMessage}`);
+    }
   };
 
   // Fetch question word suggestions
@@ -335,13 +313,9 @@ const QuizCreationPage = ({ navigation }) => {
               onChangeText={(word) => handleInputChange(index, word)}
             />
             <View style={styles.dropdownContainer}>
-              {/* <DropdownComponent
-                placeHolder={}
-                selectedValue={selectedType}
-                onValueChange={(type) => updateQuestionType(index, type)} */}
                 <DropdownComponent
-                selectedValue={selectedType}
-                onValueChange={(type) => setSelectedType(type)}
+                selectedValue={questions[index].questionType}
+                onValueChange={(type) => updateQuestionType(index, type)}
               />
             </View>
           </View>
