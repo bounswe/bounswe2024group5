@@ -18,7 +18,7 @@ const HomePage = ({ navigation }) => {
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
-  const [difficulty, setDifficulty] = useState("a1"); // Default difficulty
+  const [otherQuizzesFilterDifficulty, setOtherQuizzesFilterDifficulty] = useState("a1"); // Default difficulty
   const authContext = useAuth(); // Get the authentication context
   const token = authContext ? authContext.token : null; // Get the token if authContext is not null
 
@@ -38,7 +38,7 @@ const HomePage = ({ navigation }) => {
     };
 
     fetchData();
-  }, [difficulty]); // Dependency array includes 'difficulty'
+  }, [otherQuizzesFilterDifficulty]); // Dependency array includes 'difficulty'
 
   const fetchQuizzesForYou = async () => {
     try {
@@ -97,6 +97,7 @@ const HomePage = ({ navigation }) => {
         elo: Math.floor(Math.random() * 3000 + 500),
         difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
       }));
+      data.quizzes = data.quizzes.filter((quiz)=>quiz.difficulty=otherQuizzesFilterDifficulty);
       // sort the quizzes for being closest to the userElo
       data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
 
@@ -190,8 +191,8 @@ const HomePage = ({ navigation }) => {
           <Text style={styles.sectionTitle}>Other Quizzes</Text>
           <View style={styles.dropdownContainer}>
             <DifficultyLevelDropdown
-              selectedValue={difficulty}
-              onValueChange={(value) => setDifficulty(value)}
+              selectedValue={otherQuizzesFilterDifficulty}
+              onValueChange={(value) => setOtherQuizzesFilterDifficulty(value)}
             />
           </View>
         </View>
