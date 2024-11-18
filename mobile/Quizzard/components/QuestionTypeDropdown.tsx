@@ -4,9 +4,9 @@ import React from 'react';
 import BaseDropdown from './BaseDropdown';
 
 const languageData = [
-  { label: 'Eng -> Tr', value: 'eng-tr' },
-  { label: 'Tr -> Eng', value: 'tr-eng' },
-  { label: 'Meaning', value: 'meaning' },
+  { label: 'Eng -> Tr', value: 'english_to_turkish' },
+  { label: 'Tr -> Eng', value: 'turkish_to_english' },
+  { label: 'Meaning', value: 'english_to_sense' },
 ];
 
 const LanguageTypeDropdown = ({selectedValue, onValueChange}) => {
