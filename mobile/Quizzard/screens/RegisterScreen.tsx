@@ -13,6 +13,7 @@ import { RegisteredUser, Profile } from "../database/types";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
+import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
 
 const RegisterScreen = ({ navigation }) => {
@@ -27,7 +28,7 @@ const RegisterScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [englishProficiency, setEnglishProficiency] = useState("a1");
+  const [englishProficiency, setEnglishProficiency] = useState("");
   const { login, token } = useAuth();
 
   const showError = (message) => {
@@ -255,25 +256,7 @@ const RegisterScreen = ({ navigation }) => {
         />
       </View>
 
-      {/* English Proficiency Picker */}
-      <Text style={styles.pickerLabel}>English Proficiency</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={englishProficiency}
-          onValueChange={(itemValue) => setEnglishProficiency(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="A1" value="a1" />
-          <Picker.Item label="A2" value="a2" />
-          <Picker.Item label="B1" value="b1" />
-          <Picker.Item label="B2" value="b2" />
-          <Picker.Item label="C1" value="c1" />
-          <Picker.Item label="C2" value="c2" />
-
-        </Picker>
-      </View>
-
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+    <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerButtonText}>Register</Text>
       </TouchableOpacity>
 
@@ -307,7 +290,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 16,
   },
-  proficiencyLabel: {
     fontSize: 16,
     color: "#22005d",
     marginBottom: 8,
@@ -345,6 +327,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: 20,
+  },
+  proficiencyLabel: {
+    fontSize: 16,
+    color: "#22005d",
+    marginBottom: 8,
+    marginLeft: 4,
   },
   normalText: {
     fontSize: 16,
