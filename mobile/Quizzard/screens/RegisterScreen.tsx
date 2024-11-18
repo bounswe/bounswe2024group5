@@ -11,6 +11,7 @@ import {
 // import { CustomModal } from './LoginScreen';
 import { LinearGradient } from "expo-linear-gradient";
 import CustomModal from "../components/CustomModal";
+import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
 
 const RegisterScreen = ({ navigation }) => {
@@ -23,6 +24,7 @@ const RegisterScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [englishProficiency, setEnglishProficiency] = useState("a1");
   const { login, token } = useAuth();
 
 
@@ -77,7 +79,10 @@ const RegisterScreen = ({ navigation }) => {
       email: email,
       username: username,
       password: password,
+      //TODO uncomment this after endpoint is ready
+      //english_proficiency: englishProficiency,
     };
+    console.log(requestBody);
     try {
       const response = await fetch("http://34.55.188.177/api/auth/register", {
         method: "POST",
@@ -195,6 +200,24 @@ const RegisterScreen = ({ navigation }) => {
         secureTextEntry
       />
 
+      {/* English Proficiency Picker */}
+      <Text style={styles.pickerLabel}>English Proficiency</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={englishProficiency}
+          onValueChange={(itemValue) => setEnglishProficiency(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="A1" value="a1" />
+          <Picker.Item label="A2" value="a2" />
+          <Picker.Item label="B1" value="b1" />
+          <Picker.Item label="B2" value="b2" />
+          <Picker.Item label="C1" value="c1" />
+          <Picker.Item label="C2" value="c2" />
+
+        </Picker>
+      </View>
+
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerButtonText}>Register</Text>
       </TouchableOpacity>
@@ -228,6 +251,22 @@ const styles = StyleSheet.create({
     color: "#22005d", // dark purple color
     textAlign: "center",
     marginBottom: 16,
+  },
+  pickerLabel: {
+    fontSize: 16,
+    color: "#22005d",
+    marginBottom: 8,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#6a0dad",
+    borderRadius: 8,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  picker: {
+    height: 50,
+    color: "#6a0dad",
   },
   input: {
     borderWidth: 1,
