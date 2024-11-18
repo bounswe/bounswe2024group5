@@ -63,6 +63,9 @@ const HomePage = ({ navigation }) => {
         elo: Math.floor(Math.random() * 3000 + 500),
         difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
       }));
+       
+      // sort the quizzes for being closest to the userElo
+      data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
 
       if (response.ok) {
         setQuizzesForYou(data.quizzes);
@@ -97,6 +100,9 @@ const HomePage = ({ navigation }) => {
         elo: Math.floor(Math.random() * 3000 + 500),
         difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
       }));
+      // sort the quizzes for being closest to the userElo
+      data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
+
       if (response.ok) {
         setOtherQuizzes(data.quizzes);
         console.log("Other quizzes:", data.quizzes); // TODO: Remove or comment out after debugging
