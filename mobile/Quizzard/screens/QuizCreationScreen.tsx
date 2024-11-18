@@ -15,110 +15,145 @@ import * as FileSystem from "expo-file-system";  // Import FileSystem for base64
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "./AuthProvider";
 
-// Define question type for better typing
-type Question = {
-  title: string;
-  choices: { A: string; B: string; C: string; D: string };
-  type: string;
-};
 
 const QuizCreationPage = ({ navigation }) => {
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
-  const [image, setImage] = useState(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
-  const [selectedWord, setSelectedWord] = useState(""); // To store input word
-  const [selectedType, setSelectedType] = useState(null); // Default type
-  const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(null);
-  const [typedQuestionWord, setTypedQuestionWord] = useState("");
+  const [selectedType, setSelectedType] = useState(""); // Default type
+  const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [image, setImage] = useState<string | null>(null);
+  const authContext = useAuth();
+  const token = authContext ? authContext.token : null;
 
-  const authContext = useAuth(); 
-  const token = authContext ? authContext.token : null; 
-
+  // TODO: Complete the implemenation of the following function once the `api/file/upload` endpoint is ready.
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permission denied", "Camera roll permission is needed.");
+          return;
+        }
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
 
-    if (!result.canceled && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
-    }
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+          const selectedMedia = result.assets[0].uri;
+          setImage(selectedMedia);
+          return;
+
+          const quizData = new FormData();
+          quizData.append("file", {
+            uri: selectedMedia,
+            name: "upload.jpg",
+            type: "image/jpeg",
+          });
+
+          setUploading(true); // Start uploading
+          try {
+            const uploadResponse = await fetch(
+              "http://34.55.188.177/api/file/upload",
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "multipart/quiz-data",
+                },
+                body: quizData,
+              }
+            );
+
+            if (!uploadResponse.ok) {
+              throw new Error(`HTTP error! Status: ${uploadResponse.status}`);
+            }
+            console.log("Media file uploaded successfully");
+            const uploadData = await uploadResponse.text();
+            setImageUrl(uploadData);
+          } catch (error) {
+            console.error("Error uploading image file:", error);
+            Alert.alert("Error", "Failed to upload image file. Please try again.");
+          } finally {
+            setUploading(false); // End uploading
+          }
+        }
   };
 
   const handleAddQuestion = () => {
     setQuestions([
       ...questions, 
-      { title: "", choices: { A: "", B: "", C: "", D: "" }, type: selectedType }
+      { word: "", options: { A: "", B: "", C: "", D: "" }, questionType: ""}
     ]);
-  };
-
-  const convertImageToBase64 = async (uri: string) => {
-    const base64Image = await FileSystem.readAsStringAsync(uri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-    return base64Image;
+    setSelectedType("");
   };
 
   const submitQuiz = async () => {
-    if (!quizTitle || !questions.length) {
-      alert("Quiz must have a title and at least one question.");
+    if (!quizTitle) {
+      Alert.alert("Quiz must have a title.");
+      return;
+    } else if (!questions.length) {
+      Alert.alert("Quiz must have at least one question.");
       return;
     }
 
-    let base64Image = null;
-    if (image) {
-      base64Image = await convertImageToBase64(image);
-    }
-
     const formattedQuestions = questions.map((question) => ({
-      question_type: question.type,
-      word: question.title,
-      correct_answer: question.choices.A,
-      wrong_answers: [question.choices.B, question.choices.C, question.choices.D],
+      questionType: question.questionType,
+      word: question.word,
+      correctAnswer: question.options.A,
+      wrongAnswers: [question.options.B, question.options.C, question.options.D],
     }));
 
     const quizData = {
       title: quizTitle,
       description: quizDescription,
-      image: base64Image,
+      // image: imageUrl,
       questions: formattedQuestions,
     };
 
     if (!token) {
-      alert("You must be logged in to create a quiz.");
+      Alert.alert("Error", "You must be logged in to create a quiz.");
       return;
     }
 
-    try {
-      const response = await fetch("http://your-api-url.com/quizzes", {
+    console.log(`quiz title is: ${quizData.title} `);
+    quizData.questions.forEach((question, index) => {
+      console.log(`Question ${index + 1}:`);
+      console.log(`  Type: ${question.questionType}`);
+      console.log(`  Word: ${question.word}`);
+      console.log(`  Correct Answer: ${question.correctAnswer}`);
+      console.log(`  Wrong Answers: ${question.wrongAnswers.join(", ")}`);
+    });
+
+    console.log("Token:", token);
+      const response1 = await fetch("http://34.55.188.177/api/quizzes", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          "Content-Length": JSON.stringify(quizData).length.toString(),
+          Authorization: `Bearer ${token}`,
+          Host: "34.55.188.177",
         },
         body: JSON.stringify(quizData),
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        alert("Quiz created successfully!");
-        navigation.goBack();
+      if (response1.ok) {
+        Alert.alert("Success", "Quiz created successfully!");
+        navigation.navigate("Home");
       } else {
-        const errorMessage = await response.text();
-        alert(`Failed to create quiz: ${errorMessage}`);
+        const errorMessage = await response1.text();
+        Alert.alert("Error", `Failed to create quiz: ${errorMessage}`);
+        console.log("Error", `Failed to create quiz: ${errorMessage}`);
       }
-    } catch (error) {
-      console.error("Error creating quiz:", error);
-    }
   };
 
   // Fetch question word suggestions
   const fetchQuestionWord = async (word, type) => {
-    const apiUrl = `http://your-api-url.com/question_word?word=${word}&type=${type}`;
+    const apiUrl = `http://34.55.188.177/question_word?word=${word}&type=${type}`;
     try {
       const response = await fetch(apiUrl, {
         method: "GET",
@@ -146,7 +181,7 @@ const QuizCreationPage = ({ navigation }) => {
     token: string
   ): Promise<void> => {
     try {
-      const apiUrl = `http://your-api-url.com/question_answers?word=${encodeURIComponent(word)}&type=${type}`;
+      const apiUrl = `http://34.55.188.177/question_answers?word=${encodeURIComponent(word)}&type=${type}`;
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
@@ -165,7 +200,7 @@ const QuizCreationPage = ({ navigation }) => {
             C: data.wrong_answer2,
             D: data.wrong_answer3,
           };
-          updatedQuestions[questions.length - 1].choices = newChoices; // Update choices for the latest question
+          updatedQuestions[questions.length - 1].options = newChoices; // Update options for the latest question
           setQuestions(updatedQuestions);
         }
       } else {
@@ -195,7 +230,7 @@ const QuizCreationPage = ({ navigation }) => {
       if (!data.isValid) {
         Alert.alert("Invalid Word", "Please enter a valid word!");
       } else {
-        setSelectedWord(word);
+        // setSelectedWord(word);
         fetchQuestionWord(word, selectedType);
         fetchQuestionAnswers(word, selectedType, token);
       }
@@ -205,19 +240,48 @@ const QuizCreationPage = ({ navigation }) => {
     }
   }
 
-  const handleInputChange = async (word: string) => {
-    setTypedQuestionWord(word);
-    if (!selectedType) {
-      Alert.alert("Select Type", "Please select a type first.");
-      return;
-    }
-    if (checkInputTimeoutId != -1) {
-      clearTimeout(checkInputTimeoutId);
-    }
-    let timeOutId = setTimeout(checkInputWord, 2000)
-    setCheckInputTimeoutId(timeOutId);
+  const handleInputChange = (index: number, word: string) => {
+      if (!selectedType) {
+        Alert.alert("Select Type", "Please select a type first.");
+        return;
+      }
+
+      // if (checkInputTimeoutId != -1) {
+      //   clearTimeout(checkInputTimeoutId);
+      // }
+      // console.log('====================================');
+      // console.log();
+      // console.log('====================================');
+      // let timeOutId = setTimeout(checkInputWord, 2000)
+      // setCheckInputTimeoutId(timeOutId);
+
+      const updatedQuestions = [...questions];
+      const updatedQuestion = { ...updatedQuestions[index] };
+      updatedQuestion.word = word;
+      updatedQuestions[index] = updatedQuestion;
+      setQuestions(updatedQuestions);
+      console.log(`1- Question ${index + 1} word:`, updatedQuestions[index].word);
   };
 
+  const updateQuestionType = (index: number, type: string) => {
+    const updatedQuestions = [...questions];
+    const updatedQuestion = { ...updatedQuestions[index] };
+    updatedQuestion.questionType = type; 
+    updatedQuestions[index] = updatedQuestion;
+    setQuestions(updatedQuestions);
+    setSelectedType(type);
+    console.log(`2- Question ${index + 1} questionType:`, updatedQuestions[index].questionType);
+};
+
+  const updateQuestion = (index: number, option: string, text: string) => {
+    const updatedQuestions = [...questions];
+    const updatedQuestion = { ...updatedQuestions[index] };
+    updatedQuestion.options = { ...updatedQuestion.options, [option]: text };
+    updatedQuestions[index] = updatedQuestion;
+    setQuestions(updatedQuestions);
+    // console.log(`Question is: ${questions[index].options}`);
+    console.log(`3- Question ${index + 1} options:`, updatedQuestions[index].options);
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -268,11 +332,14 @@ const QuizCreationPage = ({ navigation }) => {
             <TextInput
               style={styles.questionTitle}
               placeholder="Enter a word"
-              value={typedQuestionWord}
-              onChangeText={handleInputChange}
+              onChangeText={(word) => handleInputChange(index, word)}
             />
             <View style={styles.dropdownContainer}>
-              <DropdownComponent
+              {/* <DropdownComponent
+                placeHolder={}
+                selectedValue={selectedType}
+                onValueChange={(type) => updateQuestionType(index, type)} */}
+                <DropdownComponent
                 selectedValue={selectedType}
                 onValueChange={(type) => setSelectedType(type)}
               />
@@ -296,7 +363,7 @@ const QuizCreationPage = ({ navigation }) => {
               key={option}
               style={styles.choiceInput}
               placeholder={`Choice ${option}`}
-              value={question.choices[option]} // Now choices will be populated from the API response
+              value={question.options[option]} // Now options will be populated from the API response
               onChangeText={(text) => updateQuestion(index, option, text)}
             />
           ))}
