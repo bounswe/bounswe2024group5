@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     profile_picture TEXT,
-    english_proficiency INT NOT NULL,
+    english_proficiency VARCHAR(255) NOT NULL,
     points INT DEFAULT 0,
     created_quizzes INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -120,6 +120,14 @@ CREATE TABLE IF NOT EXISTS favorite_questions (
     FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
 );
 
+CREATE TABLE englishWords (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+    word VARCHAR(255) NOT NULL,                
+    score DOUBLE NOT NULL,              
+    postag VARCHAR(255),                       
+    type VARCHAR(255),                        
+    word_point INT                    
+);
 
 
 
