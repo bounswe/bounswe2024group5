@@ -1,12 +1,15 @@
 package com.quizzard.quizzard.service;
 
+import com.quizzard.quizzard.model.QuestionAnswer;
 import com.quizzard.quizzard.model.Quiz;
 import com.quizzard.quizzard.model.QuizAttempt;
 import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.model.request.QuizAttemptRequest;
 import com.quizzard.quizzard.model.response.QuizAttemptResponse;
+import com.quizzard.quizzard.repository.QuestionAnswerRepository;
 import com.quizzard.quizzard.repository.QuizAttemptRepository;
 import com.quizzard.quizzard.repository.QuizRepository;
+import com.quizzard.quizzard.repository.UserRepository;
 import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,9 @@ public class QuizAttemptService {
 
     @Autowired
     private QuizAttemptRepository quizAttemptRepository;
+
+    @Autowired
+    private QuestionAnswerRepository questionAnswerRepository;
 
     @Autowired
     private QuizRepository quizRepository;
@@ -55,9 +61,9 @@ public class QuizAttemptService {
         List<QuizAttempt> quizAttempts;
         if (isCompleted.isEmpty() && quizId.isEmpty())
             quizAttempts = quizAttemptRepository.findAllByUserId(user.getId());
-        else if(!isCompleted.isEmpty() && quizId.isEmpty())
+        else if (!isCompleted.isEmpty() && quizId.isEmpty())
             quizAttempts = quizAttemptRepository.findAllByUserIdAndIsCompleted(user.getId(), isCompleted.get());
-        else if(isCompleted.isEmpty() && !quizId.isEmpty())
+        else if (isCompleted.isEmpty() && !quizId.isEmpty())
             quizAttempts = quizAttemptRepository.findAllByUserIdAndQuizId(user.getId(), quizId.get());
         else
             quizAttempts = quizAttemptRepository.findAllByUserIdAndQuizIdAndIsCompleted(user.getId(), quizId.get(), isCompleted.get());
@@ -98,21 +104,89 @@ public class QuizAttemptService {
         }
         if (quizAttemptUpdateRequest.get("completed") == null)
             throw new RuntimeException("completed field is required.");
-        else{
+        else {
             if (quizAttempt.getIsCompleted())
                 throw new RuntimeException("Quiz attempt is already completed.");
-            else if ((boolean) quizAttemptUpdateRequest.get("completed")){
+            else if ((boolean) quizAttemptUpdateRequest.get("completed")) {
                 //quizAttempt.setScore(quizAttempt.getQuiz().getQuestions().size());
+                calculateQuestionPoint(jwtToken, id);
                 quizAttempt.setCompletedAt(new Date());
                 quizAttempt.setIsCompleted(true);
                 quizAttemptRepository.save(quizAttempt);
-            }
-            else {
+            } else {
                 quizAttempt.setIsCompleted(false);
                 quizAttemptRepository.save(quizAttempt);
             }
             return new QuizAttemptResponse(quizAttempt);
         }
     }
+
+
+    public void calculateQuestionPoint(String jwtToken, Long quizAttemptId) {
+        String solverUsername = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
+        User user = userService.getOneUserByUsername(solverUsername);
+
+        QuizAttempt quizAttempt = quizAttemptRepository.findById(quizAttemptId)
+                .orElseThrow(() -> new RuntimeException("Quiz attempt not found with id: " + quizAttemptId));
+
+        List<QuestionAnswer> questionAnswers = questionAnswerRepository.findAllByQuizAttemptId(quizAttemptId);
+
+        int totalScoreOfQuiz = 0;
+
+        int userScore = user.getPoints();
+
+        double penaltyMultiplier = 0.85;
+        double bonusMultiplier = 1.02;
+
+        for (QuestionAnswer questionAnswer : questionAnswers) {
+            double wordScore = questionAnswer.getQuestion().getDifficulty();
+            double scoreDifference = wordScore - userScore;
+            double absDifference = Math.abs(scoreDifference);
+
+            int steps = (int) Math.floor(absDifference / 100.0);
+
+            double multiplier;
+            if (scoreDifference < 0) { // If user's level is higher than the word's level
+                if (questionAnswer.getIsCorrect()) {
+                    multiplier = Math.pow(penaltyMultiplier, steps); // Decrease in score
+                } else {
+                    multiplier = Math.pow(bonusMultiplier, steps); // Punishment for wrong answer
+                }
+            } else { // If user's level is lower than the word's level
+                if (questionAnswer.getIsCorrect()) {
+                    multiplier = Math.pow(bonusMultiplier, steps); // Bonus
+                } else {
+                    multiplier = Math.pow(penaltyMultiplier, steps); // Lower decrease for wrong answer
+                }
+            }
+            double wordScoreMultiplier;
+            if (wordScore < 400) {
+                wordScoreMultiplier = 1;
+            } else if (wordScore < 1000) {
+                wordScoreMultiplier = 0.9;
+            } else if (wordScore < 1800) {
+                wordScoreMultiplier = 0.8;
+            } else if (wordScore < 2600) {
+                wordScoreMultiplier = 0.7;
+            } else if (wordScore < 3300) {
+                wordScoreMultiplier = 0.6;
+            } else {
+                wordScoreMultiplier = 0.5;
+            }
+            totalScoreOfQuiz += (int) ((wordScore * wordScoreMultiplier * multiplier) / 1000);
+
+
+        }
+
+        int finalScore = userScore + totalScoreOfQuiz;
+        if (finalScore < 0) {
+            finalScore = 0;
+        } else if (finalScore > 4000) {
+            finalScore = 4000;
+        }
+        userService.updateUserPoint(user.getUsername(), finalScore);
+        userService.checkUserEnglishProficieny(user.getUsername());
+    }
+
 
 }
