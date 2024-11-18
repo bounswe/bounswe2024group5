@@ -10,11 +10,9 @@ const QuizViewComponent = ({ quiz, onPress }) => {
         onPress={onPress ? onPress : undefined}
         activeOpacity={onPress ? 0.7 : 1}
       >
-        {/* Quiz Image */}
-        <Image source={{ uri: "https://via.placeholder.com/110x110.png?text=Quiz"}} style={styles.quizImage} />
-        {/*
+        {/* Quiz Image */}        
         <Image source={{uri: quiz.image }} style={styles.quizImage} />
-        */}
+        
 
         {/* Quiz Details */}
         <View style={styles.quizDetails}>
@@ -27,10 +25,7 @@ const QuizViewComponent = ({ quiz, onPress }) => {
           <View style={styles.quizInfo}>
             <Text style={styles.difficultyLevel}>{quiz.difficulty}</Text>
             <Text style={styles.difficultyLevel}> | </Text>
-            {/*
             <Text style={styles.difficultyLevel}>ELO: {quiz.elo}</Text>
-            */}
-            <Text style={styles.difficultyLevel}>ELO: {Math.floor(Math.random() * 3000 + 500)}</Text>
             <View style={styles.likesContainer}>
               <Ionicons name="heart-outline" size={16} color="#6a0dad" />
               <Text style={styles.likeCount}>{quiz.likes}</Text>
