@@ -244,6 +244,54 @@ components:
           type: string
           format: date-time
           description: Last updated time of the quiz attempt.
+    QuestionAnswerRequest:
+      type: object
+      properties:
+        quizAttemptId:
+          type: integer
+          description: "The ID of the quiz attempt."
+        questionId:
+          type: integer
+          description: "The ID of the question."
+        answer:
+          type: string
+          description: "The user's answer."
+      required:
+        - quizAttemptId
+        - questionId
+        - answer
+    
+    QuestionAnswerResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "The ID of the question answer."
+        quizAttemptId:
+          type: integer
+          description: "The ID of the quiz attempt."
+        questionId:
+          type: integer
+          description: "The ID of the question."
+        answer:
+          type: string
+          description: "The user's answer."
+        isCorrect:
+          type: boolean
+          description: "Whether the answer was correct."
+        updatedAt:
+          type: string
+          format: date-time
+          description: "The timestamp when the answer was given."
+    
+    UpdateAnswerRequest:
+      type: object
+      properties:
+        newAnswer:
+          type: string
+          description: "The new answer to update."
+      required:
+        - newAnswer
 paths:
   /auth/register:
     post:
@@ -905,6 +953,147 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuizAttemptResponse'
+  /question-answers:
+    post:
+      summary: "Create a new question answer"
+      description: "Creates a new answer for a specific question in an incomplete quiz attempt."
+      operationId: "createQuestionAnswer"
+      tags:
+        - "Question Answer"
+      parameters:
+      requestBody:
+        description: "Request body containing the quiz attempt ID, question ID, and the answer."
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionAnswerRequest"
+      responses:
+        '200':
+          description: "Successfully created the question answer"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionAnswerResponse"
+        '400':
+          description: "Invalid input provided"
+        '401':
+          description: "Unauthorized, invalid or missing JWT token"
+        '404':
+          description: "Quiz attempt or question not found"
+    
+    get:
+      summary: "Get all question answers"
+      description: "Retrieve all question answers for the user, with optional filters for quiz attempt and question."
+      operationId: "getAllQuestionAnswers"
+      tags:
+        - "Question Answer"
+      parameters:
+        - name: "quizAttemptId"
+          in: "query"
+          description: "Filter by quiz attempt ID"
+          required: false
+          schema:
+            type: integer
+        - name: "questionId"
+          in: "query"
+          description: "Filter by question ID"
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "Successfully retrieved the list of question answers"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuestionAnswerResponse"
+        '401':
+          description: "Unauthorized, invalid or missing JWT token"
+  
+  /question-answers/{id}:
+    get:
+      summary: "Get a specific question answer"
+      description: "Retrieve a specific question answer by its ID. Only accessible to the user who owns the quiz attempt."
+      operationId: "getQuestionAnswer"
+      tags:
+        - "Question Answer"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The ID of the question answer"
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "Successfully retrieved the question answer"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionAnswerResponse"
+        '404':
+          description: "Question answer not found"
+        '403':
+          description: "Forbidden, user is not authorized to access this answer"
+    
+    delete:
+      summary: "Delete a question answer"
+      description: "Delete a specific question answer. Only accessible to the user who owns the quiz attempt."
+      operationId: "deleteQuestionAnswer"
+      tags:
+        - "Question Answer"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The ID of the question answer to delete"
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: "Successfully deleted the question answer"
+        '404':
+          description: "Question answer not found"
+        '403':
+          description: "Forbidden, user is not authorized to delete this answer"
+  
+  /question-answers/{id}/update-answer:
+    put:
+      summary: "Update an existing question answer"
+      description: "Update the answer for a specific question in an incomplete quiz attempt. Only accessible to the user who owns the quiz attempt."
+      operationId: "updateAnswer"
+      tags:
+        - "Question Answer"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The ID of the question answer to update"
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: "Request body containing the new answer to update."
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAnswerRequest"
+      responses:
+        '200':
+          description: "Successfully updated the question answer"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionAnswerResponse"
+        '400':
+          description: "Invalid input provided"
+        '404':
+          description: "Question answer not found"
+        '403':
+          description: "Forbidden, user is not authorized to update this answer"
   /forum/posts:
     post:
       summary: Create a forum post
