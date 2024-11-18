@@ -24,6 +24,8 @@ const HomePage = ({ navigation }) => {
   const authContext = useAuth(); // Get the authentication context
   const token = authContext ? authContext.token : null; // Get the token if authContext is not null
 
+  const userElo = 2000;
+
   useEffect(() => {
     // Fetch both quizzes whenever difficulty changes
     const fetchData = async () => {
@@ -52,7 +54,16 @@ const HomePage = ({ navigation }) => {
           },
         }
       );
-      const data = await response.json();
+      let data = await response.json();
+      // create dummy image, elo and difficulty while waiting for backend
+      const possibleDifficulties = ["a1", "a2", "b1", "b2", "c1", "c2"]
+      data.quizzes = data.quizzes.map((quiz) => ({
+        ...quiz,
+        image: "https://via.placeholder.com/110x110.png?text=Quiz",
+        elo: Math.floor(Math.random() * 3000 + 500),
+        difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
+      }));
+
       if (response.ok) {
         setQuizzesForYou(data.quizzes);
         console.log("Quizzes for you:", data.quizzes); // TODO: Remove or comment out after debugging
@@ -77,7 +88,15 @@ const HomePage = ({ navigation }) => {
           },
         }
       );
-      const data = await response.json();
+      let data = await response.json();
+      // create dummy image, elo and difficulty while waiting for backend
+      const possibleDifficulties = ["a1", "a2", "b1", "b2", "c1", "c2"]
+      data.quizzes = data.quizzes.map((quiz) => ({
+        ...quiz,
+        image: "https://via.placeholder.com/110x110.png?text=Quiz",
+        elo: Math.floor(Math.random() * 3000 + 500),
+        difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
+      }));
       if (response.ok) {
         setOtherQuizzes(data.quizzes);
         console.log("Other quizzes:", data.quizzes); // TODO: Remove or comment out after debugging
@@ -98,6 +117,15 @@ const HomePage = ({ navigation }) => {
   };
 
   const renderOtherQuizzes = ({ item }: { item: Quiz }) => (
+    <View style={styles.quizWrapper}>
+      <QuizViewComponent
+        quiz={item}
+        onPress={() => navigateToMockQuiz(item, item.questions)}
+      />
+    </View>
+  );
+
+  const renderQuizzesForYou = ({ item }: { item: Quiz }) => (
     <View style={styles.quizWrapper}>
       <QuizViewComponent
         quiz={item}
