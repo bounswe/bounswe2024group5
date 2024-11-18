@@ -13,6 +13,7 @@ import { RegisteredUser, Profile } from "../database/types";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
+import { useAuth } from "./AuthProvider";
 
 const RegisterScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
