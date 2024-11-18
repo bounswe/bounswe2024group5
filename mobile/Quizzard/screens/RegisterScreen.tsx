@@ -12,6 +12,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import CustomModal from "../components/CustomModal";
 import HostUrlContext from '../app/HostContext';
+import { useAuth } from "./AuthProvider";
 
 const RegisterScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
@@ -24,6 +25,8 @@ const RegisterScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { login, token } = useAuth();
+
 
   const showError = (message) => {
     setErrorMessage(message);
@@ -91,10 +94,12 @@ const RegisterScreen = ({ navigation }) => {
       });
 
       const rawData = await response.text();
+      console.log(rawData)
 
       if (response.ok) {
         const data = JSON.parse(rawData);
         console.log(data.message);
+        await login(data.token);
         setSuccessModalVisible(true);
       } else {
         const data = rawData;
