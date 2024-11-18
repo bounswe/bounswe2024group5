@@ -116,15 +116,15 @@ const HomePage = ({ navigation }) => {
     navigation.navigate("QuizCreation");
   };
 
-  const navigateToMockQuiz = (quiz, questions) => {
-    navigation.navigate("QuizSolving", { quiz, questions });
+  const navigateToQuiz = (quiz, questions) => {
+    navigation.navigate("QuizWelcome", { quiz});
   };
 
   const renderOtherQuizzes = ({ item }: { item: Quiz }) => (
     <View style={styles.quizWrapper}>
       <QuizViewComponent
         quiz={item}
-        onPress={() => navigateToMockQuiz(item, item.questions)}
+        onPress={() => navigateToQuiz(item, item.questions)}
       />
     </View>
   );
@@ -133,7 +133,7 @@ const HomePage = ({ navigation }) => {
     <View style={styles.quizWrapper}>
       <QuizViewComponent
         quiz={item}
-        onPress={() => navigateToMockQuiz(item, item.questions)}
+        onPress={() => navigateToQuiz(item, item.questions)}
       />
     </View>
   );
@@ -175,7 +175,7 @@ const HomePage = ({ navigation }) => {
                 <QuizViewComponent
                   key={quiz.id}
                   quiz={quiz}
-                  onPress={() => navigateToMockQuiz(quiz, quiz.questions)}
+                  onPress={() => navigateToQuiz(quiz, quiz.questions)}
                 />
               ))
             ) : (
