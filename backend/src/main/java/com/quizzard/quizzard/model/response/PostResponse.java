@@ -28,5 +28,9 @@ public class PostResponse {
         this.noUpvote = 0;
     }
 
+    public PostResponse(){
+
+    }
+
 
 }
