@@ -1,5 +1,14 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import BaseLayout from "./BaseLayout";
 
 const QuizWelcomePage = ({ route, navigation }) => {
@@ -17,63 +26,66 @@ const QuizWelcomePage = ({ route, navigation }) => {
 
   return (
     <BaseLayout navigation={navigation}>
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Quiz Image */}
-        <Image source={{ uri: quiz.image }} style={styles.quizImage} />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Quiz Image */}
+          <Image source={{ uri: quiz.image }} style={styles.quizImage} />
 
-        {/* Quiz Title */}
-        <Text style={styles.title}>{quiz.title}</Text>
+          {/* Quiz Title */}
+          <Text style={styles.title}>{quiz.title}</Text>
 
-        {/* Quiz Description */}
-        <Text style={styles.description}>{quiz.description}</Text>
+          {/* Quiz Description */}
+          <Text style={styles.description}>{quiz.description}</Text>
 
-        {/* Quiz Details */}
-        <View style={styles.detailsContainer}>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailsLabel}>Difficulty:</Text>
-            <Text style={styles.detailsValue}>{quiz.difficulty}</Text>
+          {/* Quiz Details */}
+          <View style={styles.detailsContainer}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailsLabel}>Difficulty:</Text>
+              <Text style={styles.detailsValue}>{quiz.difficulty}</Text>
+            </View>
+            <View style={styles.separator} />
+            <View style={styles.detailRow}>
+              <Text style={styles.detailsLabel}>Elo:</Text>
+              <Text style={styles.detailsValue}>{quiz.elo}</Text>
+            </View>
+            <View style={styles.separator} />
+            <View style={styles.detailRow}>
+              <Text style={styles.detailsLabel}>Created by:</Text>
+              <Text style={styles.detailsValue}>{quiz.username}</Text>
+            </View>
+            <View style={styles.separator} />
+            <View style={styles.detailRow}>
+              <Text style={styles.detailsLabel}>Created at:</Text>
+              <Text style={styles.detailsValue}>{quiz.createdAt}</Text>
+            </View>
+            <View style={styles.separator} />
+            <View style={styles.detailRow}>
+              <Text style={styles.detailsLabel}>Updated at:</Text>
+              <Text style={styles.detailsValue}>{quiz.updatedAt}</Text>
+            </View>
           </View>
-          <View style={styles.separator} />
-          <View style={styles.detailRow}>
-            <Text style={styles.detailsLabel}>Elo:</Text>
-            <Text style={styles.detailsValue}>{quiz.elo}</Text>
-          </View>
-          <View style={styles.separator} />
-          <View style={styles.detailRow}>
-            <Text style={styles.detailsLabel}>Created by:</Text>
-            <Text style={styles.detailsValue}>{quiz.username}</Text>
-          </View>
-          <View style={styles.separator} />
-          <View style={styles.detailRow}>
-            <Text style={styles.detailsLabel}>Created at:</Text>
-            <Text style={styles.detailsValue}>{quiz.createdAt}</Text>
-          </View>
-          <View style={styles.separator} />
-          <View style={styles.detailRow}>
-            <Text style={styles.detailsLabel}>Updated at:</Text>
-            <Text style={styles.detailsValue}>{quiz.updatedAt}</Text>
-          </View>
-        </View>
 
-        {/* Action Buttons */}
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.goBackButton} onPress={handleGoBack}>
-            <Text style={styles.buttonText}>Go Back</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.startQuizButton} onPress={handleStartQuiz}>
-            <Text style={styles.buttonText}>Start Quiz</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+          {/* Action Buttons */}
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity style={styles.goBackButton} onPress={handleGoBack}>
+              <Text style={styles.buttonText}>Go Back</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.startQuizButton} onPress={handleStartQuiz}>
+              <Text style={styles.buttonText}>Start Quiz</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </BaseLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    height: "100%",
+  scrollContent: {
     padding: 20,
-    backgroundColor: "#f9f9f9",
   },
   quizImage: {
     width: "100%",
