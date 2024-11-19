@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { QuizAttempt } from "../hooks/api/attempts/list";
 import { motion } from "framer-motion";
 import { OptionButton } from "../components/solve-quiz/option";
 import Confetti from "react-confetti";
@@ -9,12 +10,59 @@ import { questionTemplate } from "../utils";
 import { useLocation } from "react-router-dom";
 import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 import { Spin } from "antd";
+import { useCreateQuizAttempt } from "../hooks/api/attempts/create";
+import { useQuizAttempts } from "../hooks/api/attempts/list";
 export const SolveQuizPage = () => {
   const currentPath = useLocation().pathname;
 
-  const quizId = currentPath.split("/").pop();
+  const quizId = currentPath.split("/").pop() || "";
+  const quizIdAsNumber = Number.parseInt(quizId);
 
   const { data: quizzes, isLoading } = useFetchQuizzes();
+  const [quizAttempt, setQuizAttempt] = useState<QuizAttempt | null>(null);
+
+  const { mutateAsync: createQuizAttempt } = useCreateQuizAttempt();
+  const { data: existingAttempts, isLoading: isLoadingAttempts } =
+    useQuizAttempts({
+      quizId: quizIdAsNumber,
+      isCompleted: false,
+    });
+
+  useEffect(() => {
+    const initializeQuizAttempt = async () => {
+      // Don't do anything if we already have a quiz attempt
+      if (quizAttempt) return;
+
+      // Check for existing incomplete attempts first
+      if (!isLoadingAttempts && existingAttempts?.length) {
+        setQuizAttempt(existingAttempts[0]);
+        console.log(quizAttempt);
+        return;
+      }
+
+      // If no existing attempts, create a new one
+      if (!isLoadingAttempts && !existingAttempts?.length) {
+        try {
+          const newAttempt = await createQuizAttempt({
+            quizId: quizIdAsNumber,
+          });
+          setQuizAttempt(newAttempt);
+        } catch (error) {
+          console.error("Failed to create quiz attempt:", error);
+        }
+      }
+    };
+
+    initializeQuizAttempt();
+  }, [
+    quizIdAsNumber,
+    existingAttempts,
+    isLoadingAttempts,
+    createQuizAttempt,
+    quizAttempt,
+  ]);
+
+  console.log("QUIZ ATTEMPT:", quizAttempt);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
 
@@ -32,12 +80,12 @@ export const SolveQuizPage = () => {
 
   useEffect(() => {
     if (quizzes) {
-      const quiz = quizzes.find((q) => q.id === quizId);
+      const quiz = quizzes.find((q) => q.id === quizIdAsNumber);
       if (quiz) {
         setAnswers(Array(quiz.questions.length).fill(undefined));
       }
     }
-  }, [quizzes, quizId]);
+  }, [quizzes, quizIdAsNumber]);
 
   useEffect(() => {
     if (isQuizFinished) {
