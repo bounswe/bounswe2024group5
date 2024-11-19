@@ -14,6 +14,8 @@ import { useCreateQuizAttempt } from "../hooks/api/attempts/create";
 import { useQuizAttempts } from "../hooks/api/attempts/list";
 import { useCreateQuestionAnswer } from "../hooks/api/questions-answers/answer";
 import { useQuestionAnswers } from "../hooks/api/questions-answers/list";
+import { QuizResult } from "../components/solve-quiz/quiz-result";
+import { useUpdateQuizAttempt } from "../hooks/api/attempts/update";
 export const SolveQuizPage = () => {
   const currentPath = useLocation().pathname;
 
@@ -44,7 +46,9 @@ export const SolveQuizPage = () => {
       quizId: quizIdAsNumber,
       isCompleted: false,
     });
-
+  const { mutateAsync: updateQuizAttempt } = useUpdateQuizAttempt(
+    quizAttempt?.id ?? -1
+  );
   const { data: currentAttempt } = useQuestionAnswers({
     quizAttemptId: quizAttempt?.id ?? -1,
   });
@@ -134,11 +138,12 @@ export const SolveQuizPage = () => {
   useEffect(() => {
     if (isQuizFinished) {
       setConfettiEnabled(true);
+      updateQuizAttempt({ completed: true });
       setInterval(() => {
         setConfettiEnabled(false);
       }, 7000);
     }
-  }, [isQuizFinished]);
+  }, [isQuizFinished, updateQuizAttempt]);
 
   if (isLoading || !quizzes) {
     return <Spin />;
@@ -204,14 +209,7 @@ export const SolveQuizPage = () => {
     <div className="flex w-full">
       {confettiEnabled && <Confetti />}
       {isQuizFinished ? (
-        <div className="flex items-center justify-center w-full h-full">
-          <div className="flex flex-col items-center p-6 rounded-xl bg-violet-50">
-            <h1 className="text-4xl font-bold">Quiz Finished!</h1>
-            <p className="mt-4 text-lg">
-              You scored {score} out of {quiz.questions.length}
-            </p>
-          </div>
-        </div>
+        <QuizResult score={score} questionCount={quiz.questions.length} />
       ) : (
         <>
           <motion.div
