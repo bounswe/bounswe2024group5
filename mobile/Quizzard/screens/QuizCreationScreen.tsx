@@ -29,7 +29,7 @@ const QuizCreationPage = ({ navigation }) => {
   const authContext = useAuth();
   const token = authContext ? authContext.token : null;
 
-  // TODO: Complete the implemenation of the following function once the `api/file/upload` endpoint is ready.
+  // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready.
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
