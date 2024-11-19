@@ -4,6 +4,8 @@ import { Quiz } from "../../types/question";
 import { motion } from "framer-motion";
 import { IconHeart } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
+import { IconCircleDashedCheck, IconCircleDashed } from "@tabler/icons-react";
+import { useQuizAttempts } from "../../hooks/api/attempts/list";
 
 export const QUIZ_DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"];
 
@@ -12,6 +14,37 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
   const [likeCount, setLikeCount] = useState<number>(
     Math.floor(Math.random() * 100)
   );
+
+  const { data: attempts } = useQuizAttempts({
+    quizId: quiz.id,
+  });
+
+  const getProgressLabel = () => {
+    if (!attempts?.length) return null;
+
+    const hasCompletedAttempt = attempts.some((attempt) => attempt.completed);
+    const hasInProgressAttempt = attempts.some((attempt) => !attempt.completed);
+
+    if (hasCompletedAttempt) {
+      return (
+        <span className="flex items-center gap-1 px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-full">
+          Completed
+          <IconCircleDashedCheck className="w-5 h-5" />
+        </span>
+      );
+    }
+
+    if (hasInProgressAttempt) {
+      return (
+        <span className="flex items-center gap-1 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-full">
+          Continue
+          <IconCircleDashed className="w-5 h-5" />
+        </span>
+      );
+    }
+
+    return null;
+  };
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent Link navigation when clicking the heart
@@ -32,9 +65,15 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
         <div className="w-[200px] h-[200px] rounded-3xl bg-white m-2" />
         <div className="flex flex-col justify-between flex-grow p-4">
           <div>
-            <h3 className="mb-2 text-xl font-bold text-purple-800">
-              {quiz.title}
-            </h3>
+            <div className="relative flex items-center mb-2">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <h3 className="text-xl font-bold text-center text-purple-800">
+                  {quiz.title}
+                </h3>
+              </div>
+
+              <div className="ml-auto">{getProgressLabel()}</div>
+            </div>
             <p className="mb-4 text-gray-600">{quiz.description}</p>
           </div>
           <div>
