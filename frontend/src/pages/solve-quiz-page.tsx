@@ -12,6 +12,7 @@ import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 import { Spin } from "antd";
 import { useCreateQuizAttempt } from "../hooks/api/attempts/create";
 import { useQuizAttempts } from "../hooks/api/attempts/list";
+import { useCreateQuestionAnswer } from "../hooks/api/questions-answers/answer";
 export const SolveQuizPage = () => {
   const currentPath = useLocation().pathname;
 
@@ -21,6 +22,7 @@ export const SolveQuizPage = () => {
   const { data: quizzes, isLoading } = useFetchQuizzes();
   const [quizAttempt, setQuizAttempt] = useState<QuizAttempt | null>(null);
 
+  const { mutateAsync: createAnswer } = useCreateQuestionAnswer();
   const { mutateAsync: createQuizAttempt } = useCreateQuizAttempt();
   const { data: existingAttempts, isLoading: isLoadingAttempts } =
     useQuizAttempts({
@@ -127,15 +129,26 @@ export const SolveQuizPage = () => {
     }
   };
 
-  const submitAnswer = () => {
-    if (selectedAnswer && !showResult) {
+  const submitAnswer = async () => {
+    if (selectedAnswer && !showResult && quizAttempt) {
       setShowResult(true);
       console.log(
         quiz.questions[currentQuestion].correctAnswer,
         selectedAnswer
       );
+      const currentQuestionId = quiz.questions[currentQuestion].id;
+
       const correct =
         selectedAnswer === quiz.questions[currentQuestion].correctAnswer;
+
+      const answer = await createAnswer({
+        quizAttemptId: quizAttempt.id,
+        questionId: currentQuestionId ?? 0,
+        answer: selectedAnswer,
+      });
+      if (answer.isCorrect) {
+        console.log("CORRECT");
+      }
       if (correct) {
         setScore((prev) => prev + 1);
       }
