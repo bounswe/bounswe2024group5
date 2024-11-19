@@ -20,8 +20,16 @@ export const QuizActionButtons = ({
   answers: (string | undefined)[];
 }) => {
   const isThisQuestionAnswered = answers[currentQuestion] !== undefined;
+  console.log(
+    selectedAnswer,
+    selectedAnswer !== undefined || isThisQuestionAnswered
+  );
   const isLastQuestion = currentQuestion === questions.length - 1;
   const isFirstQuestion = currentQuestion === 0;
+
+  const isSubmitButtonEnabled =
+    (selectedAnswer !== undefined && !isThisQuestionAnswered) ||
+    (isThisQuestionAnswered && isLastQuestion);
 
   const buttonStyle = (enabled: boolean) =>
     `w-full py-3 rounded-lg transition-colors ${
@@ -41,10 +49,8 @@ export const QuizActionButtons = ({
           }
           submitAnswer();
         }}
-        disabled={!selectedAnswer && !isThisQuestionAnswered}
-        className={buttonStyle(
-          selectedAnswer !== undefined || isThisQuestionAnswered
-        )}
+        disabled={!isSubmitButtonEnabled}
+        className={buttonStyle(isSubmitButtonEnabled)}
       >
         {isThisQuestionAnswered && isLastQuestion
           ? "Finish Quiz"

@@ -17,6 +17,7 @@ export const useQuestionAnswers = (filters?: { quizAttemptId?: number; questionI
 	return useQuery({
 		queryKey: ['question-answers', filters],
 		queryFn: async () => {
+
 			const TOKEN = sessionStorage.getItem('token');
 			const params = new URLSearchParams();
 
@@ -43,5 +44,6 @@ export const useQuestionAnswers = (filters?: { quizAttemptId?: number; questionI
 			const data = await response.json()
 			return data as QuestionAnswer[];
 		},
-	});
+		enabled: (!!filters?.quizAttemptId && filters?.quizAttemptId !== -1) || (!!filters?.questionId && filters?.questionId !== -1),
+	},);
 };
