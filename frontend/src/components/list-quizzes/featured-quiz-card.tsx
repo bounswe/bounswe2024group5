@@ -1,7 +1,8 @@
 import { Quiz } from "../../types/question";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { QUIZ_DIFFICULTIES } from "./regular-quiz-card";
+
+import { QUIZ_DIFFICULTIES } from "../badges/level";
 import { IconHeart } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
 import { useState } from "react";

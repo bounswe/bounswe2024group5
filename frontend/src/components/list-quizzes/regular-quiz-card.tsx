@@ -2,12 +2,18 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Quiz } from "../../types/question";
 import { motion } from "framer-motion";
-import { IconHeart } from "@tabler/icons-react";
+import {
+  IconBooks,
+  IconClock,
+  IconHeart,
+  IconShare,
+  IconUser,
+} from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
-import { IconCircleDashedCheck, IconCircleDashed } from "@tabler/icons-react";
+import { IconCircleDashedCheck } from "@tabler/icons-react";
 import { useQuizAttempts } from "../../hooks/api/attempts/list";
-
-export const QUIZ_DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"];
+import { QUIZ_DIFFICULTIES } from "../badges/level";
+import { DifficultyBadge } from "../badges/level";
 
 export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
   const [liked, setLiked] = useState<boolean>(Math.random() < 0.5);
@@ -38,7 +44,7 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
       return (
         <span className="flex items-center gap-1 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-full">
           In Progress
-          <IconCircleDashed className="w-5 h-5" />
+          <IconClock className="w-5 h-5" />
         </span>
       );
     }
@@ -63,57 +69,64 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
         className="flex overflow-hidden bg-purple-100 shadow-md cursor-pointer rounded-3xl "
       >
         <div className="w-[200px] h-[200px] rounded-3xl bg-white m-2" />
-        <div className="flex flex-col justify-between flex-grow p-4">
+        <div className="flex flex-col flex-grow p-4">
+          {/* First group - title and description */}
           <div>
-            <div className="relative flex items-center mb-2">
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center justify-center pointer-events-none">
                 <h3 className="text-xl font-bold text-center text-purple-800">
                   {quiz.title}
                 </h3>
               </div>
-
               <div className="ml-auto">{getProgressLabel()}</div>
             </div>
-            <p className="mb-4 text-gray-600">{quiz.description}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600">
-              created by <span className="font-semibold">{quiz.username} </span>
-            </p>
-            <p className="text-sm text-gray-600">
-              {quiz.questions.length} questions
+            <p className="mb-4 text-gray-600 place-self-start">
+              {quiz.description}
             </p>
           </div>
 
+          {/* Second group - user info and questions count */}
+          <div className="flex justify-between">
+            <div className="flex items-center gap-1">
+              <IconUser className="text-zinc-700" size={20} />
+              <p className="text-sm text-gray-700">
+                created by{" "}
+                <span className="font-semibold">{quiz.username}</span>
+              </p>
+            </div>
+            <div className="flex items-center gap-1">
+              <IconBooks className="text-zinc-700" size={20} />
+              <p className="text-sm text-gray-700">
+                {quiz.questions.length} questions
+              </p>
+            </div>
+          </div>
+
+          <div className="flex-grow" />
+
           <motion.div
-            className="flex items-center justify-between pr-4 mb-2"
+            className="flex items-center justify-between pr-4"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <motion.span
-              className={`px-2 py-1 rounded-full text-sm font-semibold 
-              ${
-                quiz.difficulty === 0
-                  ? "bg-green-200 text-green-800"
-                  : quiz.difficulty === 1
-                  ? "bg-yellow-200 text-yellow-800"
-                  : "bg-red-200 text-red-800"
-              }`}
-              whileHover={{ scale: 1.1 }}
-            >
-              {QUIZ_DIFFICULTIES[quiz.difficulty]}
-            </motion.span>
+            <DifficultyBadge level={QUIZ_DIFFICULTIES[quiz.difficulty]} />
 
-            <div className="flex items-center gap-1 text-zinc-500">
-              <IconHeart
-                className={cx("stroke-red-500", {
-                  "fill-red-500": liked,
-                  "hover:fill-red-300 ": !liked,
-                })}
-                onClick={handleLikeClick}
+            <div className="flex items-center gap-1">
+              <IconShare
+                className="text-zinc-500 hover:text-zinc-700"
+                size={20}
               />
-              {likeCount}
+              <div className="flex items-center gap-1 text-zinc-500">
+                <IconHeart
+                  className={cx("stroke-red-500", {
+                    "fill-red-500": liked,
+                    "hover:fill-red-300": !liked,
+                  })}
+                  onClick={handleLikeClick}
+                />
+                {likeCount}
+              </div>
             </div>
           </motion.div>
         </div>
