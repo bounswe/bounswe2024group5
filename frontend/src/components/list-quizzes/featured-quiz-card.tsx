@@ -2,8 +2,8 @@ import { Quiz } from "../../types/question";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-import { QUIZ_DIFFICULTIES } from "../badges/level";
-import { IconHeart } from "@tabler/icons-react";
+import { DifficultyBadge, QUIZ_DIFFICULTIES } from "../badges/level";
+import { IconBooks, IconHeart, IconShare, IconUser } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
 import { useState } from "react";
 
@@ -38,44 +38,46 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
             <p className="mb-4 text-gray-600">{quiz.description}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">
-              created by <span className="font-semibold">{quiz.username} </span>
-            </p>
-            <p className="text-sm text-gray-600">
-              {quiz.questions.length} questions
-            </p>
+            <div className="flex items-center gap-1">
+              <IconUser className="text-zinc-700" size={20} />
+              <p className="text-sm text-gray-700">
+                created by{" "}
+                <span className="font-semibold">{quiz.username}</span>
+              </p>
+            </div>
+
+            <div className="flex items-center gap-1 mb-4">
+              <IconBooks className="text-zinc-700" size={20} />
+              <p className="text-sm text-gray-700">
+                {quiz.questions.length} questions
+              </p>
+            </div>
             <motion.div
-              className="flex items-center justify-between mb-2"
+              className="flex items-center justify-between"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <motion.span
-                className={`px-2 py-1 rounded-full text-sm font-semibold 
-                ${
-                  quiz.difficulty === 0
-                    ? "bg-green-200 text-green-800"
-                    : quiz.difficulty === 1
-                    ? "bg-yellow-200 text-yellow-800"
-                    : "bg-red-200 text-red-800"
-                }`}
-                whileHover={{ scale: 1.1 }}
-              >
-                {QUIZ_DIFFICULTIES[quiz.difficulty]}
-              </motion.span>
+              <DifficultyBadge level={QUIZ_DIFFICULTIES[quiz.difficulty]} />
 
-              <div className="flex items-center gap-1 text-zinc-500">
-                <IconHeart
-                  className={cx(
-                    "stroke-red-500 cursor-pointer transition-colors duration-200",
-                    {
-                      "fill-red-500": liked,
-                      "hover:fill-red-300": !liked,
-                    }
-                  )}
-                  onClick={handleLikeClick}
+              <div className="flex items-center gap-1">
+                <IconShare
+                  className="text-zinc-500 hover:text-zinc-700"
+                  size={20}
                 />
-                {likeCount}
+                <div className="flex items-center gap-1 text-zinc-500">
+                  <IconHeart
+                    className={cx(
+                      "stroke-red-500 cursor-pointer transition-colors duration-200",
+                      {
+                        "fill-red-500": liked,
+                        "hover:fill-red-300": !liked,
+                      }
+                    )}
+                    onClick={handleLikeClick}
+                  />
+                  {likeCount}
+                </div>
               </div>
             </motion.div>
           </div>
