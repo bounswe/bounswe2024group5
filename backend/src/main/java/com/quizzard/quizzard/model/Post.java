@@ -2,6 +2,7 @@ package com.quizzard.quizzard.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
@@ -27,6 +28,7 @@ public class Post {
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date createdAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
