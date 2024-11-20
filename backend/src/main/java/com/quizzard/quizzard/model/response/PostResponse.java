@@ -8,20 +8,21 @@ import java.util.Date;
 @Getter
 public class PostResponse {
 
-    private String content;
-    private String title;
+    private Long id;
     private Long userId;
-    private String wordnetId;
+    private String title;
+    private String content;
+    private String wordId;
+    private int noUpvote;
     private Date createdAt;
     private Date updatedAt;
-    private Long id;
-    private int noUpvote;
+
 
     public PostResponse(Post post){
         this.content = post.getContent();
         this.title = post.getTitle();
         this.userId = post.getUser().getId();
-        this.wordnetId = post.getWordnetId();
+        this.wordId = post.getWordnetId();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.id = post.getId();
