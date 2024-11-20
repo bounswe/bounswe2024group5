@@ -123,6 +123,13 @@ export const SolveQuizPage = () => {
       });
 
       setAnswers(progressedAnswers);
+
+      const firstUnansweredIndex = progressedAnswers.findIndex(
+        (answer) => answer === undefined
+      );
+      setCurrentQuestion(
+        firstUnansweredIndex !== -1 ? firstUnansweredIndex : 0
+      );
     }
   }, [currentAttempt, quizzes, quiz]);
 
