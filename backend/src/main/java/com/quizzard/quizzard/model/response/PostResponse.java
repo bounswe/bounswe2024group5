@@ -12,21 +12,21 @@ public class PostResponse {
     private Long userId;
     private String title;
     private String content;
-    private String wordId;
+    private String word;
     private int noUpvote;
     private Date createdAt;
     private Date updatedAt;
 
 
-    public PostResponse(Post post){
+    public PostResponse(Post post, int noUpvote){
         this.content = post.getContent();
         this.title = post.getTitle();
         this.userId = post.getUser().getId();
-        this.wordId = post.getWordnetId();
+        this.word = post.getWord();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.id = post.getId();
-        this.noUpvote = 0;
+        this.noUpvote = noUpvote;
     }
 
     public PostResponse(){

@@ -3,7 +3,6 @@ package com.quizzard.quizzard.model.request;
 import com.quizzard.quizzard.model.Post;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 public class PostRequest {
@@ -14,14 +13,14 @@ public class PostRequest {
     @NotNull(message = "Title cannot be null")
     private String title;
 
-    private String wordId;
+    private String word;
 
     public Post toPost(){
         Post post = new Post();
         post.setContent(content);
         post.setTitle(title);
-        if(wordId != null)
-            post.setWordnetId(wordId);
+        if(word != null)
+            post.setWord(word);
         return post;
     }
 
