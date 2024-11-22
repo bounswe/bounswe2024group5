@@ -346,6 +346,38 @@ components:
           type: string
           format: date-time
           description: Timestamp when the upvote was last updated.
+    ReplyRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          description: Content of the reply.
+      required:
+        - content
+
+    ReplyResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the reply.
+        postId:
+          type: integer
+          description: The ID of the post the reply belongs to.
+        userId:
+          type: integer
+          description: The ID of the user who created the reply.
+        content:
+          type: string
+          description: Content of the reply.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the reply was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the reply was last updated.
 paths:
   /auth/register:
     post:
@@ -1269,7 +1301,7 @@ paths:
     post:
       summary: Upvote a post
       tags:
-        - Forum Posts
+        - Forum Post Upvotes
       parameters:
         - name: postId
           in: path
@@ -1291,7 +1323,7 @@ paths:
     delete:
       summary: Remove an upvote from a post
       tags:
-        - Forum Posts
+        - Forum Post Upvotes
       parameters:
         - name: postId
           in: path
@@ -1311,7 +1343,7 @@ paths:
     get:
       summary: Get all upvotes for a post optionally by userId
       tags:
-        - Forum Posts
+        - Forum Post Upvotes
       parameters:
         - name: postId
           in: path
@@ -1339,7 +1371,7 @@ paths:
     get:
       summary: Get all upvotes optionally by userId and postId
       tags:
-        - Forum Posts
+        - Forum Post Upvotes
       parameters:
         - name: userId
           in: query
@@ -1362,6 +1394,180 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UpvoteResponse'
+  /posts/upvotes/{upvoteId}:
+    get:
+      summary: Get a specific upvote by ID
+      tags:
+        - Forum Post Upvotes
+      parameters:
+        - name: upvoteId
+          in: path
+          required: true
+          description: The ID of the upvote to retrieve.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Upvote details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpvoteResponse'
+        '404':
+          description: Upvote not found.
+  /posts/{postId}/replies:
+    post:
+      summary: Create a reply to a specific post
+      tags:
+        - Forum Post Replies
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The ID of the post to which the reply belongs.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplyRequest'
+      responses:
+        '201':
+          description: Reply created successfully.
+          headers:
+            Location:
+              description: URI of the created reply.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplyResponse'
+        '400':
+          description: Invalid request (e.g., missing or empty content).
+        '401':
+          description: Unauthorized access (invalid or missing JWT token).
+        '404':
+          description: Post not found.
+
+    get:
+      summary: Get all replies for a specific post
+      tags:
+        - Forum Post Replies
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The ID of the post for which replies are retrieved.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of replies for the specified post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReplyResponse'
+        '404':
+          description: Post not found.
+
+  /posts/replies:
+    get:
+      summary: Get replies optionally by user
+      tags:
+        - Forum Post Replies
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          description: The ID of the user whose replies are retrieved. If not provided, retrieves all replies.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of replies by the specified user or all replies if no user ID is provided.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReplyResponse'
+
+  /posts/replies/{replyId}:
+    get:
+      summary: Get a specific reply by ID
+      tags:
+        - Forum Post Replies
+      parameters:
+        - name: replyId
+          in: path
+          required: true
+          description: The ID of the reply to retrieve.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reply details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplyResponse'
+        '404':
+          description: Reply not found.
+
+    put:
+      summary: Update a specific reply by ID
+      tags:
+        - Forum Post Replies
+      parameters:
+        - name: replyId
+          in: path
+          required: true
+          description: The ID of the reply to update.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplyRequest'
+      responses:
+        '200':
+          description: Reply updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplyResponse'
+        '400':
+          description: Invalid request (e.g., missing or empty content).
+        '403':
+          description: Access denied (user is not authorized to update the reply).
+        '404':
+          description: Reply not found.
+
+    delete:
+      summary: Delete a specific reply by ID
+      tags:
+        - Forum Post Replies
+      parameters:
+        - name: replyId
+          in: path
+          required: true
+          description: The ID of the reply to delete.
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Reply deleted successfully.
+        '403':
+          description: Access denied (user is not authorized to delete the reply).
+        '404':
+          description: Reply not found.
   /search:
     get:
       summary: Search forum posts
