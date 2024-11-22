@@ -1,8 +1,11 @@
 package com.quizzard.quizzard.controller;
 
 import com.quizzard.quizzard.model.request.PostRequest;
+import com.quizzard.quizzard.model.request.ReplyRequest;
 import com.quizzard.quizzard.model.response.PostResponse;
+import com.quizzard.quizzard.model.response.ReplyResponse;
 import com.quizzard.quizzard.service.PostService;
+import com.quizzard.quizzard.service.ReplyService;
 import com.quizzard.quizzard.service.UpvoteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,9 @@ public class PostController {
     private PostService postService;
     @Autowired
     private UpvoteService upvoteService;
+
+    @Autowired
+    private ReplyService replyService;
 
     @PostMapping
     ResponseEntity<PostResponse> createPost(@RequestHeader("Authorization") String jwtToken, @RequestBody @Valid PostRequest postRequest){
@@ -71,6 +77,44 @@ public class PostController {
     @GetMapping("/upvotes")
     ResponseEntity<?> getUpvotedPosts(@RequestParam(required = false) Optional<Long> userId, @RequestParam(required = false) Optional<Long> postId){
         return ResponseEntity.ok(upvoteService.getUpvotes(userId, postId));
+    }
+
+    @GetMapping("/upvotes/{upvoteId}")
+    ResponseEntity<?> getUpvoteById(@PathVariable Long upvoteId){
+        return ResponseEntity.ok(upvoteService.getUpvoteById(upvoteId));
+    }
+
+    @PostMapping("/{postId}/replies")
+    ResponseEntity<?> createReply(@RequestHeader("Authorization") String jwtToken, @PathVariable Long postId, @RequestBody @Valid ReplyRequest replyRequest){
+        ReplyResponse createdResponse = replyService.createReply(jwtToken, postId, replyRequest);
+        URI location = URI.create("/posts/" + postId + "/replies/" + createdResponse.getId());
+        return ResponseEntity.created(location).body(createdResponse);
+    }
+
+    @GetMapping("/{postId}/replies")
+    ResponseEntity<?> getReplies(@PathVariable Long postId){
+        return ResponseEntity.ok(replyService.getRepliesByPostId(postId));
+    }
+
+    @GetMapping("/replies")
+    ResponseEntity<?> getRepliesByUser(@RequestParam(required = false) Optional<Long> userId){
+        return ResponseEntity.ok(replyService.getRepliesByUserId(userId));
+    }
+
+    @GetMapping("/replies/{replyId}")
+    ResponseEntity<?> getReplyById(@PathVariable Long replyId){
+        return ResponseEntity.ok(replyService.getReplyById(replyId));
+    }
+
+    @DeleteMapping("/replies/{replyId}")
+    ResponseEntity<?> deleteReplyById(@RequestHeader("Authorization") String jwtToken, @PathVariable Long replyId){
+        replyService.deleteReplyById(jwtToken, replyId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/replies/{replyId}")
+    ResponseEntity<?> updateReply(@RequestHeader("Authorization") String jwtToken, @PathVariable Long replyId, @RequestBody ReplyRequest replyRequest){
+        return ResponseEntity.ok(replyService.updateReply(jwtToken, replyId, replyRequest));
     }
 
 

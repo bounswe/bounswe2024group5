@@ -64,5 +64,10 @@ public class UpvoteService {
             return mapToUpvoteResponse(upvoteRepository.findByPostId(postId.get()));
         return mapToUpvoteResponse(upvoteRepository.findAll());
     }
+
+    public UpvoteResponse getUpvoteById(Long upvoteId) {
+        Upvote upvote = upvoteRepository.findById(upvoteId).orElseThrow( () -> new ResourceNotFoundException("Upvote not found"));
+        return new UpvoteResponse(upvote);
+    }
 }
 
