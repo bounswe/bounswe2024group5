@@ -292,6 +292,60 @@ components:
           description: "The new answer to update."
       required:
         - newAnswer
+
+    PostRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Sample Title"
+        content:
+          type: string
+          example: "This is a sample post content."
+        word:
+          type: string
+          example: "fast"
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        word:
+          type: string
+        noUpvote:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpvoteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the upvote.
+        postId:
+          type: integer
+          description: ID of the post that was upvoted.
+        userId:
+          type: integer
+          description: ID of the user who upvoted the post.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the upvote was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the upvote was last updated.
 paths:
   /auth/register:
     post:
@@ -960,7 +1014,6 @@ paths:
       operationId: "createQuestionAnswer"
       tags:
         - "Question Answer"
-      parameters:
       requestBody:
         description: "Request body containing the quiz attempt ID, question ID, and the answer."
         required: true
@@ -1094,118 +1147,86 @@ paths:
           description: "Question answer not found"
         '403':
           description: "Forbidden, user is not authorized to update this answer"
-  /forum/posts:
+  /posts:
     post:
-      summary: Create a forum post
+      summary: Create a new post
       tags:
-        - Forum
-      security:
-        - bearerAuth: []
+        - Forum Posts
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                content:
-                  type: string
-                lexvo_link:
-                  type: string
-                  format: uri
-                tags:
-                  type: array
-                  items:
-                    type: string
-              required:
-                - title
-                - content
-                - tags
+              $ref: '#/components/schemas/PostRequest'
       responses:
         '201':
-          description: Forum post created successfully
+          description: Post created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForumPost'
+                $ref: '#/components/schemas/PostResponse'
+        '401':
+          description: Unauthorized access (invalid or missing JWT token).
         '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Title, content and word are required
     get:
-      summary: Get list of forum posts
+      summary: Get all posts optionally by userId and word
       tags:
-        - Forum
+        - Forum Posts
       parameters:
-        - name: page
+        - name: word
           in: query
+          required: false
+          description: Filter posts by a specific word.
           schema:
-            type: integer
-          description: Page number
-        - name: limit
+            type: string
+        - name: userId
           in: query
+          required: false
+          description: Filter posts by a specific user ID.
           schema:
-            type: integer
-          description: Number of items per page
+            type: string
       responses:
         '200':
-          description: A list of forum posts
+          description: A list of posts matching the filters.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ForumPost'
-  /forum/posts/{id}:
+                  $ref: '#/components/schemas/PostResponse'
+
+  /posts/{postId}:
     get:
-      summary: Get forum post details
+      summary: Get a post by ID
       tags:
-        - Forum
+        - Forum Posts
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
+          description: The ID of the post to retrieve.
           schema:
             type: integer
       responses:
         '200':
-          description: Forum post details retrieved successfully
+          description: Post details retrieved successfully.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  post:
-                    $ref: '#/components/schemas/ForumPost'
-                  replies:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ForumReply'
-                  suggestions:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ForumPost'
+                $ref: '#/components/schemas/PostResponse'
         '404':
-          description: Forum post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /forum/posts/{id}/replies:
-    post:
-      summary: Reply to a forum post
+          description: Post not found.
+
+    put:
+      summary: Update a post by ID
       tags:
-        - Forum
-      security:
-        - bearerAuth: []
+        - Forum Posts
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
+          description: The ID of the post to update.
           schema:
             type: integer
       requestBody:
@@ -1213,74 +1234,134 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                content:
-                  type: string
-              required:
-                - content
-      responses:
-        '201':
-          description: Reply added successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForumReply'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Forum post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /forum/posts/{id}/upvote:
-    post:
-      summary: Upvote a forum post
-      tags:
-        - Forum
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+              $ref: '#/components/schemas/PostRequest'
       responses:
         '200':
-          description: Post upvoted successfully
-        '404':
-          description: Forum post not found
+          description: Post updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/PostResponse'
+        '403':
+          description: Access denied (user is not the owner of the post).
+        '404':
+          description: Post not found.
+
     delete:
-      summary: Remove upvote from a forum post
+      summary: Delete a post by ID
       tags:
-        - Forum
-      security:
-        - bearerAuth: []
+        - Forum Posts
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
+          description: The ID of the post to delete.
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Post deleted successfully.
+        '403':
+          description: Access denied (user is not the owner of the post).
+        '404':
+          description: Post not found.
+  /posts/{postId}/upvote:
+    post:
+      summary: Upvote a post
+      tags:
+        - Forum Posts
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The ID of the post to upvote.
           schema:
             type: integer
       responses:
         '200':
-          description: Post downvoted successfully
-        '404':
-          description: Forum post not found
+          description: Upvote successfully created.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/UpvoteResponse'
+        '400':
+          description: Bad request (e.g., post not found, already upvoted).
+        '401':
+          description: Unauthorized access (invalid or missing JWT token).
+    delete:
+      summary: Remove an upvote from a post
+      tags:
+        - Forum Posts
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The ID of the post to remove upvote from.
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Upvote successfully removed.
+        '400':
+          description: Bad request (e.g., upvote not found).
+        '401':
+          description: Unauthorized access (invalid or missing JWT token).
+
+  /posts/{postId}/upvotes:
+    get:
+      summary: Get all upvotes for a post optionally by userId
+      tags:
+        - Forum Posts
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The ID of the post to retrieve upvotes for.
+          schema:
+            type: integer
+        - name: userId
+          in: query
+          required: false
+          description: Filter upvotes by a specific user.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of upvotes for the post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UpvoteResponse'
+
+  /posts/upvotes:
+    get:
+      summary: Get all upvotes optionally by userId and postId
+      tags:
+        - Forum Posts
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          description: Filter upvotes by a specific user.
+          schema:
+            type: integer
+        - name: postId
+          in: query
+          required: false
+          description: Filter upvotes by a specific post.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of upvotes matching the filters.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UpvoteResponse'
   /search:
     get:
       summary: Search forum posts
