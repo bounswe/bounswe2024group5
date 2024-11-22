@@ -1,12 +1,14 @@
 package com.quizzard.quizzard.service;
 
 import com.quizzard.quizzard.exception.AccessDeniedException;
+import com.quizzard.quizzard.exception.InvalidRequestException;
 import com.quizzard.quizzard.exception.ResourceNotFoundException;
 import com.quizzard.quizzard.model.Post;
 import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.model.request.PostRequest;
 import com.quizzard.quizzard.model.response.PostResponse;
 import com.quizzard.quizzard.repository.PostRepository;
+import com.quizzard.quizzard.repository.UpvoteRepository;
 import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,22 +28,29 @@ public class PostService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UpvoteRepository upvoteRepository;
+
+
     private List<PostResponse> mapToPostResponse(List<Post> posts){
-        return posts.stream().map(PostResponse::new).toList();
+        return posts.stream().map(post -> new PostResponse(post, (int) upvoteRepository.countByPostId(post.getId()))).toList();
     }
 
     public PostResponse createPost(String jwtToken, PostRequest postRequest){
         String username = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
         User user = userService.getOneUserByUsername(username);
+        if(postRequest.getTitle() == null || postRequest.getContent() == null || postRequest.getWord() == null)
+            throw new InvalidRequestException("Title, content and word are required");
         Post post = postRequest.toPost();
         post.setUser(user);
         postRepository.save(post);
-        return new PostResponse(post);
+        return new PostResponse(post,0);
     }
 
     public PostResponse getPostById(Long postId){
         Post post = postRepository.findById(postId).orElseThrow( () -> new ResourceNotFoundException("Post not found"));
-        return new PostResponse(post);
+        int noUpvote = (int) upvoteRepository.countByPostId(postId);
+        return new PostResponse(post, noUpvote);
     }
 
     public void deletePostById(String jwtToken, Long postId){
@@ -54,11 +63,11 @@ public class PostService {
         postRepository.deleteById(postId);
     }
 
-    public List<PostResponse> getAllPosts(Optional<String> wordnetId, Optional<String> userId) {
-        if (wordnetId.isPresent() && userId.isPresent())
-            return mapToPostResponse(postRepository.findByWordnetIdAndUserId(wordnetId.get(), Long.parseLong(userId.get())));
-        else if (wordnetId.isPresent())
-            return mapToPostResponse(postRepository.findByWordnetId(wordnetId.get()));
+    public List<PostResponse> getAllPosts(Optional<String> word, Optional<String> userId) {
+        if (word.isPresent() && userId.isPresent())
+            return mapToPostResponse(postRepository.findByWordAndUserId(word.get(), Long.parseLong(userId.get())));
+        else if (word.isPresent())
+            return mapToPostResponse(postRepository.findByWord(word.get()));
         else if (userId.isPresent())
             return mapToPostResponse(postRepository.findByUserId(Long.parseLong(userId.get())));
         else
@@ -75,9 +84,10 @@ public class PostService {
             post.setContent(postRequest.getContent());
         if (postRequest.getTitle() != null)
             post.setTitle(postRequest.getTitle());
-        if (postRequest.getWordId() != null)
-            post.setWordnetId(postRequest.getWordId());
+        if (postRequest.getWord() != null)
+            post.setWord(postRequest.getWord());
         postRepository.save(post);
-        return new PostResponse(post);
+        int noUpvote = (int) upvoteRepository.countByPostId(postId);
+        return new PostResponse(post, noUpvote);
     }
 }

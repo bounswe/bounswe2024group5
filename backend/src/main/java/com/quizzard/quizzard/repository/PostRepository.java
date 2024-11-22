@@ -9,9 +9,9 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    List<Post> findByWordnetIdAndUserId(String s, long l);
+    List<Post> findByWordAndUserId(String s, long l);
 
-    List<Post> findByWordnetId(String s);
+    List<Post> findByWord(String s);
 
     List<Post> findByUserId(long l);
 }
