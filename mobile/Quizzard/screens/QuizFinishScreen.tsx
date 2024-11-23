@@ -38,7 +38,7 @@ const QuizFinishScreen = ({ route, navigation }) => {
         </Text>
       </View>
 
-      {/* Button to return to home screen */}
+      {/* Button to return to the quiz description*/}
       <TouchableOpacity
         style={styles.homeButton}
         onPress={() =>
@@ -84,10 +84,10 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   resultsContainer: {
-    backgroundColor: "#f0f8ff", // Light blue background
+    backgroundColor: "#f5f3ff", // Light blue background
     padding: 20,
     borderRadius: 15, // Rounded corners
-    borderColor: "#000", // Black outline
+    borderColor: "#8b5c56", // Black outline
     borderWidth: 2,
     width: "90%",
     alignItems: "center",
