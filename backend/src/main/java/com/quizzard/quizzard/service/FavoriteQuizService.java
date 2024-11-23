@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Date;
 
 @Service
 public class FavoriteQuizService {
@@ -49,6 +50,7 @@ public class FavoriteQuizService {
         FavoriteQuiz favoriteQuiz2 = new FavoriteQuiz();
         favoriteQuiz2.setUser(user);
         favoriteQuiz2.setQuiz(quiz);
+        favoriteQuiz2.setCreatedAt(new Date());
         favoriteQuizRepository.save(favoriteQuiz2);
         return new FavoriteQuizResponse(favoriteQuiz2);
     }
