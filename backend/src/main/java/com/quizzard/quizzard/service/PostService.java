@@ -8,6 +8,7 @@ import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.model.request.PostRequest;
 import com.quizzard.quizzard.model.response.PostResponse;
 import com.quizzard.quizzard.repository.PostRepository;
+import com.quizzard.quizzard.repository.ReplyRepository;
 import com.quizzard.quizzard.repository.UpvoteRepository;
 import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,18 @@ public class PostService {
     @Autowired
     private UpvoteRepository upvoteRepository;
 
+    @Autowired
+    private ReplyRepository replyRepository;
+
+
+    private PostResponse mapToPostResponse(Post post){
+        int noUpvote = (int) upvoteRepository.countByPostId(post.getId());
+        int NoReplies = (int) replyRepository.countByPostId(post.getId());
+        return new PostResponse(post, noUpvote, NoReplies);
+    }
 
     private List<PostResponse> mapToPostResponse(List<Post> posts){
-        return posts.stream().map(post -> new PostResponse(post, (int) upvoteRepository.countByPostId(post.getId()))).toList();
+        return posts.stream().map(post -> mapToPostResponse(post)).toList();
     }
 
     public PostResponse createPost(String jwtToken, PostRequest postRequest){
@@ -44,13 +54,12 @@ public class PostService {
         Post post = postRequest.toPost();
         post.setUser(user);
         postRepository.save(post);
-        return new PostResponse(post,0);
+        return new PostResponse(post,0, 0);
     }
 
     public PostResponse getPostById(Long postId){
         Post post = postRepository.findById(postId).orElseThrow( () -> new ResourceNotFoundException("Post not found"));
-        int noUpvote = (int) upvoteRepository.countByPostId(postId);
-        return new PostResponse(post, noUpvote);
+        return mapToPostResponse(post);
     }
 
     public void deletePostById(String jwtToken, Long postId){
@@ -87,7 +96,6 @@ public class PostService {
         if (postRequest.getWord() != null)
             post.setWord(postRequest.getWord());
         postRepository.save(post);
-        int noUpvote = (int) upvoteRepository.countByPostId(postId);
-        return new PostResponse(post, noUpvote);
+        return mapToPostResponse(post);
     }
 }

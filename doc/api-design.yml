@@ -310,8 +310,8 @@ components:
       properties:
         id:
           type: integer
-        userId:
-          type: integer
+        username:
+          type: string
         title:
           type: string
         content:
@@ -319,6 +319,8 @@ components:
         word:
           type: string
         noUpvote:
+          type: integer
+        noReplies:
           type: integer
         createdAt:
           type: string
