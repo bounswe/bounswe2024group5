@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const CreateReplyComponent = ({ close, send } : { close: () => void, send: () => void }) => {
+export const CreateReplyComponent = ({ close, send } : { close: () => void, send: (payload: {content: string}) => void }) => {
 
     const [content, setContent] = useState<string>("");
 
@@ -12,7 +12,7 @@ export const CreateReplyComponent = ({ close, send } : { close: () => void, send
                 </div>
                 <div className="px-4 pb-3 flex justify-between">
                     <button onClick={close} className="bg-violet-600 text-white p-2 px-8 rounded-lg">Discard</button>
-                    <button onClick={send} className="bg-violet-600 text-white p-2 px-8 rounded-lg">Send</button>
+                    <button onClick={() => {send({content: content})}} className="bg-violet-600 text-white p-2 px-8 rounded-lg">Send</button>
                 </div>
             </div>
         </>

@@ -9,6 +9,8 @@ export const ForumPage = () => {
 
   const { data: posts } = useFetchPosts();
 
+  console.log('here', posts)
+
   const closePostComponent = () => {
     setPostComponent(false)
   }
@@ -22,8 +24,8 @@ export const ForumPage = () => {
         <button onClick={() => {setPostComponent(true)}} className="bg-violet-600 text-white p-2 px-8 rounded-lg">Create Post</button>
       </div>
       { postComponent && <CreateaPostComponent close={closePostComponent}/> }
-      { posts && posts.map(mockPost => {
-        return <ForumPostComponent post={mockPost} />
+      { posts && posts.map(post => {
+        return <ForumPostComponent postId={post.id} />
       })}
     </div>
   );
