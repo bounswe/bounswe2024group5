@@ -9,24 +9,26 @@ import java.util.Date;
 public class PostResponse {
 
     private Long id;
-    private Long userId;
+    private String username;
     private String title;
     private String content;
     private String word;
     private int noUpvote;
+    private int noReplies;
     private Date createdAt;
     private Date updatedAt;
 
 
-    public PostResponse(Post post, int noUpvote){
+    public PostResponse(Post post, int noUpvote, int noReplies){
         this.content = post.getContent();
         this.title = post.getTitle();
-        this.userId = post.getUser().getId();
+        this.username = post.getUser().getUsername();
         this.word = post.getWord();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.id = post.getId();
         this.noUpvote = noUpvote;
+        this.noReplies = noReplies;
     }
 
     public PostResponse(){
