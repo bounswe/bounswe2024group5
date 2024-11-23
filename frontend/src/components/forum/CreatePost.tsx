@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { IconX } from "@tabler/icons-react";
+import { useCreatePost } from "../../hooks/api/create-post";
 
 const TagComponent = ({ word, removeSelf }: { word: string, removeSelf: () => void }) => {
 
@@ -24,6 +25,8 @@ export const CreateaPostComponent = ({ close } : { close: () => void }) => {
     const [tagInput, setTagInput] = useState<string>("");
     const [tags, setTags] = useState<string[]>([]);
 
+    const { mutateAsync: createPost } = useCreatePost();
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter" && tagInput) {
             setTags([...tags, tagInput])
@@ -35,7 +38,7 @@ export const CreateaPostComponent = ({ close } : { close: () => void }) => {
         setTags(tags.filter(t => t !== tag))
     }
 
-    const sendPost = () => {
+    const sendPost = async () => {
         if (title === "") {
             alert("Please enter a title for this post.")
             return
@@ -48,8 +51,14 @@ export const CreateaPostComponent = ({ close } : { close: () => void }) => {
             alert("Please enter at least one tag. This is necessary to help other users who might also be confused about this word find this post easier.")
             return
         }
-        alert("Your post has been sent.")
-        close()
+        
+        await createPost({
+            title: title,
+            content: content,
+            word: tags[0]
+        })
+
+        close();
     }
 
     return (
