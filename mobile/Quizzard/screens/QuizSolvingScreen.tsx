@@ -13,11 +13,13 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const [isQuestionAnswered, setIsQuestionAnswered] = useState(
     questions.map(() => false)
   );
+  const [alreadyFinished, setAlreadyFinished] = useState(false);
   const question = questions[questionIndex];
   const authContext = useAuth();
   const token = authContext ? authContext.token : null;
 
   const handleAnswer = async (answer) => {
+    if (alreadyFinished) return;
     if (isQuestionAnswered[questionIndex]) return;
 
     const updatedSelectedAnswers = [...selectedAnswers];
@@ -133,10 +135,18 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.submitButton}
-          onPress={() => navigation.goBack()}
+          onPress={() => {
+            setAlreadyFinished(true);
+            navigation.navigate("QuizFinish", {
+              quiz, 
+              questions, 
+              selectedAnswers,})
+            }
+          }
         >
           <Text style={styles.submitButtonText}>Finish</Text>
         </TouchableOpacity>
+
       </View>
     </View>
   );

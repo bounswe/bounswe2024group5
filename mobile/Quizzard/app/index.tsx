@@ -1,7 +1,6 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import HomeScreen from "../screens/HomeScreen";
@@ -14,7 +13,7 @@ import CreateQuestionScreen from "../screens/CreateQuestionScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import ProfileSettingsScreen from "../screens/ProfileSettingsScreen";
 import QuizWelcomePage from "../screens/QuizWelcomePage";
-
+import QuizFinishScreen from "../screens/QuizFinishScreen"; // Import the finish screen
 import { AuthProvider } from "../screens/AuthProvider";
 
 export type RootStackParamList = {
@@ -28,12 +27,15 @@ export type RootStackParamList = {
   Forum: undefined;
   QuizCreation: undefined;
   QuizSolving: undefined;
+  QuizFinish: {
+    quiz: { title: string; description: string; difficulty: string; elo: number; id: number; image: string; questions: any[]; createdAt: string; updatedAt: string; username: string };
+    questions: any[];
+    selectedAnswers: string[];
+  };
   Profile: undefined;
   ProfileSettings: undefined;
-  // Add this line:
   QuizWelcome: { quiz: { title: string; description: string; difficulty: string; elo: number; id: number; image: string; questions: any[]; createdAt: string; updatedAt: string; username: string } };
 };
-
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -73,6 +75,11 @@ function MyStack() {
       <Stack.Screen
         name="QuizSolving"
         component={QuizSolvingScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="QuizFinish"
+        component={QuizFinishScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
