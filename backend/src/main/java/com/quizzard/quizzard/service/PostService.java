@@ -3,13 +3,13 @@ package com.quizzard.quizzard.service;
 import com.quizzard.quizzard.exception.AccessDeniedException;
 import com.quizzard.quizzard.exception.InvalidRequestException;
 import com.quizzard.quizzard.exception.ResourceNotFoundException;
+import com.quizzard.quizzard.model.English;
 import com.quizzard.quizzard.model.Post;
+import com.quizzard.quizzard.model.PostTag;
 import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.model.request.PostRequest;
 import com.quizzard.quizzard.model.response.PostResponse;
-import com.quizzard.quizzard.repository.PostRepository;
-import com.quizzard.quizzard.repository.ReplyRepository;
-import com.quizzard.quizzard.repository.UpvoteRepository;
+import com.quizzard.quizzard.repository.*;
 import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,26 +35,66 @@ public class PostService {
     @Autowired
     private ReplyRepository replyRepository;
 
+    @Autowired
+    private PostTagRepository postTagRepository;
+
+    @Autowired
+    private EnglishRepository englishRepository;
+
 
     private PostResponse mapToPostResponse(Post post){
         int noUpvote = (int) upvoteRepository.countByPostId(post.getId());
         int NoReplies = (int) replyRepository.countByPostId(post.getId());
-        return new PostResponse(post, noUpvote, NoReplies);
+        List<PostTag> postTags = postTagRepository.findByPostId(post.getId());
+        return new PostResponse(post, postTags, noUpvote, NoReplies);
     }
 
     private List<PostResponse> mapToPostResponse(List<Post> posts){
-        return posts.stream().map(post -> mapToPostResponse(post)).toList();
+        return posts.stream().map(this::mapToPostResponse).toList();
+    }
+
+    // they can set tags twice
+    private boolean setPostTags(Post post, List<String> tags){
+        List<PostTag> postTags = List.of();
+        for(String tag: tags){
+            if(!englishRepository.existsByWord(tag))
+                return false;
+            English english = englishRepository.findByWord(tag);
+            PostTag postTag = new PostTag();
+            postTag.setPost(post);
+            postTag.setEnglish(english);
+            postTags.add(postTag);
+        }
+        for(PostTag postTag: postTags){
+            postTagRepository.save(postTag);
+        }
+        return true;
+    }
+
+    private boolean updatePostTags(Post post, List<String> tags){
+        List<PostTag> postTags = postTagRepository.findByPostId(post.getId());
+        if(setPostTags(post, tags)){
+            for(PostTag postTag: postTags){
+                postTagRepository.delete(postTag);
+            }
+            return true;
+        }
+        return false;
     }
 
     public PostResponse createPost(String jwtToken, PostRequest postRequest){
         String username = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
         User user = userService.getOneUserByUsername(username);
-        if(postRequest.getTitle() == null || postRequest.getContent() == null || postRequest.getWord() == null)
-            throw new InvalidRequestException("Title, content and word are required");
+        if(postRequest.getTitle() == null || postRequest.getContent() == null || postRequest.getTags() == null)
+            throw new InvalidRequestException("Title, content and tags are required");
+        if(postRequest.getTags().isEmpty())
+            throw new InvalidRequestException("At least one tag is required");
         Post post = postRequest.toPost();
         post.setUser(user);
         postRepository.save(post);
-        return new PostResponse(post,0, 0);
+        if(!setPostTags(post, postRequest.getTags()))
+            throw new InvalidRequestException("Invalid tag");
+        return mapToPostResponse(post);
     }
 
     public PostResponse getPostById(Long postId){
@@ -74,9 +114,9 @@ public class PostService {
 
     public List<PostResponse> getAllPosts(Optional<String> word, Optional<String> userId) {
         if (word.isPresent() && userId.isPresent())
-            return mapToPostResponse(postRepository.findByWordAndUserId(word.get(), Long.parseLong(userId.get())));
+            return mapToPostResponse(postRepository.findAllByTagWordAndUserId(word.get(), Integer.parseInt(userId.get())));
         else if (word.isPresent())
-            return mapToPostResponse(postRepository.findByWord(word.get()));
+            return mapToPostResponse(postRepository.findAllByTagWord(word.get()));
         else if (userId.isPresent())
             return mapToPostResponse(postRepository.findByUserId(Long.parseLong(userId.get())));
         else
@@ -93,8 +133,13 @@ public class PostService {
             post.setContent(postRequest.getContent());
         if (postRequest.getTitle() != null)
             post.setTitle(postRequest.getTitle());
-        if (postRequest.getWord() != null)
-            post.setWord(postRequest.getWord());
+        if (postRequest.getTags() != null)
+            if(postRequest.getTags().isEmpty())
+                throw new InvalidRequestException("At least one tag is required");
+            else{
+                if(!updatePostTags(post, postRequest.getTags()))
+                    throw new InvalidRequestException("Invalid tag");
+            }
         postRepository.save(post);
         return mapToPostResponse(post);
     }

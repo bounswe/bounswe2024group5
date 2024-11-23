@@ -23,9 +23,6 @@ public class Post {
     @Column(name = "title", length = 255)
     private String title;
 
-    @Column(name = "wordnet_id", length = 255)
-    private String word;
-
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp

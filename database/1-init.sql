@@ -133,6 +133,14 @@ CREATE TABLE IF NOT EXISTS upvoted_forum_posts (
     UNIQUE (user_id, post_id)
 );
 
+CREATE TABLE IF NOT EXISTS post_tags (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    english_id bigint(20),
+    FOREIGN KEY (post_id) REFERENCES forum_posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (english_id) REFERENCES english(id) ON DELETE CASCADE
+);
+
 
 
 
