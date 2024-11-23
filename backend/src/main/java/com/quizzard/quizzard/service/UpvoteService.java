@@ -8,6 +8,7 @@ import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.model.response.UpvoteResponse;
 import com.quizzard.quizzard.repository.PostRepository;
 import com.quizzard.quizzard.repository.UpvoteRepository;
+import com.quizzard.quizzard.repository.UserRepository;
 import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ public class UpvoteService {
 
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private UserRepository userRepository;
 
     private List<UpvoteResponse> mapToUpvoteResponse(List<Upvote> upvotes){
         return upvotes.stream().map(UpvoteResponse::new).toList();
@@ -55,11 +58,19 @@ public class UpvoteService {
         upvoteRepository.delete(upvote);
     }
 
-    public List<UpvoteResponse> getUpvotes(Optional<Long> userId, Optional<Long> postId) {
-        if (userId.isPresent() && postId.isPresent())
-            return mapToUpvoteResponse(upvoteRepository.findByPostIdAndUserId(postId.get(), userId.get()));
-        if (userId.isPresent())
-            return mapToUpvoteResponse(upvoteRepository.findByUserId(userId.get()));
+    public List<UpvoteResponse> getUpvotes(Optional<String> username, Optional<Long> postId) {
+        if (username.isPresent() && postId.isPresent()){
+            if (!userRepository.existsByUsername(username.get()))
+                throw new ResourceNotFoundException("User not found");
+            if (!postRepository.existsById(postId.get()))
+                throw new ResourceNotFoundException("Post not found");
+            return mapToUpvoteResponse(upvoteRepository.findByPostIdAndUserId(postId.get(), userRepository.findByUsername(username.get()).getId()));
+        }
+        if (username.isPresent()){
+            if (!userRepository.existsByUsername(username.get()))
+                throw new ResourceNotFoundException("User not found");
+            return mapToUpvoteResponse(upvoteRepository.findByUserId(userRepository.findByUsername(username.get()).getId()));
+        }
         if (postId.isPresent())
             return mapToUpvoteResponse(upvoteRepository.findByPostId(postId.get()));
         return mapToUpvoteResponse(upvoteRepository.findAll());

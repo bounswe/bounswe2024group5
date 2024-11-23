@@ -115,13 +115,17 @@ public class PostService {
         postRepository.deleteById(postId);
     }
 
-    public List<PostResponse> getAllPosts(Optional<String> word, Optional<String> userId) {
-        if (word.isPresent() && userId.isPresent())
-            return mapToPostResponse(postRepository.findAllByTagWordAndUserId(word.get(), Integer.parseInt(userId.get())));
+    public List<PostResponse> getAllPosts(Optional<String> word, Optional<String> username) {
+        if (word.isPresent() && username.isPresent())
+            return mapToPostResponse(postRepository.findAllByTagWordAndUsername(word.get(), username.get()));
         else if (word.isPresent())
             return mapToPostResponse(postRepository.findAllByTagWord(word.get()));
-        else if (userId.isPresent())
-            return mapToPostResponse(postRepository.findByUserId(Long.parseLong(userId.get())));
+        else if (username.isPresent()){
+            User user = userService.getOneUserByUsername(username.get());
+            if (user == null)
+                throw new ResourceNotFoundException("User not found");
+            return mapToPostResponse(postRepository.findByUserId(user.getId()));
+        }
         else
             return mapToPostResponse(postRepository.findAll());
     }
