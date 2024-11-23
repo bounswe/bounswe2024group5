@@ -32,7 +32,7 @@ public class User {
     private String profilePicture;
 
     @Column(name = "english_proficiency")
-    private String englishProficiency;
+    private int englishProficiency;
 
     @Column(name = "points")
     private int points;
