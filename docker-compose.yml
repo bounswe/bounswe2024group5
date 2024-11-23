@@ -5,6 +5,10 @@ services:
       - "8080"
     networks:
       - app-network
+    volumes:
+      - ./backend/credentials-template.json:/app/credentials-template.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials-template.json
     depends_on:
       database:
         condition: service_healthy

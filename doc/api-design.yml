@@ -78,6 +78,65 @@ components:
       required:
         - username_or_email
         - password
+    ProfileRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The user's updated name.
+        email:
+          type: string
+          format: email
+          description: The user's updated email address.
+        profilePicture:
+          type: string
+          description: URL of the user's updated profile picture.
+      example:
+        name: John Doe
+        email: johndoe@example.com
+        profilePicture: "https://example.com/images/profile.jpg"
+
+    ProfileResponse:
+      type: object
+      properties:
+        username:
+          type: string
+          description: The username of the user.
+        email:
+          type: string
+          format: email
+          description: The email address of the user.
+        name:
+          type: string
+          description: The full name of the user.
+        profilePicture:
+          type: string
+          description: URL of the user's profile picture.
+        score:
+          type: number
+          format: float
+          description: The user's total score.
+        englishProficiency:
+          type: string
+          description: The user's English proficiency level, based on their score.
+          enum:
+            - A1
+            - A2
+            - B1
+            - B2
+            - C1
+            - C2
+        noCreatedQuizzes:
+          type: integer
+          description: The number of quizzes created by the user.
+      example:
+        username: johndoe
+        email: johndoe@example.com
+        name: John Doe
+        profilePicture: "https://example.com/images/profile.jpg"
+        score: 1500.0
+        englishProficiency: B1
+        noCreatedQuizzes: 5
     Quiz:
       type: object
       properties:
@@ -292,6 +351,99 @@ components:
           description: "The new answer to update."
       required:
         - newAnswer
+
+    PostRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Sample Title"
+        content:
+          type: string
+          example: "This is a sample post content."
+        tags:
+          type: array
+          items:
+            type: string
+            example: "fast"
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+            example: "fast"
+        noUpvote:
+          type: integer
+        noReplies:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpvoteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the upvote.
+        postId:
+          type: integer
+          description: ID of the post that was upvoted.
+        userId:
+          type: integer
+          description: ID of the user who upvoted the post.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the upvote was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the upvote was last updated.
+    ReplyRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          description: Content of the reply.
+      required:
+        - content
+
+    ReplyResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the reply.
+        postId:
+          type: integer
+          description: The ID of the post the reply belongs to.
+        username:
+          type: string
+          description: The name of the user who created the reply.
+        content:
+          type: string
+          description: Content of the reply.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the reply was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the reply was last updated.
 paths:
   /auth/register:
     post:
@@ -426,10 +578,83 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /profile/me:
+    get:
+      summary: Get the authenticated user's profile
+      tags:
+        - Profile
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token for user authentication.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+    put:
+      summary: Update the authenticated user's profile
+      tags:
+        - Profile
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token for user authentication.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '400':
+          description: Invalid input data.
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+
+  /profile/{username}:
+    get:
+      summary: Get a user's profile by username
+      tags:
+        - Profile
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: The username of the user whose profile is being requested.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '404':
+          description: User not found.
   /autocomplete:
     get:
       summary: "Returns word auto complete suggestions"
       description: "It returns a list that contains at most 5 words that start with prefix."
+      tags:
+        - Auto-Complete
       parameters:
         - name: "prefix"
           in: "query"
@@ -960,7 +1185,6 @@ paths:
       operationId: "createQuestionAnswer"
       tags:
         - "Question Answer"
-      parameters:
       requestBody:
         description: "Request body containing the quiz attempt ID, question ID, and the answer."
         required: true
@@ -981,7 +1205,7 @@ paths:
           description: "Unauthorized, invalid or missing JWT token"
         '404':
           description: "Quiz attempt or question not found"
-    
+
     get:
       summary: "Get all question answers"
       description: "Retrieve all question answers for the user, with optional filters for quiz attempt and question."
@@ -1012,7 +1236,7 @@ paths:
                   $ref: "#/components/schemas/QuestionAnswerResponse"
         '401':
           description: "Unauthorized, invalid or missing JWT token"
-  
+
   /question-answers/{id}:
     get:
       summary: "Get a specific question answer"
@@ -1038,7 +1262,7 @@ paths:
           description: "Question answer not found"
         '403':
           description: "Forbidden, user is not authorized to access this answer"
-    
+
     delete:
       summary: "Delete a question answer"
       description: "Delete a specific question answer. Only accessible to the user who owns the quiz attempt."
@@ -1059,7 +1283,7 @@ paths:
           description: "Question answer not found"
         '403':
           description: "Forbidden, user is not authorized to delete this answer"
-  
+
   /question-answers/{id}/update-answer:
     put:
       summary: "Update an existing question answer"
@@ -1094,118 +1318,86 @@ paths:
           description: "Question answer not found"
         '403':
           description: "Forbidden, user is not authorized to update this answer"
-  /forum/posts:
+  /posts:
     post:
-      summary: Create a forum post
+      summary: Create a new post
       tags:
-        - Forum
-      security:
-        - bearerAuth: []
+        - Forum Posts
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                content:
-                  type: string
-                lexvo_link:
-                  type: string
-                  format: uri
-                tags:
-                  type: array
-                  items:
-                    type: string
-              required:
-                - title
-                - content
-                - tags
+              $ref: '#/components/schemas/PostRequest'
       responses:
         '201':
-          description: Forum post created successfully
+          description: Post created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForumPost'
+                $ref: '#/components/schemas/PostResponse'
+        '401':
+          description: Unauthorized access (invalid or missing JWT token).
         '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Title, content and word are required
     get:
-      summary: Get list of forum posts
+      summary: Get all posts optionally by userId and tag
       tags:
-        - Forum
+        - Forum Posts
       parameters:
-        - name: page
+        - name: tag
           in: query
+          required: false
+          description: Filter posts by a specific tag.
           schema:
-            type: integer
-          description: Page number
-        - name: limit
+            type: string
+        - name: userId
           in: query
+          required: false
+          description: Filter posts by a specific user ID.
           schema:
-            type: integer
-          description: Number of items per page
+            type: string
       responses:
         '200':
-          description: A list of forum posts
+          description: A list of posts matching the filters.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ForumPost'
-  /forum/posts/{id}:
+                  $ref: '#/components/schemas/PostResponse'
+
+  /posts/{postId}:
     get:
-      summary: Get forum post details
+      summary: Get a post by ID
       tags:
-        - Forum
+        - Forum Posts
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
+          description: The ID of the post to retrieve.
           schema:
             type: integer
       responses:
         '200':
-          description: Forum post details retrieved successfully
+          description: Post details retrieved successfully.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  post:
-                    $ref: '#/components/schemas/ForumPost'
-                  replies:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ForumReply'
-                  suggestions:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ForumPost'
+                $ref: '#/components/schemas/PostResponse'
         '404':
-          description: Forum post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /forum/posts/{id}/replies:
-    post:
-      summary: Reply to a forum post
+          description: Post not found.
+
+    put:
+      summary: Update a post by ID
       tags:
-        - Forum
-      security:
-        - bearerAuth: []
+        - Forum Posts
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
+          description: The ID of the post to update.
           schema:
             type: integer
       requestBody:
@@ -1213,74 +1405,308 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                content:
-                  type: string
-              required:
-                - content
+              $ref: '#/components/schemas/PostRequest'
+      responses:
+        '200':
+          description: Post updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '403':
+          description: Access denied (user is not the owner of the post).
+        '404':
+          description: Post not found.
+
+    delete:
+      summary: Delete a post by ID
+      tags:
+        - Forum Posts
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The ID of the post to delete.
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Post deleted successfully.
+        '403':
+          description: Access denied (user is not the owner of the post).
+        '404':
+          description: Post not found.
+  /posts/{postId}/upvote:
+    post:
+      summary: Upvote a post
+      tags:
+        - Forum Post Upvotes
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The ID of the post to upvote.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Upvote successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpvoteResponse'
+        '400':
+          description: Bad request (e.g., post not found, already upvoted).
+        '401':
+          description: Unauthorized access (invalid or missing JWT token).
+    delete:
+      summary: Remove an upvote from a post
+      tags:
+        - Forum Post Upvotes
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The ID of the post to remove upvote from.
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Upvote successfully removed.
+        '400':
+          description: Bad request (e.g., upvote not found).
+        '401':
+          description: Unauthorized access (invalid or missing JWT token).
+
+  /posts/{postId}/upvotes:
+    get:
+      summary: Get all upvotes for a post optionally by userId
+      tags:
+        - Forum Post Upvotes
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The ID of the post to retrieve upvotes for.
+          schema:
+            type: integer
+        - name: userId
+          in: query
+          required: false
+          description: Filter upvotes by a specific user.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of upvotes for the post.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UpvoteResponse'
+
+  /posts/upvotes:
+    get:
+      summary: Get all upvotes optionally by userId and postId
+      tags:
+        - Forum Post Upvotes
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          description: Filter upvotes by a specific user.
+          schema:
+            type: integer
+        - name: postId
+          in: query
+          required: false
+          description: Filter upvotes by a specific post.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of upvotes matching the filters.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UpvoteResponse'
+  /posts/upvotes/{upvoteId}:
+    get:
+      summary: Get a specific upvote by ID
+      tags:
+        - Forum Post Upvotes
+      parameters:
+        - name: upvoteId
+          in: path
+          required: true
+          description: The ID of the upvote to retrieve.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Upvote details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpvoteResponse'
+        '404':
+          description: Upvote not found.
+  /posts/{postId}/replies:
+    post:
+      summary: Create a reply to a specific post
+      tags:
+        - Forum Post Replies
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The ID of the post to which the reply belongs.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplyRequest'
       responses:
         '201':
-          description: Reply added successfully
+          description: Reply created successfully.
+          headers:
+            Location:
+              description: URI of the created reply.
+              schema:
+                type: string
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForumReply'
+                $ref: '#/components/schemas/ReplyResponse'
         '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Invalid request (e.g., missing or empty content).
+        '401':
+          description: Unauthorized access (invalid or missing JWT token).
         '404':
-          description: Forum post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /forum/posts/{id}/upvote:
-    post:
-      summary: Upvote a forum post
+          description: Post not found.
+
+    get:
+      summary: Get all replies for a specific post
       tags:
-        - Forum
-      security:
-        - bearerAuth: []
+        - Forum Post Replies
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
+          description: The ID of the post for which replies are retrieved.
           schema:
             type: integer
       responses:
         '200':
-          description: Post upvoted successfully
-        '404':
-          description: Forum post not found
+          description: A list of replies for the specified post.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReplyResponse'
+        '404':
+          description: Post not found.
+
+  /posts/replies:
+    get:
+      summary: Get replies optionally by user
+      tags:
+        - Forum Post Replies
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          description: The ID of the user whose replies are retrieved. If not provided, retrieves all replies.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of replies by the specified user or all replies if no user ID is provided.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReplyResponse'
+
+  /posts/replies/{replyId}:
+    get:
+      summary: Get a specific reply by ID
+      tags:
+        - Forum Post Replies
+      parameters:
+        - name: replyId
+          in: path
+          required: true
+          description: The ID of the reply to retrieve.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reply details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplyResponse'
+        '404':
+          description: Reply not found.
+
+    put:
+      summary: Update a specific reply by ID
+      tags:
+        - Forum Post Replies
+      parameters:
+        - name: replyId
+          in: path
+          required: true
+          description: The ID of the reply to update.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplyRequest'
+      responses:
+        '200':
+          description: Reply updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplyResponse'
+        '400':
+          description: Invalid request (e.g., missing or empty content).
+        '403':
+          description: Access denied (user is not authorized to update the reply).
+        '404':
+          description: Reply not found.
+
     delete:
-      summary: Remove upvote from a forum post
+      summary: Delete a specific reply by ID
       tags:
-        - Forum
-      security:
-        - bearerAuth: []
+        - Forum Post Replies
       parameters:
-        - name: id
+        - name: replyId
           in: path
           required: true
+          description: The ID of the reply to delete.
           schema:
             type: integer
       responses:
-        '200':
-          description: Post downvoted successfully
+        '204':
+          description: Reply deleted successfully.
+        '403':
+          description: Access denied (user is not authorized to delete the reply).
         '404':
-          description: Forum post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Reply not found.
   /search:
     get:
       summary: Search forum posts
@@ -1321,5 +1747,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /file/upload:
+    post:
+      tags:
+        - File
+      summary: Upload a file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
 security:
   - bearerAuth: []
