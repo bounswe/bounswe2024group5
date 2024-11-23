@@ -79,7 +79,6 @@ CREATE TABLE IF NOT EXISTS forum_posts (
     user_id INT NOT NULL,
     title VARCHAR(255),
     content TEXT,
-    wordnet_id VARCHAR(255),
     upvote INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -136,7 +135,7 @@ CREATE TABLE IF NOT EXISTS upvoted_forum_posts (
 CREATE TABLE IF NOT EXISTS post_tags (
     id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL,
-    english_id bigint(20),
+    english_id int,
     FOREIGN KEY (post_id) REFERENCES forum_posts(id) ON DELETE CASCADE,
     FOREIGN KEY (english_id) REFERENCES english(id) ON DELETE CASCADE
 );

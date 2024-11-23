@@ -6,9 +6,9 @@ import lombok.Data;
 @Data
 public class ReplyResponse {
     private Long id;
-    private String content;
+    private String username;
     private Long postId;
-    private Long userId;
+    private String content;
     private String createdAt;
     private String updatedAt;
 
@@ -16,7 +16,7 @@ public class ReplyResponse {
         this.id = reply.getId();
         this.content = reply.getContent();
         this.postId = reply.getPost().getId();
-        this.userId = reply.getUser().getId();
+        this.username = reply.getUser().getUsername();
         this.createdAt = reply.getCreatedAt().toString();
         this.updatedAt = reply.getUpdatedAt().toString();
     }

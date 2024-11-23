@@ -37,9 +37,9 @@ public class PostController {
     }
 
     @GetMapping
-    ResponseEntity<List<PostResponse>> getAllPosts(@RequestParam(required = false) Optional<String> word,
+    ResponseEntity<List<PostResponse>> getAllPosts(@RequestParam(required = false) Optional<String> tag,
                                                    @RequestParam(required = false) Optional<String> userId){
-        return ResponseEntity.ok(postService.getAllPosts(word, userId));
+        return ResponseEntity.ok(postService.getAllPosts(tag, userId));
     }
 
     @GetMapping("/{postId}")

@@ -14,6 +14,7 @@ import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,7 +56,7 @@ public class PostService {
 
     // they can set tags twice
     private boolean setPostTags(Post post, List<String> tags){
-        List<PostTag> postTags = List.of();
+        ArrayList<PostTag> postTags = new java.util.ArrayList<>(List.of());
         for(String tag: tags){
             if(!englishRepository.existsByWord(tag))
                 return false;
@@ -92,8 +93,10 @@ public class PostService {
         Post post = postRequest.toPost();
         post.setUser(user);
         postRepository.save(post);
-        if(!setPostTags(post, postRequest.getTags()))
+        if(!setPostTags(post, postRequest.getTags())){
+            postRepository.delete(post);
             throw new InvalidRequestException("Invalid tag");
+        }
         return mapToPostResponse(post);
     }
 

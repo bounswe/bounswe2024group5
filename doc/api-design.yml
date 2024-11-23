@@ -302,9 +302,11 @@ components:
         content:
           type: string
           example: "This is a sample post content."
-        word:
-          type: string
-          example: "fast"
+        tags:
+          type: array
+          items:
+            type: string
+            example: "fast"
     PostResponse:
       type: object
       properties:
@@ -316,8 +318,11 @@ components:
           type: string
         content:
           type: string
-        word:
-          type: string
+        tags:
+          type: array
+          items:
+            type: string
+            example: "fast"
         noUpvote:
           type: integer
         noReplies:
@@ -366,9 +371,9 @@ components:
         postId:
           type: integer
           description: The ID of the post the reply belongs to.
-        userId:
-          type: integer
-          description: The ID of the user who created the reply.
+        username:
+          type: string
+          description: The name of the user who created the reply.
         content:
           type: string
           description: Content of the reply.
@@ -1204,14 +1209,14 @@ paths:
         '400':
           description: Title, content and word are required
     get:
-      summary: Get all posts optionally by userId and word
+      summary: Get all posts optionally by userId and tag
       tags:
         - Forum Posts
       parameters:
-        - name: word
+        - name: tag
           in: query
           required: false
-          description: Filter posts by a specific word.
+          description: Filter posts by a specific tag.
           schema:
             type: string
         - name: userId
