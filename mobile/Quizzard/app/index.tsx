@@ -11,6 +11,8 @@ import QuizSolvingScreen from "../screens/QuizSolvingScreen";
 import QuestionDetailScreen from "../screens/QuestionDetailScreen";
 import SearchWordsScreen from "../screens/SearchWordsScreen";
 import CreateQuestionScreen from "../screens/CreateQuestionScreen";
+import ProfileScreen from "../screens/ProfileScreen";
+import ProfileSettingsScreen from "../screens/ProfileSettingsScreen";
 
 import { AuthProvider } from "../screens/AuthProvider";
 
@@ -25,6 +27,8 @@ export type RootStackParamList = {
   Forum: undefined;
   QuizCreation: undefined;
   QuizSolving: undefined;
+  Profile: undefined;
+  ProfileSettings: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -75,6 +79,16 @@ function MyStack() {
       <Stack.Screen
         name="CreateQuestion"
         component={CreateQuestionScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ProfileSettings"
+        component={ProfileSettingsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

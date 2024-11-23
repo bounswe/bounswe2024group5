@@ -38,16 +38,24 @@ export type Quiz = {
     difficulty: string;    // a1, a2, b1, b2, c1, c2
     questions: Question[];
     likes: number;
+    createdAt?: string;
+    updatedAt?: string;
 }
 export type Question = {
     id: number;
     quizId: number;
-    questionType: number;
     word: string;
-    correctAnswer: string;
+    questionType: QuestionType;
+    options: string[];
+    correctAnswer: string;      // 'A', 'B', 'C' or 'D'
     wrongAnswers: string[];
     difficulty: number;         // elo
 }
+
+export type QuestionType =
+  | "english_to_turkish"
+  | "turkish_to_english"
+  | "english_to_sense";
 
 // Forum types:
 export type ForumPost = {

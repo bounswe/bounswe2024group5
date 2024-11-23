@@ -55,7 +55,7 @@ export const CreateaPostComponent = ({ close } : { close: () => void }) => {
         await createPost({
             title: title,
             content: content,
-            word: tags[0]
+            tags: tags
         })
 
         close();

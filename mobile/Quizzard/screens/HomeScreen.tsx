@@ -1,4 +1,3 @@
-// HomeScreen.tsx
 import React, { useState, useEffect } from "react";
 import {
   Text,
@@ -94,7 +93,7 @@ const HomePage = ({ navigation }) => {
   const navigateToMockQuiz = (quiz, questions) => {
     navigation.navigate("QuizSolving", { quiz, questions });
   };
-  // do noth
+
   const renderOtherQuizzes = ({ item }: { item: Quiz }) => (
     <View style={styles.quizWrapper}>
       <QuizViewComponent
@@ -117,66 +116,71 @@ const HomePage = ({ navigation }) => {
 
   return (
     <BaseLayout navigation={navigation}>
-      {/* Quizzes For You Section */}
-      <View style={styles.quizzesForYouHeader}>
-        <Text style={styles.sectionTitle}>Quizzes For You</Text>
-        <TouchableOpacity
-          style={styles.addQuizButton}
-          onPress={navigateToQuizCreation}
-        >
-          <Text style={styles.addQuizButtonText}>+ Add Quiz</Text>
-        </TouchableOpacity>
-      </View>
+      <View style={{ flex: 1 }}>
+        {/* Quizzes For You Section */}
+        <View style={styles.quizzesForYouHeader}>
+          <Text style={styles.sectionTitle}>Quizzes For You</Text>
+          <TouchableOpacity
+            style={styles.addQuizButton}
+            onPress={navigateToQuizCreation}
+          >
+            <Text style={styles.addQuizButtonText}>Create a quiz</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Horizontally Scrollable Quizzes For You */}
-      <View style={styles.quizSection}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.quizScroll}
-        >
-          {quizzesForYou.length > 0 ? (
-            quizzesForYou.map((quiz) => (
-              <QuizViewComponent
-                key={quiz.id}
-                quiz={quiz}
-                onPress={() => navigateToMockQuiz(quiz, quiz.questions)}
-              />
-            ))
+        {/* Horizontally Scrollable Quizzes For You */}
+        <View style={styles.quizSection}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.quizScroll}
+          >
+            {quizzesForYou.length > 0 ? (
+              quizzesForYou.map((quiz) => (
+                <QuizViewComponent
+                  key={quiz.id}
+                  quiz={quiz}
+                  onPress={() => navigateToMockQuiz(quiz, quiz.questions)}
+                />
+              ))
+            ) : (
+              <Text style={styles.noQuizzesText}>
+                No quizzes available for you.
+              </Text>
+            )}
+          </ScrollView>
+        </View>
+
+        {/* Other Quizzes Header with Dropdown */}
+        <View style={styles.otherQuizzesHeader}>
+          <Text style={styles.sectionTitle}>Other Quizzes</Text>
+          <View style={styles.dropdownContainer}>
+            <DifficultyLevelDropdown
+              selectedValue={difficulty}
+              onValueChange={(value) => setDifficulty(value)}
+            />
+          </View>
+        </View>
+
+        {/* Other Quizzes Section */}
+        <View style={[styles.otherQuizzesContainer, { flex: 1 }]}>
+          <View style={styles.sectionDivider} />
+          {otherQuizzes.length > 0 ? (
+            <FlatList
+              data={otherQuizzes}
+              renderItem={renderOtherQuizzes}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={2}
+              contentContainerStyle={[styles.quizGrid, { paddingBottom: 100 }]}
+              columnWrapperStyle={styles.columnWrapper}
+              style={{ flex: 1 }}
+            />
           ) : (
             <Text style={styles.noQuizzesText}>
-              No quizzes available for you.
+              No other quizzes available.
             </Text>
           )}
-        </ScrollView>
-      </View>
-
-      {/* Other Quizzes Header with Dropdown */}
-      <View style={styles.otherQuizzesHeader}>
-        <Text style={styles.sectionTitle}>Other Quizzes</Text>
-        <View style={styles.dropdownContainer}>
-          <DifficultyLevelDropdown
-            selectedValue={difficulty}
-            onValueChange={(value) => setDifficulty(value)}
-          />
         </View>
-      </View>
-
-      {/* Other Quizzes Section */}
-      <View style={styles.otherQuizzesContainer}>
-        <View style={styles.sectionDivider} />
-        {otherQuizzes.length > 0 ? (
-          <FlatList
-            data={otherQuizzes}
-            renderItem={renderOtherQuizzes}
-            keyExtractor={(item) => item.id.toString()} // Assuming each quiz has a unique 'id'
-            numColumns={2} // To show two items per row
-            contentContainerStyle={styles.quizGrid}
-            columnWrapperStyle={styles.columnWrapper}
-          />
-        ) : (
-          <Text style={styles.noQuizzesText}>No other quizzes available.</Text>
-        )}
       </View>
     </BaseLayout>
   );
@@ -188,6 +192,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
+    marginTop: 10,
     paddingLeft: 15,
     paddingRight: 15,
     alignSelf: "stretch",
@@ -209,9 +214,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
+    fontSize: 12,
   },
   quizSection: {
-    height: 240, // Adjusted for better visibility
+    height: 240,
   },
   quizScroll: {
     paddingLeft: 15,
@@ -228,8 +234,6 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     width: "32%",
-    // Adjusted styles for better appearance
-    // Removed border styles as they are handled in DifficultyLevelDropdown
   },
   sectionDivider: {
     borderBottomWidth: 1,
@@ -239,7 +243,6 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   otherQuizzesContainer: {
-    flexGrow: 1,
     paddingHorizontal: 15,
     width: "100%",
   },
@@ -253,9 +256,6 @@ const styles = StyleSheet.create({
   quizWrapper: {
     flex: 1,
     padding: 10,
-  },
-  list: {
-    paddingBottom: 20,
   },
   loadingContainer: {
     flex: 1,

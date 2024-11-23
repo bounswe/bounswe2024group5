@@ -6,7 +6,7 @@ import { ForumPost } from "../../types/forum-post";
 type PostPayload = {
     title: string,
     content: string,
-    word: string
+    tags: string[]
 }
 
 export const useCreatePost = () => {
@@ -26,7 +26,7 @@ export const useCreatePost = () => {
 			});
 
 			if (!response.ok) {
-				throw new Error('Failed to create quiz');
+				throw new Error('Failed to create post');
 			}
 
 			return response.json();

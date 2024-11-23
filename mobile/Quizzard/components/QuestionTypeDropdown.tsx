@@ -4,12 +4,12 @@ import React from 'react';
 import BaseDropdown from './BaseDropdown';
 
 const languageData = [
-  { label: 'Eng -> Tr', value: 'eng-tr' },
-  { label: 'Tr -> Eng', value: 'tr-eng' },
-  { label: 'Meaning', value: 'meaning' },
+  { label: 'Eng -> Tr', value: 'english_to_turkish' },
+  { label: 'Tr -> Eng', value: 'turkish_to_english' },
+  { label: 'Meaning', value: 'english_to_sense' },
 ];
 
-const LanguageTypeDropdown = () => {
+const LanguageTypeDropdown = ({selectedValue, onValueChange}) => {
 
   const customStyles = {
     dropdown: {
@@ -17,7 +17,11 @@ const LanguageTypeDropdown = () => {
     },
   };
 
-  return <BaseDropdown data={languageData} placeholder="Select type" styleOverrides={customStyles}/>;
+  return <BaseDropdown data={languageData} 
+  selectedValue={selectedValue}
+  onValueChange={onValueChange}
+  placeholder="Select type" 
+  styleOverrides={customStyles}/>;
 };
 
 export default LanguageTypeDropdown;

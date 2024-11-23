@@ -3,7 +3,8 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const QuizViewComponent = ({ quiz, onPress }) => {
+const QuizViewComponent = ({ quiz, onPress, onEdit, onDelete, showActions = false }) => {
+
   return (
     <View style={styles.quizContainer}>
       <TouchableOpacity
@@ -32,6 +33,17 @@ const QuizViewComponent = ({ quiz, onPress }) => {
           </View>
         </View>
       </TouchableOpacity>
+
+      {showActions && (
+        <View style={styles.actionButtons}>
+          <TouchableOpacity style={styles.editButton} onPress={onEdit}>
+            <Text style={styles.editbuttonText}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
+            <Text style={styles.deletebuttonText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -41,14 +53,14 @@ const styles = StyleSheet.create({
     width: 140,
     height: 220,
     marginRight: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#f3e8ff",
     borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
-    overflow: "hidden",
+    overflow: "visible",
     borderWidth: 0.5,
     borderColor: "#ccc",
   },
@@ -68,7 +80,7 @@ const styles = StyleSheet.create({
   quizTitle: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#333",
+    color: "#6b21a8",
     marginBottom: 5,
   },
   quizQuestions: {
@@ -94,6 +106,51 @@ const styles = StyleSheet.create({
     marginLeft: 3,
     fontSize: 14,
     color: "#888",
+  },
+  actionButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 4,
+    paddingHorizontal: 4,
+  },
+  editButton: {
+    backgroundColor: "#f3e8ff",
+    paddingVertical: 6,
+    borderRadius: 4,  // 8
+    flexShrink: 0,
+    width: "48%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 0.5,
+    borderColor: "#ccc",
+  },
+  deleteButton: {
+    backgroundColor: "#f3e8ff",
+    paddingVertical: 6,
+    borderRadius: 4,
+    width: "48%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 0.5,
+    borderColor: "#ccc",
+  },
+  editbuttonText: {
+    color: "#6a0dad",
+    fontWeight: "bold",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  deletebuttonText: {
+    color: "#e13528",
+    fontWeight: "bold",
+    fontSize: 14,
+    textAlign: "center",
   },
 });
 
