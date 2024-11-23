@@ -78,6 +78,65 @@ components:
       required:
         - username_or_email
         - password
+    ProfileRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The user's updated name.
+        email:
+          type: string
+          format: email
+          description: The user's updated email address.
+        profilePicture:
+          type: string
+          description: URL of the user's updated profile picture.
+      example:
+        name: John Doe
+        email: johndoe@example.com
+        profilePicture: "https://example.com/images/profile.jpg"
+
+    ProfileResponse:
+      type: object
+      properties:
+        username:
+          type: string
+          description: The username of the user.
+        email:
+          type: string
+          format: email
+          description: The email address of the user.
+        name:
+          type: string
+          description: The full name of the user.
+        profilePicture:
+          type: string
+          description: URL of the user's profile picture.
+        score:
+          type: number
+          format: float
+          description: The user's total score.
+        englishProficiency:
+          type: string
+          description: The user's English proficiency level, based on their score.
+          enum:
+            - A1
+            - A2
+            - B1
+            - B2
+            - C1
+            - C2
+        noCreatedQuizzes:
+          type: integer
+          description: The number of quizzes created by the user.
+      example:
+        username: johndoe
+        email: johndoe@example.com
+        name: John Doe
+        profilePicture: "https://example.com/images/profile.jpg"
+        score: 1500.0
+        englishProficiency: B1
+        noCreatedQuizzes: 5
     Quiz:
       type: object
       properties:
@@ -519,6 +578,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /profile/me:
+    get:
+      summary: Get the authenticated user's profile
+      tags:
+        - Profile
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token for user authentication.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+    put:
+      summary: Update the authenticated user's profile
+      tags:
+        - Profile
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token for user authentication.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '400':
+          description: Invalid input data.
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+
+  /profile/{username}:
+    get:
+      summary: Get a user's profile by username
+      tags:
+        - Profile
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: The username of the user whose profile is being requested.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '404':
+          description: User not found.
   /autocomplete:
     get:
       summary: "Returns word auto complete suggestions"
