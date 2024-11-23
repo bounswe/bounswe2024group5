@@ -26,4 +26,72 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "WHERE e.word = :word AND u.username = :username")
     List<Post> findAllByTagWordAndUsername(@Param("word") String word, @Param("username") String username);
 
+    @Query(value = 
+        "SELECT fp.* " +
+        "FROM ( " +
+        "    SELECT post_id, query_order, max_category_id " +
+        "    FROM ( " +
+        "        SELECT  " +
+        "            post_id,  " +
+        "            1 AS query_order,  " +
+        "            NULL AS max_category_id " +
+        "        FROM post_tags " +
+        "        WHERE english_id IN ( " +
+        "            SELECT DISTINCT english_id " +
+        "            FROM post_tags " +
+        "            WHERE post_id = :postId " +
+        "        ) " +
+        "        AND post_id != :postId " +
+        "        UNION ALL " +
+        "        SELECT  " +
+        "            post_id,  " +
+        "            2 AS query_order,  " +
+        "            NULL AS max_category_id " +
+        "        FROM post_tags " +
+        "        WHERE english_id IN ( " +
+        "            SELECT DISTINCT english_id " +
+        "            FROM word_to_sense " +
+        "            WHERE sense_id IN ( " +
+        "                SELECT DISTINCT sense_id " +
+        "                FROM word_to_sense " +
+        "                WHERE english_id IN ( " +
+        "                    SELECT DISTINCT english_id " +
+        "                    FROM post_tags " +
+        "                    WHERE post_id = :postId " +
+        "                ) " +
+        "            ) " +
+        "        ) " +
+        "        AND post_id != :postId " +
+        "        UNION ALL " +
+        "        SELECT  " +
+        "            post_tags.post_id,  " +
+        "            3 AS query_order,  " +
+        "            MAX(t1.category_id) AS max_category_id " +
+        "        FROM  " +
+        "            translate t1 " +
+        "        LEFT JOIN  " +
+        "            translate t2 ON t1.category_id = t2.category_id " +
+        "        RIGHT JOIN  " +
+        "            post_tags ON t2.english_id = post_tags.english_id " +
+        "        WHERE  " +
+        "            t1.english_id IN ( " +
+        "                SELECT english_id  " +
+        "                FROM post_tags  " +
+        "                WHERE post_id = :postId " +
+        "            ) " +
+        "        AND post_tags.post_id != :postId " +
+        "        GROUP BY  " +
+        "            post_tags.post_id " +
+        "    ) combined " +
+        "    ORDER BY  " +
+        "        query_order ASC, " +
+        "        max_category_id DESC, " +
+        "        post_id DESC " +
+        ") AS related_posts " +
+        "LEFT JOIN forum_posts fp " +
+        "ON related_posts.post_id = fp.id " +
+        "ORDER BY related_posts.query_order ASC, related_posts.max_category_id DESC, related_posts.post_id DESC " +
+        "LIMIT 5", nativeQuery = true)
+    List<Post> findRelatedPosts(@Param("postId") Long postId);
+
 }

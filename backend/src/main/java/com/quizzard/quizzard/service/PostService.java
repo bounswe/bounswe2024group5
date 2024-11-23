@@ -150,4 +150,9 @@ public class PostService {
         postRepository.save(post);
         return mapToPostResponse(post);
     }
+
+    public List<PostResponse> getRelatedPosts(Long postId){
+        return mapToPostResponse(postRepository.findRelatedPosts(postId));
+    }
+    
 }

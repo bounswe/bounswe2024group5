@@ -117,6 +117,8 @@ public class PostController {
         return ResponseEntity.ok(replyService.updateReply(jwtToken, replyId, replyRequest));
     }
 
-
-
+    @GetMapping("/{postId}/related")
+    ResponseEntity<?> getRelatedPosts(@PathVariable Long postId){
+        return ResponseEntity.ok(postService.getRelatedPosts(postId));
+    }
 }
