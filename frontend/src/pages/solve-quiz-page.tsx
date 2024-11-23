@@ -46,6 +46,7 @@ export const SolveQuizPage = () => {
       quizId: quizIdAsNumber,
       isCompleted: false,
     });
+
   const { mutateAsync: updateQuizAttempt } = useUpdateQuizAttempt(
     quizAttempt?.id ?? -1
   );
@@ -108,20 +109,23 @@ export const SolveQuizPage = () => {
     ) {
       const progressedAnswers = Array(quiz.questions.length).fill(undefined);
 
-      currentAttempt.forEach((attempt) => {
+      // Reset score before calculating
+      setScore(0);
+
+      // Use reducer to calculate score instead of mutating state in loop
+      const calculatedScore = currentAttempt.reduce((total, attempt) => {
         const questionIndex = quiz.questions.findIndex(
           (q) => q.id === attempt.questionId
         );
 
         if (questionIndex !== -1) {
           progressedAnswers[questionIndex] = attempt.answer;
-
-          if (attempt.isCorrect) {
-            setScore((prev) => prev + 1);
-          }
+          return attempt.isCorrect ? total + 1 : total;
         }
-      });
+        return total;
+      }, 0);
 
+      setScore(calculatedScore);
       setAnswers(progressedAnswers);
 
       const firstUnansweredIndex = progressedAnswers.findIndex(
