@@ -9,7 +9,6 @@ import com.quizzard.quizzard.model.response.QuizAttemptResponse;
 import com.quizzard.quizzard.repository.QuestionAnswerRepository;
 import com.quizzard.quizzard.repository.QuizAttemptRepository;
 import com.quizzard.quizzard.repository.QuizRepository;
-import com.quizzard.quizzard.repository.UserRepository;
 import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -109,7 +108,7 @@ public class QuizAttemptService {
                 throw new RuntimeException("Quiz attempt is already completed.");
             else if ((boolean) quizAttemptUpdateRequest.get("completed")) {
                 //quizAttempt.setScore(quizAttempt.getQuiz().getQuestions().size());
-                calculateQuestionPoint(jwtToken, id);
+                calculateQuestionPoint(user, id);
                 quizAttempt.setCompletedAt(new Date());
                 quizAttempt.setIsCompleted(true);
                 quizAttemptRepository.save(quizAttempt);
@@ -122,10 +121,7 @@ public class QuizAttemptService {
     }
 
 
-    public void calculateQuestionPoint(String jwtToken, Long quizAttemptId) {
-        String solverUsername = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
-        User user = userService.getOneUserByUsername(solverUsername);
-
+    public void calculateQuestionPoint(User user, Long quizAttemptId) {
         QuizAttempt quizAttempt = quizAttemptRepository.findById(quizAttemptId)
                 .orElseThrow(() -> new RuntimeException("Quiz attempt not found with id: " + quizAttemptId));
 
@@ -159,7 +155,7 @@ public class QuizAttemptService {
                     multiplier = Math.pow(penaltyMultiplier, steps); // Lower decrease for wrong answer
                 }
             }
-            double wordScoreMultiplier;
+            /* double wordScoreMultiplier;
             if (wordScore < 400) {
                 wordScoreMultiplier = 1;
             } else if (wordScore < 1000) {
@@ -174,6 +170,8 @@ public class QuizAttemptService {
                 wordScoreMultiplier = 0.5;
             }
             totalScoreOfQuiz += (int) ((wordScore * wordScoreMultiplier * multiplier) / 1000);
+             */
+            totalScoreOfQuiz += (int) ((wordScore * multiplier) / 1000);
 
 
         }
