@@ -473,6 +473,39 @@ components:
           type: string
           format: date-time
           example: "2024-11-23T12:45:30"
+    FavoriteQuestionRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        questionId:
+          type: integer
+          example: 1
+          description: The ID of the question to add to favorites.
+      required:
+        - questionId
+
+    FavoriteQuestionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ID of the favorite question.
+        questionId:
+          type: integer
+          description: The ID of the question in favorites.
+        userId:
+          type: integer
+          description: The ID of the user who added the question to favorites.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the question was added to favorites.
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the favorite question was last updated.
 paths:
   /auth/register:
     post:
@@ -1910,5 +1943,113 @@ paths:
           description: Unauthorized - Missing or invalid JWT token.
         '404':
           description: Not Found - Favorite quiz with the given ID not found.
+  /favorite-question:
+    post:
+      summary: Add a question to favorites
+      description: Adds a question to the user's favorites.
+      tags:
+        - Favorite Questions
+      operationId: addFavoriteQuestion
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FavoriteQuestionRequest"
+      responses:
+        201:
+          description: Successfully added the question to favorites.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteQuestionResponse"
+        400:
+          description: The question is already in favorites.
+        404:
+          description: Question not found.
+    get:
+      summary: Get all favorite questions
+      description: Retrieves all questions the user has added to favorites.
+      tags:
+        - Favorite Questions
+      operationId: getAllFavoriteQuestions
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+      responses:
+        200:
+          description: Successfully retrieved favorite questions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FavoriteQuestionResponse"
+
+  /favorite-question/{id}:
+    get:
+      summary: Get a specific favorite question
+      description: Retrieves a specific favorite question by ID.
+      tags:
+        - Favorite Questions
+      operationId: getFavoriteQuestion
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the favorite question to retrieve.
+      responses:
+        200:
+          description: Successfully retrieved the favorite question.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteQuestionResponse"
+        404:
+          description: Favorite question not found.
+
+    delete:
+      summary: Remove a question from favorites
+      description: Deletes a question from the user's favorites by ID.
+      tags:
+        - Favorite Questions
+      operationId: deleteFavoriteQuestion
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the favorite question to delete.
+      responses:
+        204:
+          description: Successfully deleted the favorite question.
+        404:
+          description: Favorite question not found.
 security:
   - bearerAuth: []
