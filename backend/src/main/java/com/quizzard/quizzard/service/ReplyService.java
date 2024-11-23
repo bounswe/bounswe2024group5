@@ -9,6 +9,7 @@ import com.quizzard.quizzard.model.request.ReplyRequest;
 import com.quizzard.quizzard.model.response.ReplyResponse;
 import com.quizzard.quizzard.repository.PostRepository;
 import com.quizzard.quizzard.repository.ReplyRepository;
+import com.quizzard.quizzard.repository.UserRepository;
 import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,8 @@ public class ReplyService {
 
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private UserRepository userRepository;
 
     private List<ReplyResponse> mapToReplyResponse(List<Reply> replies){
         return replies.stream().map(ReplyResponse::new).toList();
@@ -56,11 +59,12 @@ public class ReplyService {
         return mapToReplyResponse(replyRepository.findByPostId(postId));
     }
 
-    public List<ReplyResponse> getRepliesByUserId(Optional<Long> userId) {
-        if(userId.isEmpty())
+    public List<ReplyResponse> getRepliesByUsername(Optional<String> username) {
+        if(username.isEmpty())
             return mapToReplyResponse(replyRepository.findAll());
-        else
-            return mapToReplyResponse(replyRepository.findByUserId(userId.get()));
+        if(!userRepository.existsByUsername(username.get()))
+            throw new ResourceNotFoundException("User not found");
+        return mapToReplyResponse(replyRepository.findByUserId(userService.getOneUserByUsername(username.get()).getId()));
     }
 
     public ReplyResponse getReplyById(Long replyId) {

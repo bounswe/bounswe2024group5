@@ -10,7 +10,10 @@ import java.util.List;
 
 @Repository
 public interface QuestionAnswerRepository extends JpaRepository<QuestionAnswer, Long> {
-    List<QuestionAnswer> findAllByQuizAttemptId(Long quizAttemptId);
+
+
+
+
     QuestionAnswer findByQuizAttemptIdAndQuestionId(Long quizAttemptId, Long questionId);
     boolean existsByQuizAttemptIdAndQuestionId(Long quizAttemptId, Long questionId);
 
@@ -46,5 +49,10 @@ public interface QuestionAnswerRepository extends JpaRepository<QuestionAnswer, 
     """)
     List<QuestionAnswer> findAllByQuizAttemptIdAndQuestionIdAndUserId(@Param("quizAttemptId") Long quizAttemptId, @Param("questionId") Long questionId, @Param("userId") Long userId);
 
-
+    // Fetch all question answers for a specific quiz attempt
+    @Query("""
+        SELECT qa FROM QuestionAnswer qa
+        WHERE qa.quizAttempt.id = :quizAttemptId
+    """)
+    List<QuestionAnswer> findAllByQuizAttemptId(Long quizAttemptId);
 }

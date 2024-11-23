@@ -22,6 +22,30 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    public void updateUserPoint(String username, int point) {
+        User user = userRepository.findByUsername(username);
+        user.setPoints(point);
+        userRepository.save(user);
+    }
+
+    public void checkUserEnglishProficieny(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user.getPoints() < 400) {
+            user.setEnglishProficiency("A1");
+        } else if (user.getPoints() < 1000) {
+            user.setEnglishProficiency("A2");
+        } else if (user.getPoints() < 1800) {
+            user.setEnglishProficiency("B1");
+        } else if (user.getPoints() < 2600) {
+            user.setEnglishProficiency("B2");
+        } else if (user.getPoints() < 3300) {
+            user.setEnglishProficiency("C1");
+        } else {
+            user.setEnglishProficiency("C2");
+        }
+        userRepository.save(user);
+    }
+  
     public ProfileResponse getProfileByJwt(String jwtToken) {
         String username = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
         User user = userRepository.findByUsername(username);
