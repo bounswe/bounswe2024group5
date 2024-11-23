@@ -2,7 +2,6 @@ import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import HostContext from "../HostContext";
-import { ProfileResponse } from "../types/profile";
 
 export const SignUpPage = () => {
   const [firstName, setFirstName] = useState("");
@@ -11,8 +10,6 @@ export const SignUpPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [englishProficiency, setEnglishProficiency] =
-    useState<ProfileResponse["englishProficiency"]>("A1");
   const navigate = useNavigate();
 
   const hostURL = useContext(HostContext);
@@ -20,37 +17,39 @@ export const SignUpPage = () => {
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // TODO: Confirm password match.
+
     const requestBody = {
       username: username,
       name: firstName + lastName,
       email: email,
       password: password,
-      english_proficiency: "0",
+      english_proficiency: "0"
     };
 
     fetch(`${hostURL}/api/auth/register`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify(requestBody)
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((response) => {
-        console.log("Registration successfull.");
-        sessionStorage.setItem("token", response.token);
-        navigate("/");
-      })
-      .catch((error) => {
-        // TODO: Display error in the UI.
-        console.log("Error:");
-        console.log(error);
-      });
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((response) => {
+      console.log("Registration successfull.")
+      sessionStorage.setItem("token", response.token);
+      navigate("/");
+    })
+    .catch((error) => {
+      // TODO: Display error in the UI.
+      console.log('Error:')
+      console.log(error)
+    }) 
   };
 
   return (
@@ -118,23 +117,6 @@ export const SignUpPage = () => {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
             required
           />
-          <select
-            value={englishProficiency}
-            onChange={(e) =>
-              setEnglishProficiency(
-                e.target.value as ProfileResponse["englishProficiency"]
-              )
-            }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          >
-            <option value="A1">Beginner (A1)</option>
-            <option value="A2">Elementary (A2)</option>
-            <option value="B1">Intermediate (B1)</option>
-            <option value="B2">Upper Intermediate (B2)</option>
-            <option value="C1">Advanced (C1)</option>
-            <option value="C2">Mastery (C2)</option>
-          </select>
           <motion.button
             type="submit"
             whileHover={{ scale: 1.05 }}

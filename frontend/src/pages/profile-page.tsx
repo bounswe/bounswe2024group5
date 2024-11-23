@@ -9,15 +9,8 @@ import {
 
 import { QUIZ_DIFFICULTIES } from "../components/list-quizzes/regular-quiz-card";
 import { Tabs } from "antd";
-import { useParams } from "react-router-dom";
-import { useGetProfile } from "../hooks/api/profile/get";
-import { useUpdateProfile } from "../hooks/api/profile/update";
 
 const ProfilePage = () => {
-  const { username } = useParams<{ username?: string }>();
-  const { data: profile, error } = useGetProfile(username);
-  const { mutateAsync: updateProfile, isPending: isUpdating } =
-    useUpdateProfile();
   const user = {
     username: "JohnDoe",
     email: "john@example.com",
@@ -50,25 +43,6 @@ const ProfilePage = () => {
     ],
   };
 
-  if (error || !profile) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-500">
-          {error instanceof Error ? error.message : "Failed to load profile"}
-        </p>
-      </div>
-    );
-  }
-  const handleProfileUpdate = async (updates: {
-    name?: string;
-    email?: string;
-    profilePicture?: string;
-  }) => {
-    await updateProfile(updates);
-  };
-
-  const isOwnProfile = !username;
-
   return (
     <main className="min-h-screen px-4 py-4 bg-purple-50 rounded-3xl">
       <div className="container mx-auto">
@@ -87,57 +61,27 @@ const ProfilePage = () => {
                     className="object-cover w-full h-full rounded-full"
                   />
                 </div>
-                {isOwnProfile && (
-                  <button className="absolute flex items-center p-2 text-white bg-purple-500 rounded-full bottom-2 right-2 hover:bg-purple-600">
-                    <IconPencil size={16} />
-                  </button>
-                )}
+                <button className="absolute flex items-center p-2 text-white bg-purple-500 rounded-full bottom-2 right-2 hover:bg-purple-600">
+                  <IconPencil size={16} />
+                </button>
               </div>
 
               <div className="flex-grow">
                 <div className="flex items-center justify-between">
                   <h1 className="text-3xl font-bold text-purple-800">
-                    {profile.name}
+                    {user.username}
                   </h1>
-
-                  {isOwnProfile && (
-                    <button
-                      className="px-4 py-2 text-white transition-colors rounded-full bg-violet-500 hover:bg-violet-600"
-                      onClick={() => {
-                        // Implement edit profile modal/form
-                        handleProfileUpdate({
-                          name: "New Name",
-                          email: "new@email.com",
-                        });
-                      }}
-                      disabled={isUpdating}
-                    >
-                      {isUpdating ? "Updating..." : "Edit Profile"}
-                    </button>
-                  )}
+                  <button className="px-4 py-2 text-white transition-colors rounded-full bg-violet-500 hover:bg-violet-600">
+                    Edit Profile
+                  </button>
                 </div>
-                <p className="text-gray-600 place-self-start">
-                  {profile.email}
-                </p>
-                <p className="mt-2 text-sm text-gray-600">
-                  @{profile.username}
-                </p>
+                <p className="text-gray-600 place-self-start">{user.email}</p>
 
                 <div className="flex items-center gap-4 mt-8">
                   <div className="flex items-center gap-2">
                     <IconTrophy className="w-5 h-5 text-yellow-500" />
                     <span className="font-semibold text-purple-800">
-                      {profile.score} Points
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
-                      Level: {profile.englishProficiency}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-600">
-                      {profile.noCreatedQuizzes} Quizzes Created
+                      {user.totalPoints} Points
                     </span>
                   </div>
                 </div>
