@@ -10,14 +10,14 @@ public class UpvoteResponse {
 
     private Long id;
     private Long postId;
-    private Long userId;
+    private String username;
     private Date createdAt;
     private Date updatedAt;
 
     public UpvoteResponse(Upvote upvote) {
         this.id = upvote.getId();
         this.postId = upvote.getPost().getId();
-        this.userId = upvote.getUser().getId();
+        this.username = upvote.getUser().getUsername();
         this.createdAt = upvote.getCreatedAt();
         this.updatedAt = upvote.getUpdatedAt();
     }
