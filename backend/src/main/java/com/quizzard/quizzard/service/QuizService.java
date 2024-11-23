@@ -1,7 +1,6 @@
 package com.quizzard.quizzard.service;
 
 import com.quizzard.quizzard.model.Question;
-import com.quizzard.quizzard.model.QuestionType;
 import com.quizzard.quizzard.model.Quiz;
 import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.model.request.CreateQuizRequest;
@@ -31,6 +30,9 @@ public class QuizService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private QuestionService questionService;
+
     private List<QuestionResponse> mapQuestionsToQuestionResponses(List<Question> questions) {
         return questions.stream().map(QuestionResponse::new).toList();
     }
@@ -42,6 +44,15 @@ public class QuizService {
 
     private List<QuizResponse> mapQuizzesToQuizResponses(List<Quiz> quizzes) {
         return quizzes.stream().map(quiz -> mapQuizToQuizResponse(quiz)).toList();
+    }
+
+    private double calculateQuizDifficulty(Quiz quiz) {
+        List<Question> questions = questionRepository.findByQuizId(quiz.getId());
+        double totalDifficulty = 0;
+        for (Question question : questions) {
+            totalDifficulty += question.getDifficulty();
+        }
+        return totalDifficulty / questions.size();
     }
 
     @Transactional
@@ -58,16 +69,9 @@ public class QuizService {
         // 2. Create questions and add them to quiz
         List<QuestionRequest> questionRequests = request.getQuestions();
         for (QuestionRequest questionRequest : questionRequests) {
-            Question question = new Question();
-            question.setQuizId(quiz.getId()); // quiz_id ile ilişkilendir
-            question.setQuestionType(QuestionType.valueOf(questionRequest.getQuestionType().toString().toLowerCase()));
-            question.setWord(questionRequest.getWord());
-            question.setCorrectAnswer(questionRequest.getCorrectAnswer());
-            question.setWrongAnswer1(questionRequest.getWrongAnswers().get(0));
-            question.setWrongAnswer2(questionRequest.getWrongAnswers().get(1));
-            question.setWrongAnswer3(questionRequest.getWrongAnswers().get(2));
-            questionRepository.save(question);
+            questionService.createQuestion(questionRequest, quiz.getId());
         }
+        quiz.setDifficulty(calculateQuizDifficulty(quiz));
         return mapQuizToQuizResponse(quiz);
     }
 
@@ -84,12 +88,6 @@ public class QuizService {
         }
         return null;
     }
-
-    // Getting quizzes with specific userID
-//    public List<Quiz> getQuizzesByUserId(Long userId) {
-//        return quizRepository.findByUserId(userId);
-//    }
-
 
     // Update quiz
     public Quiz updateQuiz(Long id, Quiz updatedQuiz) {
@@ -112,32 +110,6 @@ public class QuizService {
         quizRepository.deleteById(id);
     }
 
-    public SolveQuizResponse solveQuiz(Long quizId, SolveQuizRequest request, Long userId) {
-        Optional<Quiz> quiz = quizRepository.findById(quizId);
-        if (quiz.isEmpty()) {
-            // Handle the case where the quiz doesn't exist
-            return null;
-        }
-
-        List<Question> questions = questionRepository.findByQuizId(quizId);
-        int correctAnswers = 0;
-        int totalQuestions = questions.size();
-
-        for (SolveQuizRequest.Answer answer : request.getAnswers()) {
-            for (Question question : questions) {
-                if (question.getId().equals(answer.getQuestionId())) {
-                    if (question.getCorrectAnswer().equals(answer.getSelectedAnswer())) {
-                        correctAnswers++;
-                    }
-                }
-            }
-        }
-
-        int score = correctAnswers * 100 / totalQuestions;
-        int pointsAwarded = correctAnswers * 10;
-
-        return new SolveQuizResponse(score, correctAnswers, totalQuestions, pointsAwarded);
-    }
 
 
 }

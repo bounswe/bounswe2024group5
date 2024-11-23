@@ -70,14 +70,4 @@ public class QuizController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/solve")
-    public ResponseEntity<SolveQuizResponse> solveQuiz(
-            @PathVariable Long id,
-            @RequestBody SolveQuizRequest solveQuizRequest,
-            @AuthenticationPrincipal User user) {
-        SolveQuizResponse response = quizService.solveQuiz(id, solveQuizRequest, user.getId());
-        return ResponseEntity.ok(response);
-    }
-
-
 }
