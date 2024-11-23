@@ -3,11 +3,19 @@ import { ForumPostProps } from "../../types/forum-post";
 import { IconHeart } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
 import { useLocation, useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime)
+
+const timePassed = (timeString: string) => {
+  return dayjs(timeString).fromNow()
+}
 
 export const ForumPostComponent = ({ post }: ForumPostProps) => {
 
     const [liked, setLiked] = useState<boolean>(false);
-    const [likeCount, setLikeCount] = useState<number>(post.upvote);
+    const [likeCount, setLikeCount] = useState<number>(post.noUpvote);
 
     const navigate = useNavigate()
     const currentPath = useLocation().pathname;
@@ -33,7 +41,7 @@ export const ForumPostComponent = ({ post }: ForumPostProps) => {
                 <div className="py-4 px-4">{post.content}</div>
                 <div className="px-4 py-1 pb-2 text-sm text-gray-500 flex justify-between items-center">
                     <div className="w-fit">
-                        <span>{`@${post.username} - ${post.createdAt}`}</span>
+                        <span>{`@${post.username || "quizzarduser"} - ${timePassed(post.createdAt)}`}</span>
                     </div>
                     <div className="w-fit flex items-center gap-4">
                         <div className="w-fit flex items-center gap-2" onClick={handleLikes}>
