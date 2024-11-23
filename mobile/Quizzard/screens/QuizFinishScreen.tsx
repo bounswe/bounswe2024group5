@@ -1,15 +1,21 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 
 const QuizFinishScreen = ({ route, navigation }) => {
   const { quiz, questions, selectedAnswers } = route.params;
 
-  // Calculate correct, wrong, and empty answers
+  // Calculate the results
   const results = questions.reduce(
     (acc, question, index) => {
       const selected = selectedAnswers[index];
       if (selected === undefined || selected === null) {
-        acc.empty += 1; // Answer not selected
+        acc.empty += 1; // No answer
       } else if (selected === question.correctAnswer) {
         acc.correct += 1; // Correct answer
       } else {
@@ -21,47 +27,58 @@ const QuizFinishScreen = ({ route, navigation }) => {
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Quiz Finished!</Text>
       <Text style={styles.quizTitle}>{quiz.title}</Text>
 
-      {/* Styled container for results */}
-      <View style={styles.resultsContainer}>
-        <Text style={styles.resultItem}>
-          Correct: <Text style={styles.correctText}>{results.correct}</Text>
-        </Text>
-        <Text style={styles.resultItem}>
-          Wrong: <Text style={styles.wrongText}>{results.wrong}</Text>
-        </Text>
-        <Text style={styles.resultItem}>
-          Empty: <Text style={styles.emptyText}>{results.empty}</Text>
-        </Text>
+      {/* Results Container */}
+      <View style={styles.detailsContainer}>
+        <View style={styles.detailRow}>
+          <Text style={styles.detailsLabel}>Correct:</Text>
+          <Text style={[styles.detailsValue, styles.correctText]}>
+            {results.correct}
+          </Text>
+        </View>
+        <View style={styles.separator} />
+        <View style={styles.detailRow}>
+          <Text style={styles.detailsLabel}>Wrong:</Text>
+          <Text style={[styles.detailsValue, styles.wrongText]}>
+            {results.wrong}
+          </Text>
+        </View>
+        <View style={styles.separator} />
+        <View style={styles.detailRow}>
+          <Text style={styles.detailsLabel}>Empty:</Text>
+          <Text style={[styles.detailsValue, styles.emptyText]}>
+            {results.empty}
+          </Text>
+        </View>
       </View>
 
-      {/* Button to return to the quiz description*/}
-      <TouchableOpacity
-        style={styles.homeButton}
-        onPress={() =>
-          navigation.pop(2)
-        }
-      >
-        <Text style={styles.homeButtonText}>Go to Quiz Description</Text>
-      </TouchableOpacity>
-
-      {/* Optional: Revise the answers */}
-      <TouchableOpacity
-        style={styles.retryButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.retryButtonText}>Revise Answers</Text>
-      </TouchableOpacity>
-    </View>
+      {/* Action Buttons */}
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={styles.goBackButton}
+          onPress={() =>
+            navigation.pop(2)
+          }
+        >
+          <Text style={styles.buttonText}>Quiz Description</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.startQuizButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.buttonText}>Revise Answers</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f5f5f5",
@@ -70,67 +87,90 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
+    color: "#4C1D95",
     marginBottom: 20,
-    color: "#333",
+    textAlign: "center",
   },
   quizTitle: {
     fontSize: 24,
-    marginBottom: 10,
     color: "#555",
+    marginBottom: 30,
+    textAlign: "center",
   },
-  resultText: {
-    fontSize: 20,
-    marginBottom: 20,
-    color: "#000",
-  },
-  resultsContainer: {
-    backgroundColor: "#f5f3ff", // Light blue background
-    padding: 20,
-    borderRadius: 15, // Rounded corners
-    borderColor: "#8b5c56", // Black outline
-    borderWidth: 2,
-    width: "90%",
-    alignItems: "center",
+  detailsContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 15,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 3,
     marginBottom: 30,
   },
-  resultItem: {
-    fontSize: 18,
-    marginVertical: 5,
-    color: "#000",
+  detailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  detailsLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#555",
+  },
+  detailsValue: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
   correctText: {
     color: "green",
-    fontWeight: "bold",
   },
   wrongText: {
     color: "red",
-    fontWeight: "bold",
   },
   emptyText: {
     color: "gray",
-    fontWeight: "bold",
   },
-  homeButton: {
-    backgroundColor: "#6a0dad",
+  separator: {
+    height: 1,
+    backgroundColor: "#E5E7EB",
+    marginVertical: 10,
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  goBackButton: {
+    flex: 1,
+    marginRight: 10,
+    backgroundColor: "#D1D5DB",
     paddingVertical: 15,
-    paddingHorizontal: 40,
     borderRadius: 8,
-    marginBottom: 15,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 3,
   },
-  homeButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  retryButton: {
-    backgroundColor: "#555",
+  startQuizButton: {
+    flex: 1,
+    marginLeft: 10,
+    backgroundColor: "#6B21A8",
     paddingVertical: 15,
-    paddingHorizontal: 40,
     borderRadius: 8,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 3,
   },
-  retryButtonText: {
+  buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
   },
 });
