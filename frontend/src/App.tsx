@@ -29,7 +29,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => {
   return (
-    <HostContext.Provider value="http://34.55.188.177">
+    <HostContext.Provider value="http://localhost:80">
       <Router>
         <Routes>
           <Route path="signup" element={<SignUpPage />} />
