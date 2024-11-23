@@ -430,6 +430,8 @@ paths:
     get:
       summary: "Returns word auto complete suggestions"
       description: "It returns a list that contains at most 5 words that start with prefix."
+      tags:
+        - Auto-Complete
       parameters:
         - name: "prefix"
           in: "query"
@@ -960,7 +962,6 @@ paths:
       operationId: "createQuestionAnswer"
       tags:
         - "Question Answer"
-      parameters:
       requestBody:
         description: "Request body containing the quiz attempt ID, question ID, and the answer."
         required: true
@@ -981,7 +982,7 @@ paths:
           description: "Unauthorized, invalid or missing JWT token"
         '404':
           description: "Quiz attempt or question not found"
-    
+
     get:
       summary: "Get all question answers"
       description: "Retrieve all question answers for the user, with optional filters for quiz attempt and question."
@@ -1012,7 +1013,7 @@ paths:
                   $ref: "#/components/schemas/QuestionAnswerResponse"
         '401':
           description: "Unauthorized, invalid or missing JWT token"
-  
+
   /question-answers/{id}:
     get:
       summary: "Get a specific question answer"
@@ -1038,7 +1039,7 @@ paths:
           description: "Question answer not found"
         '403':
           description: "Forbidden, user is not authorized to access this answer"
-    
+
     delete:
       summary: "Delete a question answer"
       description: "Delete a specific question answer. Only accessible to the user who owns the quiz attempt."
@@ -1059,7 +1060,7 @@ paths:
           description: "Question answer not found"
         '403':
           description: "Forbidden, user is not authorized to delete this answer"
-  
+
   /question-answers/{id}/update-answer:
     put:
       summary: "Update an existing question answer"
@@ -1321,5 +1322,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /file/upload:
+    post:
+      tags:
+        - File
+      summary: Upload a file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
 security:
   - bearerAuth: []
