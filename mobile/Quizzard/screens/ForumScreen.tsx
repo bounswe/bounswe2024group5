@@ -1,5 +1,4 @@
-// ForumScreen.tsx
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -14,6 +13,7 @@ import BaseLayout from "./BaseLayout";
 import QuestionItem from "../components/QuestionItem";
 import HostUrlContext from "../app/HostContext";
 import { useAuth } from "./AuthProvider"; // Import useAuth
+import { useFocusEffect } from "@react-navigation/native"; // Add this import
 
 const ForumScreen = ({ navigation }) => {
   const [questions, setQuestions] = useState([]);
@@ -23,54 +23,66 @@ const ForumScreen = ({ navigation }) => {
   const authContext = useAuth(); // Get the authentication context
   const token = authContext ? authContext.token : null; // Get the token if authContext is not null
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch(`${hostUrl}/api/posts`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the headers
-          },
-        });
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchPosts = async () => {
+        setIsLoading(true); // Set loading to true when fetching
+        try {
+          const response = await fetch(`${hostUrl}/api/posts`, {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the headers
+            },
+          });
 
-        console.log("Response status:", response.status);
+          console.log("Response status:", response.status);
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Data fetched:", data);
+          if (response.ok) {
+            const data = await response.json();
+            console.log("Data fetched:", data);
 
-          // Check if data is an array
-          if (Array.isArray(data)) {
-            // Map the API data to match the structure expected by QuestionItem
-            const formattedData = data.map((item) => ({
-              id: item.id,
-              title: item.title,
-              description: item.content,
-              createdAt: item.createdAt,
-              commentCount: item.commentCount || 0, // Adjust based on your API response
-            }));
-            setQuestions(formattedData);
+            // Check if data is an array
+            if (Array.isArray(data)) {
+              // Map the API data to match the structure expected by QuestionItem
+              const formattedData = data.map((item) => ({
+                id: item.id,
+                title: item.title,
+                description: item.content,
+                createdAt: new Date(item.createdAt).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+                commentCount: item.noReplies || 0, // Adjust based on your API response
+                tags: item.tags || [],
+                username: item.username || item.user?.username || "Anonymous",
+                upvotes: item.noUpvote || 0,
+              }));
+              setQuestions(formattedData);
+            } else {
+              console.error("Data is not an array:", data);
+              Alert.alert(
+                "Error",
+                "Unexpected data format received from server."
+              );
+            }
           } else {
-            console.error("Data is not an array:", data);
-            Alert.alert(
-              "Error",
-              "Unexpected data format received from server."
-            );
+            const errorData = await response.json();
+            console.error("Error response data:", errorData);
+            Alert.alert("Error", errorData.message || "Failed to fetch posts.");
           }
-        } else {
-          const errorData = await response.json();
-          console.error("Error response data:", errorData);
-          Alert.alert("Error", errorData.message || "Failed to fetch posts.");
+        } catch (error) {
+          console.error("Error fetching posts:", error);
+          Alert.alert("Error", "Failed to fetch posts. Please try again.");
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-        Alert.alert("Error", "Failed to fetch posts. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      };
 
-    fetchPosts();
-  }, [hostUrl, token]);
+      fetchPosts();
+    }, [hostUrl, token])
+  );
 
   const navigateToCreateQuestion = () => {
     navigation.navigate("CreateQuestion");
@@ -80,8 +92,18 @@ const ForumScreen = ({ navigation }) => {
     navigation.navigate("SearchWords");
   };
 
-  const navigateToQuestionDetail = (questionId, title, description) => {
-    navigation.navigate("QuestionDetail", { questionId, title, description });
+  const navigateToQuestionDetail = (
+    questionId,
+    title,
+    description,
+    username
+  ) => {
+    navigation.navigate("QuestionDetail", {
+      questionId,
+      title,
+      description,
+      username,
+    });
   };
 
   if (isLoading) {
@@ -120,7 +142,12 @@ const ForumScreen = ({ navigation }) => {
             <QuestionItem
               question={item}
               onPress={() =>
-                navigateToQuestionDetail(item.id, item.title, item.description)
+                navigateToQuestionDetail(
+                  item.id,
+                  item.title,
+                  item.description,
+                  item.username
+                )
               }
             />
           )}
