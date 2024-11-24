@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { QuizAttempt } from "../hooks/api/attempts/list";
 import { motion } from "framer-motion";
 import { OptionButton } from "../components/solve-quiz/option";
 import Confetti from "react-confetti";
@@ -9,12 +10,17 @@ import { questionTemplate } from "../utils";
 import { useLocation } from "react-router-dom";
 import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 import { Spin } from "antd";
+import { useCreateQuizAttempt } from "../hooks/api/attempts/create";
+import { useQuizAttempts } from "../hooks/api/attempts/list";
+import { useCreateQuestionAnswer } from "../hooks/api/questions-answers/answer";
+import { useQuestionAnswers } from "../hooks/api/questions-answers/list";
+import { QuizResult } from "../components/solve-quiz/quiz-result";
+import { useUpdateQuizAttempt } from "../hooks/api/attempts/update";
 export const SolveQuizPage = () => {
   const currentPath = useLocation().pathname;
 
-  const quizId = currentPath.split("/").pop();
-
-  const { data: quizzes, isLoading } = useFetchQuizzes();
+  const quizId = currentPath.split("/").pop() || "";
+  const quizIdAsNumber = Number.parseInt(quizId);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
 
@@ -30,29 +36,129 @@ export const SolveQuizPage = () => {
 
   const [answers, setAnswers] = useState<(string | undefined)[]>([]);
 
+  const { data: quizzes, isLoading } = useFetchQuizzes();
+  const [quizAttempt, setQuizAttempt] = useState<QuizAttempt | null>(null);
+
+  const { mutateAsync: createAnswer } = useCreateQuestionAnswer();
+  const { mutateAsync: createQuizAttempt } = useCreateQuizAttempt();
+  const { data: existingAttempts, isLoading: isLoadingAttempts } =
+    useQuizAttempts({
+      quizId: quizIdAsNumber,
+      isCompleted: false,
+    });
+
+  const { mutateAsync: updateQuizAttempt } = useUpdateQuizAttempt(
+    quizAttempt?.id ?? -1
+  );
+  const { data: currentAttempt } = useQuestionAnswers({
+    quizAttemptId: quizAttempt?.id ?? -1,
+  });
+
+  const quiz = quizzes?.find((q) => q.id?.toString() === quizId);
+
   useEffect(() => {
-    if (quizzes) {
-      const quiz = quizzes.find((q) => q.id === quizId);
+    const initializeQuizAttempt = async () => {
+      // Don't do anything if we already have a quiz attempt
+      if (quizAttempt) return;
+
+      // Check for existing incomplete attempts first
+      if (!isLoadingAttempts && existingAttempts?.length) {
+        setQuizAttempt(existingAttempts[0]);
+        console.log(quizAttempt);
+        return;
+      }
+
+      // If no existing attempts, create a new one
+      if (!isLoadingAttempts && !existingAttempts?.length) {
+        try {
+          const newAttempt = await createQuizAttempt({
+            quizId: quizIdAsNumber,
+          });
+          setQuizAttempt(newAttempt);
+        } catch (error) {
+          console.error("Failed to create quiz attempt:", error);
+        }
+      }
+    };
+
+    initializeQuizAttempt();
+  }, [
+    quizIdAsNumber,
+    existingAttempts,
+    isLoadingAttempts,
+    createQuizAttempt,
+    quizAttempt,
+  ]);
+
+  useEffect(() => {
+    if (answers[currentQuestion]) {
+      setSelectedAnswer(answers[currentQuestion]);
+      setShowResult(true);
+    } else {
+      setSelectedAnswer(undefined);
+      setShowResult(false);
+    }
+  }, [currentQuestion, answers]);
+
+  useEffect(() => {
+    if (
+      currentAttempt?.length &&
+      currentAttempt.length > 0 &&
+      quizzes &&
+      quiz
+    ) {
+      const progressedAnswers = Array(quiz.questions.length).fill(undefined);
+
+      // Reset score before calculating
+      setScore(0);
+
+      // Use reducer to calculate score instead of mutating state in loop
+      const calculatedScore = currentAttempt.reduce((total, attempt) => {
+        const questionIndex = quiz.questions.findIndex(
+          (q) => q.id === attempt.questionId
+        );
+
+        if (questionIndex !== -1) {
+          progressedAnswers[questionIndex] = attempt.answer;
+          return attempt.isCorrect ? total + 1 : total;
+        }
+        return total;
+      }, 0);
+
+      setScore(calculatedScore);
+      setAnswers(progressedAnswers);
+
+      const firstUnansweredIndex = progressedAnswers.findIndex(
+        (answer) => answer === undefined
+      );
+      setCurrentQuestion(
+        firstUnansweredIndex !== -1 ? firstUnansweredIndex : 0
+      );
+    }
+  }, [currentAttempt, quizzes, quiz]);
+
+  useEffect(() => {
+    if (quizzes && currentAttempt?.length === 0) {
+      const quiz = quizzes.find((q) => q.id === quizIdAsNumber);
       if (quiz) {
         setAnswers(Array(quiz.questions.length).fill(undefined));
       }
     }
-  }, [quizzes, quizId]);
+  }, [quizzes, quizIdAsNumber, currentAttempt]);
 
   useEffect(() => {
     if (isQuizFinished) {
       setConfettiEnabled(true);
+      updateQuizAttempt({ completed: true });
       setInterval(() => {
         setConfettiEnabled(false);
       }, 7000);
     }
-  }, [isQuizFinished]);
+  }, [isQuizFinished, updateQuizAttempt]);
 
   if (isLoading || !quizzes) {
     return <Spin />;
   }
-
-  const quiz = quizzes?.find((q) => q.id?.toString() === quizId);
 
   if (!quiz) {
     return <div>Quiz not found</div>;
@@ -68,27 +174,23 @@ export const SolveQuizPage = () => {
     }
   };
 
-  // console.log(answers);
   const handleNavigateToQuestion = (questionIndex: number) => {
     setCurrentQuestion(questionIndex);
-
-    if (answers[questionIndex]) {
-      setShowResult(true);
-    } else {
-      setShowResult(false);
-    }
   };
 
-  const submitAnswer = () => {
-    if (selectedAnswer && !showResult) {
+  const submitAnswer = async () => {
+    if (selectedAnswer && !showResult && quizAttempt) {
       setShowResult(true);
-      console.log(
-        quiz.questions[currentQuestion].correctAnswer,
-        selectedAnswer
-      );
-      const correct =
-        selectedAnswer === quiz.questions[currentQuestion].correctAnswer;
-      if (correct) {
+
+      const currentQuestionId = quiz.questions[currentQuestion].id;
+
+      const answer = await createAnswer({
+        quizAttemptId: quizAttempt.id,
+        questionId: currentQuestionId ?? 0,
+        answer: selectedAnswer,
+      });
+
+      if (answer.isCorrect && !answers[currentQuestion]) {
         setScore((prev) => prev + 1);
       }
 
@@ -103,9 +205,6 @@ export const SolveQuizPage = () => {
   const nextQuestion = () => {
     if (currentQuestion < (quiz.questions.length ?? 0) - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(undefined);
-
-      setShowResult(false);
     } else {
       setIsQuizFinished(true);
     }
@@ -114,8 +213,6 @@ export const SolveQuizPage = () => {
   const previousQuestion = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
-      setSelectedAnswer(undefined);
-      setShowResult(false);
     }
   };
 
@@ -123,14 +220,7 @@ export const SolveQuizPage = () => {
     <div className="flex w-full">
       {confettiEnabled && <Confetti />}
       {isQuizFinished ? (
-        <div className="flex items-center justify-center w-full h-full">
-          <div className="flex flex-col items-center p-6 rounded-xl bg-violet-50">
-            <h1 className="text-4xl font-bold">Quiz Finished!</h1>
-            <p className="mt-4 text-lg">
-              You scored {score} out of {quiz.questions.length}
-            </p>
-          </div>
-        </div>
+        <QuizResult score={score} questionCount={quiz.questions.length} />
       ) : (
         <>
           <motion.div

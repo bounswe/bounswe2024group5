@@ -13,4 +13,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findByQuizId(Long quizId);
 
 
+    boolean existsByIdAndQuizId(Long questionId, Long id);
 }
