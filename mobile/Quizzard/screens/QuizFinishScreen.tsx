@@ -58,20 +58,26 @@ const QuizFinishScreen = ({ route, navigation }) => {
       {/* Action Buttons */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
-          style={styles.goBackButton}
-          onPress={() =>
-            navigation.pop(2)
-          }
+          style={styles.quizDescriptionButton}
+          onPress={() => navigation.pop(2)}
         >
           <Text style={styles.buttonText}>Quiz Description</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={styles.startQuizButton}
+          style={styles.reviseQuizButton}
           onPress={() => navigation.goBack()}
         >
           <Text style={styles.buttonText}>Revise Answers</Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity
+        style={styles.homeButton}
+        onPress={() => navigation.pop(3)}
+      >
+        <Text style={styles.buttonText}>Return to Home</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -141,11 +147,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
+    marginBottom: 20,
   },
-  goBackButton: {
+  quizDescriptionButton: {
     flex: 1,
     marginRight: 10,
-    backgroundColor: "#D1D5DB",
+    backgroundColor: "#6B21A8",
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: "center",
@@ -155,10 +162,22 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  startQuizButton: {
+  reviseQuizButton: {
     flex: 1,
     marginLeft: 10,
     backgroundColor: "#6B21A8",
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  homeButton: {
+    width: "100%",
+    backgroundColor: "#4C1D95",
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: "center",
