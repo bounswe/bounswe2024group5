@@ -12,6 +12,8 @@ import com.quizzard.quizzard.model.response.PostResponse;
 import com.quizzard.quizzard.repository.*;
 import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -52,6 +54,10 @@ public class PostService {
 
     private List<PostResponse> mapToPostResponse(List<Post> posts){
         return posts.stream().map(this::mapToPostResponse).toList();
+    }
+
+    private List<PostResponse> mapToPostResponse(Page<Post> posts){
+        return posts.map(this::mapToPostResponse).toList();
     }
 
     // they can set tags twice
@@ -151,8 +157,12 @@ public class PostService {
         return mapToPostResponse(post);
     }
 
-    public List<PostResponse> getRelatedPosts(Long postId){
-        return mapToPostResponse(postRepository.findRelatedPosts(postId));
+    public List<PostResponse> getRelatedPosts(Long postId, Pageable page){
+        return mapToPostResponse(postRepository.findRelatedPosts(postId, page));
+    }
+
+    public List<PostResponse> searchPost(String keyword, Pageable page) {
+        return mapToPostResponse(postRepository.searchPost(keyword, page));
     }
     
 }

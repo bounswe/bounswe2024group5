@@ -10,8 +10,8 @@ import com.quizzard.quizzard.service.UpvoteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
 
 import java.net.URI;
 import java.util.List;
@@ -118,7 +118,12 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/related")
-    ResponseEntity<?> getRelatedPosts(@PathVariable Long postId){
-        return ResponseEntity.ok(postService.getRelatedPosts(postId));
+    ResponseEntity<?> getRelatedPosts(@PathVariable Long postId, Pageable page){
+        return ResponseEntity.ok(postService.getRelatedPosts(postId, page));
+    }
+
+    @GetMapping("/search")
+    ResponseEntity<?> searchPost(@RequestParam(required = true) String keyword, Pageable page) {
+        return ResponseEntity.ok(postService.searchPost(keyword, page));
     }
 }
