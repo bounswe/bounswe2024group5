@@ -1,5 +1,5 @@
 // RegisterScreen.tsx
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -13,8 +13,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import CustomModal from "../components/CustomModal";
 import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
+import HostUrlContext from '../app/HostContext';
 
 const RegisterScreen = ({ navigation }) => {
+  const hostUrl = useContext(HostUrlContext);
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [username, setUsername] = useState("");
@@ -83,12 +85,14 @@ const RegisterScreen = ({ navigation }) => {
     };
     console.log(requestBody);
     try {
-      const response = await fetch("http://34.55.188.177/api/auth/register", {
+      const response = await fetch(
+        `${hostUrl}/api/auth/register`, 
+        {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Content-Length": JSON.stringify(requestBody).length.toString(),
-          Host: "34.55.188.177",
+          // Host: "34.55.188.177",
         },
         body: JSON.stringify(requestBody),
       });

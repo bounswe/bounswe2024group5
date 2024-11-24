@@ -1,5 +1,5 @@
 // LoginScreen.tsx
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -15,8 +15,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import { RegisteredUser } from "../database/types";
 import { Profile } from "../database/types";
 import CustomModal from "../components/CustomModal";
+import HostUrlContext from '../app/HostContext';
+import HostContext from '../app/HostContext';
 
 const LoginScreen = ({ navigation }) => {
+  const hostUrl = useContext(HostUrlContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,11 +31,11 @@ const LoginScreen = ({ navigation }) => {
     try {
       console.log("token is:", token);
       const response = await fetch(
-        `http://34.55.188.177/api/users/${username}`, // TODO: fix when endpoint added, Change to the correct host
+        `${hostUrl}/api/users/${username}`, // TODO: fix when endpoint added, Change to the correct host
         {
           method: "GET",
           headers: {
-            Host: "34.55.188.177", // Change to the correct host
+            // Host: "34.55.188.177", // Change to the correct host
             Authorization: `Bearer ${token}`,
           },
         }
@@ -64,13 +67,13 @@ const LoginScreen = ({ navigation }) => {
     };
     try {
       const response = await fetch(
-        "http://34.55.188.177/api/auth/login", // Change to the correct host
+        `${hostUrl}/api/auth/login`, 
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Content-Length": JSON.stringify(requestBody).length.toString(),
-            Host: "34.55.188.177", // Change to the correct host
+            // Host: "34.55.188.177", // Change to the correct host
           },
           body: JSON.stringify(requestBody),
         }

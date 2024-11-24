@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext} from "react";
 import {
   View,
   Text,
@@ -14,74 +14,84 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";  // Import FileSystem for base64 conversion
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "./AuthProvider";
-
+import HostUrlContext from '../app/HostContext';
 
 const QuizCreationPage = ({ navigation }) => {
+  const hostUrl = useContext(HostUrlContext);
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
   const [selectedType, setSelectedType] = useState(""); // Default type
   const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrl, setMediaUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setMedia] = useState<string | null>(null);
   const authContext = useAuth();
   const token = authContext ? authContext.token : null;
 
-  // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready.
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Permission denied", "Camera roll permission is needed.");
-          return;
-        }
-        const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
+  // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready
 
-        if (!result.canceled && result.assets && result.assets.length > 0) {
-          const selectedMedia = result.assets[0].uri;
-          setImage(selectedMedia);
-          return;
+  const uploadFile = async (fileUri: string) => {
+    try {
+      // Prepare the form data
+      const formData = new FormData();
+      formData.append('file', {
+        uri: fileUri,
+        type: 'image/jpeg', // Adjust this based on your file type
+        name: 'upload.jpg', // You can customize the file name
+      });
+  
+      // Make the POST request to upload the file
+      const response = await fetch(
+        `${hostUrl}/api/file/upload`,
+        {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // 'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      if (response.ok) {
+        const result = await response.text();
+        console.log('File uploaded successfully:', result);
+        return result;
+      } else {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
 
-          const quizData = new FormData();
-          quizData.append("file", {
-            uri: selectedMedia,
-            name: "upload.jpg",
-            type: "image/jpeg",
-          });
+  const pickImageAndUpload = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert('Permission to access media library is required!');
+      return;
+    }
 
-          setUploading(true); // Start uploading
-          try {
-            const uploadResponse = await fetch(
-              "http://34.55.188.177/api/file/upload",
-              {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "multipart/quiz-data",
-                },
-                body: quizData,
-              }
-            );
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
 
-            if (!uploadResponse.ok) {
-              throw new Error(`HTTP error! Status: ${uploadResponse.status}`);
-            }
-            console.log("Media file uploaded successfully");
-            const uploadData = await uploadResponse.text();
-            setImageUrl(uploadData);
-          } catch (error) {
-            console.error("Error uploading image file:", error);
-            Alert.alert("Error", "Failed to upload image file. Please try again.");
-          } finally {
-            setUploading(false); // End uploading
-          }
-        }
+    if (!result.canceled) {
+      setUploading(true);
+      try {
+        const fileUrl = await uploadFile(result.assets[0].uri);
+        console.log('Uploaded file URL:', fileUrl);
+        alert('File uploaded successfully!');
+      } catch (error) {
+        console.error('Failed to upload file:', error);
+        alert('File upload failed.');
+      } finally {
+        setUploading(false);
+      }
+    }
   };
 
   const handleAddQuestion = () => {
@@ -102,6 +112,7 @@ const QuizCreationPage = ({ navigation }) => {
     }
 
     const formattedQuestions = questions.map((question) => ({
+      id: Math.floor(Math.random() * 1000),
       questionType: question.questionType,
       word: question.word,
       correctAnswer: question.options.A,
@@ -109,6 +120,7 @@ const QuizCreationPage = ({ navigation }) => {
     }));
 
     const quizData = {
+      id: Math.floor(Math.random() * 1000),
       title: quizTitle,
       description: quizDescription,
       // image: imageUrl,
@@ -121,6 +133,7 @@ const QuizCreationPage = ({ navigation }) => {
     }
 
     console.log(`quiz title is: ${quizData.title} `);
+    console.log(`quiz image is: ${quizData.image} `);
     quizData.questions.forEach((question, index) => {
       console.log(`Question ${index + 1}:`);
       console.log(`  Type: ${question.questionType}`);
@@ -141,19 +154,18 @@ const QuizCreationPage = ({ navigation }) => {
         body: JSON.stringify(quizData),
       });
 
-      if (response1.ok) {
-        Alert.alert("Success", "Quiz created successfully!");
-        navigation.navigate("Home");
-      } else {
-        const errorMessage = await response1.text();
-        Alert.alert("Error", `Failed to create quiz: ${errorMessage}`);
-        console.log("Error", `Failed to create quiz: ${errorMessage}`);
-      }
+    if (response.ok) {
+      Alert.alert("Success", "Quiz created successfully!");
+      navigation.navigate("Home");
+    } else {
+      const errorMessage = await response.text();
+      Alert.alert("Error", `Failed to create quiz: ${errorMessage}`);
+    }
   };
 
   // Fetch question word suggestions
   const fetchQuestionWord = async (word, type) => {
-    const apiUrl = `http://34.55.188.177/question_word?word=${word}&type=${type}`;
+    const apiUrl = `${hostUrl}/api/question_word?word=${word}&type=${type}`;
     try {
       const response = await fetch(apiUrl, {
         method: "GET",
@@ -181,7 +193,7 @@ const QuizCreationPage = ({ navigation }) => {
     token: string
   ): Promise<void> => {
     try {
-      const apiUrl = `http://34.55.188.177/question_answers?word=${encodeURIComponent(word)}&type=${type}`;
+      const apiUrl = `${hostUrl}/api/question_answers?word=${encodeURIComponent(word)}&type=${type}`;
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
@@ -215,7 +227,7 @@ const QuizCreationPage = ({ navigation }) => {
     let word = typedQuestionWord;
     try {
       const response = await fetch(
-        `http://34.55.188.177/api/word-checker?word=${word}&type=${selectedType}`,
+        `${hostUrl}/api/word-checker?word=${word}&type=${selectedType}`,
         {
           method: "POST",
           headers: {
@@ -309,7 +321,7 @@ const QuizCreationPage = ({ navigation }) => {
       />
 
       {/* Image Upload Box */}
-      <TouchableOpacity style={styles.imageUploadBox} onPress={pickImage}>
+      <TouchableOpacity style={styles.imageUploadBox} onPress={pickImageAndUpload}>
         <Text style={styles.imageUploadText}>
           {image ? "Image Uploaded" : "+ Upload Image"}
         </Text>
@@ -335,13 +347,9 @@ const QuizCreationPage = ({ navigation }) => {
               onChangeText={(word) => handleInputChange(index, word)}
             />
             <View style={styles.dropdownContainer}>
-              {/* <DropdownComponent
-                placeHolder={}
-                selectedValue={selectedType}
-                onValueChange={(type) => updateQuestionType(index, type)} */}
                 <DropdownComponent
-                selectedValue={selectedType}
-                onValueChange={(type) => setSelectedType(type)}
+                selectedValue={questions[index].questionType}
+                onValueChange={(type) => updateQuestionType(index, type)}
               />
             </View>
           </View>
