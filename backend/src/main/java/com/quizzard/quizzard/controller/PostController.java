@@ -38,8 +38,8 @@ public class PostController {
 
     @GetMapping
     ResponseEntity<List<PostResponse>> getAllPosts(@RequestParam(required = false) Optional<String> tag,
-                                                   @RequestParam(required = false) Optional<String> userId){
-        return ResponseEntity.ok(postService.getAllPosts(tag, userId));
+                                                   @RequestParam(required = false) Optional<String> username){
+        return ResponseEntity.ok(postService.getAllPosts(tag, username));
     }
 
     @GetMapping("/{postId}")
@@ -70,13 +70,13 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/upvotes")
-    ResponseEntity<?> getUpvotes(@PathVariable Long postId, @RequestParam(required = false) Optional<Long> userId){
-        return ResponseEntity.ok(upvoteService.getUpvotes(userId, Optional.ofNullable(postId)));
+    ResponseEntity<?> getUpvotes(@PathVariable Long postId, @RequestParam(required = false) Optional<String> username){
+        return ResponseEntity.ok(upvoteService.getUpvotes(username, Optional.ofNullable(postId)));
     }
 
     @GetMapping("/upvotes")
-    ResponseEntity<?> getUpvotedPosts(@RequestParam(required = false) Optional<Long> userId, @RequestParam(required = false) Optional<Long> postId){
-        return ResponseEntity.ok(upvoteService.getUpvotes(userId, postId));
+    ResponseEntity<?> getUpvotedPosts(@RequestParam(required = false) Optional<String> username, @RequestParam(required = false) Optional<Long> postId){
+        return ResponseEntity.ok(upvoteService.getUpvotes(username, postId));
     }
 
     @GetMapping("/upvotes/{upvoteId}")
@@ -97,8 +97,8 @@ public class PostController {
     }
 
     @GetMapping("/replies")
-    ResponseEntity<?> getRepliesByUser(@RequestParam(required = false) Optional<Long> userId){
-        return ResponseEntity.ok(replyService.getRepliesByUserId(userId));
+    ResponseEntity<?> getRepliesByUser(@RequestParam(required = false) Optional<String> username){
+        return ResponseEntity.ok(replyService.getRepliesByUsername(username));
     }
 
     @GetMapping("/replies/{replyId}")

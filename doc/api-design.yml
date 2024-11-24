@@ -401,9 +401,9 @@ components:
         postId:
           type: integer
           description: ID of the post that was upvoted.
-        userId:
+        username:
           type: integer
-          description: ID of the user who upvoted the post.
+          description: username of the user who upvoted the post.
         createdAt:
           type: string
           format: date-time
@@ -1341,7 +1341,7 @@ paths:
         '400':
           description: Title, content and word are required
     get:
-      summary: Get all posts optionally by userId and tag
+      summary: Get all posts optionally by username and tag
       tags:
         - Forum Posts
       parameters:
@@ -1351,10 +1351,10 @@ paths:
           description: Filter posts by a specific tag.
           schema:
             type: string
-        - name: userId
+        - name: username
           in: query
           required: false
-          description: Filter posts by a specific user ID.
+          description: Filter posts by a specific username.
           schema:
             type: string
       responses:
@@ -1480,22 +1480,22 @@ paths:
 
   /posts/{postId}/upvotes:
     get:
-      summary: Get all upvotes for a post optionally by userId
+      summary: Get all upvotes for a post optionally by username
       tags:
         - Forum Post Upvotes
       parameters:
         - name: postId
           in: path
           required: true
-          description: The ID of the post to retrieve upvotes for.
+          description: The id of the post to retrieve upvotes for.
           schema:
             type: integer
-        - name: userId
+        - name: username
           in: query
           required: false
           description: Filter upvotes by a specific user.
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: A list of upvotes for the post.
@@ -1508,16 +1508,16 @@ paths:
 
   /posts/upvotes:
     get:
-      summary: Get all upvotes optionally by userId and postId
+      summary: Get all upvotes optionally by username and postId
       tags:
         - Forum Post Upvotes
       parameters:
-        - name: userId
+        - name: username
           in: query
           required: false
           description: Filter upvotes by a specific user.
           schema:
-            type: integer
+            type: string
         - name: postId
           in: query
           required: false
@@ -1616,16 +1616,16 @@ paths:
 
   /posts/replies:
     get:
-      summary: Get replies optionally by user
+      summary: Get replies optionally by username
       tags:
         - Forum Post Replies
       parameters:
-        - name: userId
+        - name: username
           in: query
           required: false
-          description: The ID of the user whose replies are retrieved. If not provided, retrieves all replies.
+          description: The username of the user whose replies are retrieved. If not provided, retrieves all replies.
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: A list of replies by the specified user or all replies if no user ID is provided.

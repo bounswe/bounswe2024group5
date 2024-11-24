@@ -19,10 +19,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByTagWord(@Param("word") String word);
 
 
-    @Query("SELECT fp FROM Post fp " +
-            "JOIN PostTag pt ON fp.id = pt.post.id " +
+    @Query("SELECT p FROM Post p " +
+            "JOIN PostTag pt ON p.id = pt.post.id " +
             "JOIN English e ON pt.english.id = e.id " +
-            "WHERE e.word = :word AND fp.user.id = :userId")
-    List<Post> findAllByTagWordAndUserId(@Param("word") String word, @Param("userId") Integer userId);
+            "JOIN User u ON p.user.id = u.id " +
+            "WHERE e.word = :word AND u.username = :username")
+    List<Post> findAllByTagWordAndUsername(@Param("word") String word, @Param("username") String username);
 
 }

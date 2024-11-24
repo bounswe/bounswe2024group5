@@ -31,9 +31,6 @@ public class User {
     @Column(name = "profile_picture")
     private String profilePicture;
 
-    @Column(name = "english_proficiency")
-    private String englishProficiency;
-
     @Column(name = "points")
     private int points;
 
@@ -54,11 +51,12 @@ public class User {
         // Default constructor required for JPA
     }
 
-    public User(String username, String password, String email, String name) {
+    public User(String username, String password, String email, String name, int points) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.name = name;
+        this.points = points;
         this.createdAt = new Date();
     }
 
