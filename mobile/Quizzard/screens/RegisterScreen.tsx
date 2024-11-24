@@ -9,8 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import CustomModal from "../components/CustomModal";
-import { RegisteredUser, Profile } from "../database/types";
-import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
+import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
 import { RegisteredUser, Profile } from "../database/types";
