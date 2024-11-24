@@ -9,6 +9,7 @@ import {
   IconUser,
   IconMail,
   IconEdit,
+  IconMessages,
 } from "@tabler/icons-react";
 
 import ProfileUpdateModal from "../components/profile/update-modal";
@@ -18,6 +19,7 @@ import { Tabs } from "antd";
 import { useParams } from "react-router-dom";
 import { useGetProfile } from "../hooks/api/profile/get";
 import { useUpdateProfile } from "../hooks/api/profile/update";
+import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 
 const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,6 +27,8 @@ const ProfilePage = () => {
   const { data: profile, error } = useGetProfile(username);
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     useUpdateProfile();
+
+  const { data: userQuizzes } = useFetchQuizzes({ filter: "own" });
   const user = {
     badges: [
       { id: 1, name: "Quiz Master", description: "Created 2 quizzes" },
@@ -114,12 +118,6 @@ const ProfilePage = () => {
                   {isOwnProfile && (
                     <button
                       className="flex items-center gap-2 px-4 py-2 text-white transition-colors rounded-full bg-violet-500 hover:bg-violet-600"
-                      // onClick={() => {
-                      //   handleProfileUpdate({
-                      //     name: "New Name",
-                      //     email: "new@email.com",
-                      //   });
-                      // }}
                       onClick={() => setIsModalOpen(true)}
                       disabled={isUpdating}
                     >
@@ -200,31 +198,39 @@ const ProfilePage = () => {
                   label: "My Quizzes",
                   children: (
                     <div className="grid gap-4">
-                      {user.createdQuizzes.map((quiz) => (
-                        <motion.div
-                          key={quiz.id}
-                          className="p-4 transition-colors cursor-pointer bg-purple-50 rounded-xl hover:bg-purple-100"
-                          whileHover={{ scale: 1.01 }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-xl font-semibold text-purple-800">
-                              {quiz.title}
-                            </h3>
-                            <div className="flex items-center gap-2">
-                              <span className="px-3 py-1 text-sm bg-purple-100 rounded-full">
-                                {QUIZ_DIFFICULTIES[quiz.difficulty]}
-                              </span>
-                              <div className="flex items-center gap-1">
-                                <IconHeart className="w-5 h-5 text-red-500" />
-                                <span>{Math.floor(Math.random() * 100)}</span>
+                      {userQuizzes ? (
+                        userQuizzes.map((quiz) => (
+                          <motion.div
+                            key={quiz.id}
+                            className="p-4 transition-colors cursor-pointer bg-purple-50 rounded-xl hover:bg-purple-100"
+                            whileHover={{ scale: 1.01 }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-xl font-semibold text-purple-800 place-self-start">
+                                  {quiz.title}
+                                </h3>
+                                <p className="text-sm text-gray-600 place-self-start">
+                                  {quiz.questions.length} Questions
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-1">
+                                  <IconHeart className="w-5 h-5 text-red-500" />
+                                  {/* <span>{quiz.likes}</span> */}4
+                                </div>
+                                <span className="px-3 py-1 text-sm bg-purple-100 rounded-full">
+                                  {QUIZ_DIFFICULTIES[quiz.difficulty]}
+                                </span>
                               </div>
                             </div>
-                          </div>
-                          <p className="mt-2 text-gray-600 place-self-start">
-                            {quiz.questions.length} Questions
-                          </p>
-                        </motion.div>
-                      ))}
+                          </motion.div>
+                        ))
+                      ) : (
+                        <div>
+                          <p className="text-purple-800">No quizzes found</p>
+                        </div>
+                      )}
                     </div>
                   ),
                 },
@@ -282,9 +288,11 @@ const ProfilePage = () => {
                                 <IconHeart className="w-5 h-5 text-red-500" />
                                 <span>{post.likes}</span>
                               </div>
-                              <span className="px-3 py-1 text-sm bg-purple-100 rounded-full">
-                                {post.replies} replies
-                              </span>
+                              |
+                              <div className="flex items-center gap-1">
+                                <IconMessages className="w-5 h-5 text-blue-500" />
+                                <span>{post.replies}</span>
+                              </div>
                             </div>
                           </div>
                         </motion.div>
