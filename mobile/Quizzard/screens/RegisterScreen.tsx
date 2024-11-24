@@ -15,7 +15,6 @@ import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
 import { RegisteredUser, Profile } from "../database/types";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
-import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
 
 const RegisterScreen = ({ navigation }) => {
@@ -232,12 +231,6 @@ const RegisterScreen = ({ navigation }) => {
         />
       </View>
 
-        <DifficultyLevelDropdown
-          selectedValue={englishProficiency}
-          onValueChange={(value) => setEnglishProficiency(value)}
-        />
-      </View>
-
     <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerButtonText}>Register</Text>
       </TouchableOpacity>
@@ -272,6 +265,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 16,
   },
+  pickerLabel: {
+    fontSize: 16,
+    color: "#22005d",
+    marginBottom: 8,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#6a0dad",
+    borderRadius: 8,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  picker: {
+    height: 50,
+    color: "#6a0dad",
+  },
   input: {
     width: "100%",
     borderWidth: 1,
@@ -300,12 +309,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: 20,
-  },
-  proficiencyLabel: {
-    fontSize: 16,
-    color: "#22005d",
-    marginBottom: 8,
-    marginLeft: 4,
   },
   normalText: {
     fontSize: 16,
