@@ -1,5 +1,6 @@
 package com.quizzard.quizzard.service;
 
+import com.quizzard.quizzard.exception.ResourceNotFoundException;
 import com.quizzard.quizzard.model.QuestionAnswer;
 import com.quizzard.quizzard.model.Quiz;
 import com.quizzard.quizzard.model.QuizAttempt;
@@ -43,7 +44,7 @@ public class QuizAttemptService {
     public QuizAttemptResponse addQuizAttempt(String jwtToken, QuizAttemptRequest quizAttemptRequest) {
         String solverUsername = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
         User user = userService.getOneUserByUsername(solverUsername);
-        Quiz quiz = quizRepository.findById(quizAttemptRequest.getQuizId()).orElse(null);
+        Quiz quiz = quizRepository.findById(quizAttemptRequest.getQuizId()).orElseThrow(() -> new ResourceNotFoundException("Quiz not found with id: " + quizAttemptRequest.getQuizId()));
         if (quizAttemptRepository.existsByUserIdAndQuizIdAndIsCompleted(user.getId(), quiz.getId(), false)) {
             // already has incomplete quiz attempt
             // return the existing quiz attempt instead of creating a new one
@@ -182,8 +183,7 @@ public class QuizAttemptService {
         } else if (finalScore > 4000) {
             finalScore = 4000;
         }
-        userService.updateUserPoint(user.getUsername(), finalScore);
-        userService.checkUserEnglishProficieny(user.getUsername());
+        userService.updateUserPoint(user, finalScore);
     }
 
 
