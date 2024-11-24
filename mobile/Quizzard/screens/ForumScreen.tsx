@@ -1,4 +1,5 @@
-import React, { useState, useContext } from "react";
+// ForumScreen.tsx
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,15 +14,65 @@ import BaseLayout from "./BaseLayout";
 import QuestionItem from "../components/QuestionItem";
 import HostUrlContext from "../app/HostContext";
 import { useAuth } from "./AuthProvider"; // Import useAuth
-import { useFocusEffect } from "@react-navigation/native"; // Add this import
+import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+
+// Define the Question interface
+interface Question {
+  id: number;
+  title: string;
+  description: string;
+  createdAt: string;
+  commentCount: number;
+  tags: string[];
+  username: string;
+  upvotes: number;
+  hasUpvoted: boolean;
+}
 
 const ForumScreen = ({ navigation }) => {
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
 
   const authContext = useAuth(); // Get the authentication context
   const token = authContext ? authContext.token : null; // Get the token if authContext is not null
+
+  const [upvotedPostIds, setUpvotedPostIds] = useState(new Set<number>());
+
+  // Load upvoted post IDs from AsyncStorage when the component mounts
+  useEffect(() => {
+    const loadUpvotedPosts = async () => {
+      try {
+        const storedUpvoted = await AsyncStorage.getItem("upvotedPostIds");
+        if (storedUpvoted) {
+          const parsedUpvoted = JSON.parse(storedUpvoted);
+          setUpvotedPostIds(new Set(parsedUpvoted));
+        }
+      } catch (error) {
+        console.error("Error loading upvoted posts from storage:", error);
+      }
+    };
+
+    loadUpvotedPosts();
+  }, []);
+
+  // Save upvoted post IDs to AsyncStorage whenever it changes
+  useEffect(() => {
+    const saveUpvotedPosts = async () => {
+      try {
+        const upvotedArray = Array.from(upvotedPostIds);
+        await AsyncStorage.setItem(
+          "upvotedPostIds",
+          JSON.stringify(upvotedArray)
+        );
+      } catch (error) {
+        console.error("Error saving upvoted posts to storage:", error);
+      }
+    };
+
+    saveUpvotedPosts();
+  }, [upvotedPostIds]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -54,10 +105,11 @@ const ForumScreen = ({ navigation }) => {
                   hour: "2-digit",
                   minute: "2-digit",
                 }),
-                commentCount: item.noReplies || 0, // Adjust based on your API response
+                commentCount: item.noReplies || 0,
                 tags: item.tags || [],
                 username: item.username || item.user?.username || "Anonymous",
                 upvotes: item.noUpvote || 0,
+                hasUpvoted: upvotedPostIds.has(item.id),
               }));
               setQuestions(formattedData);
             } else {
@@ -81,8 +133,87 @@ const ForumScreen = ({ navigation }) => {
       };
 
       fetchPosts();
-    }, [hostUrl, token])
+    }, [hostUrl, token, upvotedPostIds]) // Depend on upvotedPostIds to refresh hasUpvoted
   );
+
+  // Function to handle upvoting a question
+  const handleUpvote = async (postId: number) => {
+    // Find the question in the state
+    const questionIndex = questions.findIndex((q) => q.id === postId);
+    if (questionIndex === -1) return;
+
+    const question = questions[questionIndex];
+
+    if (question.hasUpvoted) {
+      // If already upvoted, remove upvote
+      try {
+        const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        });
+
+        if (response.status === 204) {
+          // Successfully removed upvote
+          // Update the state
+          const updatedQuestions = [...questions];
+          updatedQuestions[questionIndex].upvotes -= 1;
+          updatedQuestions[questionIndex].hasUpvoted = false;
+          setQuestions(updatedQuestions);
+
+          // Remove from upvotedPostIds
+          setUpvotedPostIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(postId);
+            return newSet;
+          });
+        } else if (response.status === 401) {
+          Alert.alert("Unauthorized", "Please log in to remove upvote.");
+        } else {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.message || "Failed to remove upvote.");
+        }
+      } catch (error) {
+        console.error("Error removing upvote:", error);
+        Alert.alert("Error", "Failed to remove upvote.");
+      }
+    } else {
+      // If not upvoted, add upvote
+      try {
+        const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        });
+        console.log(response);
+        if (response.status === 200) {
+          const data = await response.json();
+          console.log("Upvote response data:", data);
+          // Assuming the response contains the updated upvote count
+          const updatedUpvotes = data.upvotes || question.upvotes + 1;
+
+          // Update the state
+          const updatedQuestions = [...questions];
+          updatedQuestions[questionIndex].upvotes = updatedUpvotes;
+          updatedQuestions[questionIndex].hasUpvoted = true;
+          setQuestions(updatedQuestions);
+
+          // Add to upvotedPostIds
+          setUpvotedPostIds((prev) => new Set(prev).add(postId));
+        } else if (response.status === 401) {
+          Alert.alert("Unauthorized", "Please log in to upvote.");
+        } else {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.message || "Failed to upvote.");
+        }
+      } catch (error) {
+        console.error("Error upvoting post:", error);
+        Alert.alert("Error", "Failed to upvote the post.");
+      }
+    }
+  };
 
   const navigateToCreateQuestion = () => {
     navigation.navigate("CreateQuestion");
@@ -93,16 +224,18 @@ const ForumScreen = ({ navigation }) => {
   };
 
   const navigateToQuestionDetail = (
-    questionId,
-    title,
-    description,
-    username
+    questionId: number,
+    title: string,
+    description: string,
+    username: string,
+    noUpvote: number
   ) => {
     navigation.navigate("QuestionDetail", {
       questionId,
       title,
       description,
       username,
+      noUpvote,
     });
   };
 
@@ -146,9 +279,11 @@ const ForumScreen = ({ navigation }) => {
                   item.id,
                   item.title,
                   item.description,
-                  item.username
+                  item.username,
+                  item.upvotes
                 )
               }
+              onUpvote={() => handleUpvote(item.id)} // Pass the upvote handler
             />
           )}
           keyExtractor={(item) => item.id.toString()}

@@ -41,7 +41,7 @@ type ProfileResponse = {
 
 const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   // Destructure the questionId, title, and description from the route parameters
-  const { questionId, title, description, username } = route.params;
+  const { questionId, title, description, username, noUpvote } = route.params;
 
   const [question, setQuestion] = useState<any>(null);
   const [replies, setReplies] = useState<Reply[]>([]);
@@ -78,6 +78,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           title: title,
           description: description,
           username: username,
+          noUpvote: noUpvote,
         });
 
         // Fetch the replies for the question

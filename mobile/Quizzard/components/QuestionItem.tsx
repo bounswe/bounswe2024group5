@@ -1,6 +1,7 @@
 // QuestionItem.tsx
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the upvote icon
 
 type QuestionItemProps = {
   question: {
@@ -12,11 +13,17 @@ type QuestionItemProps = {
     tags: string[];
     username: string;
     upvotes: number;
+    hasUpvoted: boolean; // Add hasUpvoted field
   };
   onPress: () => void;
+  onUpvote: () => void; // Add onUpvote prop
 };
 
-const QuestionItem: React.FC<QuestionItemProps> = ({ question, onPress }) => {
+const QuestionItem: React.FC<QuestionItemProps> = ({
+  question,
+  onPress,
+  onUpvote,
+}) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Text style={styles.title}>{question.title}</Text>
@@ -26,7 +33,18 @@ const QuestionItem: React.FC<QuestionItemProps> = ({ question, onPress }) => {
 
       <View style={styles.metadata}>
         <Text style={styles.username}>By {question.username}</Text>
-        <Text style={styles.upvotes}>{question.upvotes} upvotes</Text>
+        <TouchableOpacity
+          style={styles.upvoteContainer}
+          onPress={onUpvote}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name={question.hasUpvoted ? "heart" : "heart-outline"}
+            size={20}
+            color={question.hasUpvoted ? "#e0245e" : "#6a0dad"}
+          />
+          <Text style={styles.upvoteText}>{question.upvotes}</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.tagsContainer}>
@@ -69,15 +87,21 @@ const styles = StyleSheet.create({
   metadata: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   username: {
     fontSize: 12,
     color: "#888",
   },
-  upvotes: {
-    fontSize: 12,
-    color: "#888",
+  upvoteContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  upvoteText: {
+    marginLeft: 4,
+    fontSize: 14,
+    color: "#6a0dad",
   },
   tagsContainer: {
     flexDirection: "row",
