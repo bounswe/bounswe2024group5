@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Text,
   StyleSheet,
@@ -13,8 +13,10 @@ import QuizViewComponent from "../components/QuizViewComponent";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
+import HostUrlContext from '../app/HostContext';
 
 const HomePage = ({ navigation }) => {
+  const hostUrl = useContext(HostUrlContext);
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,12 +40,14 @@ const HomePage = ({ navigation }) => {
     };
 
     fetchData();
+    fetchQuizzesForYou();
+    fetchOtherQuizzes();
   }, [otherQuizzesFilterDifficulty]); // Dependency array includes 'difficulty'
 
   const fetchQuizzesForYou = async () => {
     try {
       const response = await fetch(
-        `http://34.55.188.177/api/quizzes?page=1&limit=10`,
+        `${hostUrl}/api/quizzes?page=1&limit=10`,
         {
           method: "GET",
           headers: {
@@ -57,7 +61,6 @@ const HomePage = ({ navigation }) => {
       const possibleDifficulties = ["a1", "a2", "b1", "b2", "c1", "c2"]
       data.quizzes = data.quizzes.map((quiz) => ({
         ...quiz,
-        image: "https://via.placeholder.com/110x110.png?text=Quiz",
         elo: Math.floor(Math.random() * 3000 + 500),
         difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
       }));
@@ -78,8 +81,9 @@ const HomePage = ({ navigation }) => {
 
   const fetchOtherQuizzes = async () => {
     try {
+      console.log(`Token is ${token}`);
       const response = await fetch(
-        `http://34.55.188.177/api/quizzes?page=1&limit=10`,
+        `${hostUrl}/api/quizzes?page=1&limit=10`,
         {
           method: "GET",
           headers: {
@@ -93,7 +97,6 @@ const HomePage = ({ navigation }) => {
       const possibleDifficulties = ["a1", "a2", "b1", "b2", "c1", "c2"]
       data.quizzes = data.quizzes.map((quiz) => ({
         ...quiz,
-        image: "https://via.placeholder.com/110x110.png?text=Quiz",
         elo: Math.floor(Math.random() * 3000 + 500),
         difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
       }));

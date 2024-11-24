@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useContext, useEffect} from "react";
 import {
   View,
   Text,
@@ -12,9 +12,11 @@ import BaseLayout from "./BaseLayout";
 import QuizViewComponent from "../components/QuizViewComponent";
 import questions from "@/mockdata/mockQuizQuestionData";
 import { useAuth } from "./AuthProvider";
+import HostUrlContext from '../app/HostContext';
 
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = ({ route, navigation }) => {
+  const hostUrl = useContext(HostUrlContext);
   // Example data - in a real application, this would come from an API
   const userStats = {
     totalPoints: 1250,
@@ -35,10 +37,40 @@ const ProfileScreen = ({ navigation }) => {
 
   const authContext = useAuth(); // Get the authentication context
   const token = authContext ? authContext.token : null;
+  const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch(
+        `${hostUrl}/api/profile/me`, // TODO: fix when endpoint added, Change to the correct host
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const user = await response.json();
+      if (response.ok) {
+        setUserProfile(user);
+      } else {
+        console.error("Failed to fetch user profile data", response);
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    } finally {
+      setLoading(false); // Stop loading regardless of success or failure
+    }
+  };
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
 
   const handleEditQuiz = (quizId) => {
     // Navigate to the edit screen or open an edit modal
-    navigation.navigate("EditQuizScreen", { quizId: quizId });
+    navigation.navigate("EditQuizScreen", { username: username, quizId: quizId });
   };
   
   const handleDeleteQuiz = async (quizId) => {
@@ -53,7 +85,9 @@ const ProfileScreen = ({ navigation }) => {
           style: "destructive",
           onPress: async () => {
             try {
-              const response = await fetch(`http://34.55.188.177/api/quizzes/${quizId}`, {
+              const response = await fetch(
+                `${hostUrl}/api/quizzes/${quizId}`, 
+                {
                 method: "DELETE",
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -78,39 +112,34 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <BaseLayout navigation={navigation}>
+      {loading ? (
+        <Text>Loading...</Text>
+      ) : (
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.header}>
           <Image
-            source={{ uri: "https://via.placeholder.com/120" }}
+            source={{
+              uri:
+              // userProfile.profilePicture ||
+              "https://via.placeholder.com/120", // Default image
+          }}
             style={styles.profileImage}
           />
           <View style={styles.headerInfo}>
-            <Text style={styles.username}>John Doe</Text>
-            <Text style={styles.email}>john.doe@example.com</Text>
+            <Text style={styles.username}>{userProfile.name}</Text>
+            <Text style={styles.email}>{userProfile.email}</Text>
             <Text style={styles.points}>
-              Total Points: {userStats.totalPoints}
+              Total Points: {userProfile.score}
             </Text>
           </View>
         </View>
 
         <TouchableOpacity
           style={styles.settingsButton}
-          onPress={() => navigation.navigate("ProfileSettings")}
+          onPress={() => navigation.navigate("ProfileSettings", {username: username})}
         >
-          <Text style={styles.buttonText}>Profile Settings</Text>
+          <Text style={styles.buttonText}>Settings</Text>
         </TouchableOpacity>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quiz History</Text>
-          {userStats.quizHistory.map((quiz) => (
-            <View key={quiz.id} style={styles.card}>
-              <Text style={styles.itemTitle}>{quiz.title}</Text>
-              <Text style={styles.itemDetail}>
-                Score: {quiz.score} - {quiz.date}
-              </Text>
-            </View>
-          ))}
-        </View>
 
         <View style={styles.quizSection}>
           <Text style={styles.sectionTitle}>Created Quizzes</Text>
@@ -120,7 +149,7 @@ const ProfileScreen = ({ navigation }) => {
             style={styles.quizScroll}
             contentContainerStyle={styles.quizScrollContent}
           >
-            {userStats.createdQuizzes.length > 0 ? (
+            {userStats.createdQuizzes.length > 0 ? (        // TODO: change to the userProfile.noCreatedQuizzes
               userStats.createdQuizzes.map((quiz) => (
                 <QuizViewComponent
                   key={quiz.id}
@@ -134,7 +163,7 @@ const ProfileScreen = ({ navigation }) => {
                     likes: quiz.likes || 0,
                   }}
                   onPress={() =>
-                    navigation.navigate("MyQuizPreviewScreen", { quizId: quiz.id })
+                    navigation.navigate("MyQuizPreviewScreen", { username: username, quizId: quiz.id })
                   }
                   onEdit={() => handleEditQuiz(quiz.id)}
                   onDelete={() => handleDeleteQuiz(quiz.id)}
@@ -150,6 +179,18 @@ const ProfileScreen = ({ navigation }) => {
         </View> 
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Quiz History</Text>
+          {userStats.quizHistory.map((quiz) => (
+            <View key={quiz.id} style={styles.card}>
+              <Text style={styles.itemTitle}>{quiz.title}</Text>
+              <Text style={styles.itemDetail}>
+                Score: {quiz.score} - {quiz.date}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Posts</Text>
           {userStats.posts.map((post) => (
             <View key={post.id} style={styles.card}>
@@ -159,6 +200,7 @@ const ProfileScreen = ({ navigation }) => {
           ))}
         </View>
       </ScrollView>
+          )}
     </BaseLayout>
   );
 };
@@ -221,7 +263,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   quizSection: {
-    height: 400,
+    height: 330,
   },
   sectionTitle: {
     fontSize: 22,
