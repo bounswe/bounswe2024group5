@@ -28,7 +28,7 @@ components:
         profile_picture:
           type: string
           format: uri
-        english_proficiency:
+        englishProficiency:
           type: string
           enum: [a1,a2,b1,b2,c1,c2]
         points:
@@ -46,7 +46,7 @@ components:
         - name
         - email
         - password
-        - english_proficiency
+        - englishProficiency
     RegisterRequest:
       type: object
       properties:
@@ -59,7 +59,7 @@ components:
           format: email
         password:
           type: string
-        english_proficiency:
+        englishProficiency:
           type: string
           enum: [a1,a2,b1,b2,c1,c2]
       required:
@@ -71,7 +71,7 @@ components:
     LoginRequest:
       type: object
       properties:
-        username_or_email:
+        username:
           type: string
         password:
           type: string
@@ -498,86 +498,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /users/{id}:
-    get:
-      summary: Get user profile
-      tags:
-        - Users
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: User profile retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      summary: Update user profile
-      tags:
-        - Users
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                profile_picture:
-                  type: string
-                  format: uri
-                english_proficiency:
-                  type: string
-                  enum: [beginner, intermediate, advanced]
-                password:
-                  type: string
-                new_password:
-                  type: string
-              # Add other updatable fields as needed
-      responses:
-        '200':
-          description: User profile updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
   /profile/me:
     get:
       summary: Get the authenticated user's profile
@@ -697,12 +617,12 @@ paths:
           schema:
             type: string
           description: The word to be validated for existence in the database.
-        - name: type
+        - name: language
           in: query
           required: true
           schema:
             type: string
-          description: The type of word check (e.g., language or category).
+          description: The language of the word to be checked (e.g. english or turkish).
       responses:
         '200':
           description: Word validation result
@@ -716,7 +636,7 @@ paths:
                     description: Whether the word exists in the database.
   /word_suggestions:
     get:
-      summary: Get question word suggestions
+      summary: (not implemented yet)
       tags:
         - Questions
       security:
@@ -754,7 +674,7 @@ paths:
                 $ref: '#/components/schemas/Error'
   /question_answers:
     get:
-      summary: Get question answers
+      summary: (not implemented yet) Get question answers
       tags:
         - Questions
       security:
@@ -998,65 +918,6 @@ paths:
       responses:
         '204':
           description: Quiz deleted successfully
-        '404':
-          description: Quiz not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /quizzes/{id}/solve:
-    post:
-      summary: Solve a quiz
-      tags:
-        - Quizzes
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                answers:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      question_id:
-                        type: integer
-                      selected_answer:
-                        type: string
-              required:
-                - answers
-      responses:
-        '200':
-          description: Quiz solved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  score:
-                    type: integer
-                  correct_answers:
-                    type: integer
-                  total_questions:
-                    type: integer
-                  points_awarded:
-                    type: integer
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '404':
           description: Quiz not found
           content:
@@ -1707,13 +1568,13 @@ paths:
           description: Access denied (user is not authorized to delete the reply).
         '404':
           description: Reply not found.
-  /search:
+  /posts/search:
     get:
       summary: Search forum posts
       tags:
-        - Search
+        - Forum Post Search
       parameters:
-        - name: query
+        - name: keyword
           in: query
           required: true
           schema:
@@ -1723,8 +1584,8 @@ paths:
           in: query
           schema:
             type: integer
-          description: Page number
-        - name: limit
+          description: Page number (0-indexed)
+        - name: size
           in: query
           schema:
             type: integer
@@ -1735,18 +1596,54 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  posts:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ForumPost'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForumPost'
         '400':
           description: Invalid input
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  
+  /posts/{postId}/related:
+    get:
+      summary: Get related posts of a specific post
+      tags:
+        - Forum Post Search
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the post to retrieve related posts for.
+        - name: page
+          in: query
+          schema:
+            type: integer
+          description: Page number (0-indexed)
+        - name: size
+          in: query
+          schema:
+            type: integer
+          description: Number of items per page
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForumPost'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
   /file/upload:
     post:
       tags:

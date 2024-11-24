@@ -2,9 +2,11 @@ package com.quizzard.quizzard.model;
 
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "quizzes")
 public class Quiz {
@@ -50,67 +52,6 @@ public class Quiz {
         this.image = image;
         this.difficulty = difficulty;
         this.createdAt = new Date();
-    }
-
-    // Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public double getDifficulty() {
-        return difficulty;
-    }
-
-    public User getAuthor() {
-        return author;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-
-    // Setters
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public void setDifficulty(double difficulty) {
-        this.difficulty = difficulty;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     // toString

@@ -68,7 +68,13 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
         whileTap={{ scale: 0.98 }}
         className="flex overflow-hidden bg-purple-100 shadow-md cursor-pointer rounded-3xl "
       >
-        <div className="w-[200px] h-[200px] rounded-3xl bg-white m-2" />
+        {/* <div className="w-[200px] h-[200px] rounded-3xl bg-white m-2" /> */}
+        <img
+          src={quiz.image}
+          alt={quiz.title}
+          // sizes="200px 200px"
+          className=" rounded-3xl w-[200px] h-[200px] m-2"
+        />
         <div className="flex flex-col flex-grow p-4">
           {/* First group - title and description */}
           <div>
@@ -89,10 +95,14 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
           <div className="flex justify-between">
             <div className="flex items-center gap-1">
               <IconUser className="text-zinc-700" size={20} />
-              <p className="text-sm text-gray-700">
-                created by{" "}
-                <span className="font-semibold">{quiz.username}</span>
-              </p>
+              <Link to={`/profile/${quiz.username}`}>
+                <p className="text-sm text-gray-700 group">
+                  created by{" "}
+                  <span className="font-semibold group-hover:underline">
+                    {quiz.username}
+                  </span>
+                </p>
+              </Link>
             </div>
             <div className="flex items-center gap-1">
               <IconBooks className="text-zinc-700" size={20} />

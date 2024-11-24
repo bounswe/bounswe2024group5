@@ -18,9 +18,11 @@ const HomePage = ({ navigation }) => {
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
-  const [difficulty, setDifficulty] = useState("a1"); // Default difficulty
+  const [otherQuizzesFilterDifficulty, setOtherQuizzesFilterDifficulty] = useState("a1"); // Default difficulty
   const authContext = useAuth(); // Get the authentication context
   const token = authContext ? authContext.token : null; // Get the token if authContext is not null
+
+  const userElo = 2000;
 
   useEffect(() => {
     // Fetch both quizzes whenever difficulty changes
@@ -36,7 +38,7 @@ const HomePage = ({ navigation }) => {
     };
 
     fetchData();
-  }, [difficulty]); // Dependency array includes 'difficulty'
+  }, [otherQuizzesFilterDifficulty]); // Dependency array includes 'difficulty'
 
   const fetchQuizzesForYou = async () => {
     try {
@@ -50,7 +52,19 @@ const HomePage = ({ navigation }) => {
           },
         }
       );
-      const data = await response.json();
+      let data = await response.json();
+      // create dummy image, elo and difficulty while waiting for backend
+      const possibleDifficulties = ["a1", "a2", "b1", "b2", "c1", "c2"]
+      data.quizzes = data.quizzes.map((quiz) => ({
+        ...quiz,
+        image: "https://via.placeholder.com/110x110.png?text=Quiz",
+        elo: Math.floor(Math.random() * 3000 + 500),
+        difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
+      }));
+       
+      // sort the quizzes for being closest to the userElo
+      data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
+
       if (response.ok) {
         setQuizzesForYou(data.quizzes);
         console.log("Quizzes for you:", data.quizzes); // TODO: Remove or comment out after debugging
@@ -74,7 +88,19 @@ const HomePage = ({ navigation }) => {
           },
         }
       );
-      const data = await response.json();
+      let data = await response.json();
+      // create dummy image, elo and difficulty while waiting for backend
+      const possibleDifficulties = ["a1", "a2", "b1", "b2", "c1", "c2"]
+      data.quizzes = data.quizzes.map((quiz) => ({
+        ...quiz,
+        image: "https://via.placeholder.com/110x110.png?text=Quiz",
+        elo: Math.floor(Math.random() * 3000 + 500),
+        difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
+      }));
+      data.quizzes = data.quizzes.filter((quiz)=>quiz.difficulty=otherQuizzesFilterDifficulty);
+      // sort the quizzes for being closest to the userElo
+      data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
+
       if (response.ok) {
         setOtherQuizzes(data.quizzes);
         console.log("Other quizzes:", data.quizzes); // TODO: Remove or comment out after debugging
@@ -90,15 +116,24 @@ const HomePage = ({ navigation }) => {
     navigation.navigate("QuizCreation");
   };
 
-  const navigateToMockQuiz = (quiz, questions) => {
-    navigation.navigate("QuizSolving", { quiz, questions });
+  const navigateToQuiz = (quiz, questions) => {
+    navigation.navigate("QuizWelcome", { quiz});
   };
 
   const renderOtherQuizzes = ({ item }: { item: Quiz }) => (
     <View style={styles.quizWrapper}>
       <QuizViewComponent
         quiz={item}
-        onPress={() => navigateToMockQuiz(item, item.questions)}
+        onPress={() => navigateToQuiz(item, item.questions)}
+      />
+    </View>
+  );
+
+  const renderQuizzesForYou = ({ item }: { item: Quiz }) => (
+    <View style={styles.quizWrapper}>
+      <QuizViewComponent
+        quiz={item}
+        onPress={() => navigateToQuiz(item, item.questions)}
       />
     </View>
   );
@@ -140,7 +175,7 @@ const HomePage = ({ navigation }) => {
                 <QuizViewComponent
                   key={quiz.id}
                   quiz={quiz}
-                  onPress={() => navigateToMockQuiz(quiz, quiz.questions)}
+                  onPress={() => navigateToQuiz(quiz, quiz.questions)}
                 />
               ))
             ) : (
@@ -156,8 +191,8 @@ const HomePage = ({ navigation }) => {
           <Text style={styles.sectionTitle}>Other Quizzes</Text>
           <View style={styles.dropdownContainer}>
             <DifficultyLevelDropdown
-              selectedValue={difficulty}
-              onValueChange={(value) => setDifficulty(value)}
+              selectedValue={otherQuizzesFilterDifficulty}
+              onValueChange={(value) => setOtherQuizzesFilterDifficulty(value)}
             />
           </View>
         </View>

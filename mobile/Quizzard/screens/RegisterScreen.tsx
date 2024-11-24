@@ -11,6 +11,8 @@ import {
 // import { CustomModal } from './LoginScreen';
 import { LinearGradient } from "expo-linear-gradient";
 import CustomModal from "../components/CustomModal";
+import { Picker } from "@react-native-picker/picker"; // Import Picker
+import { useAuth } from "./AuthProvider";
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -22,6 +24,9 @@ const RegisterScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [englishProficiency, setEnglishProficiency] = useState("a1");
+  const { login, token } = useAuth();
+
 
   const showError = (message) => {
     setErrorMessage(message);
@@ -74,7 +79,9 @@ const RegisterScreen = ({ navigation }) => {
       email: email,
       username: username,
       password: password,
+      englishProficiency: englishProficiency,
     };
+    console.log(requestBody);
     try {
       const response = await fetch("http://34.55.188.177/api/auth/register", {
         method: "POST",
@@ -87,10 +94,12 @@ const RegisterScreen = ({ navigation }) => {
       });
 
       const rawData = await response.text();
+      console.log(rawData)
 
       if (response.ok) {
         const data = JSON.parse(rawData);
         console.log(data.message);
+        await login(data.token);
         setSuccessModalVisible(true);
       } else {
         const data = rawData;
@@ -190,6 +199,24 @@ const RegisterScreen = ({ navigation }) => {
         secureTextEntry
       />
 
+      {/* English Proficiency Picker */}
+      <Text style={styles.pickerLabel}>English Proficiency</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={englishProficiency}
+          onValueChange={(itemValue) => setEnglishProficiency(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="A1" value="A1" />
+          <Picker.Item label="A2" value="A2" />
+          <Picker.Item label="B1" value="B1" />
+          <Picker.Item label="B2" value="B2" />
+          <Picker.Item label="C1" value="C1" />
+          <Picker.Item label="C2" value="C2" />
+
+        </Picker>
+      </View>
+
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerButtonText}>Register</Text>
       </TouchableOpacity>
@@ -223,6 +250,22 @@ const styles = StyleSheet.create({
     color: "#22005d", // dark purple color
     textAlign: "center",
     marginBottom: 16,
+  },
+  pickerLabel: {
+    fontSize: 16,
+    color: "#22005d",
+    marginBottom: 8,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#6a0dad",
+    borderRadius: 8,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  picker: {
+    height: 50,
+    color: "#6a0dad",
   },
   input: {
     borderWidth: 1,

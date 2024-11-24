@@ -71,7 +71,16 @@ public class WebSecurityConfig {
 
         http.cors(httpSecurityCorsConfigurer -> 
             httpSecurityCorsConfigurer.configurationSource(request -> 
-           new CorsConfiguration().applyPermitDefaultValues()));
+           {
+            CorsConfiguration configuration = new CorsConfiguration();
+            configuration.addAllowedOrigin("*"); // Allow all origins (adjust as needed)
+            configuration.addAllowedMethod("GET");
+            configuration.addAllowedMethod("POST");
+            configuration.addAllowedMethod("DELETE");
+            configuration.addAllowedMethod("PUT");
+            configuration.addAllowedHeader("*"); // Allow all headers
+            return configuration;
+           }));
 
         return http.build();
     }

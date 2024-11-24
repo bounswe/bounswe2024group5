@@ -24,8 +24,15 @@ const NavBar = () => {
         </Link>
       </div>
       <div className="flex gap-4">
-        <div className="w-8 h-8 bg-white rounded-full cursor-pointer" />
-        <Link to="/login" onClick={() => {sessionStorage.removeItem("token")}}>
+        <Link to="profile">
+          <div className="w-8 h-8 bg-white rounded-full cursor-pointer" />
+        </Link>
+        <Link
+          to="/login"
+          onClick={() => {
+            sessionStorage.removeItem("token");
+          }}
+        >
           <IconLogout size={32} className="cursor-pointer text-violet-700" />
         </Link>
       </div>

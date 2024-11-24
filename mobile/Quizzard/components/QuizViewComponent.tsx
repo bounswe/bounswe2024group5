@@ -11,8 +11,9 @@ const QuizViewComponent = ({ quiz, onPress, onEdit, onDelete, showActions = fals
         onPress={onPress ? onPress : undefined}
         activeOpacity={onPress ? 0.7 : 1}
       >
-        {/* Quiz Image */}
-        <Image source={{ uri: quiz.image }} style={styles.quizImage} />
+        {/* Quiz Image */}        
+        <Image source={{uri: quiz.image }} style={styles.quizImage} />
+        
 
         {/* Quiz Details */}
         <View style={styles.quizDetails}>
