@@ -1,100 +1,76 @@
 // ForumScreen.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BaseLayout from "./BaseLayout";
 import QuestionItem from "../components/QuestionItem";
+import HostUrlContext from "../app/HostContext";
+import { useAuth } from "./AuthProvider"; // Import useAuth
 
 const ForumScreen = ({ navigation }) => {
-  const [questions, setQuestions] = useState([
-    {
-      id: 1,
-      title: "What’s the difference between 'affect' and 'effect'?",
-      description:
-        "I often confuse 'affect' and 'effect'. Can someone explain the difference with examples?",
-      createdAt: "1h ago",
-      commentCount: 8,
-    },
-    {
-      id: 2,
-      title: "How do I use 'since' and 'for' correctly in sentences?",
-      description:
-        "I'm having trouble using 'since' and 'for' when talking about time. Can anyone give clear examples of when to use each?",
-      createdAt: "2h ago",
-      commentCount: 5,
-    },
-    {
-      id: 3,
-      title: "What’s the meaning of the word 'ubiquitous'?",
-      description:
-        "I came across the word 'ubiquitous' in an article. Can someone explain what it means and how to use it in a sentence?",
-      createdAt: "3h ago",
-      commentCount: 3,
-    },
-    {
-      id: 4,
-      title:
-        "How can I remember the difference between 'their', 'there', and 'they’re'?",
-      description:
-        "I often get confused with 'their', 'there', and 'they’re'. What are some tips or tricks to remember the differences?",
-      createdAt: "5h ago",
-      commentCount: 10,
-    },
-    {
-      id: 5,
-      title: "What is the past tense of 'buy'?",
-      description:
-        "I'm trying to understand irregular verbs. Is 'buyed' the correct past tense of 'buy'?",
-      createdAt: "6h ago",
-      commentCount: 2,
-    },
-    {
-      id: 6,
-      title: "What’s the difference between 'lend' and 'borrow'?",
-      description:
-        "I'm confused about when to use 'lend' vs. 'borrow'. Can someone clarify with examples?",
-      createdAt: "7h ago",
-      commentCount: 6,
-    },
-    {
-      id: 7,
-      title: "How do I use 'could', 'would', and 'should' in polite requests?",
-      description:
-        "I'm learning modal verbs but struggle with using 'could', 'would', and 'should' correctly in polite requests. Any advice?",
-      createdAt: "8h ago",
-      commentCount: 7,
-    },
-    {
-      id: 8,
-      title: "Can someone explain the phrase 'kick the bucket'?",
-      description:
-        "I heard someone say 'kick the bucket' in a movie. What does this phrase mean?",
-      createdAt: "9h ago",
-      commentCount: 4,
-    },
-    {
-      id: 9,
-      title: "How do I form a question in the present perfect tense?",
-      description:
-        "I’m having difficulty forming questions in the present perfect tense. Can someone give examples?",
-      createdAt: "10h ago",
-      commentCount: 5,
-    },
-    {
-      id: 10,
-      title: "What’s the difference between 'few' and 'a few'?",
-      description:
-        "I’ve seen both 'few' and 'a few' used in sentences, but I’m not sure when to use each. Can anyone explain?",
-      createdAt: "12h ago",
-      commentCount: 6,
-    },
-  ]);
+  const [questions, setQuestions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
+
+  const authContext = useAuth(); // Get the authentication context
+  const token = authContext ? authContext.token : null; // Get the token if authContext is not null
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(`${hostUrl}/api/posts`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        });
+
+        console.log("Response status:", response.status);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Data fetched:", data);
+
+          // Check if data is an array
+          if (Array.isArray(data)) {
+            // Map the API data to match the structure expected by QuestionItem
+            const formattedData = data.map((item) => ({
+              id: item.id,
+              title: item.title,
+              description: item.content,
+              createdAt: item.createdAt,
+              commentCount: item.commentCount || 0, // Adjust based on your API response
+            }));
+            setQuestions(formattedData);
+          } else {
+            console.error("Data is not an array:", data);
+            Alert.alert(
+              "Error",
+              "Unexpected data format received from server."
+            );
+          }
+        } else {
+          const errorData = await response.json();
+          console.error("Error response data:", errorData);
+          Alert.alert("Error", errorData.message || "Failed to fetch posts.");
+        }
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+        Alert.alert("Error", "Failed to fetch posts. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [hostUrl, token]);
 
   const navigateToCreateQuestion = () => {
     navigation.navigate("CreateQuestion");
@@ -104,13 +80,19 @@ const ForumScreen = ({ navigation }) => {
     navigation.navigate("SearchWords");
   };
 
-  const navigateToQuestionDetail = (
-    questionId: number,
-    title: string,
-    description: string
-  ) => {
+  const navigateToQuestionDetail = (questionId, title, description) => {
     navigation.navigate("QuestionDetail", { questionId, title, description });
   };
+
+  if (isLoading) {
+    return (
+      <BaseLayout navigation={navigation}>
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#6a0dad" />
+        </View>
+      </BaseLayout>
+    );
+  }
 
   return (
     <BaseLayout navigation={navigation}>

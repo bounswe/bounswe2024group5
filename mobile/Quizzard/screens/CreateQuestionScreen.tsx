@@ -1,14 +1,19 @@
-import React, { useState } from "react";
+// CreateQuestionScreen.tsx
+import React, { useState, useContext } from "react";
 import {
   View,
   TextInput,
   TouchableOpacity,
   Text,
   StyleSheet,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../app/index";
-import { Ionicons } from "@expo/vector-icons"; // Ensure you have expo/vector-icons installed
+import { Ionicons } from "@expo/vector-icons";
+import HostUrlContext from "../app/HostContext";
+import { useAuth } from "./AuthProvider"; // Import useAuth
 
 type CreateQuestionScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -21,12 +26,62 @@ type Props = {
 
 const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
+  const [content, setContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
 
-  const handleSubmit = () => {
-    // Submit the question to your backend
-    // Then navigate back to the previous screen (likely ForumScreen)
-    navigation.goBack();
+  const authContext = useAuth(); // Get the authentication context
+  const token = authContext ? authContext.token : null; // Get the token if authContext is not null
+
+  const handleSubmit = async () => {
+    if (!title || !content || !tagsInput) {
+      Alert.alert("Error", "Please fill in all fields.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Split the tagsInput by commas and trim whitespace
+      const tagsArray = tagsInput.split(",").map((tag) => tag.trim());
+
+      const response = await fetch(`${hostUrl}/api/posts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the token from useAuth
+        },
+        body: JSON.stringify({
+          title: title,
+          content: content,
+          tags: tagsArray,
+        }),
+      });
+
+      console.log("Request Body:", {
+        title: title,
+        content: content,
+        tags: tagsArray,
+      });
+
+      if (response.status === 201) {
+        const data = await response.json();
+        // Navigate back to the ForumScreen or show a success message
+        navigation.goBack();
+      } else if (response.status === 401) {
+        Alert.alert("Unauthorized", "Please log in to submit a question.");
+      } else if (response.status === 400) {
+        Alert.alert("Error", "Title, content, and tags are required.");
+      } else {
+        Alert.alert("Error", "An unexpected error occurred.");
+      }
+    } catch (error) {
+      console.error("Error submitting question:", error);
+      Alert.alert("Error", "Failed to submit the question.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -38,20 +93,34 @@ const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
       <TextInput
-        style={styles.titleInput}
+        style={styles.input}
         value={title}
         onChangeText={setTitle}
         placeholder="Question Title"
       />
       <TextInput
+        style={styles.input}
+        value={tagsInput}
+        onChangeText={setTagsInput}
+        placeholder="Tags (comma-separated)"
+      />
+      <TextInput
         style={styles.descriptionInput}
-        value={description}
-        onChangeText={setDescription}
-        placeholder="Question Description"
+        value={content}
+        onChangeText={setContent}
+        placeholder="Question Content"
         multiline
       />
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Submit Question</Text>
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={handleSubmit}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.submitButtonText}>Submit Question</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -66,7 +135,7 @@ const styles = StyleSheet.create({
   backButton: {
     marginBottom: 20,
   },
-  titleInput: {
+  input: {
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
