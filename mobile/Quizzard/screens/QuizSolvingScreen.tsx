@@ -212,6 +212,10 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     }
   };
 
+  const handleCancel = async () => {
+    // TODO: Add putting the question-answers for this quiz attempt to the backend.
+  };
+
   const generateQuestionSentence = (question): string => {
     // const generateQuestionSentence = (question_type: 'english_to_turkish' | 'turkish_to_english' | 'english_to_sense', word: string): string => {
     console.log("Question: ", question.questionType, question.word);
@@ -292,7 +296,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
             <View style={styles.bottomButtons}>
         <TouchableOpacity
           style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
+          onPress={handleCancel}
         >
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>

@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import CustomModal from "../components/CustomModal";
-import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
 import { RegisteredUser, Profile } from "../database/types";
@@ -28,7 +27,6 @@ const RegisterScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [englishProficiency, setEnglishProficiency] = useState("");
   const { login, token } = useAuth();
 
   const showError = (message) => {
@@ -263,22 +261,6 @@ const styles = StyleSheet.create({
     color: "#22005d", // dark purple color
     textAlign: "center",
     marginBottom: 16,
-  },
-  pickerLabel: {
-    fontSize: 16,
-    color: "#22005d",
-    marginBottom: 8,
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: "#6a0dad",
-    borderRadius: 8,
-    marginBottom: 16,
-    overflow: "hidden",
-  },
-  picker: {
-    height: 50,
-    color: "#6a0dad",
   },
   input: {
     width: "100%",
