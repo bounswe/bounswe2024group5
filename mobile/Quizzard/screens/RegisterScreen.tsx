@@ -6,15 +6,11 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Modal,
 } from "react-native";
-// import { CustomModal } from './LoginScreen';
-import { LinearGradient } from "expo-linear-gradient";
 import CustomModal from "../components/CustomModal";
 import HostUrlContext from '../app/HostContext';
 import { RegisteredUser, Profile } from "../database/types";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
-import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
 
@@ -30,9 +26,7 @@ const RegisterScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [englishProficiency, setEnglishProficiency] = useState("a1");
   const { login, token } = useAuth();
-
 
   const showError = (message) => {
     setErrorMessage(message);
@@ -125,7 +119,6 @@ const RegisterScreen = ({ navigation }) => {
         headers: {
           "Content-Type": "application/json",
           "Content-Length": JSON.stringify(requestBody).length.toString(),
-          // Host: "34.55.188.177",
         },
         body: JSON.stringify(requestBody),
       });
@@ -252,24 +245,8 @@ const RegisterScreen = ({ navigation }) => {
           secureTextEntry
         />
 
-      {/* English Proficiency Picker */}
-      <Text style={styles.pickerLabel}>English Proficiency</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={englishProficiency}
-          onValueChange={(itemValue) => setEnglishProficiency(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="A1" value="A1" />
-          <Picker.Item label="A2" value="A2" />
-          <Picker.Item label="B1" value="B1" />
-          <Picker.Item label="B2" value="B2" />
-          <Picker.Item label="C1" value="C1" />
-          <Picker.Item label="C2" value="C2" />
-
-        </Picker>
-      </View>
-
+      {/* English Proficiency */}
+      <Text style={styles.proficiencyLabel}>Select your Proficiency:</Text>
         <DifficultyLevelDropdown
           selectedValue={englishProficiency}
           onValueChange={(value) => setEnglishProficiency(value)}
@@ -310,21 +287,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 16,
   },
-  pickerLabel: {
+  proficiencyLabel: {
     fontSize: 16,
     color: "#22005d",
     marginBottom: 8,
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: "#6a0dad",
-    borderRadius: 8,
-    marginBottom: 16,
-    overflow: "hidden",
-  },
-  picker: {
-    height: 50,
-    color: "#6a0dad",
+    marginLeft: 4,
   },
   inputContainer: {
     marginRight: 12,
