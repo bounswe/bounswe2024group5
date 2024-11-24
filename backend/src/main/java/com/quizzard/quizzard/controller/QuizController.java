@@ -4,6 +4,7 @@ import com.quizzard.quizzard.model.Quiz;
 import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.model.request.CreateQuizRequest;
 import com.quizzard.quizzard.model.request.SolveQuizRequest;
+import com.quizzard.quizzard.model.request.UpdateQuizRequest;
 import com.quizzard.quizzard.model.response.QuizResponse;
 import com.quizzard.quizzard.model.response.SolveQuizResponse;
 import com.quizzard.quizzard.service.QuizService;
@@ -27,10 +28,11 @@ public class QuizController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    // Tüm quizleri listeleme
     @GetMapping
-    public Map<String, Object> getAllQuizzes() {
-        return Map.of("quizzes", quizService.getAllQuizzes());
+    public Map<String, Object> getAllQuizzes(@RequestParam Optional<String> username,
+                                             @RequestParam Optional<Integer> minDifficulty,
+                                             @RequestParam Optional<Integer> maxDifficulty) {
+        return Map.of("quizzes", quizService.getAllQuizzes(username, minDifficulty, maxDifficulty));
     }
 
     // ID'ye göre quiz getirme
@@ -44,7 +46,7 @@ public class QuizController {
         }
     }
 
-    // Yeni quiz oluşturma
+
     @PostMapping
     public ResponseEntity<QuizResponse> createQuiz(@RequestHeader("Authorization") String jwt, @RequestBody CreateQuizRequest quizRequest) {
         String authorUsername = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
@@ -52,21 +54,20 @@ public class QuizController {
         return ResponseEntity.ok(createdQuiz);
     }
 
-    // Quiz güncelleme
+
     @PutMapping("/{id}")
-    public ResponseEntity<Quiz> updateQuiz(@PathVariable Long id, @RequestBody Quiz quiz) {
-        Quiz updatedQuiz = quizService.updateQuiz(id, quiz);
-        if (updatedQuiz != null) {
-            return ResponseEntity.ok(updatedQuiz);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<QuizResponse> updateQuiz(@RequestHeader("Authorization") String jwt, @PathVariable Long id,
+                                           @RequestBody UpdateQuizRequest request) {
+        String username = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
+        QuizResponse updatedQuiz = quizService.updateQuiz(username, id, request);
+        return ResponseEntity.ok(updatedQuiz);
     }
 
-    // Quiz silme
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteQuiz(@PathVariable Long id) {
-        quizService.deleteQuiz(id);
+    public ResponseEntity<Void> deleteQuiz(@RequestHeader("Authorization") String jwt, @PathVariable Long id) {
+        String authorUsername = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
+        quizService.deleteQuiz(authorUsername, id);
         return ResponseEntity.noContent().build();
     }
 
