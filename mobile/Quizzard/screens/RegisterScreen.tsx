@@ -12,6 +12,8 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import CustomModal from "../components/CustomModal";
 import HostUrlContext from '../app/HostContext';
+import { RegisteredUser, Profile } from "../database/types";
+import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
@@ -19,11 +21,12 @@ import HostUrlContext from '../app/HostContext';
 const RegisterScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
   const [username, setUsername] = useState("");
+  const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [englishProficiency, setEnglishProficiency] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -41,10 +44,6 @@ const RegisterScreen = ({ navigation }) => {
       showError("Name cannot be empty");
       return false;
     }
-    if (!surname) {
-      showError("Surname cannot be empty");
-      return false;
-    }
     if (!username) {
       showError("Username cannot be empty");
       return false;
@@ -55,6 +54,14 @@ const RegisterScreen = ({ navigation }) => {
     }
     if (!password) {
       showError("Password cannot be empty");
+      return false;
+    }
+    if (!confirmPassword) {
+      showError("Confirm Password cannot be empty");
+      return false;
+    }
+    if (!englishProficiency) {
+      showError("English Proficiency cannot be empty");
       return false;
     }
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -73,12 +80,37 @@ const RegisterScreen = ({ navigation }) => {
     return true;
   };
 
+  const fetchUserProfile = async (token) => {
+    try {
+      console.log("username is:", username);
+      const response = await fetch(
+        `${hostUrl}/api/profile/${username}`, // TODO: fix when endpoint added, Change to the correct host
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const user = await response.json();
+      if (response.ok) {
+        console.log("User profile data:", user);
+        return user;
+      } else {
+        console.error("Failed to fetch user profile data", response);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      return null;
+    }
+  };
+
   const handleRegister = async () => {
     if (!validateInputs()) return;
 
     const requestBody = {
       name: name,
-      surname: surname,
       email: email,
       username: username,
       password: password,
@@ -106,6 +138,30 @@ const RegisterScreen = ({ navigation }) => {
         console.log(data.message);
         await login(data.token);
         setSuccessModalVisible(true);
+        // await login(data.token);
+        console.log("Registered successfully");
+        fetchUserProfile(data.token);
+        const registeredUser = await fetchUserProfile(data.token);
+        const userProfile: Profile = {
+          name: registeredUser.name,
+          score: registeredUser.score,
+          profilePicture: registeredUser.profilePicture,
+          englishProficiency: registeredUser.englishProficiency,
+          createdQuizzes: [],
+          favoritedQuizzes: [],
+          favoritedQuestions: [],
+          posts: [],
+        };
+        const user: RegisteredUser = {
+          username: registeredUser.username,
+          password: registeredUser.password,
+          email: registeredUser.email,
+          profile: userProfile,
+        };
+        setUser(user);
+        console.log("Logged in user:", user);
+        navigation.navigate("Home", { registeredUser: user });
+
       } else {
         const data = rawData;
         switch (response.status) {
@@ -149,60 +205,52 @@ const RegisterScreen = ({ navigation }) => {
       <Text style={styles.title}>Quizzard</Text>
       <Text style={styles.infoText}>Register to access Quizzard.</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        placeholderTextColor="#aaa"
-        value={name}
-        onChangeText={setName}
-        autoCapitalize="words"
-      />
+      <View style={styles.inputContainer}> 
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          placeholderTextColor="#aaa"
+          value={name}
+          onChangeText={setName}
+          autoCapitalize="words"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Surname"
-        placeholderTextColor="#aaa"
-        value={surname}
-        onChangeText={setSurname}
-        autoCapitalize="words"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          placeholderTextColor="#aaa"
+          value={username}
+          onChangeText={setUsername}
+          autoCapitalize="none"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        placeholderTextColor="#aaa"
-        value={username}
-        onChangeText={setUsername}
-        autoCapitalize="none"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#aaa"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#aaa"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#aaa"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#aaa"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        placeholderTextColor="#aaa"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          placeholderTextColor="#aaa"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+        />
 
       {/* English Proficiency Picker */}
       <Text style={styles.pickerLabel}>English Proficiency</Text>
@@ -220,6 +268,12 @@ const RegisterScreen = ({ navigation }) => {
           <Picker.Item label="C2" value="C2" />
 
         </Picker>
+      </View>
+
+        <DifficultyLevelDropdown
+          selectedValue={englishProficiency}
+          onValueChange={(value) => setEnglishProficiency(value)}
+        />
       </View>
 
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
@@ -272,11 +326,17 @@ const styles = StyleSheet.create({
     height: 50,
     color: "#6a0dad",
   },
+  inputContainer: {
+    marginRight: 12,
+    marginLeft: 4,
+  },
   input: {
+    width: "100%",
     borderWidth: 1,
     borderColor: "#6a0dad",
     borderRadius: 8,
     padding: 12,
+    margin: 4,
     marginBottom: 16,
     backgroundColor: "#fff",
     color: "#6a0dad",

@@ -9,40 +9,35 @@ import {
   Modal,
 } from "react-native";
 import { useAuth } from "./AuthProvider";
-// import CustomButton from "../components/CustomButton";
-// import GradientBackground from "../components/GradientBackground";
 import { LinearGradient } from "expo-linear-gradient";
-import { RegisteredUser } from "../database/types";
-import { Profile } from "../database/types";
+import { RegisteredUser, Profile } from "../database/types";
 import CustomModal from "../components/CustomModal";
 import HostUrlContext from '../app/HostContext';
 import HostContext from '../app/HostContext';
 
 const LoginScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
+  const [user, setUser] = useState<RegisteredUser | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
   const { login, token } = useAuth();
-  const [registeredUser, setUserData] = useState(null);
 
   const fetchUserProfile = async (token) => {
     try {
-      console.log("token is:", token);
+      console.log("username is:", username);
       const response = await fetch(
-        `${hostUrl}/api/users/${username}`, // TODO: fix when endpoint added, Change to the correct host
+        `${hostUrl}/api/profile/${username}`, // TODO: fix when endpoint added, Change to the correct host
         {
           method: "GET",
           headers: {
-            // Host: "34.55.188.177", // Change to the correct host
             Authorization: `Bearer ${token}`,
           },
         }
       );
       const user = await response.json();
       if (response.ok) {
-        setUserData(user);
         console.log("User profile data:", user);
         return user;
       } else {
@@ -73,7 +68,6 @@ const LoginScreen = ({ navigation }) => {
           headers: {
             "Content-Type": "application/json",
             "Content-Length": JSON.stringify(requestBody).length.toString(),
-            // Host: "34.55.188.177", // Change to the correct host
           },
           body: JSON.stringify(requestBody),
         }
@@ -82,38 +76,26 @@ const LoginScreen = ({ navigation }) => {
       if (response.ok) {
         await login(data.token);
         console.log("Logged in successfully");
-        // fetchUserProfile(data.token); // TODO: uncomment when endpoint added
-        // const registeredUser = await fetchUserProfile(data.token);
-        // const userProfile: Profile = { //
-        //   name: registeredUser.name,
-        //   surname: registeredUser.surname,
-        //   level: registeredUser.level,
-        //   elo: registeredUser.elo,
-        // };
-        // const user: RegisteredUser = {
-        //   username: registeredUser.username,
-        //   password: registeredUser.password,
-        //   email: registeredUser.email,
-        //   profile: userProfile,
-        // };
+        fetchUserProfile(data.token);
+        const registeredUser = await fetchUserProfile(data.token);
         const userProfile: Profile = {
-          name: "John",
-          surname: "Doe",
-          level: "Beginner",
-          elo: 1000,
-          profilePicture: "demo",
-        };
-        const user: RegisteredUser = {
-          username: "demo",
-          password: "demo",
-          email: "demo",
-          profile: userProfile,
+          name: registeredUser.name,
+          score: registeredUser.score,
+          profilePicture: registeredUser.profilePicture,
+          englishProficiency: registeredUser.englishProficiency,
           createdQuizzes: [],
           favoritedQuizzes: [],
           favoritedQuestions: [],
           posts: [],
         };
-        console.log("Registered user data:", user);
+        const user: RegisteredUser = {
+          username: registeredUser.username,
+          password: registeredUser.password,
+          email: registeredUser.email,
+          profile: userProfile,
+        };
+        setUser(user);
+        console.log("Logged in user:", user);
         navigation.navigate("Home", { registeredUser: user });
       } else {
         setErrorMessage(data.message || "Invalid username/password");

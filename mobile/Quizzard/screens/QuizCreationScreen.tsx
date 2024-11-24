@@ -24,7 +24,7 @@ const QuizCreationPage = ({ navigation }) => {
   const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
   const [selectedType, setSelectedType] = useState(""); // Default type
   const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
-  const [imageUrl, setMediaUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [image, setMedia] = useState<string | null>(null);
   const authContext = useAuth();
@@ -84,10 +84,11 @@ const QuizCreationPage = ({ navigation }) => {
       try {
         const fileUrl = await uploadFile(result.assets[0].uri);
         console.log('Uploaded file URL:', fileUrl);
+        setImageUrl(fileUrl);
         alert('File uploaded successfully!');
       } catch (error) {
         console.error('Failed to upload file:', error);
-        alert('File upload failed.');
+        alert('File upload failed. Try a smaller image.');
       } finally {
         setUploading(false);
       }
@@ -123,9 +124,8 @@ const QuizCreationPage = ({ navigation }) => {
       id: Math.floor(Math.random() * 1000),
       title: quizTitle,
       description: quizDescription,
-      difficulty: 1,
-      image: "/api/placeholder/250/250",
-      // image: imageUrl || "/api/placeholder/250/250",
+      // difficulty: 1,
+      image: imageUrl || "/api/placeholder/250/250",
       questions: formattedQuestions,
     };
 
@@ -146,7 +146,9 @@ const QuizCreationPage = ({ navigation }) => {
 
     console.log("Token:", token);
     console.log("Request Body:", JSON.stringify(quizData)); // Log the payload
-    const response = await fetch("http://34.55.188.177/api/quizzes", {
+    const response = await fetch(
+      `${hostUrl}/api/quizzes`,
+      {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
