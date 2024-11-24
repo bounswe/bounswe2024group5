@@ -1,29 +1,33 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 import {
   IconHeart,
   IconPencil,
   IconTrophy,
   IconMedal,
+  IconUser,
+  IconMail,
+  IconEdit,
 } from "@tabler/icons-react";
 
-import { QUIZ_DIFFICULTIES } from "../components/list-quizzes/regular-quiz-card";
+import ProfileUpdateModal from "../components/profile/update-modal";
+
+import { QUIZ_DIFFICULTIES } from "../components/badges/level";
 import { Tabs } from "antd";
 import { useParams } from "react-router-dom";
 import { useGetProfile } from "../hooks/api/profile/get";
 import { useUpdateProfile } from "../hooks/api/profile/update";
 
 const ProfilePage = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { username } = useParams<{ username?: string }>();
   const { data: profile, error } = useGetProfile(username);
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     useUpdateProfile();
   const user = {
-    username: "JohnDoe",
-    email: "john@example.com",
-    totalPoints: 1250,
     badges: [
-      { id: 1, name: "Quiz Master", description: "Created 10 quizzes" },
+      { id: 1, name: "Quiz Master", description: "Created 2 quizzes" },
       { id: 2, name: "Perfect Score", description: "Got 100% on 5 quizzes" },
     ],
     quizHistory: [
@@ -71,6 +75,13 @@ const ProfilePage = () => {
 
   return (
     <main className="min-h-screen px-4 py-4 bg-purple-50 rounded-3xl">
+      <ProfileUpdateModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onUpdate={handleProfileUpdate}
+        initialData={profile}
+        isUpdating={isUpdating}
+      />
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -102,26 +113,37 @@ const ProfilePage = () => {
 
                   {isOwnProfile && (
                     <button
-                      className="px-4 py-2 text-white transition-colors rounded-full bg-violet-500 hover:bg-violet-600"
-                      onClick={() => {
-                        // Implement edit profile modal/form
-                        handleProfileUpdate({
-                          name: "New Name",
-                          email: "new@email.com",
-                        });
-                      }}
+                      className="flex items-center gap-2 px-4 py-2 text-white transition-colors rounded-full bg-violet-500 hover:bg-violet-600"
+                      // onClick={() => {
+                      //   handleProfileUpdate({
+                      //     name: "New Name",
+                      //     email: "new@email.com",
+                      //   });
+                      // }}
+                      onClick={() => setIsModalOpen(true)}
                       disabled={isUpdating}
                     >
-                      {isUpdating ? "Updating..." : "Edit Profile"}
+                      <IconEdit size={20} />
+                      {isUpdating ? "Updating..." : "Edit"}
                     </button>
                   )}
                 </div>
-                <p className="text-gray-600 place-self-start">
-                  {profile.email}
-                </p>
-                <p className="mt-2 text-sm text-gray-600">
-                  @{profile.username}
-                </p>
+
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1 mt-2">
+                    <IconUser className="text-zinc-700" size={20} stroke={3} />
+                    <p className="text-gray-600 text-md place-self-start">
+                      @{profile.username}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1 mt-2">
+                    <IconMail className="text-zinc-700" size={20} stroke={3} />
+                    <p className="text-gray-600 place-self-start">
+                      {profile.email}
+                    </p>
+                  </div>
+                </div>
 
                 <div className="flex items-center gap-4 mt-8">
                   <div className="flex items-center gap-2">
@@ -194,7 +216,6 @@ const ProfilePage = () => {
                               </span>
                               <div className="flex items-center gap-1">
                                 <IconHeart className="w-5 h-5 text-red-500" />
-                                {/* <span>{quiz.likes}</span> */}
                                 <span>{Math.floor(Math.random() * 100)}</span>
                               </div>
                             </div>
