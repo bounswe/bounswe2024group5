@@ -13,10 +13,10 @@ import QuizViewComponent from "../components/QuizViewComponent";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
-import HostContext from '../app/HostContext';
+import HostUrlContext from '../app/HostContext';
 
 const HomePage = ({ navigation }) => {
-  const hostUrl = useContext(HostContext);
+  const hostUrl = useContext(HostUrlContext);
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);

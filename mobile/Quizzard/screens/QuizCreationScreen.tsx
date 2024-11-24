@@ -14,10 +14,10 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";  // Import FileSystem for base64 conversion
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "./AuthProvider";
-import HostContext from '../app/HostContext';
+import HostUrlContext from '../app/HostContext';
 
 const QuizCreationPage = ({ navigation }) => {
-  const hostUrl = useContext(HostContext);
+  const hostUrl = useContext(HostUrlContext);
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
