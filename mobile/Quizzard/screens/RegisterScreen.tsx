@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import CustomModal from "../components/CustomModal";
-import HostUrlContext from '../app/HostContext';
 import { RegisteredUser, Profile } from "../database/types";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
