@@ -16,7 +16,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "./AuthProvider";
 import HostContext from '../app/HostContext';
 
-
 const QuizCreationPage = ({ navigation }) => {
   const hostUrl = useContext(HostContext);
   const [quizTitle, setQuizTitle] = useState("");
@@ -25,13 +24,75 @@ const QuizCreationPage = ({ navigation }) => {
   const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
   const [selectedType, setSelectedType] = useState(""); // Default type
   const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrl, setMediaUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setMedia] = useState<string | null>(null);
   const authContext = useAuth();
   const token = authContext ? authContext.token : null;
 
-  // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready.
+  // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready
+
+  const uploadFile = async (fileUri: string) => {
+    try {
+      // Prepare the form data
+      const formData = new FormData();
+      formData.append('file', {
+        uri: fileUri,
+        type: 'image/jpeg', // Adjust this based on your file type
+        name: 'upload.jpg', // You can customize the file name
+      });
+  
+      // Make the POST request to upload the file
+      const response = await fetch(
+        `${hostUrl}/api/file/upload`,
+        {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      if (response.ok) {
+        const result = await response.text();
+        console.log('File uploaded successfully:', result);
+        return result;
+      } else {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const pickImageAndUpload = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert('Permission to access media library is required!');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setUploading(true);
+      try {
+        const fileUrl = await uploadFile(result.assets[0].uri);
+        console.log('Uploaded file URL:', fileUrl);
+        alert('File uploaded successfully!');
+      } catch (error) {
+        console.error('Failed to upload file:', error);
+        alert('File upload failed.');
+      } finally {
+        setUploading(false);
+      }
+    }
+  };
+
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -46,9 +107,9 @@ const QuizCreationPage = ({ navigation }) => {
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const selectedMedia = result.assets[0].uri;
-      setImage(selectedMedia);
+      setMedia(selectedMedia);
 
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append("file", {
         uri: selectedMedia,
         name: "upload.jpg",
@@ -58,23 +119,24 @@ const QuizCreationPage = ({ navigation }) => {
       setUploading(true); // Start uploading
       try {
         const uploadResponse = await fetch(
-          // `${hostUrl}/api/file/upload`,
-          "http://localhost:80/api/file/upload",
+          `${hostUrl}/api/file/upload`,
           {
             method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
+              Accept: 'application/json',
+              'Content-Type': 'multipart/form-data',
             },
             body: formData,
           }
         );
 
         if (!uploadResponse.ok) {
-          throw new Error(`HTTP error! Status: ${uploadResponse.status}`);
+          const errorMessage = await uploadResponse.text();
+          throw new Error(`HTTP error! Status: ${uploadResponse.status}. Message: ${errorMessage}`);
         }
         const uploadData = await uploadResponse.text();
-        setImageUrl(uploadData);
+        setMediaUrl(uploadData);
         console.log("Media file uploaded successfully: ", uploadData);
       } catch (error) {
         console.error("Error uploading media file:", error);
@@ -317,7 +379,7 @@ const QuizCreationPage = ({ navigation }) => {
       />
 
       {/* Image Upload Box */}
-      <TouchableOpacity style={styles.imageUploadBox} onPress={pickImage}>
+      <TouchableOpacity style={styles.imageUploadBox} onPress={pickImageAndUpload}>
         <Text style={styles.imageUploadText}>
           {image ? "Image Uploaded" : "+ Upload Image"}
         </Text>
