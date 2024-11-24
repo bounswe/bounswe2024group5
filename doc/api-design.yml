@@ -137,6 +137,91 @@ components:
         score: 1500.0
         englishProficiency: B1
         noCreatedQuizzes: 5
+    CreateQuizRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionRequest'
+    UpdateQuizRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+    QuestionRequest:
+      type: object
+      properties:
+        questionType:
+          type: string
+          enum: [english_to_turkish, turkish_to_english, english_to_sense]
+        word:
+          type: string
+        correctAnswer:
+          type: string
+        wrongAnswers:
+          type: array
+          items:
+            type: string
+          example: ["answer1", "answer2", "answer3"]  
+    QuizResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        difficulty:
+          type: number
+          format: float
+        username:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionResponse'
+    QuestionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        quizId:
+          type: integer
+        questionType:
+          type: string
+          enum: [english_to_turkish, turkish_to_english, english_to_sense]
+        word:
+          type: string
+        correctAnswer:
+          type: string
+        wrongAnswers:
+          type: array
+          items:
+            type: string
+          example: ["answer1", "answer2", "answer3"]  
+        difficulty:
+          type: number
+          format: float
     Quiz:
       type: object
       properties:
@@ -710,90 +795,33 @@ paths:
         '400':
           description: Invalid input
   /quizzes:
-    post:
-      summary: Create a new quiz
-      tags:
-        - Quizzes
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                description:
-                  type: string
-                image:
-                  type: string
-                  format: base64
-                questions:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      questionType:
-                        type: string
-                        enum: [english_to_turkish, turkish_to_english, english_to_sense]
-                      word:
-                        type: string
-                      correctAnswer:
-                        type: string
-                      wrongAnswers:
-                        type: array
-                        items:
-                          type: string
-              required:
-                - title
-                - questions
-      responses:
-        '201':
-          description: Quiz created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Quiz'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
     get:
-      summary: Get list of quizzes
+      summary: Get all quizzes optionally by filters
+      description: Retrieve all quizzes, optionally filtered by author username and difficulty range.
       tags:
         - Quizzes
-      security:
-        - bearerAuth: []
       parameters:
-        - name: page
+        - name: username
           in: query
-          schema:
-            type: integer
-          description: Page number
-        - name: limit
-          in: query
-          schema:
-            type: integer
-          description: Number of items per page
-        - name: filter
-          in: query
+          description: Username of the quiz author
+          required: false
           schema:
             type: string
-            enum: [own, others, all]
-          description: Filter quizzes by ownership (own, others, or all)
-        - name: difficulty
+        - name: minDifficulty
           in: query
+          description: Minimum difficulty level of quizzes
+          required: false
           schema:
-            type: string
-            enum: [a1,a2,b1,b2,c1,c2]
-          description: Filter quizzes by difficulty
+            type: integer
+        - name: maxDifficulty
+          in: query
+          description: Maximum difficulty level of quizzes
+          required: false
+          schema:
+            type: integer
       responses:
         '200':
-          description: A list of quizzes
+          description: List of quizzes
           content:
             application/json:
               schema:
@@ -802,55 +830,59 @@ paths:
                   quizzes:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Quiz'
-                  total_count:
-                    type: integer
-                  page:
-                    type: integer
-                  total_pages:
-                    type: integer
-        '400':
-          description: Invalid input
+                      $ref: '#/components/schemas/QuizResponse'
+    post:
+      summary: Create a quiz
+      description: Create a new quiz. Requires authentication.
+      tags:
+        - Quizzes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuizRequest'
+      responses:
+        '200':
+          description: Created quiz
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/QuizResponse'
   /quizzes/{id}:
     get:
-      summary: Get quiz details
+      summary: Get a quiz by ID
+      description: Retrieve a quiz by its ID.
       tags:
         - Quizzes
       parameters:
         - name: id
           in: path
+          description: ID of the quiz
           required: true
           schema:
             type: integer
       responses:
         '200':
-          description: Quiz details retrieved successfully
+          description: Quiz details
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   quiz:
-                    $ref: '#/components/schemas/Quiz'
+                    $ref: '#/components/schemas/QuizResponse'
         '404':
           description: Quiz not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
     put:
       summary: Update a quiz
+      description: Update an existing quiz. Requires authentication.
       tags:
         - Quizzes
-      security:
-        - bearerAuth: []
       parameters:
         - name: id
           in: path
+          description: ID of the quiz
           required: true
           schema:
             type: integer
@@ -859,71 +891,29 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                description:
-                  type: string
-                image:
-                  type: string
-                  format: base64
-                questions:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      questionType:
-                        type: string
-                        enum: [english_to_turkish, turkish_to_english, english_to_sense]
-                      word:
-                        type: string
-                      correctAnswer:
-                        type: string
-                      wrongAnswers:
-                        type: array
-                        items:
-                          type: string
+              $ref: '#/components/schemas/UpdateQuizRequest'
       responses:
         '200':
-          description: Quiz updated successfully
+          description: Updated quiz
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quiz'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Quiz not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/QuizResponse'
     delete:
       summary: Delete a quiz
+      description: Delete a quiz by its ID. Requires authentication.
       tags:
         - Quizzes
-      security:
-        - bearerAuth: []
       parameters:
         - name: id
           in: path
+          description: ID of the quiz
           required: true
           schema:
             type: integer
       responses:
         '204':
-          description: Quiz deleted successfully
-        '404':
-          description: Quiz not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Quiz deleted
   /quiz-attempts:
     post:
       summary: Attempt a quiz
