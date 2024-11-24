@@ -81,8 +81,7 @@ const RegisterScreen = ({ navigation }) => {
       email: email,
       username: username,
       password: password,
-      //TODO uncomment this after endpoint is ready
-      //english_proficiency: englishProficiency,
+      englishProficiency: englishProficiency,
     };
     console.log(requestBody);
     try {
@@ -212,12 +211,12 @@ const RegisterScreen = ({ navigation }) => {
           onValueChange={(itemValue) => setEnglishProficiency(itemValue)}
           style={styles.picker}
         >
-          <Picker.Item label="A1" value="a1" />
-          <Picker.Item label="A2" value="a2" />
-          <Picker.Item label="B1" value="b1" />
-          <Picker.Item label="B2" value="b2" />
-          <Picker.Item label="C1" value="c1" />
-          <Picker.Item label="C2" value="c2" />
+          <Picker.Item label="A1" value="A1" />
+          <Picker.Item label="A2" value="A2" />
+          <Picker.Item label="B1" value="B1" />
+          <Picker.Item label="B2" value="B2" />
+          <Picker.Item label="C1" value="C1" />
+          <Picker.Item label="C2" value="C2" />
 
         </Picker>
       </View>
