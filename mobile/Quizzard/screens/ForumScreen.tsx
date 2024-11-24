@@ -1,17 +1,19 @@
 // ForumScreen.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BaseLayout from "./BaseLayout";
 import QuestionItem from "../components/QuestionItem";
 
 const ForumScreen = ({ navigation }) => {
+  const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([
     {
       id: 1,
@@ -96,6 +98,33 @@ const ForumScreen = ({ navigation }) => {
     },
   ]);
 
+   // Function to fetch posts
+   const fetchForumPosts = async () => {
+    try {
+      const response = await fetch("`http://34.55.188.177/api/posts", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} - ${response.statusText}`);
+      }
+
+      const data = await response.json(); // Parse the JSON
+    } catch (err) {
+      console.error("Failed to fetch posts:", err);
+    } finally {
+      setLoading(false); // Stop loading spinner
+    }
+  };
+
+  // Trigger fetch on component mount
+  useEffect(() => {
+    fetchForumPosts();
+  }, []);
+
   const navigateToCreateQuestion = () => {
     navigation.navigate("CreateQuestion");
   };
@@ -111,6 +140,17 @@ const ForumScreen = ({ navigation }) => {
   ) => {
     navigation.navigate("QuestionDetail", { questionId, title, description });
   };
+
+  if (loading) {
+    return (
+      <BaseLayout navigation={navigation}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#6a0dad" />
+          <Text style={styles.loadingText}>Loading quizzes...</Text>
+        </View>
+      </BaseLayout>
+    );
+  }
 
   return (
     <BaseLayout navigation={navigation}>
@@ -188,6 +228,16 @@ const styles = StyleSheet.create({
   },
   questionList: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#6a0dad",
   },
 });
 
