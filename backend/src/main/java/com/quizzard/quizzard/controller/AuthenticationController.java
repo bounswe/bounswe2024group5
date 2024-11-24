@@ -44,10 +44,29 @@ public class AuthenticationController {
         if(userRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
+
+        String proficiency = request.getEnglishProficiency().toUpperCase();
+        if(!proficiency.equals("A1") && !proficiency.equals("A2") && !proficiency.equals("B1") && !proficiency.equals("B2") && !proficiency.equals("C1") && !proficiency.equals("C2")) {
+            return ResponseEntity.badRequest().body("Error: Invalid English proficiency level!");
+        }
+        int score;
+        if(proficiency.equals("A1"))
+            score = 200;
+        else if(proficiency.equals("A2"))
+            score = 600;
+        else if(proficiency.equals("B1"))
+            score = 1400;
+        else if(proficiency.equals("B2"))
+            score = 2200;
+        else if(proficiency.equals("C1"))
+            score = 2900;
+        else
+            score = 3400;
+
         User user = new User(request.getUsername(), 
                              encoder.encode(request.getPassword()), 
                              request.getEmail(), 
-                             request.getName());
+                             request.getName(),score);
         userRepository.save(user);
 
         Authentication authentication = authenticationManager.authenticate(
