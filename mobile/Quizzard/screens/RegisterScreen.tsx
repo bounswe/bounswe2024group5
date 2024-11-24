@@ -13,6 +13,8 @@ import { RegisteredUser, Profile } from "../database/types";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
+import { RegisteredUser, Profile } from "../database/types";
+import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
 
@@ -75,32 +77,6 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     return true;
-  };
-
-  const fetchUserProfile = async (token) => {
-    try {
-      console.log("username is:", username);
-      const response = await fetch(
-        `${hostUrl}/api/profile/${username}`, // TODO: fix when endpoint added, Change to the correct host
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const user = await response.json();
-      if (response.ok) {
-        console.log("Register screen - User profile data:", user);
-        return user;
-      } else {
-        console.error("Failed to fetch user profile data", response);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      return null;
-    }
   };
 
   const handleRegister = async () => {
@@ -256,6 +232,12 @@ const RegisterScreen = ({ navigation }) => {
         />
       </View>
 
+        <DifficultyLevelDropdown
+          selectedValue={englishProficiency}
+          onValueChange={(value) => setEnglishProficiency(value)}
+        />
+      </View>
+
     <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerButtonText}>Register</Text>
       </TouchableOpacity>
@@ -289,15 +271,6 @@ const styles = StyleSheet.create({
     color: "#22005d", // dark purple color
     textAlign: "center",
     marginBottom: 16,
-  },
-    fontSize: 16,
-    color: "#22005d",
-    marginBottom: 8,
-    marginLeft: 4,
-  },
-  inputContainer: {
-    marginRight: 12,
-    marginLeft: 4,
   },
   input: {
     width: "100%",
