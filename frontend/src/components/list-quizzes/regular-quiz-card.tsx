@@ -6,6 +6,7 @@ import {
   IconBooks,
   IconClock,
   IconHeart,
+  IconPhotoOff,
   IconShare,
   IconUser,
 } from "@tabler/icons-react";
@@ -68,13 +69,17 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
         whileTap={{ scale: 0.98 }}
         className="flex overflow-hidden bg-purple-100 shadow-md cursor-pointer rounded-3xl "
       >
-        {/* <div className="w-[200px] h-[200px] rounded-3xl bg-white m-2" /> */}
-        <img
-          src={quiz.image}
-          alt={quiz.title}
-          // sizes="200px 200px"
-          className=" rounded-3xl w-[200px] h-[200px] m-2"
-        />
+        {quiz.image === "none" ? (
+          <div className="w-[200px] h-[200px] rounded-3xl bg-white m-2 flex items-center justify-center">
+            <IconPhotoOff className="w-20 h-20 m-auto text-gray-300" />
+          </div>
+        ) : (
+          <img
+            src={quiz.image}
+            alt={quiz.title}
+            className=" rounded-3xl w-[200px] h-[200px] m-2"
+          />
+        )}
         <div className="flex flex-col flex-grow p-4">
           {/* First group - title and description */}
           <div>

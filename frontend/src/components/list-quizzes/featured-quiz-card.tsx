@@ -1,9 +1,16 @@
 import { Quiz } from "../../types/question";
+
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 import { DifficultyBadge } from "../badges/level";
-import { IconBooks, IconHeart, IconShare, IconUser } from "@tabler/icons-react";
+import {
+  IconBooks,
+  IconHeart,
+  IconShare,
+  IconUser,
+  IconPhotoOff,
+} from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
 import { useState } from "react";
 
@@ -30,12 +37,14 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
         className="flex flex-col pb-2 bg-purple-100 shadow-md cursor-pointer rounded-3xl"
       >
         {quiz.image === "none" ? (
-          <div className="w-full bg-white rounded-t-xl" />
+          <div className="flex items-center justify-center w-full bg-white rounded-t-3xl h-[150px]">
+            <IconPhotoOff className="w-20 h-20 m-auto text-gray-300" />
+          </div>
         ) : (
           <img
             src={quiz.image}
             alt={quiz.title}
-            className="w-full rounded-t-3xl"
+            className="w-full rounded-t-3xl h-[150px]"
           />
         )}
         <div className="flex flex-col justify-between flex-grow p-4 min-h-40">
