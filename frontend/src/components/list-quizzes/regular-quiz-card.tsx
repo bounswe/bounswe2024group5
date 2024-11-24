@@ -12,7 +12,7 @@ import {
 import { cx } from "class-variance-authority";
 import { IconCircleDashedCheck } from "@tabler/icons-react";
 import { useQuizAttempts } from "../../hooks/api/attempts/list";
-import { QUIZ_DIFFICULTIES } from "../badges/level";
+
 import { DifficultyBadge } from "../badges/level";
 
 export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
@@ -120,7 +120,7 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <DifficultyBadge level={QUIZ_DIFFICULTIES[quiz.difficulty]} />
+            <DifficultyBadge difficulty={quiz.difficulty} />
 
             <div className="flex items-center gap-1">
               <IconShare

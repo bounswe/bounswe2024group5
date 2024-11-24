@@ -2,7 +2,7 @@ import { Quiz } from "../../types/question";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-import { DifficultyBadge, QUIZ_DIFFICULTIES } from "../badges/level";
+import { DifficultyBadge } from "../badges/level";
 import { IconBooks, IconHeart, IconShare, IconUser } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
 import { useState } from "react";
@@ -29,11 +29,15 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
         whileTap={{ scale: 0.98 }}
         className="flex flex-col pb-2 bg-purple-100 shadow-md cursor-pointer rounded-3xl"
       >
-        <img
-          src={quiz.image}
-          alt={quiz.title}
-          className="w-full rounded-t-3xl"
-        />
+        {quiz.image === "none" ? (
+          <div className="w-full bg-white rounded-t-xl" />
+        ) : (
+          <img
+            src={quiz.image}
+            alt={quiz.title}
+            className="w-full rounded-t-3xl"
+          />
+        )}
         <div className="flex flex-col justify-between flex-grow p-4 min-h-40">
           <div>
             <h3 className="mb-2 text-xl font-bold text-purple-800">
@@ -66,7 +70,7 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <DifficultyBadge level={QUIZ_DIFFICULTIES[quiz.difficulty]} />
+              <DifficultyBadge difficulty={quiz.difficulty} />
 
               <div className="flex items-center gap-1">
                 <IconShare

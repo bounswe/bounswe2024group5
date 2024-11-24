@@ -1,46 +1,63 @@
-import { IconFlame, IconTarget, IconTrophy } from "@tabler/icons-react";
-import { motion } from "framer-motion";
-export const QUIZ_DIFFICULTIES = [
-  "Beginner",
-  "Intermediate",
-  "Advanced",
-] as const;
+import {
+  IconStar,
+  IconTrophy,
+  IconTarget,
+  IconFlame,
+  IconCrown,
+  IconRocket,
+} from "@tabler/icons-react";
 
-export const DifficultyBadge = ({
-  level,
-}: {
-  level: (typeof QUIZ_DIFFICULTIES)[number];
-}) => {
-  const badges = {
-    Beginner: {
+const getLevelInfo = (difficulty: number) => {
+  if (difficulty >= 0 && difficulty <= 500) {
+    return {
+      icon: <IconStar size={16} />,
+      label: "Novice",
+      colors: "text-emerald-600 border-emerald-600",
+    };
+  } else if (difficulty <= 1000) {
+    return {
       icon: <IconTrophy size={16} />,
-      colors: "bg-white text-emerald-500",
-    },
-    Intermediate: {
+      label: "Intermediate",
+      colors: "text-blue-600 border-blue-600",
+    };
+  } else if (difficulty <= 1500) {
+    return {
       icon: <IconTarget size={16} />,
-      colors: "bg-white text-amber-500  ",
-    },
-    Advanced: {
+      label: "Advanced",
+      colors: "text-amber-600 border-amber-600",
+    };
+  } else if (difficulty <= 2000) {
+    return {
       icon: <IconFlame size={16} />,
-      colors: "bg-white text-rose-500",
-    },
-  };
+      label: "Expert",
+      colors: "text-orange-600 border-orange-600",
+    };
+  } else if (difficulty <= 2500) {
+    return {
+      icon: <IconCrown size={16} />,
+      label: "Master",
+      colors: "text-purple-600 border-purple-600",
+    };
+  } else {
+    return {
+      icon: <IconRocket size={16} />,
+      label: "Elite",
+      colors: "text-red-600 border-red-600",
+    };
+  }
+};
 
-  const { icon } = badges[level];
+export const DifficultyBadge = ({ difficulty }: { difficulty: number }) => {
+  const { icon, label, colors } = getLevelInfo(difficulty);
 
   return (
-    <motion.span
-      className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 bg-white ${
-        level === "Beginner"
-          ? " text-green-600 border border-green-600"
-          : level === "Intermediate"
-          ? " text-yellow-600 border border-yellow-600"
-          : " text-red-600 border border-red-600"
-      }`}
-      whileHover={{ scale: 1.1 }}
+    <div
+      className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold bg-white border rounded-full ${colors} hover:scale-110 transition-transform duration-200`}
     >
       {icon}
-      <span className="text-xs">{level}</span>
-    </motion.span>
+      <span className="text-xs">
+        {label} ({difficulty})
+      </span>
+    </div>
   );
 };
