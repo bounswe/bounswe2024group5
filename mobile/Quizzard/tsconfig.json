@@ -3,6 +3,7 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "noImplicitAny": false,
+    "lib": ["es2015", "dom"],
     "strict": true,
     "paths": {
       "@/*": [

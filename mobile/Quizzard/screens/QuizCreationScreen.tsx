@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext} from "react";
 import {
   View,
   Text,
@@ -14,9 +14,11 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";  // Import FileSystem for base64 conversion
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "./AuthProvider";
+import HostContext from '../app/HostContext';
 
 
 const QuizCreationPage = ({ navigation }) => {
+  const hostUrl = useContext(HostContext);
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -36,24 +38,50 @@ const QuizCreationPage = ({ navigation }) => {
       Alert.alert("Permission denied", "Camera roll permission is needed.");
       return;
     }
-    
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
     });
-  
+
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const selectedMedia = result.assets[0].uri;
-      
-      // Convert image to base64
-      const base64 = await FileSystem.readAsStringAsync(selectedMedia, {
-        encoding: FileSystem.EncodingType.Base64
-      });
-  
       setImage(selectedMedia);
-      setImageUrl(base64); // Store base64 encoded image
+
+      let formData = new FormData();
+      formData.append("file", {
+        uri: selectedMedia,
+        name: "upload.jpg",
+        type: "image/jpeg",
+      });
+
+      setUploading(true); // Start uploading
+      try {
+        const uploadResponse = await fetch(
+          // `${hostUrl}/api/file/upload`,
+          "http://localhost:80/api/file/upload",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+            body: formData,
+          }
+        );
+
+        if (!uploadResponse.ok) {
+          throw new Error(`HTTP error! Status: ${uploadResponse.status}`);
+        }
+        const uploadData = await uploadResponse.text();
+        setImageUrl(uploadData);
+        console.log("Media file uploaded successfully: ", uploadData);
+      } catch (error) {
+        console.error("Error uploading media file:", error);
+        Alert.alert("Error", "Failed to upload media file. Please try again.");
+      } finally {
+        setUploading(false); // End uploading
+      }
     }
   };
 
@@ -87,8 +115,8 @@ const QuizCreationPage = ({ navigation }) => {
       title: quizTitle,
       description: quizDescription,
       difficulty: 1,
-      image: "/api/placeholder/250/250",
-      // image: imageUrl || "/api/placeholder/250/250",
+      // image: "/api/placeholder/250/250",
+      image: imageUrl || "/api/placeholder/250/250",
       questions: formattedQuestions,
     };
 
@@ -109,7 +137,9 @@ const QuizCreationPage = ({ navigation }) => {
 
     console.log("Token:", token);
     console.log("Request Body:", JSON.stringify(quizData)); // Log the payload
-    const response = await fetch("http://34.55.188.177/api/quizzes", {
+    const response = await fetch(
+      `${hostUrl}/api/quizzes`, 
+      {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -193,7 +223,7 @@ const QuizCreationPage = ({ navigation }) => {
     let word = typedQuestionWord;
     try {
       const response = await fetch(
-        `http://34.55.188.177/api/word-checker?word=${word}&type=${selectedType}`,
+        `${hostUrl}/api/word-checker?word=${word}&type=${selectedType}`,
         {
           method: "POST",
           headers: {
