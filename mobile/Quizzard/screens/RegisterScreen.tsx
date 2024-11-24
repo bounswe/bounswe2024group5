@@ -109,12 +109,7 @@ const RegisterScreen = ({ navigation }) => {
       email: email,
       username: username,
       password: password,
-<<<<<<< HEAD
       englishProficiency: englishProficiency,
-=======
-      //TODO uncomment this after endpoint is ready
-      //english_proficiency: englishProficiency,
->>>>>>> a34a4ce (added a proficiency level picker for registration. I commented the proficiency for api call because backend is not ready.)
     };
     console.log(requestBody);
     try {

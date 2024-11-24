@@ -17,7 +17,6 @@ import HostContext from '../app/HostContext';
 
 const LoginScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
-  const [user, setUser] = useState<RegisteredUser | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,7 +27,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       console.log("username is:", username);
       const response = await fetch(
-        `${hostUrl}/api/profile/${username}`, // TODO: fix when endpoint added, Change to the correct host
+        `${hostUrl}/api/profile/${username}`,
         {
           method: "GET",
           headers: {

@@ -15,8 +15,7 @@ import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
 import HostUrlContext from '../app/HostContext';
 
-const HomePage = ({ route, navigation }) => {
-  // const username = route.params.username;
+const HomePage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
