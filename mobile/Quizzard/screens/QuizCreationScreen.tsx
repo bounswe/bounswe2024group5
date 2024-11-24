@@ -144,7 +144,6 @@ const QuizCreationPage = ({ navigation }) => {
       console.log(`  Wrong Answers: ${question.wrongAnswers.join(", ")}`);
     });
 
-    console.log("Token:", token);
     console.log("Request Body:", JSON.stringify(quizData)); // Log the payload
     const response = await fetch(
       `${hostUrl}/api/quizzes`,
@@ -154,7 +153,6 @@ const QuizCreationPage = ({ navigation }) => {
         "Content-Type": "application/json",
         "Content-Length": JSON.stringify(quizData).length.toString(),
         Authorization: `Bearer ${token}`,
-        Host: "34.55.188.177",
       },
       body: JSON.stringify(quizData),
     });

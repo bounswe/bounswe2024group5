@@ -89,7 +89,7 @@ const RegisterScreen = ({ navigation }) => {
       );
       const user = await response.json();
       if (response.ok) {
-        console.log("User profile data:", user);
+        console.log("Register screen - User profile data:", user);
         return user;
       } else {
         console.error("Failed to fetch user profile data", response);

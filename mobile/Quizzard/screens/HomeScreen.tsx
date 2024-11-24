@@ -15,7 +15,8 @@ import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
 import HostUrlContext from '../app/HostContext';
 
-const HomePage = ({ navigation }) => {
+const HomePage = ({ route, navigation }) => {
+  // const username = route.params.username;
   const hostUrl = useContext(HostUrlContext);
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
@@ -40,6 +41,8 @@ const HomePage = ({ navigation }) => {
     };
 
     fetchData();
+    fetchQuizzesForYou();
+    fetchOtherQuizzes();
   }, [otherQuizzesFilterDifficulty]); // Dependency array includes 'difficulty'
 
   const fetchQuizzesForYou = async () => {
@@ -59,7 +62,6 @@ const HomePage = ({ navigation }) => {
       const possibleDifficulties = ["a1", "a2", "b1", "b2", "c1", "c2"]
       data.quizzes = data.quizzes.map((quiz) => ({
         ...quiz,
-        image: "https://via.placeholder.com/110x110.png?text=Quiz",
         elo: Math.floor(Math.random() * 3000 + 500),
         difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
       }));
@@ -96,7 +98,6 @@ const HomePage = ({ navigation }) => {
       const possibleDifficulties = ["a1", "a2", "b1", "b2", "c1", "c2"]
       data.quizzes = data.quizzes.map((quiz) => ({
         ...quiz,
-        image: "https://via.placeholder.com/110x110.png?text=Quiz",
         elo: Math.floor(Math.random() * 3000 + 500),
         difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
       }));

@@ -38,7 +38,7 @@ const LoginScreen = ({ navigation }) => {
       );
       const user = await response.json();
       if (response.ok) {
-        console.log("User profile data:", user);
+        console.log("Login screen - User profile data:", user);
         return user;
       } else {
         console.error("Failed to fetch user profile data", response);
