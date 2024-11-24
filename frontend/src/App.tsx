@@ -18,7 +18,6 @@ import { AddQuizPage } from "./pages/add-quiz-page";
 import { LoginPage } from "./pages/login-page";
 import { SignUpPage } from "./pages/sign-up";
 import HostContext from "./HostContext";
-import ProfilePage from "./pages/profile-page";
 
 import { PostDetailsPage } from "./pages/post-details-page";
 
