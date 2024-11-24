@@ -38,13 +38,17 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
             <p className="mb-4 text-gray-600">{quiz.description}</p>
           </div>
           <div>
-            <div className="flex items-center gap-1">
-              <IconUser className="text-zinc-700" size={20} />
-              <p className="text-sm text-gray-700">
-                created by{" "}
-                <span className="font-semibold">{quiz.username}</span>
-              </p>
-            </div>
+            <Link to={`/profile/${quiz.username}`}>
+              <div className="flex items-center gap-1">
+                <IconUser className="text-zinc-700" size={20} />
+                <p className="text-sm text-gray-700 group">
+                  created by{" "}
+                  <span className="font-semibold group-hover:underline">
+                    {quiz.username}
+                  </span>
+                </p>
+              </div>
+            </Link>
 
             <div className="flex items-center gap-1 mb-4">
               <IconBooks className="text-zinc-700" size={20} />

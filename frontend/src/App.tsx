@@ -18,6 +18,7 @@ import { AddQuizPage } from "./pages/add-quiz-page";
 import { LoginPage } from "./pages/login-page";
 import { SignUpPage } from "./pages/sign-up";
 import HostContext from "./HostContext";
+import ProfilePage from "./pages/profile-page";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = sessionStorage.getItem("token");
@@ -72,6 +73,14 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <AddQuizPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
                 </ProtectedRoute>
               }
             />
