@@ -4,31 +4,28 @@ import {
   View,
   Text,
   TextInput,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Modal,
 } from "react-native";
-// import { CustomModal } from './LoginScreen';
-import { LinearGradient } from "expo-linear-gradient";
 import CustomModal from "../components/CustomModal";
-import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
+import { RegisteredUser, Profile } from "../database/types";
+import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 
 const RegisterScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
   const [username, setUsername] = useState("");
+  const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [englishProficiency, setEnglishProficiency] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [englishProficiency, setEnglishProficiency] = useState("a1");
-  const { login, token } = useAuth();
-
 
   const showError = (message) => {
     setErrorMessage(message);
@@ -38,10 +35,6 @@ const RegisterScreen = ({ navigation }) => {
   const validateInputs = () => {
     if (!name) {
       showError("Name cannot be empty");
-      return false;
-    }
-    if (!surname) {
-      showError("Surname cannot be empty");
       return false;
     }
     if (!username) {
@@ -54,6 +47,14 @@ const RegisterScreen = ({ navigation }) => {
     }
     if (!password) {
       showError("Password cannot be empty");
+      return false;
+    }
+    if (!confirmPassword) {
+      showError("Confirm Password cannot be empty");
+      return false;
+    }
+    if (!englishProficiency) {
+      showError("English Proficiency cannot be empty");
       return false;
     }
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -77,7 +78,6 @@ const RegisterScreen = ({ navigation }) => {
 
     const requestBody = {
       name: name,
-      surname: surname,
       email: email,
       username: username,
       password: password,
@@ -92,7 +92,6 @@ const RegisterScreen = ({ navigation }) => {
         headers: {
           "Content-Type": "application/json",
           "Content-Length": JSON.stringify(requestBody).length.toString(),
-          // Host: "34.55.188.177",
         },
         body: JSON.stringify(requestBody),
       });
@@ -105,6 +104,30 @@ const RegisterScreen = ({ navigation }) => {
         console.log(data.message);
         await login(data.token);
         setSuccessModalVisible(true);
+        // await login(data.token);
+        console.log("Registered successfully");
+        fetchUserProfile(data.token);
+        const registeredUser = await fetchUserProfile(data.token);
+        const userProfile: Profile = {
+          name: registeredUser.name,
+          score: registeredUser.score,
+          profilePicture: registeredUser.profilePicture,
+          englishProficiency: registeredUser.englishProficiency,
+          createdQuizzes: [],
+          favoritedQuizzes: [],
+          favoritedQuestions: [],
+          posts: [],
+        };
+        const user: RegisteredUser = {
+          username: registeredUser.username,
+          password: registeredUser.password,
+          email: registeredUser.email,
+          profile: userProfile,
+        };
+        setUser(user);
+        console.log("Logged in user:", user);
+        navigation.navigate("Home", { registeredUser: user });
+
       } else {
         const data = rawData;
         switch (response.status) {
@@ -131,7 +154,7 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <CustomModal
         visible={modalVisible}
         message={errorMessage}
@@ -148,80 +171,62 @@ const RegisterScreen = ({ navigation }) => {
       <Text style={styles.title}>Quizzard</Text>
       <Text style={styles.infoText}>Register to access Quizzard.</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        placeholderTextColor="#aaa"
-        value={name}
-        onChangeText={setName}
-        autoCapitalize="words"
-      />
+      <View style={styles.inputContainer}> 
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          placeholderTextColor="#aaa"
+          value={name}
+          onChangeText={setName}
+          autoCapitalize="words"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Surname"
-        placeholderTextColor="#aaa"
-        value={surname}
-        onChangeText={setSurname}
-        autoCapitalize="words"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          placeholderTextColor="#aaa"
+          value={username}
+          onChangeText={setUsername}
+          autoCapitalize="none"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        placeholderTextColor="#aaa"
-        value={username}
-        onChangeText={setUsername}
-        autoCapitalize="none"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#aaa"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#aaa"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#aaa"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#aaa"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          placeholderTextColor="#aaa"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        placeholderTextColor="#aaa"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
-
-      {/* English Proficiency Picker */}
-      <Text style={styles.pickerLabel}>English Proficiency</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
+      {/* English Proficiency */}
+      <Text style={styles.proficiencyLabel}>Select your Proficiency:</Text>
+        <DifficultyLevelDropdown
           selectedValue={englishProficiency}
-          onValueChange={(itemValue) => setEnglishProficiency(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="A1" value="A1" />
-          <Picker.Item label="A2" value="A2" />
-          <Picker.Item label="B1" value="B1" />
-          <Picker.Item label="B2" value="B2" />
-          <Picker.Item label="C1" value="C1" />
-          <Picker.Item label="C2" value="C2" />
-
-        </Picker>
+          onValueChange={(value) => setEnglishProficiency(value)}
+        />
       </View>
 
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+    <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerButtonText}>Register</Text>
       </TouchableOpacity>
 
@@ -231,18 +236,18 @@ const RegisterScreen = ({ navigation }) => {
           <Text style={styles.loginButton}>Login here</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     paddingHorizontal: 16,
     backgroundColor: "#fff",
   },
   title: {
+    marginTop: 50,
     fontSize: 28,
     fontWeight: "bold",
     color: "#6a0dad",
@@ -272,10 +277,12 @@ const styles = StyleSheet.create({
     color: "#6a0dad",
   },
   input: {
+    width: "100%",
     borderWidth: 1,
     borderColor: "#6a0dad",
     borderRadius: 8,
     padding: 12,
+    margin: 4,
     marginBottom: 16,
     backgroundColor: "#fff",
     color: "#6a0dad",

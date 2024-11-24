@@ -9,12 +9,10 @@ import {
   IconUser,
   IconMail,
   IconEdit,
-  IconMessages,
 } from "@tabler/icons-react";
 
 import ProfileUpdateModal from "../components/profile/update-modal";
 
-import { QUIZ_DIFFICULTIES } from "../components/badges/level";
 import { Tabs } from "antd";
 import { useParams } from "react-router-dom";
 import { useGetProfile } from "../hooks/api/profile/get";
@@ -23,6 +21,9 @@ import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 
 import { useQuizAttempts } from "../hooks/api/attempts/list";
 import { QuizAttemptCard } from "../components/profile/quiz-attempt-card";
+import { DifficultyBadge } from "../components/badges/level";
+import { useFetchPosts } from "../hooks/api/get-forum-post";
+import { ForumPostCard } from "../components/profile/forum-post-card";
 
 const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,6 +31,7 @@ const ProfilePage = () => {
   const { data: profile, error } = useGetProfile(username);
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     useUpdateProfile();
+  const { data: posts } = useFetchPosts({ username: profile?.username ?? "" });
 
   const { data: userQuizAttempts } = useQuizAttempts();
 
@@ -220,13 +222,11 @@ const ProfilePage = () => {
                                 </p>
                               </div>
                               <div className="flex items-center gap-4">
+                                <DifficultyBadge difficulty={quiz.difficulty} />
                                 <div className="flex items-center gap-1">
                                   <IconHeart className="w-5 h-5 text-red-500" />
                                   {/* <span>{quiz.likes}</span> */}4
                                 </div>
-                                <span className="px-3 py-1 text-sm bg-purple-100 rounded-full">
-                                  {QUIZ_DIFFICULTIES[quiz.difficulty]}
-                                </span>
                               </div>
                             </div>
                           </motion.div>
@@ -255,34 +255,8 @@ const ProfilePage = () => {
                   label: "Forum Posts",
                   children: (
                     <div className="grid gap-4">
-                      {user.forumPosts.map((post) => (
-                        <motion.div
-                          key={post.id}
-                          className="p-4 transition-colors cursor-pointer bg-purple-50 rounded-xl hover:bg-purple-100"
-                          whileHover={{ scale: 1.01 }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-xl font-semibold text-purple-800">
-                                {post.title}
-                              </h3>
-                              <p className="text-sm text-gray-600 place-self-start">
-                                {post.date}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-1">
-                                <IconHeart className="w-5 h-5 text-red-500" />
-                                <span>{post.likes}</span>
-                              </div>
-                              |
-                              <div className="flex items-center gap-1">
-                                <IconMessages className="w-5 h-5 text-blue-500" />
-                                <span>{post.replies}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
+                      {posts?.map((post) => (
+                        <ForumPostCard key={post.id} post={post} />
                       ))}
                     </div>
                   ),

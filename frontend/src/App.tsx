@@ -18,6 +18,9 @@ import { AddQuizPage } from "./pages/add-quiz-page";
 import { LoginPage } from "./pages/login-page";
 import { SignUpPage } from "./pages/sign-up";
 import HostContext from "./HostContext";
+
+import { PostDetailsPage } from "./pages/post-details-page";
+
 import ProfilePage from "./pages/profile-page";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -30,7 +33,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => {
   return (
-    <HostContext.Provider value="http://34.55.188.177">
+    <HostContext.Provider value="http://localhost:80">
       <Router>
         <Routes>
           <Route path="signup" element={<SignUpPage />} />
@@ -60,14 +63,8 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="forum"
-              element={
-                <ProtectedRoute>
-                  <ForumPage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="forum" element={<ForumPage />} />
+            <Route path="post/:postId" element={<PostDetailsPage />} />
             <Route
               path="add-quiz"
               element={
@@ -77,7 +74,7 @@ const App = () => {
               }
             />
             <Route
-              path="profile"
+              path="profile/:id?"
               element={
                 <ProtectedRoute>
                   <ProfilePage />

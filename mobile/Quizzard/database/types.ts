@@ -9,10 +9,6 @@ export type RegisteredUser = {
     password: string;
     email?: string;
     profile: Profile;
-    createdQuizzes: Quiz[];
-    favoritedQuizzes: Quiz[];
-    favoritedQuestions: Question[];
-    posts: ForumPost[];
 };
 export type GuestUser = {
     username: string;
@@ -21,10 +17,13 @@ export type GuestUser = {
 };
 export type Profile = {
     name: string;
-    surname: string;
-    level: string;        // a1, a2, b1, b2, c1, c2
-    elo: number,
+    score: number,
     profilePicture: string;
+    englishProficiency: string;         // a1, a2, b1, b2, c1, c2
+    createdQuizzes: Quiz[];
+    favoritedQuizzes: Quiz[];
+    favoritedQuestions: Question[];
+    posts: ForumPost[];
 }
 
 // Quiz types:

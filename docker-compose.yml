@@ -6,9 +6,9 @@ services:
     networks:
       - app-network
     volumes:
-      - ./backend/credentials-template.json:/app/credentials-template.json
+      - ./backend/credentials.json:/app/credentials.json
     environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials-template.json
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
     depends_on:
       database:
         condition: service_healthy
@@ -38,7 +38,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 5s
       retries: 10
 

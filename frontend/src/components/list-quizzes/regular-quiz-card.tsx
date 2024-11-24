@@ -6,13 +6,14 @@ import {
   IconBooks,
   IconClock,
   IconHeart,
+  IconPhotoOff,
   IconShare,
   IconUser,
 } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
 import { IconCircleDashedCheck } from "@tabler/icons-react";
 import { useQuizAttempts } from "../../hooks/api/attempts/list";
-import { QUIZ_DIFFICULTIES } from "../badges/level";
+
 import { DifficultyBadge } from "../badges/level";
 
 export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
@@ -68,7 +69,17 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
         whileTap={{ scale: 0.98 }}
         className="flex overflow-hidden bg-purple-100 shadow-md cursor-pointer rounded-3xl "
       >
-        <div className="w-[200px] h-[200px] rounded-3xl bg-white m-2" />
+        {quiz.image === "none" ? (
+          <div className="min-w-[200px] min-h-[200px] rounded-3xl bg-white m-2 flex items-center justify-center">
+            <IconPhotoOff className="w-20 h-20 m-auto text-gray-300" />
+          </div>
+        ) : (
+          <img
+            src={quiz.image}
+            alt={quiz.title}
+            className=" rounded-3xl w-[200px] h-[200px] m-2"
+          />
+        )}
         <div className="flex flex-col flex-grow p-4">
           {/* First group - title and description */}
           <div>
@@ -114,7 +125,7 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <DifficultyBadge level={QUIZ_DIFFICULTIES[quiz.difficulty]} />
+            <DifficultyBadge difficulty={quiz.difficulty} />
 
             <div className="flex items-center gap-1">
               <IconShare

@@ -33,7 +33,7 @@ export const LoginPage = () => {
       })
       .then((response) => {
         sessionStorage.setItem("token", response.token);
-
+        sessionStorage.setItem('username', username);
         navigate("/quizzes");
       })
       .catch((error) => {
