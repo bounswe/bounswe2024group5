@@ -4,6 +4,7 @@ import {
   View,
   Text,
   TextInput,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
@@ -181,7 +182,7 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <CustomModal
         visible={modalVisible}
         message={errorMessage}
@@ -263,18 +264,18 @@ const RegisterScreen = ({ navigation }) => {
           <Text style={styles.loginButton}>Login here</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     paddingHorizontal: 16,
     backgroundColor: "#fff",
   },
   title: {
+    marginTop: 50,
     fontSize: 28,
     fontWeight: "bold",
     color: "#6a0dad",
