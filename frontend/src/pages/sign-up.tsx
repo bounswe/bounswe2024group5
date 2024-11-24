@@ -25,7 +25,7 @@ export const SignUpPage = () => {
       name: firstName + lastName,
       email: email,
       password: password,
-      english_proficiency: "0",
+      englishProficiency: "A2",
     };
 
     fetch(`${hostURL}/api/auth/register`, {

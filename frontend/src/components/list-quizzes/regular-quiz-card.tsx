@@ -89,10 +89,14 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
           <div className="flex justify-between">
             <div className="flex items-center gap-1">
               <IconUser className="text-zinc-700" size={20} />
-              <p className="text-sm text-gray-700">
-                created by{" "}
-                <span className="font-semibold">{quiz.username}</span>
-              </p>
+              <Link to={`/profile/${quiz.username}`}>
+                <p className="text-sm text-gray-700 group">
+                  created by{" "}
+                  <span className="font-semibold group-hover:underline">
+                    {quiz.username}
+                  </span>
+                </p>
+              </Link>
             </div>
             <div className="flex items-center gap-1">
               <IconBooks className="text-zinc-700" size={20} />

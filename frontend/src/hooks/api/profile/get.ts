@@ -16,13 +16,13 @@ export const useGetProfile = (username?: string) => {
 
 			const headers: HeadersInit = {};
 
-			if (isMyProfile) {
-				const TOKEN = sessionStorage.getItem('token');
-				if (!TOKEN) {
-					throw new Error('No authentication token found');
-				}
-				headers['Authorization'] = `Bearer ${TOKEN}`;
+
+			const TOKEN = sessionStorage.getItem('token');
+			if (!TOKEN) {
+				throw new Error('No authentication token found');
 			}
+			headers['Authorization'] = `Bearer ${TOKEN}`;
+
 
 			const response = await fetch(endpoint, { headers });
 
