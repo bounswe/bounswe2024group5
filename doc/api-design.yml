@@ -1596,12 +1596,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  posts:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ForumPost'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForumPost'
         '400':
           description: Invalid input
           content:
@@ -1637,12 +1634,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  posts:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ForumPost'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForumPost'
         '400':
           description: Invalid input
           content:
