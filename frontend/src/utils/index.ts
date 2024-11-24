@@ -9,3 +9,12 @@ export const questionTemplate = ({ word, type }: { word: Question['word'], type:
 		return `What is the meaning of ${word}?`;
 	}
 }
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime)
+
+export const timePassed = (timeString: string) => {
+	return dayjs(timeString).fromNow()
+}
