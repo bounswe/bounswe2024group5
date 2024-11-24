@@ -70,7 +70,7 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
         className="flex overflow-hidden bg-purple-100 shadow-md cursor-pointer rounded-3xl "
       >
         {quiz.image === "none" ? (
-          <div className="w-[200px] h-[200px] rounded-3xl bg-white m-2 flex items-center justify-center">
+          <div className="min-w-[200px] min-h-[200px] rounded-3xl bg-white m-2 flex items-center justify-center">
             <IconPhotoOff className="w-20 h-20 m-auto text-gray-300" />
           </div>
         ) : (
