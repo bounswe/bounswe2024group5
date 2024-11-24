@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Text,
   StyleSheet,
@@ -13,8 +13,10 @@ import QuizViewComponent from "../components/QuizViewComponent";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
+import HostContext from '../app/HostContext';
 
 const HomePage = ({ navigation }) => {
+  const hostUrl = useContext(HostContext);
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +43,7 @@ const HomePage = ({ navigation }) => {
   const fetchQuizzesForYou = async () => {
     try {
       const response = await fetch(
-        `http://34.55.188.177/api/quizzes?page=1&limit=10`,
+        `${hostUrl}/api/quizzes?page=1&limit=10`,
         {
           method: "GET",
           headers: {
@@ -64,8 +66,9 @@ const HomePage = ({ navigation }) => {
 
   const fetchOtherQuizzes = async () => {
     try {
+      console.log(`Token is ${token}`);
       const response = await fetch(
-        `http://34.55.188.177/api/quizzes?page=1&limit=10`,
+        `${hostUrl}/api/quizzes?page=1&limit=10`,
         {
           method: "GET",
           headers: {
