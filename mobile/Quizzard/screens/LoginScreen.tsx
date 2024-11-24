@@ -131,6 +131,7 @@ const LoginScreen = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        onSubmitEditing={handleLogin}
       />
 
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
