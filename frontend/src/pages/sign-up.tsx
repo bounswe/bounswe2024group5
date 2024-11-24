@@ -24,7 +24,7 @@ export const SignUpPage = () => {
       name: firstName + lastName,
       email: email,
       password: password,
-      english_proficiency: "0"
+      englishProficiency: "a1"
     };
 
     fetch(`${hostURL}/api/auth/register`, {
@@ -43,6 +43,7 @@ export const SignUpPage = () => {
     .then((response) => {
       console.log("Registration successfull.")
       sessionStorage.setItem("token", response.token);
+      sessionStorage.setItem('username', username);
       navigate("/");
     })
     .catch((error) => {

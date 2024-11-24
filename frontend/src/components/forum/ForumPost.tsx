@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ForumPostProps } from "../../types/forum-post";
 import { IconHeart } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
@@ -6,6 +6,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useFetchPost } from "../../hooks/api/get-forum-post";
+import HostContext from "../../HostContext";
+import { useCreateUpvote } from "../../hooks/api/create-upvote";
+import { useDeleteUpvote } from "../../hooks/api/delete-upvote";
 
 dayjs.extend(relativeTime)
 
@@ -19,12 +22,44 @@ export const ForumPostComponent = ({ postId }: ForumPostProps) => {
 
     const [liked, setLiked] = useState<boolean>(false);
 
+    const hostUrl = useContext(HostContext);
+
+    useEffect(() => {
+        const TOKEN = sessionStorage.getItem('token');
+        const username = sessionStorage.getItem('username');
+        const fetchUpvote = async () => {
+            const response = await fetch(`${hostUrl}/api/posts/${postId}/upvotes?username=${username}`, {
+                headers: {
+                    'Authorization': `Bearer ${TOKEN}`
+                }
+            });
+
+            if (!response.ok) return;
+
+            const body = await response.json();
+
+            setLiked(Array.isArray(body) && body.length > 0);
+            
+        }
+        fetchUpvote();
+    }, [hostUrl, postId])
+
     const navigate = useNavigate()
     const currentPath = useLocation().pathname;
 
-    const handleLikes = (e: React.MouseEvent) => {
+    const { mutateAsync: createUpvote } = useCreateUpvote(postId);
+    const { mutateAsync: deleteUpvote } = useDeleteUpvote(postId);
+
+    const handleLikes = async (e: React.MouseEvent) => {
         e.stopPropagation()
+
+        if (!liked) {
+            await createUpvote();
+        } else {
+            await deleteUpvote();
+        }
         setLiked(!liked);
+
     }
 
     const handleClick = () => {
