@@ -22,7 +22,7 @@ export const AddQuizPage: React.FC = () => {
     title: "",
     description: "",
     difficulty: 1,
-    image: "/api/placeholder/250/250",
+    image: "none",
     questions: [],
   });
 
@@ -112,7 +112,7 @@ export const AddQuizPage: React.FC = () => {
               onClick={handleImageClick}
               className="relative flex items-center justify-center mr-6 bg-purple-200 rounded-lg cursor-pointer w-36 h-36 group"
             >
-              {quiz.image === "/api/placeholder/250/250" ? (
+              {quiz.image === "none" ? (
                 <>
                   <IconImageInPicture className="text-purple-500" size={32} />
                   <div className="absolute z-50 p-1 bg-white rounded-full shadow-md -bottom-3 -right-3">

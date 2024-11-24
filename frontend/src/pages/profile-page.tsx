@@ -14,7 +14,6 @@ import {
 
 import ProfileUpdateModal from "../components/profile/update-modal";
 
-import { QUIZ_DIFFICULTIES } from "../components/badges/level";
 import { Tabs } from "antd";
 import { useParams } from "react-router-dom";
 import { useGetProfile } from "../hooks/api/profile/get";
@@ -23,6 +22,7 @@ import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 
 import { useQuizAttempts } from "../hooks/api/attempts/list";
 import { QuizAttemptCard } from "../components/profile/quiz-attempt-card";
+import { DifficultyBadge } from "../components/badges/level";
 
 const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -225,7 +225,10 @@ const ProfilePage = () => {
                                   {/* <span>{quiz.likes}</span> */}4
                                 </div>
                                 <span className="px-3 py-1 text-sm bg-purple-100 rounded-full">
-                                  {QUIZ_DIFFICULTIES[quiz.difficulty]}
+                                  {/* {QUIZ_DIFFICULTIES[quiz.difficulty]} */}
+                                  <DifficultyBadge
+                                    difficulty={quiz.difficulty}
+                                  />
                                 </span>
                               </div>
                             </div>
