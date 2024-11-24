@@ -1,7 +1,9 @@
 package com.quizzard.quizzard.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "questions")
 public class Question {
@@ -50,77 +52,6 @@ public class Question {
         this.wrongAnswer2 = wrongAnswer2;
         this.wrongAnswer3 = wrongAnswer3;
     }
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public Long getQuizId() {
-        return quizId;
-    }
-
-    public void setQuizId(Long quizId) {
-        this.quizId = quizId;
-    }
-
-    public QuestionType getQuestionType() {
-        return questionType;
-    }
-
-    public void setQuestionType(QuestionType questionType) {
-        this.questionType = questionType;
-    }
-
-    public String getWord() {
-        return word;
-    }
-
-    public void setWord(String word) {
-        this.word = word;
-    }
-
-    public String getCorrectAnswer() {
-        return correctAnswer;
-    }
-
-    public void setCorrectAnswer(String correctAnswer) {
-        this.correctAnswer = correctAnswer;
-    }
-
-    public String getWrongAnswer1() {
-        return wrongAnswer1;
-    }
-
-    public void setWrongAnswer1(String wrongAnswer1) {
-        this.wrongAnswer1 = wrongAnswer1;
-    }
-
-    public void setWrongAnswer2(String wrongAnswer2) {
-        this.wrongAnswer2 = wrongAnswer2;
-    }
-
-    public String getWrongAnswer2() {
-        return wrongAnswer2;
-    }
-
-    public void setWrongAnswer3(String wrongAnswer3) {
-        this.wrongAnswer3 = wrongAnswer3;
-    }
-
-    public String getWrongAnswer3() {
-        return wrongAnswer3;
-    }
-
-    public double getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(double difficulty) {
-        this.difficulty = difficulty;
-    }
-
-
 
     // toString
     @Override
