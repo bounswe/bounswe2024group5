@@ -21,12 +21,17 @@ import { useGetProfile } from "../hooks/api/profile/get";
 import { useUpdateProfile } from "../hooks/api/profile/update";
 import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 
+import { useQuizAttempts } from "../hooks/api/attempts/list";
+import { QuizAttemptCard } from "../components/profile/quiz-attempt-card";
+
 const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { username } = useParams<{ username?: string }>();
   const { data: profile, error } = useGetProfile(username);
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     useUpdateProfile();
+
+  const { data: userQuizAttempts } = useQuizAttempts();
 
   const { data: userQuizzes } = useFetchQuizzes({ filter: "own" });
   const user = {
@@ -239,26 +244,8 @@ const ProfilePage = () => {
                   label: "Quiz History",
                   children: (
                     <div className="grid gap-4">
-                      {user.quizHistory.map((quiz) => (
-                        <motion.div
-                          key={quiz.id}
-                          className="p-4 transition-colors cursor-pointer bg-purple-50 rounded-xl hover:bg-purple-100"
-                          whileHover={{ scale: 1.01 }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-xl font-semibold text-purple-800">
-                                {quiz.title}
-                              </h3>
-                              <p className="text-sm text-gray-600 place-self-start">
-                                {quiz.date}
-                              </p>
-                            </div>
-                            <div className="px-3 py-1 text-lg font-semibold text-green-800 bg-green-100 rounded-full">
-                              {quiz.score}%
-                            </div>
-                          </div>
-                        </motion.div>
+                      {userQuizAttempts?.map((attempt) => (
+                        <QuizAttemptCard key={attempt.id} attempt={attempt} />
                       ))}
                     </div>
                   ),
