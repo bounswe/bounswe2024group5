@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 const QuizFinishScreen = ({ route, navigation }) => {
-  const { quiz, questions, selectedAnswers } = route.params;
+  const { quiz, questions, selectedAnswers, alreadyFinished } = route.params;
 
   // Calculate the results
   const results = questions.reduce(

@@ -140,7 +140,8 @@ const QuizSolvingScreen = ({ route, navigation }) => {
             navigation.navigate("QuizFinish", {
               quiz, 
               questions, 
-              selectedAnswers,})
+              selectedAnswers,
+              alreadyFinished})
             }
           }
         >

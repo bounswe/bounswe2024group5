@@ -31,6 +31,7 @@ export type RootStackParamList = {
     quiz: { title: string; description: string; difficulty: string; elo: number; id: number; image: string; questions: any[]; createdAt: string; updatedAt: string; username: string };
     questions: any[];
     selectedAnswers: string[];
+    alreadyFinished: boolean;
   };
   Profile: undefined;
   ProfileSettings: undefined;
