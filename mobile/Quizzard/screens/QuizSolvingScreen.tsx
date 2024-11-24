@@ -1,7 +1,7 @@
 // QuizSolvingScreen.tsx
 import React, { useState, useContext, useEffect} from "react";
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons"; // Import the icon
+import Icon from "react-native-vector-icons/MaterialIcons";
 import QuizHeader from "../components/QuizSolveQuizHeader";
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
@@ -37,6 +37,10 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const [quizAttemptId, setQuizAttemptId] = useState(null);
   const [previousAnswers, setPreviousAnswers] = useState({});
   const authContext = useAuth(); // Get the authentication context
+//   const [selectedAnswers, setSelectedAnswers] = useState(
+//     Array(questions.length).fill(null)
+//   );
+//   const [alreadyFinished, setAlreadyFinished] = useState(false);
   const token = authContext ? authContext.token : null;
 
   const initializeQuiz = async () => {
@@ -131,6 +135,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   },[quiz.id, hostUrl, token]);
 
   const handleAnswer = async (answer) => {
+    if (alreadyFinished) return;
     if (isQuestionAnswered[questionIndex]) return;
 
     try {
@@ -164,24 +169,49 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     } catch (error) {
       console.error("Error submitting answer:", error);
       Alert.alert("Error", "Failed to submit answer. Please try again.");
+//     const updatedSelectedAnswers = [...selectedAnswers];
+//     updatedSelectedAnswers[questionIndex] = answer;
+//     setSelectedAnswers(updatedSelectedAnswers);
+
+//     const updatedIsQuestionAnswered = [...isQuestionAnswered];
+//     updatedIsQuestionAnswered[questionIndex] = true;
+//     setIsQuestionAnswered(updatedIsQuestionAnswered);
+
+//     console.log(`Question ${questionIndex} answered with: ${answer}`);
+
+//     const answerData = {
+//       questionID: questionIndex,
+//       selectedChoice: answer,
+//     };
+
+//     try {
+//       const uploadResponse = await fetch("http://34.55.188.177/quiz-solve", {
+//         method: "POST",
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(answerData),
+//       });
+//     } catch (err) {
+//       console.error("Error sending answer to backend:", err);
     }
   };
 
   const handlePrevious = () => {
-    console.log('handling previous');
     if (questionIndex > 0) {
       setQuestionIndex(questionIndex - 1);
-      console.log(`Is answered? ${isQuestionAnswered}`);
     } else {
-      Alert.alert("Start of the Quiz:", "This is the first question of the quiz.");
+      Alert.alert(
+        "Start of the Quiz:",
+        "This is the first question of the quiz."
+      );
     }
   };
 
   const handleNext = () => {
-    console.log('handling next');
     if (questionIndex < questions.length - 1) {
       setQuestionIndex(questionIndex + 1);
-      console.log(`Is answered? ${isQuestionAnswered}`);
     } else {
       Alert.alert("End of the Quiz:", "This is the last question of the quiz.");
     }
@@ -249,16 +279,13 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         </Text>
         <Text style={styles.questionText}>{question.body}</Text>
         {answers.map((answer, index) => {
-          let backgroundColor;
-          if (!isQuestionAnswered[questionIndex]) {
-            backgroundColor = "#ddd6fe"; // Match the background color
-          } else {
+          let backgroundColor = "#ddd6fe";
+
+          if (isQuestionAnswered[questionIndex]) {
             if (answer === question.correctAnswer) {
-              backgroundColor = "green"; // Correct answer
-            } else if (answer === selectedAnswers[selectedAnswers.length - 1]) {
-              backgroundColor = "red"; // Selected answer
-            } else {
-              backgroundColor = "#ddd6fe"; // Match the background color
+              backgroundColor = "green";
+            } else if (answer === selectedAnswers[questionIndex]) {
+              backgroundColor = "red";
             }
           }
 
@@ -267,65 +294,65 @@ const QuizSolvingScreen = ({ route, navigation }) => {
               key={index}
               style={[styles.button, { backgroundColor }]}
               onPress={() => handleAnswer(answer)}
+              disabled={isQuestionAnswered[questionIndex]}
             >
               <Text style={styles.buttonText}>{answer}</Text>
             </TouchableOpacity>
           );
         })}
       </View>
-      {/* Container for Next Button */}
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={styles.nextButton}
-          onPress={handlePrevious}
-        >
-          {/* Replace text with right-pointing arrow icon */}
+        <TouchableOpacity style={styles.nextButton} onPress={handlePrevious}>
           <Icon name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.nextButton}
-          onPress={handleNext}
-        >
-          {/* Replace text with right-pointing arrow icon */}
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Icon name="arrow-forward" size={24} color="#000" />
         </TouchableOpacity>
       </View>
 
-      {/* Cancel and Submit Buttons */}
-            <View style={styles.bottomButtons}>
+      <View style={styles.bottomButtons}>
+
         <TouchableOpacity
           style={styles.cancelButton}
           onPress={handleCancel}
         >
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.submitButton}
-          onPress={handleFinish}
+          onPress={() => {
+            setAlreadyFinished(true);
+            navigation.navigate("QuizFinish", {
+              quiz, 
+              questions, 
+              selectedAnswers,
+              alreadyFinished})
+            }
+          }
         >
-          {/*Upon submission of the quiz, navigate back to the home screen for now*/}
           <Text style={styles.submitButtonText}>Finish</Text>
         </TouchableOpacity>
+
       </View>
     </View>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#FFFFFF", // Set the background color
+    backgroundColor: "#FFFFFF",
   },
   roundQuestionContainer: {
-    backgroundColor: "#f5f3ff", // Light grey background color
+    backgroundColor: "#f5f3ff",
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 10, // Rounded corners
-    opacity: 0.9, // Slight opacity
+    borderRadius: 10,
+    opacity: 0.9,
     marginTop: 40,
   },
   questionText: {
@@ -333,16 +360,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    borderColor: "#8b5c56", // Dark outline
+    borderColor: "#8b5c56",
     borderWidth: 1,
-    borderRadius: 20, // Rounded corners
+    borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 15,
     marginVertical: 5,
     alignItems: "center",
   },
   buttonText: {
-    color: "#000000", // Text color
+    color: "#000000",
     fontSize: 16,
   },
   buttonsContainer: {
@@ -356,7 +383,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     paddingVertical: 10,
-    paddingHorizontal: 60, // Adjust for smaller button size
+    paddingHorizontal: 60,
   },
   bottomButtons: {
     flexDirection: "row",
