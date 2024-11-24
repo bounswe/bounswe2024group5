@@ -1,7 +1,7 @@
 // QuizSolvingScreen.tsx
 import React, { useState, useContext, useEffect} from "react";
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import Icon from "react-native-vector-icons/MaterialIcons"; // Import the icon
 import QuizHeader from "../components/QuizSolveQuizHeader";
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from '../app/HostContext';
@@ -40,7 +40,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
 //   const [selectedAnswers, setSelectedAnswers] = useState(
 //     Array(questions.length).fill(null)
 //   );
-//   const [alreadyFinished, setAlreadyFinished] = useState(false);
+  const [alreadyFinished, setAlreadyFinished] = useState(false);
   const token = authContext ? authContext.token : null;
 
   const initializeQuiz = async () => {
@@ -58,14 +58,14 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           body: JSON.stringify({ quizId: quiz.id }),
         }
       );
-      
+
       if (!attemptResponse.ok) {
         throw new Error('Failed to create/get quiz attempt');
       }
       const attemptData = await attemptResponse.json();
 
       console.log(`Quiz attempt ID: ${attemptData.id} and quiz ID: ${quiz.id}`);
-      
+
       setQuizAttemptId(attemptData.id);
 
       // Step 2: Get quiz details with questions
@@ -78,11 +78,11 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           },
         }
       );
-      
+
       if (!quizResponse.ok) {
         throw new Error('Failed to fetch quiz details');
       }
-      
+
       const quizData = await quizResponse.json();
       setQuestions(quizData.quiz.questions);
       setIsQuestionAnswered(new Array(quizData.quiz.questions.length).fill(false));
@@ -97,7 +97,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           },
         }
       );
-      
+
       if (answersResponse.ok) {
         // TODO: complete this part later.
         // const answersData = await answersResponse.json();
@@ -106,7 +106,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         //   answersMap[answer.questionId] = answer.answer;
         // });
         // setPreviousAnswers(answersMap);
-        
+
         // // Mark questions as answered if they have previous answers
         // const newIsQuestionAnswered = new Array(quizData.questions.length).fill(false);
         // quizData.questions.forEach((_, index) => {
@@ -162,7 +162,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       const updatedIsQuestionAnswered = [...isQuestionAnswered];
       updatedIsQuestionAnswered[questionIndex] = true;
       setIsQuestionAnswered(updatedIsQuestionAnswered);
-      
+
       const updatedSelectedAnswers = [...selectedAnswers];
       updatedSelectedAnswers[questionIndex] = answer;
       setSelectedAnswers(updatedSelectedAnswers);
@@ -199,19 +199,20 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   };
 
   const handlePrevious = () => {
+    console.log('handling previous');
     if (questionIndex > 0) {
       setQuestionIndex(questionIndex - 1);
+      console.log(`Is answered? ${isQuestionAnswered}`);
     } else {
-      Alert.alert(
-        "Start of the Quiz:",
-        "This is the first question of the quiz."
-      );
+      Alert.alert("Start of the Quiz:", "This is the first question of the quiz.");
     }
   };
 
   const handleNext = () => {
+    console.log('handling next');
     if (questionIndex < questions.length - 1) {
       setQuestionIndex(questionIndex + 1);
+      console.log(`Is answered? ${isQuestionAnswered}`);
     } else {
       Alert.alert("End of the Quiz:", "This is the last question of the quiz.");
     }
@@ -245,7 +246,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const handleCancel = async () => {
     // TODO: Add putting the question-answers for this quiz attempt to the backend.
   };
-
   const generateQuestionSentence = (question): string => {
     // const generateQuestionSentence = (question_type: 'english_to_turkish' | 'turkish_to_english' | 'english_to_sense', word: string): string => {
     console.log("Question: ", question.questionType, question.word);
@@ -279,13 +279,16 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         </Text>
         <Text style={styles.questionText}>{question.body}</Text>
         {answers.map((answer, index) => {
-          let backgroundColor = "#ddd6fe";
-
-          if (isQuestionAnswered[questionIndex]) {
+          let backgroundColor;
+          if (!isQuestionAnswered[questionIndex]) {
+            backgroundColor = "#ddd6fe"; // Match the background color
+          } else {
             if (answer === question.correctAnswer) {
-              backgroundColor = "green";
-            } else if (answer === selectedAnswers[questionIndex]) {
-              backgroundColor = "red";
+              backgroundColor = "green"; // Correct answer
+            } else if (answer === selectedAnswers[selectedAnswers.length - 1]) {
+              backgroundColor = "red"; // Selected answer
+            } else {
+              backgroundColor = "#ddd6fe"; // Match the background color
             }
           }
 
@@ -294,30 +297,41 @@ const QuizSolvingScreen = ({ route, navigation }) => {
               key={index}
               style={[styles.button, { backgroundColor }]}
               onPress={() => handleAnswer(answer)}
-              disabled={isQuestionAnswered[questionIndex]}
             >
               <Text style={styles.buttonText}>{answer}</Text>
             </TouchableOpacity>
           );
         })}
       </View>
+      {/* Container for Next Button */}
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.nextButton} onPress={handlePrevious}>
+        <TouchableOpacity
+          style={styles.nextButton}
+          onPress={handlePrevious}
+        >
+          {/* Replace text with right-pointing arrow icon */}
           <Icon name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+
+        <TouchableOpacity
+          style={styles.nextButton}
+          onPress={handleNext}
+        >
+          {/* Replace text with right-pointing arrow icon */}
           <Icon name="arrow-forward" size={24} color="#000" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.bottomButtons}>
-
+      {/* Cancel and Submit Buttons */}
+            <View style={styles.bottomButtons}>
         <TouchableOpacity
           style={styles.cancelButton}
+          onPress={() => navigation.goBack()}
           onPress={handleCancel}
         >
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.submitButton}
           onPress={() => {
@@ -332,27 +346,24 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         >
           <Text style={styles.submitButtonText}>Finish</Text>
         </TouchableOpacity>
-
       </View>
     </View>
   );
 };
-
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#FFFFFF", // Set the background color
   },
   roundQuestionContainer: {
-    backgroundColor: "#f5f3ff",
+    backgroundColor: "#f5f3ff", // Light grey background color
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 10,
-    opacity: 0.9,
+    borderRadius: 10, // Rounded corners
+    opacity: 0.9, // Slight opacity
     marginTop: 40,
   },
   questionText: {
@@ -360,16 +371,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    borderColor: "#8b5c56",
+    borderColor: "#8b5c56", // Dark outline
     borderWidth: 1,
-    borderRadius: 20,
+    borderRadius: 20, // Rounded corners
     paddingVertical: 10,
     paddingHorizontal: 15,
     marginVertical: 5,
     alignItems: "center",
   },
   buttonText: {
-    color: "#000000",
+    color: "#000000", // Text color
     fontSize: 16,
   },
   buttonsContainer: {
@@ -383,7 +394,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     paddingVertical: 10,
-    paddingHorizontal: 60,
+    paddingHorizontal: 60, // Adjust for smaller button size
   },
   bottomButtons: {
     flexDirection: "row",

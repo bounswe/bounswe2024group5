@@ -17,7 +17,6 @@ import HostContext from '../app/HostContext';
 
 const LoginScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
-  const [user, setUser] = useState<RegisteredUser | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,7 +27,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       console.log("username is:", username);
       const response = await fetch(
-        `${hostUrl}/api/users/${username}`, // TODO: fix when endpoint added, Change to the correct host
+        `${hostUrl}/api/profile/${username}`,
         {
           method: "GET",
           headers: {
@@ -38,8 +37,7 @@ const LoginScreen = ({ navigation }) => {
       );
       const user = await response.json();
       if (response.ok) {
-        setUserData(user);
-        console.log("User profile data:", user);
+        console.log("Login screen - User profile data:", user);
         return user;
       } else {
         console.error("Failed to fetch user profile data", response);
@@ -95,7 +93,6 @@ const LoginScreen = ({ navigation }) => {
           email: registeredUser.email,
           profile: userProfile,
         };
-        setUser(user);
         console.log("Logged in user:", user);
         navigation.navigate("Home", { registeredUser: user });
       } else {
