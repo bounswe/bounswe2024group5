@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 @Entity
-@Table(name = "english")
-public class English {
+@Table(name = "turkish")
+public class Turkish {
 
     @Id
     @GeneratedValue
@@ -15,7 +15,5 @@ public class English {
     @Column(name = "word", nullable = false)
     private String word;
 
-    @Column(name = "score")
-    private int score;
 
 }
