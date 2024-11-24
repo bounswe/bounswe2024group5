@@ -1,13 +1,21 @@
-import { IconCirclePlus, IconImageInPicture } from "@tabler/icons-react";
-import React, { useState } from "react";
+import {
+  IconCirclePlus,
+  IconImageInPicture,
+  IconUpload,
+  IconPlus,
+} from "@tabler/icons-react";
+import React, { useState, useRef } from "react";
 import type { Quiz, Question, QuestionType } from "../types/question";
 import { QuestionInputWithTemplate } from "../components/create-quiz/word-input-with-question-template";
 import { useCreateQuiz } from "../hooks/api/create-quiz";
 import { useNavigate } from "react-router-dom";
+import { useUploadFile } from "../hooks/api/upload-image";
 
 export const AddQuizPage: React.FC = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { mutateAsync: createQuiz } = useCreateQuiz();
+  const { mutateAsync: uploadFile, isLoading: isUploading } = useUploadFile();
   const [quiz, setQuiz] = useState<Quiz>({
     id: Math.floor(Math.random() * 1000),
     title: "",
@@ -16,6 +24,29 @@ export const AddQuizPage: React.FC = () => {
     image: "/api/placeholder/250/250",
     questions: [],
   });
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const imageUrl = await uploadFile(file);
+      console.log(imageUrl);
+      setQuiz((prev) => ({
+        ...prev,
+        image: imageUrl,
+      }));
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+      // You might want to show an error message to the user here
+    }
+  };
 
   const addQuestion = () => {
     const newQuestion: Question = {
@@ -81,8 +112,40 @@ export const AddQuizPage: React.FC = () => {
 
         <div className="p-6 mb-8 bg-white rounded-lg shadow-md">
           <div className="flex items-center mb-6">
-            <div className="flex items-center justify-center mr-6 bg-purple-200 rounded-lg cursor-pointer w-36 h-36">
+            {/* <div className="flex items-center justify-center mr-6 bg-purple-200 rounded-lg cursor-pointer w-36 h-36">
               <IconImageInPicture className="text-purple-500" size={32} />
+            </div> */}
+            <div
+              onClick={handleImageClick}
+              className="relative flex items-center justify-center mr-6 bg-purple-200 rounded-lg cursor-pointer w-36 h-36 group"
+            >
+              {quiz.image === "/api/placeholder/250/250" ? (
+                <>
+                  <IconImageInPicture className="text-purple-500" size={32} />
+                  <div className="absolute z-50 p-1 bg-white rounded-full shadow-md -bottom-3 -right-3">
+                    <div className="p-1 bg-purple-500 rounded-full">
+                      <IconPlus className="text-white" size={16} />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <img
+                  src={quiz.image}
+                  alt="Quiz cover"
+                  className="object-cover w-full h-full rounded-lg"
+                />
+              )}
+              <div className="absolute inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100">
+                <IconUpload className="text-white" size={24} />
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileChange}
+                disabled={isUploading}
+              />
             </div>
             <div className="flex-1">
               <input
@@ -102,6 +165,7 @@ export const AddQuizPage: React.FC = () => {
               />
             </div>
           </div>
+
           <div className="place-self-start">
             <label className="block mb-1 text-sm font-medium text-purple-700 place-self-start">
               Difficulty

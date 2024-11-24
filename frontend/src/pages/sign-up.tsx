@@ -24,32 +24,32 @@ export const SignUpPage = () => {
       name: firstName + lastName,
       email: email,
       password: password,
-      english_proficiency: "0"
+      englishProficiency: "A2",
     };
 
     fetch(`${hostURL}/api/auth/register`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(requestBody),
     })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((response) => {
-      console.log("Registration successfull.")
-      sessionStorage.setItem("token", response.token);
-      navigate("/");
-    })
-    .catch((error) => {
-      // TODO: Display error in the UI.
-      console.log('Error:')
-      console.log(error)
-    }) 
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((response) => {
+        console.log("Registration successfull.");
+        sessionStorage.setItem("token", response.token);
+        navigate("/");
+      })
+      .catch((error) => {
+        // TODO: Display error in the UI.
+        console.log("Error:");
+        console.log(error);
+      });
   };
 
   return (
