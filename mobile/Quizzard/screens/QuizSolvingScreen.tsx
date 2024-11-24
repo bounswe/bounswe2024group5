@@ -1,11 +1,13 @@
 // QuizSolvingScreen.js
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons"; // Import the icon
 import QuizHeader from "../components/QuizSolveQuizHeader";
 import { useAuth } from "./AuthProvider";
+import HostUrlContext from '../app/HostContext';
 
 const QuizSolvingScreen = ({ route, navigation }) => {
+  const hostUrl = useContext(HostUrlContext);
   const { quiz, questions } = route.params; // Access the passed data
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
@@ -30,7 +32,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     console.log(`question ID is ${questionIndex} and selected ${answer}.`);
     try {
     const uploadResponse = await fetch(
-      "http://34.55.188.177/quiz-solve",
+      `${hostUrl}/api/quiz-solve`,
       {
         method: "POST",
         headers: {

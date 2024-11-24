@@ -207,7 +207,7 @@ const QuizCreationPage = ({ navigation }) => {
         "Content-Type": "application/json",
         "Content-Length": JSON.stringify(quizData).length.toString(),
         Authorization: `Bearer ${token}`,
-        Host: "34.55.188.177",
+        // Host: "34.55.188.177",
       },
       body: JSON.stringify(quizData),
     });
@@ -223,7 +223,7 @@ const QuizCreationPage = ({ navigation }) => {
 
   // Fetch question word suggestions
   const fetchQuestionWord = async (word, type) => {
-    const apiUrl = `http://34.55.188.177/question_word?word=${word}&type=${type}`;
+    const apiUrl = `${hostUrl}/api/question_word?word=${word}&type=${type}`;
     try {
       const response = await fetch(apiUrl, {
         method: "GET",
@@ -251,7 +251,7 @@ const QuizCreationPage = ({ navigation }) => {
     token: string
   ): Promise<void> => {
     try {
-      const apiUrl = `http://34.55.188.177/question_answers?word=${encodeURIComponent(word)}&type=${type}`;
+      const apiUrl = `${hostUrl}/api/question_answers?word=${encodeURIComponent(word)}&type=${type}`;
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {

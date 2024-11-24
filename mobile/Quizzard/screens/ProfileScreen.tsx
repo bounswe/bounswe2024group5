@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import {
   View,
   Text,
@@ -12,9 +12,11 @@ import BaseLayout from "./BaseLayout";
 import QuizViewComponent from "../components/QuizViewComponent";
 import questions from "@/mockdata/mockQuizQuestionData";
 import { useAuth } from "./AuthProvider";
+import HostUrlContext from '../app/HostContext';
 
 
 const ProfileScreen = ({ navigation }) => {
+  const hostUrl = useContext(HostUrlContext);
   // Example data - in a real application, this would come from an API
   const userStats = {
     totalPoints: 1250,
@@ -53,7 +55,9 @@ const ProfileScreen = ({ navigation }) => {
           style: "destructive",
           onPress: async () => {
             try {
-              const response = await fetch(`http://34.55.188.177/api/quizzes/${quizId}`, {
+              const response = await fetch(
+                `${hostUrl}/api/quizzes/${quizId}`, 
+                {
                 method: "DELETE",
                 headers: {
                   Authorization: `Bearer ${token}`,
