@@ -14,6 +14,7 @@ import CustomModal from "../components/CustomModal";
 import HostUrlContext from '../app/HostContext';
 import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useAuth } from "./AuthProvider";
+import HostUrlContext from '../app/HostContext';
 
 const RegisterScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
