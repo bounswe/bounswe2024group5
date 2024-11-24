@@ -1,78 +1,159 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Switch,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
+import { useAuth } from "./AuthProvider";
+import HostUrlContext from "../app/HostContext";
+import BaseLayout from "./BaseLayout";
 
 const ProfileSettingsScreen = ({ navigation }) => {
-  const [username, setUsername] = useState("John Doe");
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [isPublicProfile, setIsPublicProfile] = useState(true);
+  const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
+  const authContext = useAuth();
+  const token = authContext ? authContext.token : null;
 
-  const handleSave = () => {
-    // API call to save settings
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(`${hostUrl}/api/profile/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setName(data.name || "");
+          setEmail(data.email || "");
+        } else {
+          const errorData = await response.json();
+          Alert.alert(
+            "Error",
+            errorData.message || "Failed to fetch profile data."
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+        Alert.alert("Error", "An error occurred while fetching profile data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`${hostUrl}/api/profile/me`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        Alert.alert("Success", "Profile updated successfully.", [
+          {
+            text: "OK",
+            onPress: () => {
+              // Navigate back and trigger profile refresh
+              navigation.goBack();
+            },
+          },
+        ]);
+      } else {
+        const errorData = await response.json();
+        Alert.alert("Error", errorData.message || "Failed to update profile.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Alert.alert("Error", "An error occurred while updating profile.");
+    }
+  };
+
+  const handleCancel = () => {
+    // Navigate back without saving changes
     navigation.goBack();
   };
 
+  if (loading) {
+    return (
+      <BaseLayout navigation={navigation}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#6a0dad" />
+          <Text>Loading...</Text>
+        </View>
+      </BaseLayout>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.sectionTitle}>Profile Settings</Text>
+    <BaseLayout navigation={navigation}>
+      <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.contentContainer}>
+          <Text style={styles.sectionTitle}>Profile Settings</Text>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Username</Text>
-          <TextInput
-            style={styles.input}
-            value={username}
-            onChangeText={setUsername}
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Profile Visibility</Text>
-          <View style={styles.switchContainer}>
-            <Text style={styles.switchLabel}>
-              {isPublicProfile ? "Public" : "Private"}
-            </Text>
-            <Switch
-              value={isPublicProfile}
-              onValueChange={setIsPublicProfile}
-              trackColor={{ false: "#767577", true: "#6a0dad" }}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
             />
           </View>
-        </View>
-      </ScrollView>
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.buttonText}>Save Changes</Text>
-      </TouchableOpacity>
-    </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
+          </View>
+        </ScrollView>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.buttonText}>Save Changes</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </BaseLayout>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Fills the entire screen
+    flex: 1,
     backgroundColor: "#fff",
   },
   contentContainer: {
     padding: 20,
-    paddingBottom: 0, // Adjust padding to avoid extra space
+    paddingBottom: 0,
   },
   sectionTitle: {
     fontSize: 26,
@@ -95,26 +176,36 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
   },
-  switchContainer: {
+  buttonContainer: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    margin: 20,
   },
-  switchLabel: {
-    fontSize: 16,
-    color: "#555",
+  cancelButton: {
+    backgroundColor: "#ccc",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    flex: 1,
+    marginRight: 10,
   },
   saveButton: {
     backgroundColor: "#6a0dad",
     paddingVertical: 15,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     borderRadius: 8,
-    margin: 20, // Spacing around the button
+    flex: 1,
+    marginLeft: 10,
   },
   buttonText: {
     color: "#fff",
     fontSize: 18,
     textAlign: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
