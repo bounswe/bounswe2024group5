@@ -1568,13 +1568,13 @@ paths:
           description: Access denied (user is not authorized to delete the reply).
         '404':
           description: Reply not found.
-  /search:
+  /posts/search:
     get:
-      summary: (not implemented) Search forum posts
+      summary: Search forum posts
       tags:
-        - Search
+        - Forum Post Search
       parameters:
-        - name: query
+        - name: keyword
           in: query
           required: true
           schema:
@@ -1584,8 +1584,8 @@ paths:
           in: query
           schema:
             type: integer
-          description: Page number
-        - name: limit
+          description: Page number (0-indexed)
+        - name: size
           in: query
           schema:
             type: integer
@@ -1608,6 +1608,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  
+  /posts/{postId}/related:
+    get:
+      summary: Get related posts of a specific post
+      tags:
+        - Forum Post Search
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the post to retrieve related posts for.
+        - name: page
+          in: query
+          schema:
+            type: integer
+          description: Page number (0-indexed)
+        - name: size
+          in: query
+          schema:
+            type: integer
+          description: Number of items per page
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ForumPost'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
   /file/upload:
     post:
       tags:
