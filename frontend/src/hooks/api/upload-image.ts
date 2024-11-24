@@ -24,8 +24,8 @@ export const useUploadFile = () => {
 				throw new Error('Failed to upload file');
 			}
 
-			const data = await response.json();
-			return data.url as string;
+
+			return (await response.text()) as string;
 		},
 	});
 };
