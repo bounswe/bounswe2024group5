@@ -253,7 +253,8 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
     title: string,
     description: string,
     username: string,
-    noUpvote: number
+    noUpvote: number,
+    createdAt: string
   ) => {
     navigation.navigate("QuestionDetail", {
       questionId,
@@ -261,6 +262,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
       description,
       username,
       noUpvote,
+      createdAt,
     });
   };
 
@@ -293,7 +295,8 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
                 item.title,
                 item.description,
                 item.username,
-                item.upvotes
+                item.upvotes,
+                item.createdAt
               )
             }
             onUpvote={() => handleUpvote(item.id)}

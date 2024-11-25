@@ -228,7 +228,8 @@ const ForumScreen = ({ navigation }) => {
     title: string,
     description: string,
     username: string,
-    noUpvote: number
+    noUpvote: number,
+    createdAt: string
   ) => {
     navigation.navigate("QuestionDetail", {
       questionId,
@@ -236,6 +237,7 @@ const ForumScreen = ({ navigation }) => {
       description,
       username,
       noUpvote,
+      createdAt,
     });
   };
 
@@ -280,7 +282,8 @@ const ForumScreen = ({ navigation }) => {
                   item.title,
                   item.description,
                   item.username,
-                  item.upvotes
+                  item.upvotes,
+                  item.createdAt
                 )
               }
               onUpvote={() => handleUpvote(item.id)} // Pass the upvote handler
