@@ -16,6 +16,7 @@ import { useCreateQuestionAnswer } from "../hooks/api/questions-answers/answer";
 import { useQuestionAnswers } from "../hooks/api/questions-answers/list";
 import { QuizResult } from "../components/solve-quiz/quiz-result";
 import { useUpdateQuizAttempt } from "../hooks/api/attempts/update";
+import { ForumForQuizSolvePage } from "../components/solve-quiz/forum-integration";
 export const SolveQuizPage = () => {
   const currentPath = useLocation().pathname;
 
@@ -217,34 +218,35 @@ export const SolveQuizPage = () => {
   };
 
   return (
-    <div className="flex w-full">
-      {confettiEnabled && <Confetti />}
-      {isQuizFinished ? (
-        <QuizResult score={score} questionCount={quiz.questions.length} />
-      ) : (
-        <>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex-grow p-6 mr-4 rounded-xl bg-violet-50"
-          >
-            <ProgressBar
-              currentQuestion={currentQuestion}
-              questions={quiz.questions}
-              answers={answers}
-            />
+    <>
+      <div className="flex w-full">
+        {confettiEnabled && <Confetti />}
+        {isQuizFinished ? (
+          <QuizResult score={score} questionCount={quiz.questions.length} />
+        ) : (
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex-grow p-6 mr-4 rounded-xl bg-violet-50"
+              >
+              <ProgressBar
+                currentQuestion={currentQuestion}
+                questions={quiz.questions}
+                answers={answers}
+                />
 
-            <p className="mb-6 text-lg">
-              {questionTemplate({
-                word: quiz.questions[currentQuestion].word,
-                type: quiz.questions[currentQuestion].questionType,
-              })}
-            </p>
+              <p className="mb-6 text-lg">
+                {questionTemplate({
+                  word: quiz.questions[currentQuestion].word,
+                  type: quiz.questions[currentQuestion].questionType,
+                })}
+              </p>
 
-            <div className="grid grid-cols-2 gap-4 ">
-              {quiz.questions[currentQuestion].options.map((option, index) => (
-                <OptionButton
+              <div className="grid grid-cols-2 gap-4 ">
+                {quiz.questions[currentQuestion].options.map((option, index) => (
+                  <OptionButton
                   key={index}
                   index={index}
                   option={option}
@@ -253,30 +255,32 @@ export const SolveQuizPage = () => {
                   question={quiz.questions[currentQuestion]}
                   answers={answers}
                   currentQuestion={currentQuestion}
+                  />
+                ))}
+              </div>
+
+              <QuizActionButtons
+                questions={quiz.questions}
+                submitAnswer={submitAnswer}
+                nextQuestion={nextQuestion}
+                previousQuestion={previousQuestion}
+                currentQuestion={currentQuestion}
+                selectedAnswer={selectedAnswer}
+                answers={answers}
                 />
-              ))}
-            </div>
+            </motion.div>
 
-            <QuizActionButtons
+            <QuizOverview
               questions={quiz.questions}
-              submitAnswer={submitAnswer}
-              nextQuestion={nextQuestion}
-              previousQuestion={previousQuestion}
               currentQuestion={currentQuestion}
-              selectedAnswer={selectedAnswer}
+              score={score}
               answers={answers}
-            />
-          </motion.div>
-
-          <QuizOverview
-            questions={quiz.questions}
-            currentQuestion={currentQuestion}
-            score={score}
-            answers={answers}
-            handleNavigateToQuestion={handleNavigateToQuestion}
-          />
-        </>
-      )}
-    </div>
+              handleNavigateToQuestion={handleNavigateToQuestion}
+              />
+          </>
+        )}
+      </div>
+      <ForumForQuizSolvePage word={quiz.questions[currentQuestion].word} />
+    </>
   );
 };

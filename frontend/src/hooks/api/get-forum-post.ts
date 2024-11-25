@@ -33,13 +33,14 @@ export const useFetchPosts = (params?: { username?: string; tag?: string }) => {
     });
 };
 
-export const useFetchPost = (postId: number) => {
+export const useFetchPost = (postId: number | null) => {
 
     const TOKEN = sessionStorage.getItem('token');
     const hostUrl = useContext(HostContext);
     return useQuery({
         queryKey: ['posts', postId],
         queryFn: async () => {
+            if (postId === null) return null;
             const response = await fetch(`${hostUrl}/api/posts/${postId}`, {
                 headers: {
                     'Authorization': `Bearer ${TOKEN}`,
