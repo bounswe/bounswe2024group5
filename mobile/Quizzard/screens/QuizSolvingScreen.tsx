@@ -47,49 +47,43 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     console.log("### Initializing quiz:", quiz.id);
     try {
       // Get or create quiz attempt
-      const attemptResponse = await fetch(
-        `${hostUrl}/api/quiz-attempts`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ quizId: quiz.id }),
-        }
-      );
-
+      const attemptResponse = await fetch(`${hostUrl}/api/quiz-attempts`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ quizId: quiz.id }),
+      });
+  
       if (!attemptResponse.ok) {
-        throw new Error('Failed to create/get quiz attempt');
+        throw new Error("Failed to create/get quiz attempt");
       }
       const attemptData = await attemptResponse.json();
-
-      console.log(`Quiz attempt ID: ${attemptData.id} and quiz ID: ${quiz.id}`);
-
       setQuizAttemptId(attemptData.id);
-
-      // Step 2: Get quiz details with questions
-      const quizResponse = await fetch(
-        `${hostUrl}/api/quizzes/${quiz.id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+  
+      // Fetch quiz details with questions
+      const quizResponse = await fetch(`${hostUrl}/api/quizzes/${quiz.id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
       if (!quizResponse.ok) {
-        throw new Error('Failed to fetch quiz details');
+        throw new Error("Failed to fetch quiz details");
       }
-
+  
       const quizData = await quizResponse.json();
-      setQuestions(quizData.quiz.questions);
-      setIsQuestionAnswered(new Array(quizData.quiz.questions.length).fill(false));
-
-      // Step 3: Get previous answers if they exist
+      const questions = quizData.quiz.questions;
+  
+      setQuestions(questions);
+      setIsQuestionAnswered(new Array(questions.length).fill(false));
+      setSelectedAnswers(new Array(questions.length).fill(null));
+  
+      // Fetch previous answers
       const answersResponse = await fetch(
-        `${hostUrl}/api/question-answers?quizAttemptId=${quizAttemptId}`,
+        `${hostUrl}/api/question-answers?quizAttemptId=${attemptData.id}`,
         {
           method: "GET",
           headers: {
@@ -97,28 +91,28 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           },
         }
       );
-
+  
       if (answersResponse.ok) {
-        // TODO: complete this part later.
-        // const answersData = await answersResponse.json();
-        // const answersMap = {};
-        // answersData.forEach(answer => {
-        //   answersMap[answer.questionId] = answer.answer;
-        // });
-        // setPreviousAnswers(answersMap);
-
-        // // Mark questions as answered if they have previous answers
-        // const newIsQuestionAnswered = new Array(quizData.questions.length).fill(false);
-        // quizData.questions.forEach((_, index) => {
-        //   if (answersMap[index] !== undefined) {
-        //     newIsQuestionAnswered[index] = true;
-        //   }
-        // });
-        // setIsQuestionAnswered(newIsQuestionAnswered);
+        const answersData = await answersResponse.json();
+  
+        // Map previous answers
+        const answersMap = {};
+        answersData.forEach((answer) => {
+          answersMap[answer.questionId] = answer.answer;
+        });
+        setPreviousAnswers(answersMap);
+  
+        // Update selectedAnswers and isQuestionAnswered
+        const updatedSelectedAnswers = questions.map(
+          (q) => answersMap[q.id] || null
+        );
+        const updatedIsQuestionAnswered = questions.map(
+          (q) => answersMap[q.id] !== undefined
+        );
+  
+        setSelectedAnswers(updatedSelectedAnswers);
+        setIsQuestionAnswered(updatedIsQuestionAnswered);
       }
-      console.log(`Questions: ${quizData.quiz.questions[0].correctAnswer}`);
-      // setQuestion(quizData.quiz.questions[questionIndex]);
-      // console.log(`${questions[0]} question is ${question} and ${question.correctAnswer}`);
     } catch (error) {
       console.error("Error initializing quiz:", error);
       Alert.alert(
