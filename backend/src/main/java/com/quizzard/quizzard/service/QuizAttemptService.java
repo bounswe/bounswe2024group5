@@ -109,7 +109,7 @@ public class QuizAttemptService {
                 throw new RuntimeException("Quiz attempt is already completed.");
             else if ((boolean) quizAttemptUpdateRequest.get("completed")) {
                 //quizAttempt.setScore(quizAttempt.getQuiz().getQuestions().size());
-                calculateQuestionPoint(user, id);
+                quizAttempt.setScore(calculateQuestionPoint(user, id));
                 quizAttempt.setCompletedAt(new Date());
                 quizAttempt.setIsCompleted(true);
                 quizAttemptRepository.save(quizAttempt);
@@ -122,7 +122,7 @@ public class QuizAttemptService {
     }
 
 
-    public void calculateQuestionPoint(User user, Long quizAttemptId) {
+    public int calculateQuestionPoint(User user, Long quizAttemptId) {
         QuizAttempt quizAttempt = quizAttemptRepository.findById(quizAttemptId)
                 .orElseThrow(() -> new RuntimeException("Quiz attempt not found with id: " + quizAttemptId));
 
@@ -184,6 +184,8 @@ public class QuizAttemptService {
             finalScore = 4000;
         }
         userService.updateUserPoint(user, finalScore);
+
+        return totalScoreOfQuiz;
     }
 
 
