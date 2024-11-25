@@ -190,7 +190,7 @@ const ProfileScreen = ({ route, navigation }) => {
             navigation.navigate("ProfileSettings", { username: username })
           }
         >
-          <Text style={styles.buttonText}>Settings</Text>
+          <Text style={styles.buttonText}>Change Profile Settings</Text>
         </TouchableOpacity>
 
         <View style={styles.quizSection}>
