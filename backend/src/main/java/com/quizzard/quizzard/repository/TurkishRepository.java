@@ -15,15 +15,18 @@ public interface TurkishRepository extends JpaRepository<Turkish, Long> {
     Turkish findByWord(String word);
 
     @Query(value = """
-    SELECT word FROM (
-        SELECT DISTINCT t.word, e.score
-        FROM turkish t 
-        INNER JOIN translate tr ON t.id = tr.turkish_id 
-        INNER JOIN english e ON e.id = tr.english_id 
-        WHERE t.word LIKE :prefix% 
-        AND e.score != 2000 
+    SELECT word 
+    FROM (
+        SELECT t.word, MIN(e.score) AS score
+        FROM turkish t
+        INNER JOIN translate tr ON t.id = tr.turkish_id
+        INNER JOIN english e ON e.id = tr.english_id
+        WHERE t.word LIKE :prefix%
+          AND e.score != 2000
+          AND t.word NOT LIKE '% %'
+        GROUP BY t.word
     ) AS sub
-    ORDER BY score 
+    ORDER BY score
     LIMIT 10
     """,
             nativeQuery = true)
