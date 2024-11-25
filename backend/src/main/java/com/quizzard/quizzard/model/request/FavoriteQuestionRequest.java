@@ -6,9 +6,6 @@ import lombok.Data;
 @Data
 public class FavoriteQuestionRequest {
 
-    private Long userId;
-
     private Long questionId;
-
 
 }
