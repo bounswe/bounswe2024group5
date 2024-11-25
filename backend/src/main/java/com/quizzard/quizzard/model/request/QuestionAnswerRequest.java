@@ -1,9 +1,10 @@
 package com.quizzard.quizzard.model.request;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
+@Data
 public class QuestionAnswerRequest {
     @NotNull
     private Long quizAttemptId;

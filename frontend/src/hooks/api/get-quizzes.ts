@@ -4,26 +4,31 @@ import { useContext } from 'react';
 import HostContext from '../../HostContext';
 
 interface QuizParams {
-	filter?: 'own' | 'others' | 'all';
-	difficulty?: 'a1' | 'a2' | 'b1' | 'b2' | 'c1' | 'c2';
+	username?: string;
+	minDifficulty?: number;
+	maxDifficulty?: number;
 }
 
 export const useFetchQuizzes = (params: QuizParams = {}) => {
 	const TOKEN = sessionStorage.getItem('token');
 	const hostUrl = useContext(HostContext);
-	const { filter, difficulty } = params;
+	const { username, minDifficulty, maxDifficulty } = params;
 
 	const context = useQuery({
-		queryKey: ['quizzes', { filter, difficulty }],
+		queryKey: ['quizzes', { username, minDifficulty, maxDifficulty }],
 		queryFn: async () => {
 			const queryParams = new URLSearchParams();
 
-			if (filter) {
-				queryParams.append('filter', filter);
+			if (username) {
+				queryParams.append('username', username);
 			}
 
-			if (difficulty) {
-				queryParams.append('difficulty', difficulty);
+			if (minDifficulty !== undefined) {
+				queryParams.append('minDifficulty', minDifficulty.toString());
+			}
+
+			if (maxDifficulty !== undefined) {
+				queryParams.append('maxDifficulty', maxDifficulty.toString());
 			}
 
 			const url = `${hostUrl}/api/quizzes${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
