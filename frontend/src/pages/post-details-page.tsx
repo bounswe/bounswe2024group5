@@ -6,6 +6,23 @@ import { CreateReplyComponent } from "../components/forum/CreateReply";
 import { useState } from "react";
 import { useFetchReplies } from "../hooks/api/get-reply";
 import { useCreateReply } from "../hooks/api/create-reply";
+import { useFetchRelatedPosts } from "../hooks/api/get-related-posts";
+
+const RelatedPostsComponent = ({ postId }: {postId: number}) => {
+
+    const { data: posts } = useFetchRelatedPosts(postId);
+
+    return (
+        <>
+            <div className="text-left w-full max-w-2xl px-2">Similar Posts</div>
+            <div className="flex gap-8 overflow-x-scroll w-full max-w-2xl">
+                { posts && posts.map( post => {return <div className="w-[578px] flex-shrink-0">
+                    <ForumPostComponent postId={post.id} />
+                </div>})}
+            </div>
+        </>
+    );
+}
 
 export const PostDetailsPage = () => {
 
@@ -51,6 +68,7 @@ export const PostDetailsPage = () => {
                 { replies && replies.map(reply => {
                     return <ForumReplyComponent reply={reply} />
                 })}
+                <RelatedPostsComponent postId={postId}/>
             </div>
         </>
     );

@@ -67,6 +67,8 @@ export const ForumPostComponent = ({ postId, setPostId }: ForumPostProps) => {
             navigate(`/post/${post.id}`)
         } else if ( currentPath.split("/").includes("quiz") ) {
             if (setPostId) setPostId(postId);
+        } else if ( post && currentPath.split("/").includes("post") ) {
+            navigate(`/post/${post.id}`)
         }
     }
 
