@@ -1,5 +1,6 @@
 import { Link, Outlet } from "react-router-dom";
-import { IconLogout } from "@tabler/icons-react";
+import { IconLogout, IconPhotoOff } from "@tabler/icons-react";
+import { useGetProfile } from "../hooks/api/profile/get";
 
 const Logo = () => {
   return (
@@ -9,6 +10,7 @@ const Logo = () => {
   );
 };
 const NavBar = () => {
+  const { data: profile } = useGetProfile();
   return (
     <div className="w-[%80] mx-auto bg-violet-200 border border-violet-400 rounded-3xl h-16 flex items-center justify-between px-8">
       <Logo />
@@ -24,8 +26,20 @@ const NavBar = () => {
         </Link>
       </div>
       <div className="flex gap-4">
-        <Link to="profile">
-          <div className="w-8 h-8 bg-white rounded-full cursor-pointer" />
+        <Link to="/profile">
+          <div className="w-8 h-8 overflow-hidden transition-transform rounded-full cursor-pointer hover:scale-110">
+            {profile?.profilePicture ? (
+              <img
+                src={profile.profilePicture}
+                alt="Your profile"
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <div className="flex items-center justify-center w-full h-full bg-white">
+                <IconPhotoOff className="w-4 h-4 text-gray-300" />
+              </div>
+            )}
+          </div>
         </Link>
         <Link
           to="/login"
