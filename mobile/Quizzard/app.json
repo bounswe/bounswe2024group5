@@ -13,7 +13,12 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to update your profile picture.",
+        "NSCameraUsageDescription": "This app needs access to your camera to take profile pictures.",
+        "NSPhotoLibraryAddUsageDescription": "This app needs permission to save photos to your library."
+      }
     },
     "android": {
       "adaptiveIcon": {
