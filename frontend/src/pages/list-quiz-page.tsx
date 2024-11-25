@@ -11,13 +11,26 @@ type DifficultyFilter = "all" | string;
 export const ListQuizzesPage = () => {
   const getDifficultyAnnouncement = (level: string) => {
     const levels = {
-      "0": "Beginner friendly quiz",
-      "1": "Intermediate level quiz",
-      "2": "Advanced level quiz",
-      "all": "Quizzes of all difficulty levels"
+      A1: "Beginner level (A1) - Basic understanding",
+      A2: "Elementary level (A2) - Foundation building",
+      B1: "Intermediate level (B1) - Practical usage",
+      B2: "Upper intermediate level (B2) - Fluent usage",
+      C1: "Advanced level (C1) - Professional competence",
+      C2: "Mastery level (C2) - Near-native proficiency",
+      all: "Quizzes of all proficiency levels",
     } as const;
     return levels[level as keyof typeof levels] || levels["all"];
   };
+
+  const getDifficultyLevel = (difficulty: number): string => {
+    if (difficulty < 400) return "A1";
+    if (difficulty < 1000) return "A2";
+    if (difficulty < 1800) return "B1";
+    if (difficulty < 2600) return "B2";
+    if (difficulty < 3300) return "C1";
+    return "C2";
+  };
+
   const { data: quizzes } = useFetchQuizzes();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,9 +46,11 @@ export const ListQuizzesPage = () => {
       const matchesSearch = quiz.title
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
+
+      const quizDifficultyLevel = getDifficultyLevel(quiz.difficulty);
       const matchesDifficulty =
-        difficultyFilter === "all" ||
-        quiz.difficulty.toString() === difficultyFilter;
+        difficultyFilter === "all" || quizDifficultyLevel === difficultyFilter;
+
       return matchesSearch && matchesDifficulty;
     });
   }, [quizzes, searchQuery, difficultyFilter]);
@@ -64,7 +79,11 @@ export const ListQuizzesPage = () => {
   };
 
   return (
-    <main className="min-h-screen px-4 border border-purple-300 bg-purple-50 rounded-3xl" role="main" aria-label="Quiz listing page">
+    <main
+      className="min-h-screen px-4 border border-purple-300 bg-purple-50 rounded-3xl"
+      role="main"
+      aria-label="Quiz listing page"
+    >
       <div className="container px-4 py-8 mx-auto">
         <motion.section
           initial={{ opacity: 0 }}
@@ -74,7 +93,10 @@ export const ListQuizzesPage = () => {
           aria-label="featured-section"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="mb-4 text-2xl font-semibold text-purple-800" id="featured-section">
+            <h2
+              className="mb-4 text-2xl font-semibold text-purple-800"
+              id="featured-section"
+            >
               Featured Quizzes
             </h2>
             <Link to="/add-quiz" aria-label="Create a new quiz">
@@ -83,12 +105,17 @@ export const ListQuizzesPage = () => {
               </button>
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4" aria-label="Featured quizzes grid">
+          <div
+            className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"
+            aria-label="Featured quizzes grid"
+          >
             {highlightedQuizzes.map((quiz) => (
-              <div 
-                key={quiz.id} 
+              <div
+                key={quiz.id}
                 role="listitem"
-                aria-label={`${quiz.title} - ${getDifficultyAnnouncement(quiz.difficulty.toString())}`}
+                aria-label={`${quiz.title} - ${getDifficultyAnnouncement(
+                  getDifficultyLevel(quiz.difficulty)
+                )}`}
               >
                 <FeaturedQuizCard quiz={quiz} />
               </div>
@@ -103,7 +130,10 @@ export const ListQuizzesPage = () => {
           aria-labelledby="all-quizzes-section"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="mb-4 text-2xl font-semibold text-purple-800" id="all-quizzes-section">
+            <h2
+              className="mb-4 text-2xl font-semibold text-purple-800"
+              id="all-quizzes-section"
+            >
               All Quizzes
             </h2>
 
@@ -112,13 +142,18 @@ export const ListQuizzesPage = () => {
                 className="px-4 py-2 bg-white border-2 rounded-full outline-none border-violet-500"
                 value={difficultyFilter}
                 onChange={handleDifficultyChange}
-                aria-label="Filter quizzes by difficulty level"
-                aria-description="Filter quizzes by learning difficulty: beginner, intermediate, or advanced"
+                aria-label="Filter quizzes by proficiency level"
+                aria-description="Filter quizzes by language proficiency level from A1 to C2"
               >
-                <option value="all">All Difficulty Levels</option>
-                <option value="0">Beginner - Perfect for New Learners</option>
-                <option value="1">Intermediate - For Growing Skills</option>
-                <option value="2">Advanced - Challenge Yourself</option>
+                <option value="all">All Proficiency Levels</option>
+                <option value="A1">A1 - Beginner Level (0-399)</option>
+                <option value="A2">A2 - Elementary Level (400-999)</option>
+                <option value="B1">B1 - Intermediate Level (1000-1799)</option>
+                <option value="B2">
+                  B2 - Upper Intermediate Level (1800-2599)
+                </option>
+                <option value="C1">C1 - Advanced Level (2600-3299)</option>
+                <option value="C2">C2 - Mastery Level (3300+)</option>
               </select>
               <input
                 className="w-48 px-4 py-2 border-2 rounded-full outline-none border-violet-500"
@@ -129,22 +164,37 @@ export const ListQuizzesPage = () => {
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2" aria-label="All quizzes grid">
+          <div
+            className="grid grid-cols-1 gap-4 md:grid-cols-2"
+            aria-label="All quizzes grid"
+          >
             {currentQuizzes.map((quiz) => (
-              <div role="listitem" key={quiz.id} aria-label={`Educational quiz: ${quiz.title} - ${getDifficultyAnnouncement(quiz.difficulty.toString())}`}>
-                <RegularQuizCard  quiz={quiz} />
+              <div
+                role="listitem"
+                key={quiz.id}
+                aria-label={`Educational quiz: ${
+                  quiz.title
+                } - ${getDifficultyAnnouncement(
+                  getDifficultyLevel(quiz.difficulty)
+                )}`}
+              >
+                <RegularQuizCard quiz={quiz} />
               </div>
-              
             ))}
           </div>
-          <div className="flex justify-center mt-8" aria-label="Quiz pagination">
+          <div
+            className="flex justify-center mt-8"
+            aria-label="Quiz pagination"
+          >
             <Pagination
               current={currentPage}
               total={regularQuizzes.length}
               pageSize={pageSize}
               onChange={onPageChange}
               showSizeChanger={false}
-              aria-label={`Page ${currentPage} of ${Math.ceil(regularQuizzes.length / pageSize)}`}
+              aria-label={`Page ${currentPage} of ${Math.ceil(
+                regularQuizzes.length / pageSize
+              )}`}
             />
           </div>
         </motion.section>
