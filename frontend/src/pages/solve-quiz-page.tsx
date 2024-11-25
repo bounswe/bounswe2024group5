@@ -285,7 +285,7 @@ export const SolveQuizPage = () => {
           </>
         )}
       </div>
-      <ForumForQuizSolvePage word={quiz.questions[currentQuestion].word} />
+      { !isQuizFinished && <ForumForQuizSolvePage word={quiz.questions[currentQuestion].word} />}
     </>
   );
 };
