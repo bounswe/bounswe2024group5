@@ -304,7 +304,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           } else {
             if (answer === question.correctAnswer) {
               backgroundColor = "green"; // Correct answer
-            } else if (answer === selectedAnswers[selectedAnswers.length - 1]) {
+            } else if (answer === selectedAnswers[questionIndex]) {
               backgroundColor = "red"; // Selected answer
             } else {
               backgroundColor = "#ddd6fe"; // Match the background color
