@@ -70,7 +70,7 @@ const SearchWordsScreen: React.FC = () => {
         const response = await fetch(
           `${hostUrl}/api/autocomplete?prefix=${encodeURIComponent(
             currentTerm
-          )}`,
+          )}&language=english`,
           {
             method: "GET",
             headers: {
@@ -90,6 +90,7 @@ const SearchWordsScreen: React.FC = () => {
           const data = await response.json();
           setSuggestions(data);
         } else if (response.status === 401) {
+          console.log(`Unauthorized: ${response.status}.`);
           // Handle unauthorized access
           Alert.alert(
             "Unauthorized",

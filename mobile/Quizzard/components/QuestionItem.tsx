@@ -32,7 +32,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
       </Text>
 
       <View style={styles.metadata}>
-        <Text style={styles.username}>By {question.username}</Text>
+        <Text style={styles.username}>@{question.username}</Text>
         <TouchableOpacity
           style={styles.upvoteContainer}
           onPress={onUpvote}

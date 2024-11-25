@@ -23,7 +23,7 @@ export type Profile = {
     createdQuizzes: Quiz[];
     favoritedQuizzes: Quiz[];
     favoritedQuestions: Question[];
-    posts: ForumPost[];
+    posts: ForumQuestion[];
 }
 
 // Quiz types:
@@ -57,26 +57,28 @@ export type QuestionType =
   | "english_to_sense";
 
 // Forum types:
-export type ForumPost = {
+export type ForumQuestion = {
     id: number;
     title: string;
-    content: Content;
-    replies: ForumReply[];
-    upvote: number;
+    content: string;
+    username: string;
+    noUpvote: number;
+    hasUpvoted: boolean;
+    createdAt: string;
     tags: string[];
+    noReplies: number;
 }
-export type Content = {
-    username: RegisteredUser;
-    creationTimestamp: number;
-    text: string;
-};
+
 export type ForumReply = {
     id: number;
+    content: string;
+    createdAt: string;
     postId: number;
-    content: Content;
+    username: string;
 }
+
 export type ForumFeed = {
-    posts: ForumPost[];
+    posts: ForumQuestion[];
 }
 // export type SearchEngine = {
 //     searchHistory: string[];
