@@ -16,12 +16,12 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByUserId(long l);
+
     @Query("SELECT fp FROM Post fp " +
             "JOIN PostTag pt ON fp.id = pt.post.id " +
             "JOIN English e ON pt.english.id = e.id " +
             "WHERE e.word = :word")
     List<Post> findAllByTagWord(@Param("word") String word);
-
 
     @Query("SELECT p FROM Post p " +
             "JOIN PostTag pt ON p.id = pt.post.id " +
@@ -30,10 +30,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "WHERE e.word = :word AND u.username = :username")
     List<Post> findAllByTagWordAndUsername(@Param("word") String word, @Param("username") String username);
 
+    Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
     @Query(value = 
         "SELECT fp.* " +
         "FROM ( " +
-        "    SELECT post_id, query_order, max_category_id " +
+        "    SELECT post_id, MIN(query_order) AS query_order, MAX(max_category_id) AS max_category_id " +
         "    FROM ( " +
         "        SELECT  " +
         "            post_id,  " +
@@ -67,30 +69,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         "        ) " +
         "        AND post_id != :postId " +
         "        UNION ALL " +
-        "        SELECT  " +
-        "            post_tags.post_id,  " +
-        "            3 AS query_order,  " +
-        "            MAX(t1.category_id) AS max_category_id " +
-        "        FROM  " +
-        "            translate t1 " +
-        "        LEFT JOIN  " +
-        "            translate t2 ON t1.category_id = t2.category_id " +
-        "        RIGHT JOIN  " +
-        "            post_tags ON t2.english_id = post_tags.english_id " +
-        "        WHERE  " +
-        "            t1.english_id IN ( " +
-        "                SELECT english_id  " +
-        "                FROM post_tags  " +
-        "                WHERE post_id = :postId " +
-        "            ) " +
-        "        AND post_tags.post_id != :postId " +
-        "        GROUP BY  " +
-        "            post_tags.post_id " +
+        "        SELECT pt2.post_id AS post_id, 3 AS query_order, MAX(t2.category_id) AS max_category_id " +
+        "        FROM post_tags pt1 " +
+        "        JOIN translate t1 ON pt1.english_id = t1.english_id " +
+        "        JOIN translate t2 ON t1.category_id = t2.category_id " +
+        "        JOIN post_tags pt2 ON t2.english_id = pt2.english_id " +
+        "        WHERE pt1.post_id = :postId " +
+        "        AND pt2.post_id <> :postId " +
+        "        GROUP BY pt2.post_id " +
         "    ) combined " +
-        "    ORDER BY  " +
-        "        query_order ASC, " +
-        "        max_category_id DESC, " +
-        "        post_id DESC " +
+        "    GROUP BY post_id " +
         ") AS related_posts " +
         "LEFT JOIN forum_posts fp " +
         "ON related_posts.post_id = fp.id " +
@@ -132,25 +120,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         "        ) " +
         "        AND post_id != :postId " +
         "        UNION ALL " +
-        "        SELECT  " +
-        "            post_tags.post_id,  " +
-        "            3 AS query_order,  " +
-        "            MAX(t1.category_id) AS max_category_id " +
-        "        FROM  " +
-        "            translate t1 " +
-        "        LEFT JOIN  " +
-        "            translate t2 ON t1.category_id = t2.category_id " +
-        "        RIGHT JOIN  " +
-        "            post_tags ON t2.english_id = post_tags.english_id " +
-        "        WHERE  " +
-        "            t1.english_id IN ( " +
-        "                SELECT english_id  " +
-        "                FROM post_tags  " +
-        "                WHERE post_id = :postId " +
-        "            ) " +
-        "        AND post_tags.post_id != :postId " +
-        "        GROUP BY  " +
-        "            post_tags.post_id " +
+        "        SELECT pt2.post_id AS post_id, 3 AS query_order, MAX(t2.category_id) AS max_category_id " +
+        "        FROM post_tags pt1 " +
+        "        JOIN translate t1 ON pt1.english_id = t1.english_id " +
+        "        JOIN translate t2 ON t1.category_id = t2.category_id " +
+        "        JOIN post_tags pt2 ON t2.english_id = pt2.english_id " +
+        "        WHERE pt1.post_id = :postId " +
+        "        AND pt2.post_id <> :postId " +
+        "        GROUP BY pt2.post_id " +
         "    ) combined " +
         ") AS related_posts",
         nativeQuery = true
