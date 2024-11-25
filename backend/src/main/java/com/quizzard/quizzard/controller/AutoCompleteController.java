@@ -29,12 +29,10 @@ public class AutoCompleteController {
         if (language.equals("turkish")) {
             return turkishRepository.findTop5ByWordStartingWith(prefix)
                     .stream()
-                    .map(Turkish::getWord)
                     .toList();
         } else if (language.equals("english")) {
             return englishRepository.findTop5ByWordStartingWith(prefix)
                     .stream()
-                    .map(English::getWord)
                     .toList();
         } else {
             return List.of();
