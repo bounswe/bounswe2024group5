@@ -142,7 +142,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       const response = await fetch(
         `${hostUrl}/api/question-answers`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -156,6 +156,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       );
 
       if (!response.ok) {
+        console.log(`Response status: ${response.status}`);
         throw new Error('Failed to submit answer');
       }
 

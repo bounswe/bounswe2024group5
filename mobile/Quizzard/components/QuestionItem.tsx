@@ -20,6 +20,30 @@ const QuestionItem: React.FC<QuestionItemProps> = ({ question, onPress }) => {
         {question.description.slice(0, 50)}...
       </Text>
       <View style={styles.metadata}>
+        <Text style={styles.username}>@{question.username}</Text>
+        <TouchableOpacity
+          style={styles.upvoteContainer}
+          onPress={onUpvote}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name={question.hasUpvoted ? "heart" : "heart-outline"}
+            size={20}
+            color={question.hasUpvoted ? "#e0245e" : "#6a0dad"}
+          />
+          <Text style={styles.upvoteText}>{question.upvotes}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.tagsContainer}>
+        {question.tags.map((tag, index) => (
+          <View key={index} style={styles.tag}>
+            <Text style={styles.tagText}>#{tag}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.footer}>
         <Text style={styles.metadataText}>{question.createdAt}</Text>
         <Text style={styles.metadataText}>
           {question.commentCount} comments

@@ -96,6 +96,7 @@ const LoginScreen = ({ navigation }) => {
         console.log("Logged in user:", user);
         navigation.navigate("Home", { registeredUser: user });
       } else {
+        console.error("Login failed:", response.status);
         setErrorMessage(data.message || "Invalid username/password");
         setModalVisible(true);
       }
