@@ -219,6 +219,17 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   };
 
   const handleFinish = async () => {
+
+    if(alreadyFinished) {
+      navigation.navigate("QuizFinish", {
+        quiz, 
+        questions, 
+        selectedAnswers,
+        alreadyFinished});
+        return;
+    }
+    setAlreadyFinished(true);
+
     try {
       const response = await fetch(
         `${hostUrl}/api/quiz-attempts/${quizAttemptId}`,
@@ -236,7 +247,14 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         throw new Error('Failed to complete quiz');
       }
 
-      navigation.goBack();
+      navigation.navigate("QuizFinish", {
+        quiz, 
+        questions, 
+        selectedAnswers,
+        alreadyFinished});
+      
+      
+
     } catch (error) {
       console.error("Error completing quiz:", error);
       Alert.alert("Error", "Failed to complete quiz. Please try again.");
@@ -245,6 +263,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
 
   const handleCancel = async () => {
     // TODO: Add putting the question-answers for this quiz attempt to the backend.
+    navigation.goBack();
   };
   const generateQuestionSentence = (question): string => {
     // const generateQuestionSentence = (question_type: 'english_to_turkish' | 'turkish_to_english' | 'english_to_sense', word: string): string => {
@@ -334,15 +353,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
 
         <TouchableOpacity
           style={styles.submitButton}
-          onPress={() => {
-            setAlreadyFinished(true);
-            navigation.navigate("QuizFinish", {
-              quiz, 
-              questions, 
-              selectedAnswers,
-              alreadyFinished})
-            }
-          }
+          onPress={handleFinish}
         >
           <Text style={styles.submitButtonText}>Finish</Text>
         </TouchableOpacity>
