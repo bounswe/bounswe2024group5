@@ -154,7 +154,10 @@ export const SolveQuizPage = () => {
   useEffect(() => {
     if (isQuizFinished) {
       setConfettiEnabled(true);
-      updateQuizAttempt({ completed: true });
+      updateQuizAttempt({ completed: true }).then((updatedAttempt) => {
+        setQuizAttempt(updatedAttempt);
+      });
+
       setInterval(() => {
         setConfettiEnabled(false);
       }, 7000);
@@ -227,7 +230,13 @@ export const SolveQuizPage = () => {
       <div className="flex w-full">
         {confettiEnabled && <Confetti />}
         {isQuizFinished ? (
-          <QuizResult score={score} questionCount={quiz.questions.length} />
+          <QuizResult
+            eloGained={quizAttempt?.score ?? 0}
+            correctAnswers={score}
+            questionCount={quiz.questions.length}
+            completedAt={quizAttempt?.completedAt ?? new Date().toISOString()}
+            quizId={quizIdAsNumber}
+          />
         ) : (
           <>
             <motion.div
@@ -235,12 +244,12 @@ export const SolveQuizPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               className="flex-grow p-6 mr-4 rounded-xl bg-violet-50"
-              >
+            >
               <ProgressBar
                 currentQuestion={currentQuestion}
                 questions={quiz.questions}
                 answers={answers}
-                />
+              />
 
               <p className="mb-6 text-lg">
                 {questionTemplate({
@@ -250,18 +259,20 @@ export const SolveQuizPage = () => {
               </p>
 
               <div className="grid grid-cols-2 gap-4 ">
-                {quiz.questions[currentQuestion].options.map((option, index) => (
-                  <OptionButton
-                  key={index}
-                  index={index}
-                  option={option}
-                  selectedAnswer={selectedAnswer}
-                  handleAnswer={handleAnswer}
-                  question={quiz.questions[currentQuestion]}
-                  answers={answers}
-                  currentQuestion={currentQuestion}
-                  />
-                ))}
+                {quiz.questions[currentQuestion].options.map(
+                  (option, index) => (
+                    <OptionButton
+                      key={index}
+                      index={index}
+                      option={option}
+                      selectedAnswer={selectedAnswer}
+                      handleAnswer={handleAnswer}
+                      question={quiz.questions[currentQuestion]}
+                      answers={answers}
+                      currentQuestion={currentQuestion}
+                    />
+                  )
+                )}
               </div>
 
               <QuizActionButtons
@@ -272,7 +283,7 @@ export const SolveQuizPage = () => {
                 currentQuestion={currentQuestion}
                 selectedAnswer={selectedAnswer}
                 answers={answers}
-                />
+              />
             </motion.div>
 
             <QuizOverview
@@ -281,11 +292,13 @@ export const SolveQuizPage = () => {
               score={score}
               answers={answers}
               handleNavigateToQuestion={handleNavigateToQuestion}
-              />
+            />
           </>
         )}
       </div>
-      { !isQuizFinished && <ForumForQuizSolvePage word={quiz.questions[currentQuestion].word} />}
+      {!isQuizFinished && (
+        <ForumForQuizSolvePage word={quiz.questions[currentQuestion].word} />
+      )}
     </>
   );
 };
