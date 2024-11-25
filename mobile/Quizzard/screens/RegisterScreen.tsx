@@ -26,6 +26,7 @@ const RegisterScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { login, token } = useAuth();
 
   const showError = (message) => {
     setErrorMessage(message);
@@ -71,6 +72,32 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     return true;
+  };
+
+  const fetchUserProfile = async (token) => {
+    try {
+      console.log("username is:", username);
+      const response = await fetch(
+        `${hostUrl}/api/profile/${username}`, // TODO: fix when endpoint added, Change to the correct host
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const user = await response.json();
+      if (response.ok) {
+        console.log("Register screen - User profile data:", user);
+        return user;
+      } else {
+        console.error("Failed to fetch user profile data", response);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      return null;
+    }
   };
 
   const handleRegister = async () => {
