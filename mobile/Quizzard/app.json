@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "LearnEnglishApp",
-    "slug": "LearnEnglishApp",
+    "name": "Quizzard",
+    "slug": "quizzard",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -51,8 +51,12 @@
     },
     "extra": {
       "eas": {
-        "projectId": "cdcdd289-4d69-4093-9d47-df18434b39c3"
+        "projectId": "c4a43ed3-b4b1-4b17-85fa-5da92779549c"
+      },
+      "router": {
+        "origin": false
       }
-    }
+    },
+    "owner": "arincdemir"
   }
 }

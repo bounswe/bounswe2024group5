@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import BaseLayout from "./BaseLayout";
 import QuizViewComponent from "../components/QuizViewComponent";
@@ -15,6 +16,15 @@ import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
 import HostUrlContext from '../app/HostContext';
 
+const calculateQuizDifficultyFromElo = (elo: number) => {
+  if (elo < 400) return "A1";
+  else if (elo < 1000) return "A2";
+  else if (elo < 1800) return "B1";
+  else if (elo < 2600) return "B2";
+  else if (elo < 3300) return "C1";
+  else return "C2";
+}
+
 const HomePage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
@@ -22,16 +32,65 @@ const HomePage = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [otherQuizzesFilterDifficulty, setOtherQuizzesFilterDifficulty] = useState("a1"); // Default difficulty
   const authContext = useAuth(); // Get the authentication context
+  const [userProfile, setUserProfile] = useState(null);
   const token = authContext ? authContext.token : null; // Get the token if authContext is not null
+  const [userElo, setUserElo] = useState(200);
 
-  const userElo = 2000;
+
+  const fetchUserProfile = async () => {
+    try {
+      console.log(`Fetching profile from: ${hostUrl}/api/profile/me`);
+      console.log(`Authorization Token: Bearer ${token}`);
+
+      const response = await fetch(`${hostUrl}/api/profile/me`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const contentType = response.headers.get("Content-Type");
+      const status = response.status;
+
+      console.log(`Response Status: ${status}`);
+      console.log(`Content-Type: ${contentType}`);
+
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        console.log("Response Data:", data);
+        if (response.ok) {
+          setUserProfile(data);
+          setUserElo(data.score)
+        } else {
+          // Handle specific error messages from API
+          Alert.alert("Error", data.message || "Failed to fetch profile data.");
+          console.error("API Error:", data);
+          if (status === 401) {
+            navigation.navigate("LoginScreen");
+          }
+        }
+      } else {
+        // If response is not JSON, log it as text
+        const text = await response.text();
+        console.error("Non-JSON response:", text);
+        Alert.alert("Error", "Unexpected response from the server.");
+        if (status === 401) {
+          navigation.navigate("LoginScreen");
+        }
+      }
+    } catch (error) {
+      console.error("Network or parsing error:", error);
+      Alert.alert("Error", "An unexpected error occurred.");
+    }
+  };
 
   useEffect(() => {
     // Fetch both quizzes whenever difficulty changes
     const fetchData = async () => {
       setLoading(true);
       try {
-        await Promise.all([fetchQuizzesForYou(), fetchOtherQuizzes()]);
+        await Promise.all([fetchQuizzesForYou(), fetchOtherQuizzes(), fetchUserProfile()]);
       } catch (error) {
         console.error("Error fetching quizzes:", error);
       } finally {
@@ -57,13 +116,14 @@ const HomePage = ({ navigation }) => {
         }
       );
       let data = await response.json();
-      // create dummy image, elo and difficulty while waiting for backend
-      const possibleDifficulties = ["a1", "a2", "b1", "b2", "c1", "c2"]
+      console.log(data);
+     
       data.quizzes = data.quizzes.map((quiz) => ({
         ...quiz,
-        elo: Math.floor(Math.random() * 3000 + 500),
-        difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
+        elo: quiz.difficulty,
+        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty)
       }));
+      
        
       // sort the quizzes for being closest to the userElo
       data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
@@ -93,14 +153,12 @@ const HomePage = ({ navigation }) => {
         }
       );
       let data = await response.json();
-      // create dummy image, elo and difficulty while waiting for backend
-      const possibleDifficulties = ["a1", "a2", "b1", "b2", "c1", "c2"]
       data.quizzes = data.quizzes.map((quiz) => ({
         ...quiz,
-        elo: Math.floor(Math.random() * 3000 + 500),
-        difficulty: possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)],
+        elo: quiz.difficulty,
+        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty)
       }));
-      data.quizzes = data.quizzes.filter((quiz)=>quiz.difficulty=otherQuizzesFilterDifficulty);
+      data.quizzes = data.quizzes.filter((quiz)=>quiz.difficulty==otherQuizzesFilterDifficulty.toUpperCase());
       // sort the quizzes for being closest to the userElo
       data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
 
