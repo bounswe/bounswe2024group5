@@ -1,100 +1,219 @@
 // ForumScreen.tsx
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BaseLayout from "./BaseLayout";
 import QuestionItem from "../components/QuestionItem";
+import HostUrlContext from "../app/HostContext";
+import { useAuth } from "./AuthProvider"; // Import useAuth
+import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+
+// Define the Question interface
+interface Question {
+  id: number;
+  title: string;
+  description: string;
+  createdAt: string;
+  commentCount: number;
+  tags: string[];
+  username: string;
+  upvotes: number;
+  hasUpvoted: boolean;
+}
 
 const ForumScreen = ({ navigation }) => {
-  const [questions, setQuestions] = useState([
-    {
-      id: 1,
-      title: "What’s the difference between 'affect' and 'effect'?",
-      description:
-        "I often confuse 'affect' and 'effect'. Can someone explain the difference with examples?",
-      createdAt: "1h ago",
-      commentCount: 8,
-    },
-    {
-      id: 2,
-      title: "How do I use 'since' and 'for' correctly in sentences?",
-      description:
-        "I'm having trouble using 'since' and 'for' when talking about time. Can anyone give clear examples of when to use each?",
-      createdAt: "2h ago",
-      commentCount: 5,
-    },
-    {
-      id: 3,
-      title: "What’s the meaning of the word 'ubiquitous'?",
-      description:
-        "I came across the word 'ubiquitous' in an article. Can someone explain what it means and how to use it in a sentence?",
-      createdAt: "3h ago",
-      commentCount: 3,
-    },
-    {
-      id: 4,
-      title:
-        "How can I remember the difference between 'their', 'there', and 'they’re'?",
-      description:
-        "I often get confused with 'their', 'there', and 'they’re'. What are some tips or tricks to remember the differences?",
-      createdAt: "5h ago",
-      commentCount: 10,
-    },
-    {
-      id: 5,
-      title: "What is the past tense of 'buy'?",
-      description:
-        "I'm trying to understand irregular verbs. Is 'buyed' the correct past tense of 'buy'?",
-      createdAt: "6h ago",
-      commentCount: 2,
-    },
-    {
-      id: 6,
-      title: "What’s the difference between 'lend' and 'borrow'?",
-      description:
-        "I'm confused about when to use 'lend' vs. 'borrow'. Can someone clarify with examples?",
-      createdAt: "7h ago",
-      commentCount: 6,
-    },
-    {
-      id: 7,
-      title: "How do I use 'could', 'would', and 'should' in polite requests?",
-      description:
-        "I'm learning modal verbs but struggle with using 'could', 'would', and 'should' correctly in polite requests. Any advice?",
-      createdAt: "8h ago",
-      commentCount: 7,
-    },
-    {
-      id: 8,
-      title: "Can someone explain the phrase 'kick the bucket'?",
-      description:
-        "I heard someone say 'kick the bucket' in a movie. What does this phrase mean?",
-      createdAt: "9h ago",
-      commentCount: 4,
-    },
-    {
-      id: 9,
-      title: "How do I form a question in the present perfect tense?",
-      description:
-        "I’m having difficulty forming questions in the present perfect tense. Can someone give examples?",
-      createdAt: "10h ago",
-      commentCount: 5,
-    },
-    {
-      id: 10,
-      title: "What’s the difference between 'few' and 'a few'?",
-      description:
-        "I’ve seen both 'few' and 'a few' used in sentences, but I’m not sure when to use each. Can anyone explain?",
-      createdAt: "12h ago",
-      commentCount: 6,
-    },
-  ]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
+
+  const authContext = useAuth(); // Get the authentication context
+  const token = authContext ? authContext.token : null; // Get the token if authContext is not null
+
+  const [upvotedPostIds, setUpvotedPostIds] = useState(new Set<number>());
+
+  // Load upvoted post IDs from AsyncStorage when the component mounts
+  useEffect(() => {
+    const loadUpvotedPosts = async () => {
+      try {
+        const storedUpvoted = await AsyncStorage.getItem("upvotedPostIds");
+        if (storedUpvoted) {
+          const parsedUpvoted = JSON.parse(storedUpvoted);
+          setUpvotedPostIds(new Set(parsedUpvoted));
+        }
+      } catch (error) {
+        console.error("Error loading upvoted posts from storage:", error);
+      }
+    };
+
+    loadUpvotedPosts();
+  }, []);
+
+  // Save upvoted post IDs to AsyncStorage whenever it changes
+  useEffect(() => {
+    const saveUpvotedPosts = async () => {
+      try {
+        const upvotedArray = Array.from(upvotedPostIds);
+        await AsyncStorage.setItem(
+          "upvotedPostIds",
+          JSON.stringify(upvotedArray)
+        );
+      } catch (error) {
+        console.error("Error saving upvoted posts to storage:", error);
+      }
+    };
+
+    saveUpvotedPosts();
+  }, [upvotedPostIds]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchPosts = async () => {
+        setIsLoading(true); // Set loading to true when fetching
+        try {
+          const response = await fetch(`${hostUrl}/api/posts`, {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the headers
+            },
+          });
+
+          console.log("Response status:", response.status);
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log("Data fetched:", data);
+
+            // Check if data is an array
+            if (Array.isArray(data)) {
+              // Map the API data to match the structure expected by QuestionItem
+              const formattedData = data.map((item) => ({
+                id: item.id,
+                title: item.title,
+                description: item.content,
+                createdAt: new Date(item.createdAt).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+                commentCount: item.noReplies || 0,
+                tags: item.tags || [],
+                username: item.username || item.user?.username || "Anonymous",
+                upvotes: item.noUpvote || 0,
+                hasUpvoted: upvotedPostIds.has(item.id),
+              }));
+              setQuestions(formattedData);
+            } else {
+              console.error("Data is not an array:", data);
+              Alert.alert(
+                "Error",
+                "Unexpected data format received from server."
+              );
+            }
+          } else {
+            const errorData = await response.json();
+            console.error("Error response data:", errorData);
+            Alert.alert("Error", errorData.message || "Failed to fetch posts.");
+          }
+        } catch (error) {
+          console.error("Error fetching posts:", error);
+          Alert.alert("Error", "Failed to fetch posts. Please try again.");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchPosts();
+    }, [hostUrl, token, upvotedPostIds]) // Depend on upvotedPostIds to refresh hasUpvoted
+  );
+
+  // Function to handle upvoting a question
+  const handleUpvote = async (postId: number) => {
+    // Find the question in the state
+    const questionIndex = questions.findIndex((q) => q.id === postId);
+    if (questionIndex === -1) return;
+
+    const question = questions[questionIndex];
+
+    if (question.hasUpvoted) {
+      // If already upvoted, remove upvote
+      try {
+        const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        });
+
+        if (response.status === 204) {
+          // Successfully removed upvote
+          // Update the state
+          const updatedQuestions = [...questions];
+          updatedQuestions[questionIndex].upvotes -= 1;
+          updatedQuestions[questionIndex].hasUpvoted = false;
+          setQuestions(updatedQuestions);
+
+          // Remove from upvotedPostIds
+          setUpvotedPostIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(postId);
+            return newSet;
+          });
+        } else if (response.status === 401) {
+          Alert.alert("Unauthorized", "Please log in to remove upvote.");
+        } else {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.message || "Failed to remove upvote.");
+        }
+      } catch (error) {
+        console.error("Error removing upvote:", error);
+        Alert.alert("Error", "Failed to remove upvote.");
+      }
+    } else {
+      // If not upvoted, add upvote
+      try {
+        const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        });
+        console.log(response);
+        if (response.status === 200) {
+          const data = await response.json();
+          console.log("Upvote response data:", data);
+          // Assuming the response contains the updated upvote count
+          const updatedUpvotes = data.upvotes || question.upvotes + 1;
+
+          // Update the state
+          const updatedQuestions = [...questions];
+          updatedQuestions[questionIndex].upvotes = updatedUpvotes;
+          updatedQuestions[questionIndex].hasUpvoted = true;
+          setQuestions(updatedQuestions);
+
+          // Add to upvotedPostIds
+          setUpvotedPostIds((prev) => new Set(prev).add(postId));
+        } else if (response.status === 401) {
+          Alert.alert("Unauthorized", "Please log in to upvote.");
+        } else {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.message || "Failed to upvote.");
+        }
+      } catch (error) {
+        console.error("Error upvoting post:", error);
+        Alert.alert("Error", "Failed to upvote the post.");
+      }
+    }
+  };
 
   const navigateToCreateQuestion = () => {
     navigation.navigate("CreateQuestion");
@@ -107,10 +226,30 @@ const ForumScreen = ({ navigation }) => {
   const navigateToQuestionDetail = (
     questionId: number,
     title: string,
-    description: string
+    description: string,
+    username: string,
+    noUpvote: number,
+    createdAt: string
   ) => {
-    navigation.navigate("QuestionDetail", { questionId, title, description });
+    navigation.navigate("QuestionDetail", {
+      questionId,
+      title,
+      description,
+      username,
+      noUpvote,
+      createdAt,
+    });
   };
+
+  if (isLoading) {
+    return (
+      <BaseLayout navigation={navigation}>
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#6a0dad" />
+        </View>
+      </BaseLayout>
+    );
+  }
 
   return (
     <BaseLayout navigation={navigation}>
@@ -138,8 +277,16 @@ const ForumScreen = ({ navigation }) => {
             <QuestionItem
               question={item}
               onPress={() =>
-                navigateToQuestionDetail(item.id, item.title, item.description)
+                navigateToQuestionDetail(
+                  item.id,
+                  item.title,
+                  item.description,
+                  item.username,
+                  item.upvotes,
+                  item.createdAt
+                )
               }
+              onUpvote={() => handleUpvote(item.id)} // Pass the upvote handler
             />
           )}
           keyExtractor={(item) => item.id.toString()}
