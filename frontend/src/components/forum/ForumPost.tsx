@@ -16,7 +16,7 @@ const timePassed = (timeString: string) => {
   return dayjs(timeString).fromNow()
 }
 
-export const ForumPostComponent = ({ postId }: ForumPostProps) => {
+export const ForumPostComponent = ({ postId, setPostId }: ForumPostProps) => {
 
     const { data: post } = useFetchPost(postId);
 
@@ -65,6 +65,8 @@ export const ForumPostComponent = ({ postId }: ForumPostProps) => {
     const handleClick = () => {
         if (post && currentPath.split("/").pop() === "forum") {
             navigate(`/post/${post.id}`)
+        } else if ( currentPath.split("/").includes("quiz") ) {
+            if (setPostId) setPostId(postId);
         }
     }
 

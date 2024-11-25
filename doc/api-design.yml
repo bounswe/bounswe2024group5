@@ -137,6 +137,91 @@ components:
         score: 1500.0
         englishProficiency: B1
         noCreatedQuizzes: 5
+    CreateQuizRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionRequest'
+    UpdateQuizRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+    QuestionRequest:
+      type: object
+      properties:
+        questionType:
+          type: string
+          enum: [english_to_turkish, turkish_to_english, english_to_sense]
+        word:
+          type: string
+        correctAnswer:
+          type: string
+        wrongAnswers:
+          type: array
+          items:
+            type: string
+          example: ["answer1", "answer2", "answer3"]  
+    QuizResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        difficulty:
+          type: number
+          format: float
+        username:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionResponse'
+    QuestionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        quizId:
+          type: integer
+        questionType:
+          type: string
+          enum: [english_to_turkish, turkish_to_english, english_to_sense]
+        word:
+          type: string
+        correctAnswer:
+          type: string
+        wrongAnswers:
+          type: array
+          items:
+            type: string
+          example: ["answer1", "answer2", "answer3"]  
+        difficulty:
+          type: number
+          format: float
     Quiz:
       type: object
       properties:
@@ -444,6 +529,62 @@ components:
           type: string
           format: date-time
           description: Timestamp when the reply was last updated.
+    FavoriteQuizRequest:
+      type: object
+      properties:
+        quizId:
+          type: integer
+          example: 42
+    FavoriteQuizResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        userId:
+          type: integer
+          example: 1
+        quizId:
+          type: integer
+          example: 42
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-11-23T12:45:30"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-11-23T12:45:30"
+    FavoriteQuestionRequest:
+      type: object
+      properties:
+        questionId:
+          type: integer
+          example: 1
+          description: The ID of the question to add to favorites.
+      required:
+        - questionId
+
+    FavoriteQuestionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ID of the favorite question.
+        questionId:
+          type: integer
+          description: The ID of the question in favorites.
+        userId:
+          type: integer
+          description: The ID of the user who added the question to favorites.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the question was added to favorites.
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the favorite question was last updated.
 paths:
   /auth/register:
     post:
@@ -574,14 +715,21 @@ paths:
       summary: "Returns word auto complete suggestions"
       description: "It returns a list that contains at most 5 words that start with prefix."
       tags:
-        - Auto-Complete
+        - Word Related
       parameters:
-        - name: "prefix"
+        - name: prefix
           in: "query"
           required: true
           schema:
             type: "string"
             example: "ca"
+        - name: language
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [english, turkish]
+          description: The language of the word to be completed (e.g. english or turkish).
       responses:
         200:
           description: "Successfully returned words."
@@ -593,7 +741,7 @@ paths:
                   type: "string"
                 example: [ "car", "care", "carry", "carrier", "cat" ]
         400:
-          description: "Geçersiz parametre veya eksik prefix."
+          description: "Bad request"
           content:
             application/json:
               schema:
@@ -607,7 +755,7 @@ paths:
     get:
       summary: Check if a word is valid
       tags:
-        - Questions
+        - Word Related
       security:
         - bearerAuth: []
       parameters:
@@ -622,6 +770,7 @@ paths:
           required: true
           schema:
             type: string
+            enum: [english, turkish]
           description: The language of the word to be checked (e.g. english or turkish).
       responses:
         '200':
@@ -634,166 +783,84 @@ paths:
                   isValid:
                     type: boolean
                     description: Whether the word exists in the database.
-  /word_suggestions:
+  /answer-suggestion:
     get:
-      summary: (not implemented yet)
+      summary: Get answer suggestions (wrong answer suggestions not implemented yet)
       tags:
-        - Questions
-      security:
-        - bearerAuth: []
+        - Word Related
+      description: Returns a list of correct and wrong answer suggestions based on the given word and question type.
       parameters:
         - name: word
           in: query
           required: true
+          description: The word for which suggestions are needed.
           schema:
             type: string
-        - name: type
+        - name: questionType
           in: query
           required: true
+          description: The type of question (e.g., english_to_sense, english_to_turkish, turkish_to_english).
           schema:
             type: string
-            enum: [english_to_turkish, turkish_to_english, english_to_sense]
+            enum:
+              - english_to_sense
+              - english_to_turkish
+              - turkish_to_english
       responses:
         '200':
-          description: Question word retrieved successfully
+          description: Successful response with answer suggestions.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  suggestions:
+                  correctAnswerSuggestions:
                     type: array
                     items:
                       type: string
-                    example: ["fast", "fasten", "faster"]
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /question_answers:
-    get:
-      summary: (not implemented yet) Get question answers
-      tags:
-        - Questions
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: word
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: type
-          in: query
-          required: true
-          schema:
-            type: string
-            enum: [english_to_turkish, turkish_to_english, english_to_sense]
-      responses:
-        '200':
-          description: Question answers retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    correctAnswer:
+                    description: List of correct answer suggestions.
+                  wrongAnswerSuggestions:
+                    type: array
+                    items:
                       type: string
-                    wrongAnswers:
-                      type: array
-                      items:
-                        type: string
+                    description: List of wrong answer suggestions.
+                example:
+                  correctAnswerSuggestions:
+                    - example_correct_1
+                    - example_correct_2
+                  wrongAnswerSuggestions:
+                    - example_wrong_1
+                    - example_wrong_2
         '400':
-          description: Invalid input
+          description: Invalid parameters provided.
   /quizzes:
-    post:
-      summary: Create a new quiz
-      tags:
-        - Quizzes
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                description:
-                  type: string
-                image:
-                  type: string
-                  format: base64
-                questions:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      questionType:
-                        type: string
-                        enum: [english_to_turkish, turkish_to_english, english_to_sense]
-                      word:
-                        type: string
-                      correctAnswer:
-                        type: string
-                      wrongAnswers:
-                        type: array
-                        items:
-                          type: string
-              required:
-                - title
-                - questions
-      responses:
-        '201':
-          description: Quiz created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Quiz'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
     get:
-      summary: Get list of quizzes
+      summary: Get all quizzes optionally by filters
+      description: Retrieve all quizzes, optionally filtered by author username and difficulty range.
       tags:
         - Quizzes
-      security:
-        - bearerAuth: []
       parameters:
-        - name: page
+        - name: username
           in: query
-          schema:
-            type: integer
-          description: Page number
-        - name: limit
-          in: query
-          schema:
-            type: integer
-          description: Number of items per page
-        - name: filter
-          in: query
+          description: Username of the quiz author
+          required: false
           schema:
             type: string
-            enum: [own, others, all]
-          description: Filter quizzes by ownership (own, others, or all)
-        - name: difficulty
+        - name: minDifficulty
           in: query
+          description: Minimum difficulty level of quizzes
+          required: false
           schema:
-            type: string
-            enum: [a1,a2,b1,b2,c1,c2]
-          description: Filter quizzes by difficulty
+            type: integer
+        - name: maxDifficulty
+          in: query
+          description: Maximum difficulty level of quizzes
+          required: false
+          schema:
+            type: integer
       responses:
         '200':
-          description: A list of quizzes
+          description: List of quizzes
           content:
             application/json:
               schema:
@@ -802,55 +869,59 @@ paths:
                   quizzes:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Quiz'
-                  total_count:
-                    type: integer
-                  page:
-                    type: integer
-                  total_pages:
-                    type: integer
-        '400':
-          description: Invalid input
+                      $ref: '#/components/schemas/QuizResponse'
+    post:
+      summary: Create a quiz
+      description: Create a new quiz. Requires authentication.
+      tags:
+        - Quizzes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuizRequest'
+      responses:
+        '200':
+          description: Created quiz
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/QuizResponse'
   /quizzes/{id}:
     get:
-      summary: Get quiz details
+      summary: Get a quiz by ID
+      description: Retrieve a quiz by its ID.
       tags:
         - Quizzes
       parameters:
         - name: id
           in: path
+          description: ID of the quiz
           required: true
           schema:
             type: integer
       responses:
         '200':
-          description: Quiz details retrieved successfully
+          description: Quiz details
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   quiz:
-                    $ref: '#/components/schemas/Quiz'
+                    $ref: '#/components/schemas/QuizResponse'
         '404':
           description: Quiz not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
     put:
       summary: Update a quiz
+      description: Update an existing quiz. Requires authentication.
       tags:
         - Quizzes
-      security:
-        - bearerAuth: []
       parameters:
         - name: id
           in: path
+          description: ID of the quiz
           required: true
           schema:
             type: integer
@@ -859,71 +930,29 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                description:
-                  type: string
-                image:
-                  type: string
-                  format: base64
-                questions:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      questionType:
-                        type: string
-                        enum: [english_to_turkish, turkish_to_english, english_to_sense]
-                      word:
-                        type: string
-                      correctAnswer:
-                        type: string
-                      wrongAnswers:
-                        type: array
-                        items:
-                          type: string
+              $ref: '#/components/schemas/UpdateQuizRequest'
       responses:
         '200':
-          description: Quiz updated successfully
+          description: Updated quiz
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quiz'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Quiz not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/QuizResponse'
     delete:
       summary: Delete a quiz
+      description: Delete a quiz by its ID. Requires authentication.
       tags:
         - Quizzes
-      security:
-        - bearerAuth: []
       parameters:
         - name: id
           in: path
+          description: ID of the quiz
           required: true
           schema:
             type: integer
       responses:
         '204':
-          description: Quiz deleted successfully
-        '404':
-          description: Quiz not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Quiz deleted
   /quiz-attempts:
     post:
       summary: Attempt a quiz
@@ -1669,5 +1698,222 @@ paths:
                 properties:
                   url:
                     type: string
+  /favorite-quiz:
+    get:
+      summary: Get all favorite quizzes.
+      description: Returns a list of all favorite quizzes for the authenticated user.
+      tags:
+        - Favorite Quizzes
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer <jwt_token>
+          description: JWT token for authentication.
+      responses:
+        '200':
+          description: List of favorite quizzes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FavoriteQuizResponse'
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+    post:
+      summary: Add a quiz to the user's favorites.
+      description: Adds a quiz to the user's favorite list. Requires an Authorization header with a valid JWT token.
+      tags:
+        - Favorite Quizzes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FavoriteQuizRequest'
+      responses:
+        '201':
+          description: Quiz added to favorites successfully.
+          headers:
+            Location:
+              description: URI of the created resource.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteQuizResponse'
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+  /favorite-quiz/{id}:
+    get:
+      summary: Get a favorite quiz.
+      description: Returns a favorite quiz by its ID. Requires an Authorization header with a valid JWT token.
+      tags:
+        - Favorite Quizzes
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer <jwt_token>
+          description: JWT token for authentication.
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: ID of the favorite quiz to retrieve.
+      responses:
+        '200':
+          description: The favorite quiz with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteQuizResponse'
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+        '404':
+          description: Not Found - Favorite quiz with the given ID not found.
+    delete:
+      summary: Delete a favorite quiz.
+      description: Deletes a favorite quiz by its ID. Requires an Authorization header with a valid JWT token.
+      tags:
+        - Favorite Quizzes
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer <jwt_token>
+          description: JWT token for authentication.
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: ID of the favorite quiz to delete.
+      responses:
+        '204':
+          description: No content - Favorite quiz deleted successfully.
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+        '404':
+          description: Not Found - Favorite quiz with the given ID not found.
+  /favorite-question:
+    post:
+      summary: Add a question to favorites
+      description: Adds a question to the user's favorites.
+      tags:
+        - Favorite Questions
+      operationId: addFavoriteQuestion
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FavoriteQuestionRequest"
+      responses:
+        201:
+          description: Successfully added the question to favorites.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteQuestionResponse"
+        400:
+          description: The question is already in favorites.
+        404:
+          description: Question not found.
+    get:
+      summary: Get all favorite questions
+      description: Retrieves all questions the user has added to favorites.
+      tags:
+        - Favorite Questions
+      operationId: getAllFavoriteQuestions
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+      responses:
+        200:
+          description: Successfully retrieved favorite questions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FavoriteQuestionResponse"
+
+  /favorite-question/{id}:
+    get:
+      summary: Get a specific favorite question
+      description: Retrieves a specific favorite question by ID.
+      tags:
+        - Favorite Questions
+      operationId: getFavoriteQuestion
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the favorite question to retrieve.
+      responses:
+        200:
+          description: Successfully retrieved the favorite question.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteQuestionResponse"
+        404:
+          description: Favorite question not found.
+
+    delete:
+      summary: Remove a question from favorites
+      description: Deletes a question from the user's favorites by ID.
+      tags:
+        - Favorite Questions
+      operationId: deleteFavoriteQuestion
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the favorite question to delete.
+      responses:
+        204:
+          description: Successfully deleted the favorite question.
+        404:
+          description: Favorite question not found.
 security:
   - bearerAuth: []

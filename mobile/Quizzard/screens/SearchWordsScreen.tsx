@@ -1,14 +1,32 @@
-import React, { useState } from "react";
+// SearchWordsScreen.tsx
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   TextInput,
-  FlatList,
-  Text,
   StyleSheet,
   TouchableOpacity,
+  Keyboard,
+  Alert,
+  ActivityIndicator,
+  ScrollView,
+  Platform,
+  Text,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the back icon
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the back and search icons
 import { useNavigation } from "@react-navigation/native"; // For navigation
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import HostUrlContext from "../app/HostContext"; // Import HostUrlContext
+import { useAuth } from "./AuthProvider"; // Import useAuth
+
+type RootStackParamList = {
+  SearchResults: { keyword: string };
+  // Add other routes if necessary
+};
+
+type SearchWordsScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "SearchResults"
+>;
 
 const SearchWordsScreen: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -132,6 +150,7 @@ const SearchWordsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      {/* Back button */}
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={styles.backButton}
@@ -139,26 +158,44 @@ const SearchWordsScreen: React.FC = () => {
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
 
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search for words..."
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-      />
-      <FlatList
-        data={filteredWords}
-        renderItem={({ item }) => (
-          <View style={styles.wordContainer}>
-            <Text style={styles.word}>{item}</Text>
-            {wordMeanings[item].map((meaning, index) => (
-              <Text key={index} style={styles.meaning}>
-                {index + 1}. {meaning}
-              </Text>
-            ))}
+      {/* Search Input with Autocomplete */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search for words..."
+          value={searchTerm}
+          onChangeText={handleSearchInputChange}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
+        />
+        <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+          <Ionicons name="search" size={24} color="#6a0dad" />
+        </TouchableOpacity>
+
+        {/* Loading Indicator for Suggestions */}
+        {isFetchingSuggestions && (
+          <View style={styles.loadingIndicator}>
+            <ActivityIndicator size="small" color="#000" />
           </View>
         )}
-        keyExtractor={(item) => item}
-      />
+      </View>
+
+      {/* Suggestions Dropdown */}
+      {showSuggestions && suggestions.length > 0 && (
+        <View style={styles.suggestionsContainer}>
+          <ScrollView keyboardShouldPersistTaps="handled">
+            {suggestions.map((suggestion) => (
+              <TouchableOpacity
+                key={suggestion}
+                onPress={() => handleSuggestionSelect(suggestion)}
+                style={styles.suggestionItem}
+              >
+                <Text>{suggestion}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
     </View>
   );
 };
@@ -166,28 +203,46 @@ const SearchWordsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    padding: 16,
+    backgroundColor: "#fff",
   },
   backButton: {
-    marginBottom: 10,
+    marginBottom: 20,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    position: "relative",
   },
   searchInput: {
+    flex: 1,
     height: 40,
+    borderColor: "#6a0dad",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    backgroundColor: "#f3e8ff",
+  },
+  searchButton: {
+    marginLeft: 10,
+  },
+  suggestionsContainer: {
+    marginTop: 10, // Space between search input and suggestions
+    backgroundColor: "#fff",
     borderColor: "gray",
     borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    maxHeight: 150,
+    borderRadius: 5,
   },
-  wordContainer: {
-    marginBottom: 10,
+  suggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "gray",
   },
-  word: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  meaning: {
-    fontSize: 14,
-    marginLeft: 10,
+  loadingIndicator: {
+    position: "absolute",
+    right: 10,
+    top: Platform.OS === "ios" ? 8 : 6,
   },
 });
 

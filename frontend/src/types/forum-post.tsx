@@ -10,7 +10,8 @@ export type ForumPost = {
 }
 
 export type ForumPostProps = { 
-  postId: number 
+  postId: number,
+  setPostId?: (postId: number) => void
 };
 
 export type ForumReply = {

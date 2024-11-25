@@ -109,7 +109,7 @@ public class QuizAttemptService {
                 throw new RuntimeException("Quiz attempt is already completed.");
             else if ((boolean) quizAttemptUpdateRequest.get("completed")) {
                 //quizAttempt.setScore(quizAttempt.getQuiz().getQuestions().size());
-                calculateQuestionPoint(user, id);
+                quizAttempt.setScore(calculateQuestionPoint(user, id));
                 quizAttempt.setCompletedAt(new Date());
                 quizAttempt.setIsCompleted(true);
                 quizAttemptRepository.save(quizAttempt);
@@ -122,7 +122,7 @@ public class QuizAttemptService {
     }
 
 
-    public void calculateQuestionPoint(User user, Long quizAttemptId) {
+    public int calculateQuestionPoint(User user, Long quizAttemptId) {
         QuizAttempt quizAttempt = quizAttemptRepository.findById(quizAttemptId)
                 .orElseThrow(() -> new RuntimeException("Quiz attempt not found with id: " + quizAttemptId));
 
@@ -156,23 +156,11 @@ public class QuizAttemptService {
                     multiplier = Math.pow(penaltyMultiplier, steps); // Lower decrease for wrong answer
                 }
             }
-            /* double wordScoreMultiplier;
-            if (wordScore < 400) {
-                wordScoreMultiplier = 1;
-            } else if (wordScore < 1000) {
-                wordScoreMultiplier = 0.9;
-            } else if (wordScore < 1800) {
-                wordScoreMultiplier = 0.8;
-            } else if (wordScore < 2600) {
-                wordScoreMultiplier = 0.7;
-            } else if (wordScore < 3300) {
-                wordScoreMultiplier = 0.6;
+            if (questionAnswer.getIsCorrect()) {
+                totalScoreOfQuiz += (int) ((wordScore * multiplier) / 1000);
             } else {
-                wordScoreMultiplier = 0.5;
+                totalScoreOfQuiz -= (int) ((wordScore * multiplier) / 1000);
             }
-            totalScoreOfQuiz += (int) ((wordScore * wordScoreMultiplier * multiplier) / 1000);
-             */
-            totalScoreOfQuiz += (int) ((wordScore * multiplier) / 1000);
 
 
         }
@@ -184,6 +172,8 @@ public class QuizAttemptService {
             finalScore = 4000;
         }
         userService.updateUserPoint(user, finalScore);
+
+        return totalScoreOfQuiz;
     }
 
 

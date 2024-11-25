@@ -22,7 +22,7 @@ export const AddQuizPage: React.FC = () => {
     title: "",
     description: "",
     difficulty: 1,
-    image: "/api/placeholder/250/250",
+    image: "none",
     questions: [],
   });
 
@@ -112,7 +112,7 @@ export const AddQuizPage: React.FC = () => {
               onClick={handleImageClick}
               className="relative flex items-center justify-center mr-6 bg-purple-200 rounded-lg cursor-pointer w-36 h-36 group"
             >
-              {quiz.image === "/api/placeholder/250/250" ? (
+              {quiz.image === "none" ? (
                 <>
                   <IconImageInPicture className="text-purple-500" size={32} />
                   <div className="absolute z-50 p-1 bg-white rounded-full shadow-md -bottom-3 -right-3">
@@ -164,23 +164,6 @@ export const AddQuizPage: React.FC = () => {
                 }
               />
             </div>
-          </div>
-
-          <div className="place-self-start">
-            <label className="block mb-1 text-sm font-medium text-purple-700 place-self-start">
-              Difficulty
-            </label>
-            <select
-              className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none w-36"
-              value={quiz.difficulty}
-              onChange={(e) =>
-                setQuiz({ ...quiz, difficulty: Number(e.target.value) })
-              }
-            >
-              <option value={1}>Beginner</option>
-              <option value={2}>Intermediate</option>
-              <option value={3}>Advanced</option>
-            </select>
           </div>
         </div>
 
@@ -258,26 +241,6 @@ export const AddQuizPage: React.FC = () => {
                 />
               </div>
             ))}
-
-            <div className="mt-4">
-              <label className="block mb-1 text-sm font-medium text-purple-700">
-                Question Difficulty
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="3"
-                className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none"
-                value={question.difficulty}
-                onChange={(e) =>
-                  updateQuestion(
-                    question.id ?? 0,
-                    "difficulty",
-                    Number(e.target.value)
-                  )
-                }
-              />
-            </div>
           </div>
         ))}
 

@@ -1,8 +1,9 @@
 package com.quizzard.quizzard.model.request;
 
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
+@Data
 public class UpdateQuizRequest {
     private String title;
     private String description;
@@ -12,5 +13,8 @@ public class UpdateQuizRequest {
         this.title = title;
         this.description = description;
         this.image = image;
+    }
+
+    public UpdateQuizRequest() {
     }
 }

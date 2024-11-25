@@ -7,11 +7,16 @@ import com.quizzard.quizzard.model.response.ReplyResponse;
 import com.quizzard.quizzard.service.PostService;
 import com.quizzard.quizzard.service.ReplyService;
 import com.quizzard.quizzard.service.UpvoteService;
+import com.quizzard.quizzard.util.CacheConditionUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.net.URI;
 import java.util.List;
@@ -28,6 +33,9 @@ public class PostController {
 
     @Autowired
     private ReplyService replyService;
+
+    @Autowired
+    private CacheConditionUtil cacheConditionUtil;
 
     @PostMapping
     ResponseEntity<PostResponse> createPost(@RequestHeader("Authorization") String jwtToken, @RequestBody @Valid PostRequest postRequest){
@@ -118,6 +126,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/related")
+    @Cacheable(value = "relatedPosts", key = "#postId", condition = "!@cacheConditionUtil.isNoCache()")
     ResponseEntity<?> getRelatedPosts(@PathVariable Long postId, Pageable page){
         return ResponseEntity.ok(postService.getRelatedPosts(postId, page));
     }

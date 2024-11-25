@@ -3,18 +3,15 @@ import { useState } from "react";
 
 import {
   IconHeart,
-  IconPencil,
   IconTrophy,
   IconMedal,
   IconUser,
   IconMail,
   IconEdit,
-  IconMessages,
 } from "@tabler/icons-react";
 
 import ProfileUpdateModal from "../components/profile/update-modal";
 
-import { QUIZ_DIFFICULTIES } from "../components/badges/level";
 import { Tabs } from "antd";
 import { useParams } from "react-router-dom";
 import { useGetProfile } from "../hooks/api/profile/get";
@@ -23,6 +20,10 @@ import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 
 import { useQuizAttempts } from "../hooks/api/attempts/list";
 import { QuizAttemptCard } from "../components/profile/quiz-attempt-card";
+import { DifficultyBadge } from "../components/badges/level";
+import { useFetchPosts } from "../hooks/api/get-forum-post";
+import { ForumPostCard } from "../components/profile/forum-post-card";
+import { ProfilePhotoUpload } from "../components/profile/profile-photo";
 
 const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,36 +31,17 @@ const ProfilePage = () => {
   const { data: profile, error } = useGetProfile(username);
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     useUpdateProfile();
+  const { data: posts } = useFetchPosts({ username: profile?.username ?? "" });
 
   const { data: userQuizAttempts } = useQuizAttempts();
 
-  const { data: userQuizzes } = useFetchQuizzes({ filter: "own" });
+  const { data: userQuizzes } = useFetchQuizzes({
+    username: profile?.username ?? "",
+  });
   const user = {
     badges: [
       { id: 1, name: "Quiz Master", description: "Created 2 quizzes" },
       { id: 2, name: "Perfect Score", description: "Got 100% on 5 quizzes" },
-    ],
-    quizHistory: [
-      { id: 1, title: "English Grammar", score: 90, date: "2024-03-15" },
-      { id: 2, title: "Basic Vocabulary", score: 85, date: "2024-03-10" },
-    ],
-    createdQuizzes: [
-      {
-        id: 1,
-        title: "Beginner French",
-        difficulty: 0,
-        likes: 42,
-        questions: { length: 10 },
-      },
-    ],
-    forumPosts: [
-      {
-        id: 1,
-        title: "Tips for Learning Spanish",
-        likes: 15,
-        replies: 8,
-        date: "2024-03-01",
-      },
     ],
   };
 
@@ -100,19 +82,12 @@ const ProfilePage = () => {
           {/* Profile Header */}
           <div className="p-6 bg-white rounded-3xl">
             <div className="flex items-start gap-6">
-              <div className="relative">
-                <div className="w-32 h-32 bg-purple-200 rounded-full">
-                  <img
-                    src="/api/placeholder/128/128"
-                    className="object-cover w-full h-full rounded-full"
-                  />
-                </div>
-                {isOwnProfile && (
-                  <button className="absolute flex items-center p-2 text-white bg-purple-500 rounded-full bottom-2 right-2 hover:bg-purple-600">
-                    <IconPencil size={16} />
-                  </button>
-                )}
-              </div>
+              <ProfilePhotoUpload
+                currentPhoto={profile.profilePicture}
+                isOwnProfile={isOwnProfile}
+                username={profile.username}
+                size="large"
+              />
 
               <div className="flex-grow">
                 <div className="flex items-center justify-between">
@@ -220,13 +195,11 @@ const ProfilePage = () => {
                                 </p>
                               </div>
                               <div className="flex items-center gap-4">
+                                <DifficultyBadge difficulty={quiz.difficulty} />
                                 <div className="flex items-center gap-1">
                                   <IconHeart className="w-5 h-5 text-red-500" />
                                   {/* <span>{quiz.likes}</span> */}4
                                 </div>
-                                <span className="px-3 py-1 text-sm bg-purple-100 rounded-full">
-                                  {QUIZ_DIFFICULTIES[quiz.difficulty]}
-                                </span>
                               </div>
                             </div>
                           </motion.div>
@@ -255,34 +228,8 @@ const ProfilePage = () => {
                   label: "Forum Posts",
                   children: (
                     <div className="grid gap-4">
-                      {user.forumPosts.map((post) => (
-                        <motion.div
-                          key={post.id}
-                          className="p-4 transition-colors cursor-pointer bg-purple-50 rounded-xl hover:bg-purple-100"
-                          whileHover={{ scale: 1.01 }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-xl font-semibold text-purple-800">
-                                {post.title}
-                              </h3>
-                              <p className="text-sm text-gray-600 place-self-start">
-                                {post.date}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-1">
-                                <IconHeart className="w-5 h-5 text-red-500" />
-                                <span>{post.likes}</span>
-                              </div>
-                              |
-                              <div className="flex items-center gap-1">
-                                <IconMessages className="w-5 h-5 text-blue-500" />
-                                <span>{post.replies}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
+                      {posts?.map((post) => (
+                        <ForumPostCard key={post.id} post={post} />
                       ))}
                     </div>
                   ),

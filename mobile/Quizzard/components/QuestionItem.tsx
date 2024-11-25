@@ -1,5 +1,7 @@
+// QuestionItem.tsx
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the upvote icon
 
 type QuestionItemProps = {
   question: {
@@ -8,17 +10,27 @@ type QuestionItemProps = {
     description: string;
     createdAt: string;
     commentCount: number;
+    tags: string[];
+    username: string;
+    upvotes: number;
+    hasUpvoted: boolean; // Add hasUpvoted field
   };
   onPress: () => void;
+  onUpvote: () => void; // Add onUpvote prop
 };
 
-const QuestionItem: React.FC<QuestionItemProps> = ({ question, onPress }) => {
+const QuestionItem: React.FC<QuestionItemProps> = ({
+  question,
+  onPress,
+  onUpvote,
+}) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Text style={styles.title}>{question.title}</Text>
       <Text style={styles.description}>
-        {question.description.slice(0, 50)}...
+        {question.description.slice(0, 100)}...
       </Text>
+
       <View style={styles.metadata}>
         <Text style={styles.username}>@{question.username}</Text>
         <TouchableOpacity
@@ -67,17 +79,48 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
   },
-  separator: {
-    height: 1,
-    backgroundColor: "#E0E0E0",
-    marginVertical: 8,
-  },
   description: {
     fontSize: 14,
     color: "#666",
     marginBottom: 8,
   },
   metadata: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  username: {
+    fontSize: 12,
+    color: "#888",
+  },
+  upvoteContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  upvoteText: {
+    marginLeft: 4,
+    fontSize: 14,
+    color: "#6a0dad",
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 8,
+  },
+  tag: {
+    backgroundColor: "#e0d4f7",
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginRight: 6,
+    marginBottom: 6,
+  },
+  tagText: {
+    fontSize: 12,
+    color: "#6a0dad",
+  },
+  footer: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
