@@ -661,7 +661,7 @@ paths:
       tags:
         - Auto-Complete
       parameters:
-        - name: "prefix"
+        - name: prefix
           in: "query"
           required: true
           schema:
@@ -672,6 +672,7 @@ paths:
           required: true
           schema:
             type: string
+            enum: [english, turkish]
           description: The language of the word to be completed (e.g. english or turkish).
       responses:
         200:
@@ -684,7 +685,7 @@ paths:
                   type: "string"
                 example: [ "car", "care", "carry", "carrier", "cat" ]
         400:
-          description: "Geçersiz parametre veya eksik prefix."
+          description: "Bad request"
           content:
             application/json:
               schema:
@@ -713,6 +714,7 @@ paths:
           required: true
           schema:
             type: string
+            enum: [english, turkish]
           description: The language of the word to be checked (e.g. english or turkish).
       responses:
         '200':
