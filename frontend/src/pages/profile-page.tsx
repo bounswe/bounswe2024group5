@@ -35,33 +35,13 @@ const ProfilePage = () => {
 
   const { data: userQuizAttempts } = useQuizAttempts();
 
-  const { data: userQuizzes } = useFetchQuizzes({ filter: "own" });
+  const { data: userQuizzes } = useFetchQuizzes({
+    username: profile?.username ?? "",
+  });
   const user = {
     badges: [
       { id: 1, name: "Quiz Master", description: "Created 2 quizzes" },
       { id: 2, name: "Perfect Score", description: "Got 100% on 5 quizzes" },
-    ],
-    quizHistory: [
-      { id: 1, title: "English Grammar", score: 90, date: "2024-03-15" },
-      { id: 2, title: "Basic Vocabulary", score: 85, date: "2024-03-10" },
-    ],
-    createdQuizzes: [
-      {
-        id: 1,
-        title: "Beginner French",
-        difficulty: 0,
-        likes: 42,
-        questions: { length: 10 },
-      },
-    ],
-    forumPosts: [
-      {
-        id: 1,
-        title: "Tips for Learning Spanish",
-        likes: 15,
-        replies: 8,
-        date: "2024-03-01",
-      },
     ],
   };
 
