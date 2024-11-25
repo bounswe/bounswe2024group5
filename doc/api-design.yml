@@ -529,6 +529,68 @@ components:
           type: string
           format: date-time
           description: Timestamp when the reply was last updated.
+    FavoriteQuizRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        quizId:
+          type: integer
+          example: 42
+    FavoriteQuizResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        userId:
+          type: integer
+          example: 1
+        quizId:
+          type: integer
+          example: 42
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-11-23T12:45:30"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-11-23T12:45:30"
+    FavoriteQuestionRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        questionId:
+          type: integer
+          example: 1
+          description: The ID of the question to add to favorites.
+      required:
+        - questionId
+
+    FavoriteQuestionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ID of the favorite question.
+        questionId:
+          type: integer
+          description: The ID of the question in favorites.
+        userId:
+          type: integer
+          description: The ID of the user who added the question to favorites.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the question was added to favorites.
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the favorite question was last updated.
 paths:
   /auth/register:
     post:
@@ -1667,5 +1729,222 @@ paths:
                 properties:
                   url:
                     type: string
+  /favorite-quiz:
+    get:
+      summary: Get all favorite quizzes.
+      description: Returns a list of all favorite quizzes for the authenticated user.
+      tags:
+        - Favorite Quizzes
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer <jwt_token>
+          description: JWT token for authentication.
+      responses:
+        '200':
+          description: List of favorite quizzes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FavoriteQuizResponse'
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+    post:
+      summary: Add a quiz to the user's favorites.
+      description: Adds a quiz to the user's favorite list. Requires an Authorization header with a valid JWT token.
+      tags:
+        - Favorite Quizzes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FavoriteQuizRequest'
+      responses:
+        '201':
+          description: Quiz added to favorites successfully.
+          headers:
+            Location:
+              description: URI of the created resource.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteQuizResponse'
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+  /favorite-quiz/{id}:
+    get:
+      summary: Get a favorite quiz.
+      description: Returns a favorite quiz by its ID. Requires an Authorization header with a valid JWT token.
+      tags:
+        - Favorite Quizzes
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer <jwt_token>
+          description: JWT token for authentication.
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: ID of the favorite quiz to retrieve.
+      responses:
+        '200':
+          description: The favorite quiz with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteQuizResponse'
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+        '404':
+          description: Not Found - Favorite quiz with the given ID not found.
+    delete:
+      summary: Delete a favorite quiz.
+      description: Deletes a favorite quiz by its ID. Requires an Authorization header with a valid JWT token.
+      tags:
+        - Favorite Quizzes
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer <jwt_token>
+          description: JWT token for authentication.
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: ID of the favorite quiz to delete.
+      responses:
+        '204':
+          description: No content - Favorite quiz deleted successfully.
+        '401':
+          description: Unauthorized - Missing or invalid JWT token.
+        '404':
+          description: Not Found - Favorite quiz with the given ID not found.
+  /favorite-question:
+    post:
+      summary: Add a question to favorites
+      description: Adds a question to the user's favorites.
+      tags:
+        - Favorite Questions
+      operationId: addFavoriteQuestion
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FavoriteQuestionRequest"
+      responses:
+        201:
+          description: Successfully added the question to favorites.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteQuestionResponse"
+        400:
+          description: The question is already in favorites.
+        404:
+          description: Question not found.
+    get:
+      summary: Get all favorite questions
+      description: Retrieves all questions the user has added to favorites.
+      tags:
+        - Favorite Questions
+      operationId: getAllFavoriteQuestions
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+      responses:
+        200:
+          description: Successfully retrieved favorite questions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FavoriteQuestionResponse"
+
+  /favorite-question/{id}:
+    get:
+      summary: Get a specific favorite question
+      description: Retrieves a specific favorite question by ID.
+      tags:
+        - Favorite Questions
+      operationId: getFavoriteQuestion
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the favorite question to retrieve.
+      responses:
+        200:
+          description: Successfully retrieved the favorite question.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteQuestionResponse"
+        404:
+          description: Favorite question not found.
+
+    delete:
+      summary: Remove a question from favorites
+      description: Deletes a question from the user's favorites by ID.
+      tags:
+        - Favorite Questions
+      operationId: deleteFavoriteQuestion
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token for authentication.
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the favorite question to delete.
+      responses:
+        204:
+          description: Successfully deleted the favorite question.
+        404:
+          description: Favorite question not found.
 security:
   - bearerAuth: []
