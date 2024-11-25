@@ -156,23 +156,11 @@ public class QuizAttemptService {
                     multiplier = Math.pow(penaltyMultiplier, steps); // Lower decrease for wrong answer
                 }
             }
-            /* double wordScoreMultiplier;
-            if (wordScore < 400) {
-                wordScoreMultiplier = 1;
-            } else if (wordScore < 1000) {
-                wordScoreMultiplier = 0.9;
-            } else if (wordScore < 1800) {
-                wordScoreMultiplier = 0.8;
-            } else if (wordScore < 2600) {
-                wordScoreMultiplier = 0.7;
-            } else if (wordScore < 3300) {
-                wordScoreMultiplier = 0.6;
+            if (questionAnswer.getIsCorrect()) {
+                totalScoreOfQuiz += (int) ((wordScore * multiplier) / 1000);
             } else {
-                wordScoreMultiplier = 0.5;
+                totalScoreOfQuiz -= (int) ((wordScore * multiplier) / 1000);
             }
-            totalScoreOfQuiz += (int) ((wordScore * wordScoreMultiplier * multiplier) / 1000);
-             */
-            totalScoreOfQuiz += (int) ((wordScore * multiplier) / 1000);
 
 
         }
