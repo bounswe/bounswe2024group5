@@ -26,7 +26,7 @@ const QuizViewComponent = ({ quiz, onPress, onEdit, onDelete, showActions = fals
           <View style={styles.quizInfo}>
             <Text style={styles.difficultyLevel}>{quiz.difficulty}</Text>
             <Text style={styles.difficultyLevel}> | </Text>
-            <Text style={styles.difficultyLevel}>ELO: {quiz.elo}</Text>
+            <Text style={styles.difficultyLevel}>ELO: {Math.round(quiz.elo)}</Text>
             <View style={styles.likesContainer}>
               <Ionicons name="heart-outline" size={16} color="#6a0dad" />
               <Text style={styles.likeCount}>{quiz.likes}</Text>
