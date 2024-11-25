@@ -5,9 +5,10 @@ import com.quizzard.quizzard.model.English;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Repository
 public interface EnglishRepository extends JpaRepository<English, Long> {
 
     boolean existsByWord(String word);
