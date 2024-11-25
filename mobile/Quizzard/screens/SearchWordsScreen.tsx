@@ -1,35 +1,39 @@
+// SearchWordsScreen.tsx
 import React, { useState } from "react";
 import {
   View,
   TextInput,
-  FlatList,
-  Text,
   StyleSheet,
   TouchableOpacity,
+  Keyboard,
+  Alert,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the back icon
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the back and search icons
 import { useNavigation } from "@react-navigation/native"; // For navigation
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+type RootStackParamList = {
+  SearchResults: { keyword: string };
+};
 
 const SearchWordsScreen: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const navigation = useNavigation(); // Hook for navigation
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const wordMeanings = {
-    example: [
-      "A representative form or pattern",
-      "A typical instance",
-      "A problem or exercise designed to illustrate a rule",
-      "A punishment designed to serve as a warning to others",
-    ],
-    // Add more words and their meanings...
+  const handleSearch = () => {
+    const trimmedTerm = searchTerm.trim();
+    if (trimmedTerm.length === 0) {
+      Alert.alert("Error", "Please enter a search term.");
+      return;
+    }
+    Keyboard.dismiss();
+    navigation.navigate("SearchResults", { keyword: trimmedTerm });
   };
-
-  const filteredWords = Object.keys(wordMeanings).filter((word) =>
-    word.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <View style={styles.container}>
+      {/* Back button */}
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={styles.backButton}
@@ -37,26 +41,20 @@ const SearchWordsScreen: React.FC = () => {
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
 
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search for words..."
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-      />
-      <FlatList
-        data={filteredWords}
-        renderItem={({ item }) => (
-          <View style={styles.wordContainer}>
-            <Text style={styles.word}>{item}</Text>
-            {wordMeanings[item].map((meaning, index) => (
-              <Text key={index} style={styles.meaning}>
-                {index + 1}. {meaning}
-              </Text>
-            ))}
-          </View>
-        )}
-        keyExtractor={(item) => item}
-      />
+      {/* Search Input */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search for words..."
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
+        />
+        <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+          <Ionicons name="search" size={24} color="#6a0dad" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -64,27 +62,26 @@ const SearchWordsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    padding: 16,
+    backgroundColor: "#fff",
   },
   backButton: {
-    marginBottom: 10,
+    marginBottom: 20,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   searchInput: {
+    flex: 1,
     height: 40,
-    borderColor: "gray",
+    borderColor: "#6a0dad",
     borderWidth: 1,
-    marginBottom: 10,
+    borderRadius: 8,
     paddingHorizontal: 10,
+    backgroundColor: "#f3e8ff",
   },
-  wordContainer: {
-    marginBottom: 10,
-  },
-  word: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  meaning: {
-    fontSize: 14,
+  searchButton: {
     marginLeft: 10,
   },
 });

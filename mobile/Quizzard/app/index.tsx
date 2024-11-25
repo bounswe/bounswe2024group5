@@ -15,6 +15,7 @@ import ProfileSettingsScreen from "../screens/ProfileSettingsScreen";
 import QuizWelcomePage from "../screens/QuizWelcomePage";
 import QuizFinishScreen from "../screens/QuizFinishScreen"; // Import the finish screen
 import { AuthProvider } from "../screens/AuthProvider";
+import SearchResultsScreen from "../screens/SearchResultsScreen";
 
 export type RootStackParamList = {
   Login: undefined;
@@ -28,14 +29,39 @@ export type RootStackParamList = {
   QuizCreation: undefined;
   QuizSolving: undefined;
   QuizFinish: {
-    quiz: { title: string; description: string; difficulty: string; elo: number; id: number; image: string; questions: any[]; createdAt: string; updatedAt: string; username: string };
+    quiz: {
+      title: string;
+      description: string;
+      difficulty: string;
+      elo: number;
+      id: number;
+      image: string;
+      questions: any[];
+      createdAt: string;
+      updatedAt: string;
+      username: string;
+    };
     questions: any[];
     selectedAnswers: string[];
     alreadyFinished: boolean;
   };
   Profile: undefined;
   ProfileSettings: undefined;
-  QuizWelcome: { quiz: { title: string; description: string; difficulty: string; elo: number; id: number; image: string; questions: any[]; createdAt: string; updatedAt: string; username: string } };
+  QuizWelcome: {
+    quiz: {
+      title: string;
+      description: string;
+      difficulty: string;
+      elo: number;
+      id: number;
+      image: string;
+      questions: any[];
+      createdAt: string;
+      updatedAt: string;
+      username: string;
+    };
+  };
+  SearchResults: { keyword: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -72,6 +98,13 @@ function MyStack() {
         name="QuizWelcome"
         component={QuizWelcomePage}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SearchResults"
+        component={SearchResultsScreen}
+        options={({ route }) => ({
+          title: `Search: "${route.params.keyword}"`,
+        })}
       />
       <Stack.Screen
         name="QuizSolving"
