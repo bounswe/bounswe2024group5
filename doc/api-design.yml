@@ -659,7 +659,7 @@ paths:
       summary: "Returns word auto complete suggestions"
       description: "It returns a list that contains at most 5 words that start with prefix."
       tags:
-        - Auto-Complete
+        - Word Related
       parameters:
         - name: prefix
           in: "query"
@@ -699,7 +699,7 @@ paths:
     get:
       summary: Check if a word is valid
       tags:
-        - Questions
+        - Word Related
       security:
         - bearerAuth: []
       parameters:
@@ -727,81 +727,56 @@ paths:
                   isValid:
                     type: boolean
                     description: Whether the word exists in the database.
-  /word_suggestions:
+  /answer-suggestion:
     get:
-      summary: (not implemented yet)
+      summary: Get answer suggestions (wrong answer suggestions not implemented yet)
       tags:
-        - Questions
-      security:
-        - bearerAuth: []
+        - Word Related
+      description: Returns a list of correct and wrong answer suggestions based on the given word and question type.
       parameters:
         - name: word
           in: query
           required: true
+          description: The word for which suggestions are needed.
           schema:
             type: string
-        - name: type
+        - name: questionType
           in: query
           required: true
+          description: The type of question (e.g., english_to_sense, english_to_turkish, turkish_to_english).
           schema:
             type: string
-            enum: [english_to_turkish, turkish_to_english, english_to_sense]
+            enum:
+              - english_to_sense
+              - english_to_turkish
+              - turkish_to_english
       responses:
         '200':
-          description: Question word retrieved successfully
+          description: Successful response with answer suggestions.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  suggestions:
+                  correctAnswerSuggestions:
                     type: array
                     items:
                       type: string
-                    example: ["fast", "fasten", "faster"]
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /question_answers:
-    get:
-      summary: (not implemented yet) Get question answers
-      tags:
-        - Questions
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: word
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: type
-          in: query
-          required: true
-          schema:
-            type: string
-            enum: [english_to_turkish, turkish_to_english, english_to_sense]
-      responses:
-        '200':
-          description: Question answers retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    correctAnswer:
+                    description: List of correct answer suggestions.
+                  wrongAnswerSuggestions:
+                    type: array
+                    items:
                       type: string
-                    wrongAnswers:
-                      type: array
-                      items:
-                        type: string
+                    description: List of wrong answer suggestions.
+                example:
+                  correctAnswerSuggestions:
+                    - example_correct_1
+                    - example_correct_2
+                  wrongAnswerSuggestions:
+                    - example_wrong_1
+                    - example_wrong_2
         '400':
-          description: Invalid input
+          description: Invalid parameters provided.
   /quizzes:
     get:
       summary: Get all quizzes optionally by filters
