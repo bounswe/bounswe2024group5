@@ -3,7 +3,6 @@ import { useState } from "react";
 
 import {
   IconHeart,
-  IconPencil,
   IconTrophy,
   IconMedal,
   IconUser,
@@ -24,6 +23,7 @@ import { QuizAttemptCard } from "../components/profile/quiz-attempt-card";
 import { DifficultyBadge } from "../components/badges/level";
 import { useFetchPosts } from "../hooks/api/get-forum-post";
 import { ForumPostCard } from "../components/profile/forum-post-card";
+import { ProfilePhotoUpload } from "../components/profile/profile-photo";
 
 const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -102,19 +102,12 @@ const ProfilePage = () => {
           {/* Profile Header */}
           <div className="p-6 bg-white rounded-3xl">
             <div className="flex items-start gap-6">
-              <div className="relative">
-                <div className="w-32 h-32 bg-purple-200 rounded-full">
-                  <img
-                    src="/api/placeholder/128/128"
-                    className="object-cover w-full h-full rounded-full"
-                  />
-                </div>
-                {isOwnProfile && (
-                  <button className="absolute flex items-center p-2 text-white bg-purple-500 rounded-full bottom-2 right-2 hover:bg-purple-600">
-                    <IconPencil size={16} />
-                  </button>
-                )}
-              </div>
+              <ProfilePhotoUpload
+                currentPhoto={profile.profilePicture}
+                isOwnProfile={isOwnProfile}
+                username={profile.username}
+                size="large"
+              />
 
               <div className="flex-grow">
                 <div className="flex items-center justify-between">
