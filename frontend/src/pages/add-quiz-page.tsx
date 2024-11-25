@@ -165,23 +165,6 @@ export const AddQuizPage: React.FC = () => {
               />
             </div>
           </div>
-
-          <div className="place-self-start">
-            <label className="block mb-1 text-sm font-medium text-purple-700 place-self-start">
-              Difficulty
-            </label>
-            <select
-              className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none w-36"
-              value={quiz.difficulty}
-              onChange={(e) =>
-                setQuiz({ ...quiz, difficulty: Number(e.target.value) })
-              }
-            >
-              <option value={1}>Beginner</option>
-              <option value={2}>Intermediate</option>
-              <option value={3}>Advanced</option>
-            </select>
-          </div>
         </div>
 
         <h2 className="mb-4 text-2xl font-semibold text-purple-800">
@@ -258,26 +241,6 @@ export const AddQuizPage: React.FC = () => {
                 />
               </div>
             ))}
-
-            <div className="mt-4">
-              <label className="block mb-1 text-sm font-medium text-purple-700">
-                Question Difficulty
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="3"
-                className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none"
-                value={question.difficulty}
-                onChange={(e) =>
-                  updateQuestion(
-                    question.id ?? 0,
-                    "difficulty",
-                    Number(e.target.value)
-                  )
-                }
-              />
-            </div>
           </div>
         ))}
 
