@@ -142,6 +142,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     console.log(quizAttemptId);
     console.log(questions[questionIndex].id)
     console.log(answer)
+    return;
     try {
       const response = await fetch(
         `${hostUrl}/api/question-answers`,
