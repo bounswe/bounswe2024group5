@@ -23,6 +23,7 @@ export const SolveQuizPage = () => {
   const quizIdAsNumber = Number.parseInt(quizId);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [lastSolvedQuestion, setLastSolvedQuestion] = useState(-1);
 
   const [selectedAnswer, setSelectedAnswer] = useState<string | undefined>(
     undefined
@@ -109,10 +110,8 @@ export const SolveQuizPage = () => {
     ) {
       const progressedAnswers = Array(quiz.questions.length).fill(undefined);
 
-      // Reset score before calculating
       setScore(0);
 
-      // Use reducer to calculate score instead of mutating state in loop
       const calculatedScore = currentAttempt.reduce((total, attempt) => {
         const questionIndex = quiz.questions.findIndex(
           (q) => q.id === attempt.questionId
@@ -131,11 +130,16 @@ export const SolveQuizPage = () => {
       const firstUnansweredIndex = progressedAnswers.findIndex(
         (answer) => answer === undefined
       );
-      setCurrentQuestion(
-        firstUnansweredIndex !== -1 ? firstUnansweredIndex : 0
-      );
+
+      if (lastSolvedQuestion !== -1) {
+        setCurrentQuestion(lastSolvedQuestion);
+      } else {
+        setCurrentQuestion(
+          firstUnansweredIndex !== -1 ? firstUnansweredIndex : 0
+        );
+      }
     }
-  }, [currentAttempt, quizzes, quiz]);
+  }, [currentAttempt, quizzes, quiz, lastSolvedQuestion]);
 
   useEffect(() => {
     if (quizzes && currentAttempt?.length === 0) {
@@ -182,6 +186,7 @@ export const SolveQuizPage = () => {
     if (selectedAnswer && !showResult && quizAttempt) {
       setShowResult(true);
 
+      setLastSolvedQuestion(currentQuestion);
       const currentQuestionId = quiz.questions[currentQuestion].id;
 
       const answer = await createAnswer({
