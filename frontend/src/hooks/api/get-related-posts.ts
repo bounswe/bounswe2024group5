@@ -8,7 +8,7 @@ export const useFetchRelatedPosts = (postId: number | null) => {
     const hostUrl = useContext(HostContext);
 
     return useQuery({
-        queryKey: ['replies', postId],
+        queryKey: ['posts', postId],
         queryFn: async () => {
             if (postId === null) return null;
             const response = await fetch(`${hostUrl}/api/posts/${postId}/related`, {
