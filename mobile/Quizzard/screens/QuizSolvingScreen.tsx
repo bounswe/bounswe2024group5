@@ -61,6 +61,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       }
       const attemptData = await attemptResponse.json();
       setQuizAttemptId(attemptData.id);
+      console.log(attemptData)
   
       // Fetch quiz details with questions
       const quizResponse = await fetch(`${hostUrl}/api/quizzes/${quiz.id}`, {
@@ -131,7 +132,16 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const handleAnswer = async (answer) => {
     if (alreadyFinished) return;
     if (isQuestionAnswered[questionIndex]) return;
+    const updatedIsQuestionAnswered = [...isQuestionAnswered];
+    updatedIsQuestionAnswered[questionIndex] = true;
+    setIsQuestionAnswered(updatedIsQuestionAnswered);
 
+    const updatedSelectedAnswers = [...selectedAnswers];
+    updatedSelectedAnswers[questionIndex] = answer;
+    setSelectedAnswers(updatedSelectedAnswers);
+    console.log(quizAttemptId);
+    console.log(questions[questionIndex].id)
+    console.log(answer)
     try {
       const response = await fetch(
         `${hostUrl}/api/question-answers`,
@@ -153,13 +163,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         throw new Error('Failed to submit answer');
       }
 
-      const updatedIsQuestionAnswered = [...isQuestionAnswered];
-      updatedIsQuestionAnswered[questionIndex] = true;
-      setIsQuestionAnswered(updatedIsQuestionAnswered);
-
-      const updatedSelectedAnswers = [...selectedAnswers];
-      updatedSelectedAnswers[questionIndex] = answer;
-      setSelectedAnswers(updatedSelectedAnswers);
+      
     } catch (error) {
       console.error("Error submitting answer:", error);
       Alert.alert("Error", "Failed to submit answer. Please try again.");
