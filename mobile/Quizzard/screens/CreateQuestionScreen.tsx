@@ -139,7 +139,7 @@ const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
         const response = await fetch(
           `${hostUrl}/api/autocomplete?prefix=${encodeURIComponent(
             currentTag
-          )}`,
+          )}&language=english`,
           {
             method: "GET",
             headers: {
