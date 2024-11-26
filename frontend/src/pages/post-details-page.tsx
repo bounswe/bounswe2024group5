@@ -16,7 +16,7 @@ const RelatedPostsComponent = ({ postId }: {postId: number}) => {
         <>
             <div className="text-left w-full max-w-2xl px-2">Similar Posts</div>
             <div className="flex gap-8 overflow-x-scroll w-full max-w-2xl">
-                { posts && posts.map( post => {return <div className="w-[578px] flex-shrink-0">
+                { posts && Array.isArray(posts) && posts.map( post => {return <div className="w-[578px] flex-shrink-0">
                     <ForumPostComponent postId={post.id} />
                 </div>})}
             </div>
