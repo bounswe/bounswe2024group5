@@ -11,8 +11,6 @@ import { useFetchRelatedPosts } from "../hooks/api/get-related-posts";
 const RelatedPostsComponent = ({ postId }: {postId: number}) => {
 
     const { data: posts } = useFetchRelatedPosts(postId);
-    console.log("here2");
-    console.log(posts);
 
     return (
         <>

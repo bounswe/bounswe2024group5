@@ -8,7 +8,7 @@ export const useFetchRelatedPosts = (postId: number | null) => {
     const hostUrl = useContext(HostContext);
 
     return useQuery({
-        queryKey: ['posts', postId],
+        queryKey: ['related-posts', postId],
         queryFn: async () => {
             if (postId === null) return null;
             const response = await fetch(`${hostUrl}/api/posts/${postId}/related`, {
@@ -21,6 +21,10 @@ export const useFetchRelatedPosts = (postId: number | null) => {
                 throw new Error('Failed to fetch replies!');
             }
             const body = await response.json();
+
+            console.log("here2");
+            console.log(body);
+
             return body as ForumPost[];
         }
     });
