@@ -1,65 +1,64 @@
 # Introduction
-
 This is the second milestone report for our group project, group bounswe2024group5. We are a group of enthusiastic students of CmpE451, committed to building an English Learning app that features posting and solving quizzes, interacting with other language learners in the forums.
 
 Our team members that have contributed to the project:
+* [ARINÇ DEMİR](https://github.com/bounswe/bounswe2024group5/wiki/Ar%C4%B1n%C3%A7-Demir)
+* [ASUDE EBRAR KIZILOĞLU](https://github.com/bounswe/bounswe2024group5/wiki/Asude-Ebrar-K%C4%B1z%C4%B1lo%C4%9Flu)
+* [HALİL UTKU ÇELİK](https://github.com/bounswe/bounswe2024group5/wiki/Halil-Utku-%C3%87elik)
+* [ÖZGÜR DENİZ DEMİR](https://github.com/bounswe/bounswe2024group5/wiki/%C3%96zg%C3%BCr-Deniz-Demir)
+* [RAMAZAN ONUR ACAR](https://github.com/bounswe/bounswe2024group5/wiki/Ramazan-Onur-Acar)
+* [SEMİH YILMAZ](https://github.com/bounswe/bounswe2024group5/wiki/Semih-Y%C4%B1lmaz)
+* [SÜLEYMAN EMİR TAŞAN](https://github.com/bounswe/bounswe2024group5/wiki/S%C3%BCleyman-Emir-Ta%C5%9Fan)
+* [FAHREDDİN ÖZCAN](https://github.com/bounswe/bounswe2024group5/wiki/Fahreddin-%C3%96zcan)
 
-- [ARINÇ DEMİR](https://github.com/bounswe/bounswe2024group5/wiki/Ar%C4%B1n%C3%A7-Demir)
-- [ASUDE EBRAR KIZILOĞLU](https://github.com/bounswe/bounswe2024group5/wiki/Asude-Ebrar-K%C4%B1z%C4%B1lo%C4%9Flu)
-- [HALİL UTKU ÇELİK](https://github.com/bounswe/bounswe2024group5/wiki/Halil-Utku-%C3%87elik)
-- [ÖZGÜR DENİZ DEMİR](https://github.com/bounswe/bounswe2024group5/wiki/%C3%96zg%C3%BCr-Deniz-Demir)
-- [RAMAZAN ONUR ACAR](https://github.com/bounswe/bounswe2024group5/wiki/Ramazan-Onur-Acar)
-- [SEMİH YILMAZ](https://github.com/bounswe/bounswe2024group5/wiki/Semih-Y%C4%B1lmaz)
-- [SÜLEYMAN EMİR TAŞAN](https://github.com/bounswe/bounswe2024group5/wiki/S%C3%BCleyman-Emir-Ta%C5%9Fan)
-- [FAHREDDİN ÖZCAN](https://github.com/bounswe/bounswe2024group5/wiki/Fahreddin-%C3%96zcan)
-
----
+*** 
 
 <details>
   <summary>Table of Contents</summary>
 
 - [1. Executive Summary](#1-executive-summary)
-  - [1.1 Project Description](#11-project-description)
-  - [1.2 Project Status](#12-project-status)
+  * [1.1 Project Description](#11-project-description)
+  * [1.2 Project Status](#12-project-status)
 - [2. Customer Feedback and Reflections](#2-customer-feedback-and-reflections)
 - [3. List and Status of Deliverables](#3-list-and-status-of-deliverables)
-  - [3.1 Evaluation of the status of Deliverables](#31-evaluation-of-the-status-of-deliverables)
-  - [3.2 Addressed Requirements](#32-addressed-requirements)
-  - [3.3 Evaluation of Tools](#33-evaluation-of-tools)
-    - [3.3.1 GitHub](#331-github)
-    - [3.3.2 Google Meet](#332-google-meet)
-    - [3.3.3 WhatsApp](#333-whatsapp)
+  * [3.1 Evaluation of the status of Deliverables](#31-evaluation-of-the-status-of-deliverables)
+  * [3.2 Addressed Requirements](#32-addressed-requirements)
+  * [3.3 Evaluation of Tools](#33-evaluation-of-tools)
+    * [3.3.1 GitHub](#331-github)
+    * [3.3.2 Google Meet](#332-google-meet)
+    * [3.3.3 WhatsApp](#333-whatsapp)
 - [4. Planning](#4-Planning)
-  - [4.1. Change Of Plans](#41-change-of-plans)
-  - [4.2 Plan for completing the project](#42-plan-for-completing-the-project)
-  - [4.3 Project plan](#43-project-plan)
+  * [4.1. Change Of Plans](#41-change-of-plans)
+  * [4.2 Plan for completing the project](#42-plan-for-completing-the-project)
+  * [4.3 Project plan](#43-project-plan)
 - [5. Individual Contribution Table](#5-individual-contribution-table)
-  - [5.1 ARINÇ DEMİR](#51-ARINÇ-DEMİR)
-  - [5.2 ASUDE EBRAR KIZILOĞLU](#52-ASUDE-EBRAR-KIZILOĞLU)
-  - [5.3 FAHREDDİN ÖZCAN](#53-FAHREDDİN-ÖZCAN)
-  - [5.4 HALİL UTKU ÇELİK](#54-HALİL-UTKU-ÇELİK)
-  - [5.5 ÖZGÜR DENİZ DEMİR](#55-ÖZGÜR-DENİZ-DEMİR)
-  - [5.6 RAMAZAN ONUR ACAR](#56-Ramazan-Onur-Acar)
-  - [5.7 SEMİH YILMAZ](#57-SEMİH-YILMAZ)
-  - [5.8 SÜLEYMAN EMİR TAŞAN](#58-SÜLEYMAN-EMİR-TAŞAN)
+  * [5.1 ARINÇ DEMİR](#51-ARINÇ-DEMİR)
+  * [5.2 ASUDE EBRAR KIZILOĞLU](#52-ASUDE-EBRAR-KIZILOĞLU)
+  * [5.3 FAHREDDİN ÖZCAN](#53-FAHREDDİN-ÖZCAN)
+  * [5.4 HALİL UTKU ÇELİK](#54-HALİL-UTKU-ÇELİK)
+  * [5.5 ÖZGÜR DENİZ DEMİR](#55-ÖZGÜR-DENİZ-DEMİR)
+  * [5.6 RAMAZAN ONUR ACAR](#56-Ramazan-Onur-Acar)
+  * [5.7 SEMİH YILMAZ](#57-SEMİH-YILMAZ)
+  * [5.8 SÜLEYMAN EMİR TAŞAN](#58-SÜLEYMAN-EMİR-TAŞAN)
 - [6. Deliverables](#6-deliverables)
-  - [6.1 Project Repository](#61-project-repository)
-  - [6.2 RAM (Responsibility Assignment Matrix)](#62-ram-responsibility-assignment-matrix)
-  - [6.3 A pre-release Version of our Software](#63-a-pre-release-version-of-our-software)
-  - [6.4 UX Design](#64-ux-design)
-  - [6.5 Utilized Standard](#65-utilized-standard)
-  - [6.6 API documentation](#66-api-documentation)
+  * [6.1 Project Repository](#61-project-repository)
+  * [6.2 RAM (Responsibility Assignment Matrix)](#62-ram-responsibility-assignment-matrix)
+  * [6.3 A pre-release Version of our Software](#63-a-pre-release-version-of-our-software)
+  * [6.4 UX Design](#64-ux-design)
+  * [6.5 Utilized Standard](#65-utilized-standard)
+  * [6.6 API documentation](#66-api-documentation)
 - [7. Testing](#7-testing)
-  - [7.1 General Testing Plan](#71-general-testing-plan)
-  - [7.2 Unit Tests](#72-unit-tests)
-  _ [7.2.1 Backend](#721-backend)
-  _ [7.2.2 Frontend](#722-frontend) \* [7.2.3 Mobile](#723-mobile)
-  </details>
+  * [7.1 General Testing Plan](#71-general-testing-plan)
+  * [7.2 Unit Tests](#72-unit-tests)
+    * [7.2.1 Backend](#721-backend)
+    * [7.2.2 Frontend](#722-frontend)
+    * [7.2.3 Mobile](#723-mobile)
+</details>
 
-# 1. Executive Summary
+
+# 1. Executive Summary 
 
 ## 1.1 Project Description
-
 Quizzard is a language learning platform for Turkish speakers. It helps users acquire new vocabulary words by letting them solve quizzes. Those quizzes contain questions that are designed to help users commit new words to their long-term memory by matching words to their translations or meanings.
 
 Users can either solve quizzes that they themselves have created or quizzes created by other users. This enables a community of language learners help each other through their learning journey. But quiz sharing isn't the only mechanism through which users can help each other. They can also answer questions related to specific words that are asked by other users on the forum.
@@ -68,15 +67,15 @@ Overall, Quizzard's quiz and forum features are the main drivers of language adv
 
 ## 1.2 Project Status
 
-During this last month, sinse Milestone 1, we implemented the most of the backend infrastructure. Quiz creation, and quiz solve attempt, forum post creation, search and other functionalities endpoints were designed. Moreover, we integrated the open-source database we will use for the quiz data.
+During this last month, sinse Milestone 1, we implemented the most of the backend infrastructure. Quiz creation, and quiz solve attempt, forum post creation, search and other functionalities endpoints were designed. Moreover, we integrated the open-source database we will use for the quiz data. 
 
-On the mobile client side, backend integration were implemented for several features. Web users are now able to use quiz and forum functionalities to the fullest. On the web client side, similar to the mobile, most of the necessary features were implemented. In addition, we added a section for related forum posts in the quiz-solve page, as a part of the customer feedback we received in the first customer presentation.
+On the mobile client side, backend integration were implemented for several features. Web users are now able to use quiz and forum functionalities to the fullest. On the web client side, similar to the mobile, most of the necessary features were implemented. In addition, we added a section for related forum posts in the quiz-solve page, as a part of the customer feedback we received in the first customer presentation. 
 
-In terms of UI/UX, both mobile and web now has quiz images displayed. We also worked to make the UI for both clients similar to each other to keep consistent UI for our app. For a better user experience, we thought of users who start solving a quiz in our platform but leave on the half way for various reasons. To handle such occurrences, we introduced the "in progress" status for the quizzes so that whenever a user goes back to a quiz they solved half-way previously, we retrieve their previous answers to offer the users to continue from where they left off. This feature is fully implemented in the web and partially implemented in the mobile client, to be completed soon.
+In terms of UI/UX, both mobile and web now has quiz images displayed. We also worked to make the UI for both clients similar to each other to keep consistent UI for our app. For a better user experience, we thought of users who start solving a quiz in our platform but leave on the half way for various reasons. To handle such occurrences, we introduced the "in progress" status for the quizzes so that whenever a user goes back to a quiz they solved half-way previously, we retrieve their previous answers to offer the users to continue from where they left off. This feature is fully implemented in the web and partially implemented in the mobile client, to be completed soon. 
 
-In addition, we started implementing the profile page on both clients, which is an ongoing feature that is being improved still.
+In addition, we started implementing the profile page on both clients, which is an ongoing feature that is being improved still. 
 
----
+*** 
 
 # 2. Customer Feedback and Reflections
 
@@ -92,31 +91,31 @@ Lastly, the customer emphasized the importance of transparency in how proficienc
 
 By implementing these changes, we can improve the usability and integrity of the app while ensuring a more engaging and personalized experience for the learners.
 
----
+*** 
 
 # 3. List and Status of Deliverables
 
-| Deliverable                                  | Status                 | Related Link                                         |
-| -------------------------------------------- | ---------------------- | ---------------------------------------------------- |
-| Project Repository                           | Delivered              | [repo](https://github.com/bounswe/bounswe2024group5) |
-| Project plan                                 | Completed & Delivered  | [jump](#43-project-plan)                             |
-| RAM (Responsibility Assignment Matrix)       | Completed & Delivered  | [jump](#62-ram-responsibility-assignment-matrix)     |
-| Pre-release Version of our Software          | Implemented & Released | [jump](#63-a-pre-release-version-of-our-software)    |
-| UX Design                                    | Designed & Implemented | [jump](#64-ux-design)                                |
-| Utilized Standard                            | Designed & Implemented | [jump](#65-utilized-standard)                        |
-| API documentation                            | Designed & Implemented | [jump](#66-api-documentation)                        |
-| Individual Contributions (see section below) | Completed & Documented | [jump](#5-individual-contribution-table)             |
-| Milestone Report                             | Completed & Delivered  | this report                                          |
+Deliverable | Status | Related Link
+-- | -- | --
+Project Repository | Delivered | [repo](https://github.com/bounswe/bounswe2024group5)
+Project plan | Completed & Delivered | [jump](#43-project-plan)
+RAM (Responsibility Assignment Matrix) | Completed & Delivered | [jump](#62-ram-responsibility-assignment-matrix)
+Pre-release Version of our Software | Implemented & Released | [jump](#63-a-pre-release-version-of-our-software)
+UX Design | Designed & Implemented | [jump](#64-ux-design)
+Utilized Standard | Designed & Implemented | [jump](#65-utilized-standard)
+API documentation | Designed & Implemented | [jump](#66-api-documentation)
+Individual Contributions (see section below) | Completed & Documented | [jump](#5-individual-contribution-table)
+Milestone Report | Completed & Delivered | this report
 
 ## 3.1 Evaluation of the status of Deliverables
 
 <!--- Evaluation of the status of deliverables and its impact on your project plan (reflection). -->
 
-- **Project plan**: We utilize Github's Projects [Roadmap](https://github.com/orgs/bounswe/projects/67/views/4) feature to manage our project plan effectively. [See](#43-project-plan) for more details.
+* **Project plan**: We utilize Github's Projects [Roadmap](https://github.com/orgs/bounswe/projects/67/views/4) feature to manage our project plan effectively. [See](#43-project-plan) for more details.
 
-- **RAM (Responsibility Assignment Matrix)**: We keep track of our individual task distributions in this matrix, and we often review it. This semester, [Semih](https://github.com/bounswe/bounswe2024group5/wiki/Semih-Y%C4%B1lmaz) volunteered for the RAM revision duty. Other team members also review the matrix to arrange their responsibilities. RAM is particularly important in terms of task distributions in the sub temas (mobile, backend, frontend). With this visualization, we find it easier to distribute the tasks fairly among us.
+* **RAM (Responsibility Assignment Matrix)**: We keep track of our individual task distributions in this matrix, and we often review it. This semester, [Semih](https://github.com/bounswe/bounswe2024group5/wiki/Semih-Y%C4%B1lmaz) volunteered for the RAM revision duty. Other team members also review the matrix to arrange their responsibilities. RAM is particularly important in terms of task distributions in the sub temas (mobile, backend, frontend). With this visualization, we find it easier to distribute the tasks fairly among us.
 
-- **API documentation**: Our [API documentation](https://editor.swagger.io/?url=https://raw.githubusercontent.com/bounswe/bounswe2024group5/refs/heads/main/doc/api-design.yml) includes detailed descriptions of available endpoints, including parameters, request methods, and sample responses. It forms the basis of a cohesive agreement between the different teams (front end, mobile and back end) in our group. In the image below, you can see the api-doc for the /autocomplete endpoint. [See](#66-api-documentation) for some API examples.
+* **API documentation**: Our [API documentation](https://editor.swagger.io/?url=https://raw.githubusercontent.com/bounswe/bounswe2024group5/refs/heads/main/doc/api-design.yml) includes detailed descriptions of available endpoints, including parameters, request methods, and sample responses. It forms the basis of a cohesive agreement between the different teams (front end, mobile and back end) in our group. In the image below, you can see the api-doc for the /autocomplete endpoint. [See](#66-api-documentation) for some API examples. 
 
 ![image](https://github.com/user-attachments/assets/672fa87c-69d1-40e4-8c44-124f3d5985c2)
 
@@ -124,31 +123,28 @@ By implementing these changes, we can improve the usability and integrity of the
 
 The status of requirements is updated at their [page](https://github.com/bounswe/bounswe2024group5/wiki/Requirements). The emojis symbolize three different state:
 
-- ✅ is for requirements that we finished implementing it.
-- ⚠️ is for requirements that we have started working on but not finished.
-- ❌ is for requirements that we have not started.
+* ✅ is for requirements that we finished implementing it.
+* ⚠️ is for requirements that we have started working on but not finished.
+* ❌ is for requirements that we have not started.
 
----
+***
 
 ## 3.3 Evaluation of Tools
 
 We used four major tools for team communication, and planning and design of our project.
 
 ## 3.3.1 GitHub
-
 GitHub continues to be the primary platform for planning and tracking of our project. We constantly make use of issues to collaborate on and track project tasks and this enables all team members to exactly know the status of our project and diffuse confusion as to who's supposed to do what.
 
 We also use wiki section to document meeting notes, diagrams and design files. This easy access to project files enables us to keep in sight what our final objective is at all times. Finally we use pull requests to ensure only high quality code makes it to the main branch of our codebase. For this. we only commmit reviewed and approved code to our main branch.
 
 ## 3.3.2 Google Meet
-
-The fact that Discord continues to be blocked in the country, we needed to use a new platform to hold our weekly meetings. We chose Google Meet for this job due to its longer meeting time allowance (for an hour).
+The fact that Discord continues to be blocked in the country, we needed to use a new platform to hold our weekly meetings. We chose Google Meet for this job due to its longer meeting time allowance (for an hour). 
 
 ## 3.3.3 WhatsApp
+We were already using WhatsApp for texting related to issues that needed to be resolved fast. But, specifically in this last month, since we had to discontinue using Discord to share brainstorming ideas and files, we used our whatsapp group chat for these tasks as well. 
 
-We were already using WhatsApp for texting related to issues that needed to be resolved fast. But, specifically in this last month, since we had to discontinue using Discord to share brainstorming ideas and files, we used our whatsapp group chat for these tasks as well.
-
----
+***
 
 # 4. Planning
 
@@ -161,22 +157,23 @@ We haven't really changed any plans from the Milestone 1. After milestone 1, we 
 With the milestone 2 coming to an end, we can say that we've implemented most of the necessary features that makes our application function, including all backend, mobile and frontend. It should also be noted that, almost none of the implemented features uses mock data, so everything works in sync with backend with real data from database. After this point, we can group the necessary further improvement towards completing the project in these groups:
 
 1. Fixing the existing bugs
-   Since we're an agile team, we're implementing features in a fast manner and there are few flaws in some of the flows. This is our number one priority going forward.
+Since we're an agile team, we're implementing features in a fast manner and there are few flaws in some of the flows. This is our number one priority going forward.
 
 2. Test coverage
-   To make sure that everything works as intended and maintain the software quality, we need to increase our test coverage.
+To make sure that everything works as intended and maintain the software quality, we need to increase our test coverage.
 
 3. Feature Additions
-   Throughout the development process and during customer presentations, we've collected feedbacks for possible features. One of the major focuses and the most time consuming one will be implementing these features. It's possible that not all are implemented at the final state, but our roadmap is as below:
+Throughout the development process and during customer presentations, we've collected feedbacks for possible features. One of the major focuses and the most time consuming one will be implementing these features. It's possible that not all are implemented at the final state, but our roadmap is as below:
 
-- First, we want to improve the learning experience. For that, we'll put more information about the word on the quiz solving page, so that there are enough resources to learn about the word while solving the quiz. This will include images, meaning, example usages.
-- We will improve the CRUD operations on quizzes and implement quiz update and deletion.
-- We will add quiz upvote and favourites list.
-- Photo suggestions from wikidata for quiz images
-- Improvements in the difficulty algorithm
-- Improvements in the user level detection and score gain algorithm
-- Follow action, followers and feed implementation
-  etc.
+* First, we want to improve the learning experience. For that, we'll put more information about the word on the quiz solving page, so that there are enough resources to learn about the word while solving the quiz. This will include images, meaning, example usages.
+* We will improve the CRUD operations on quizzes and implement quiz update and deletion.
+* We will add quiz upvote and favourites list.
+* Photo suggestions from wikidata for quiz images
+* Improvements in the difficulty algorithm
+* Improvements in the user level detection and score gain algorithm
+* Follow action, followers and feed implementation
+etc.
+
 
 ## 4.3 Project Plan
 
@@ -186,11 +183,11 @@ either commit your plan file to your repository or document screenshots of the p
 your wiki, linking either way in this section. On the other hand, if you're using GitHub
 Projects, take screenshots of the board and document them in your wiki, linking in this
 section.
---->
+---> 
 
 We utilize Github's Projects [Roadmap](https://github.com/orgs/bounswe/projects/67/views/4) feature to manage our project plan effectively. This visual representation allows us to monitor our progress according to the upcoming deadlines, such as the milestones. Additionally, it facilitates communication between sub-teams (backend, frontend, and mobile), ensuring that everyone is informed of each other's progress. [Ebrar](https://github.com/bounswe/bounswe2024group5/wiki/Asude-Ebrar-K%C4%B1z%C4%B1lo%C4%9Flu) is responsible to update the Project plan frequently, and other team members also review and revise it often. You can view the screenshot of our project plan from the [wiki page](https://github.com/bounswe/bounswe2024group5/wiki/Project-Plan).
 
----
+***
 
 # 5. Individual Contribution Table
 
@@ -216,7 +213,6 @@ regarding the pull requests you have reviewed.
 listed above.
 
  -->
-
 ## 5.1 [ARINÇ DEMİR](https://github.com/bounswe/bounswe2024group5/wiki/Ar%C4%B1n%C3%A7-Demir)
 
 ### Responsibilities
@@ -242,9 +238,9 @@ No splash image and icon, home screen not taking user elo from api, home screen 
 
 I integrated two endpoints. One in the home page and one in the quiz solving page.
 
-- **`Get /profile/me` endpoint**: The home page needed the elo of the user in order to sort the quizzes shown properly. I implemented this endpoint in order to get the elo of the user.
+* **`Get /profile/me` endpoint**: The home page needed the elo of the user in order to sort the quizzes shown properly. I implemented this endpoint in order to get the elo of the user.
 
-```py
+```py 
 const response = await fetch(`${hostUrl}/api/profile/me`, {
         method: "GET",
         headers: {
@@ -259,7 +255,6 @@ if (response.ok) {
 ```
 
 The response of the endpoint is the profile data of the user. I only needed the elo here.
-
 ```
 example:
         username: johndoe
@@ -271,8 +266,8 @@ example:
         noCreatedQuizzes: 5
 ```
 
-- **`PUT /question-answers?quizAttemptId={id}` endpoint**: This call was needed for getting the previous answers on a quiz solving attempt. In our app, the user can continue their solving attempt later. I needed to get the questions they already answered and show those as done in the solving screen.
 
+* **`PUT /question-answers?quizAttemptId={id}` endpoint**:  This call was needed for getting the previous answers on a quiz solving attempt. In our app, the user can continue their solving attempt later. I needed to get the questions they already answered and show those as done in the solving screen.
 ```py
 const answersResponse = await fetch(
         `${hostUrl}/api/question-answers?quizAttemptId=${attemptData.id}`,
@@ -295,7 +290,6 @@ const answersResponse = await fetch(
 ```
 
 The response is a list of question answers. Every element in the list look like this:
-
 ```
 	id: 3 	// quiz ID
         quizAttemptId: 2
@@ -321,34 +315,36 @@ The response is a list of question answers. Every element in the list look like 
 
 #### Created
 
-- [PR#370](https://github.com/bounswe/bounswe2024group5/pull/370):
-  Created random elo and difficulty for quizzes since they don't exist in the backend yet.
-  Added placeholder image to quizzes since they don't exist in the backend yet.
-  Added a mock elo for the user to the home page. Also sort the quizzes for being the closest to the users elo.
-  Now selecting the dropdown on the "other quizzes" section filters the quizzes by their difficulty.
+- [PR#370](https://github.com/bounswe/bounswe2024group5/pull/370): 
+    Created random elo and difficulty for quizzes since they don't exist in the backend yet.
+    Added placeholder image to quizzes since they don't exist in the backend yet.
+    Added a mock elo for the user to the home page. Also sort the quizzes for being the closest to the users elo.
+    Now selecting the dropdown on the "other quizzes" section filters the quizzes by their difficulty.
 - [PR#374](https://github.com/bounswe/bounswe2024group5/pull/374): I added the Quiz Welcome Page when we select a page from the home page.
-  In that page, the details of the quiz are displayed.
-  You can continue to solve the quiz or go back.
+In that page, the details of the quiz are displayed.
+You can continue to solve the quiz or go back.
 - [PR#405](https://github.com/bounswe/bounswe2024group5/pull/405): Fixed bug where users were not authenticated after registration.
-  Added picker for proficiency level in registration.
-  Modified the API call to send field "englishProficiency".
+Added picker for proficiency level in registration.
+Modified the API call to send field "englishProficiency".
 - [PR#408](https://github.com/bounswe/bounswe2024group5/pull/408): Fixed wrong answer not showing when you return back to a question in Quiz Solving.
-  Added Quiz Finish Screen. It shows the number of right, wrong, empty answers.
-  Added the buttons for Return Home, Quiz Description and Revise Answers.
+Added Quiz Finish Screen. It shows the number of right, wrong, empty answers.
+Added the buttons for Return Home, Quiz Description and Revise Answers.
 - [PR#408](https://github.com/bounswe/bounswe2024group5/pull/446): Added splash image and icon.
-  Fixed home screen not taking user elo from api.
-  Fixed home screen not getting difficulty from api.
-  Fixed bug in quizzes for you filtering.
-  Fixed quiz not finishing properly.
-  Fixed false answer not showing red when you return back to previous questions.
-  Fixed answered questions not showing when you return to attempt.
-  Fixed quiz elo showing decimal points in home page.
+Fixed home screen not taking user elo from api.
+Fixed home screen not getting difficulty from api.
+Fixed bug in quizzes for you filtering.
+Fixed quiz not finishing properly.
+Fixed false answer not showing red when you return back to previous questions.
+Fixed answered questions not showing when you return to attempt.
+Fixed quiz elo showing decimal points in home page.
+
 
 #### Reviewed/Merged
 
 - [PR#368](https://github.com/bounswe/bounswe2024group5/pull/368): My Quiz Preview Mobile (Ebrar)
 - [PR#426](https://github.com/bounswe/bounswe2024group5/pull/426): Add/mobile api calls for profile (Ramazan)
 - [PR#449](https://github.com/bounswe/bounswe2024group5/pull/449): Hotfix: Forum search Missing language parameter for Mobil (Ebrar)
+
 
 ### Additional Information
 
@@ -357,6 +353,8 @@ I wrote the two user stories [#353](https://github.com/bounswe/bounswe2024group5
 I built the apk for our release.
 
 I periodically update my personal page for my contributions.
+
+
 
 ## 5.2 [ASUDE EBRAR KIZILOĞLU](https://github.com/bounswe/bounswe2024group5/wiki/Asude-Ebrar-K%C4%B1z%C4%B1lo%C4%9Flu)
 
@@ -368,7 +366,7 @@ Group Communicator, Mobile Development.
 
 For our Mobile app, I implemented the API requests for creating new quizzes. I worked closely with [Süleyman](https://github.com/bounswe/bounswe2024group5/wiki/S%C3%BCleyman-Emir-Ta%C5%9Fan) from the backend team to make the `file/upload` api work for the image upload functionality. After [Ramazan](https://github.com/bounswe/bounswe2024group5/wiki/Ramazan-Onur-Acar) implemented the profile page, I made use of the existing quiz view in profile page to display the user's own created quizzes. I also added edit and delete buttons to it. Delete button is integrated with backend, but edit button is not yet. I also fetched user profile data to display in profil page.
 
-I introduced a simple IP-address [variable](https://github.com/bounswe/bounswe2024group5/blob/main/mobile/Quizzard/app/HostContext.tsx) to make use of api uri dynamically in the mobile client, instead of hardcoding it. I added the usage of the existing dropdown view in registration page to keep consistent UI, after [Arınç](https://github.com/bounswe/bounswe2024group5/wiki/Ar%C4%B1n%C3%A7-Demir) implemented the proficiency level selection in registration.
+I introduced a simple IP-address [variable](https://github.com/bounswe/bounswe2024group5/blob/main/mobile/Quizzard/app/HostContext.tsx) to make use of api uri dynamically in the mobile client, instead of hardcoding it. I added the usage of the existing dropdown view in registration page to keep consistent UI, after [Arınç](https://github.com/bounswe/bounswe2024group5/wiki/Ar%C4%B1n%C3%A7-Demir) implemented the proficiency level selection in registration. 
 
 After [Ramazan](https://github.com/bounswe/bounswe2024group5/wiki/Ramazan-Onur-Acar) implemented the forum screens, I improved the UI of forum question detail view to keep consistent theme with the web, as well as keeping the date, upvote, and comment features look neat.
 
@@ -382,14 +380,14 @@ For the management tasks, I often organize our agenda during the labs and initia
 
 I integrated several endpoints to mobile in the quiz creation, quiz solve, and profile screens. I will mention 2 of such endpoints I used:
 
-- **`POST /file/upload` endpoint**: I implementing the file upload backend integration in the quiz creation screen, [code](https://github.com/bounswe/bounswe2024group5/blob/3421cd7ca1cd5ebde665e49f415eb940ac9f3616/mobile/Quizzard/screens/QuizCreationScreen.tsx#L46-L55). An example call to this endpoint is as follows:
+* **`POST /file/upload` endpoint**: I implementing the file upload backend integration in the quiz creation screen, [code](https://github.com/bounswe/bounswe2024group5/blob/3421cd7ca1cd5ebde665e49f415eb940ac9f3616/mobile/Quizzard/screens/QuizCreationScreen.tsx#L46-L55). An example call to this endpoint is as follows: 
 
-```py
+```py 
 const formData = new FormData();
 formData.append('file', {
     uri: fileUri,
     type: 'image/jpeg', // Adjust this based on your file type
-    name: 'upload.jpg',
+    name: 'upload.jpg', 
 });
 const response = await fetch(
     `${hostUrl}/api/file/upload`,
@@ -411,8 +409,7 @@ The response of the endpoint is the uri of the uploaded file, images in our case
 
 Getting this endpoint work was a great challenge. I collaborated with [Fahderrin](https://github.com/bounswe/bounswe2024group5/wiki/Fahreddin-%C3%96zcan) from frontend and [Semih](https://github.com/bounswe/bounswe2024group5/wiki/Semih-Y%C4%B1lmaz) from backend throughout this process. We encountered several issues in terms of cloud arrangement of files, and local deployment. At least, we managed to overcome difficulties and finished with great image functionality on both mobile and web.
 
-- **`PUT /quiz-attempts/{id}` endpoint**: I implementing the PUT request to this endpoint inside the `handleFinish` function in the quiz solving screen, [code](https://github.com/bounswe/bounswe2024group5/blob/3421cd7ca1cd5ebde665e49f415eb940ac9f3616/mobile/Quizzard/screens/QuizSolvingScreen.tsx#L229-L239). An example call to this endpoint is as follows:
-
+* **`PUT /quiz-attempts/{id}` endpoint**: I implementing the PUT request to this endpoint inside the `handleFinish` function in the quiz solving screen, [code](https://github.com/bounswe/bounswe2024group5/blob/3421cd7ca1cd5ebde665e49f415eb940ac9f3616/mobile/Quizzard/screens/QuizSolvingScreen.tsx#L229-L239). An example call to this endpoint is as follows: 
 ```py
 const response = await fetch(
     `${hostUrl}/api/quiz-attempts/${quizAttemptId}`,
@@ -436,6 +433,7 @@ On the other hand, if the user starts to solve a quiz (hence created a quiz atte
 - [#366](https://github.com/bounswe/bounswe2024group5/issues/366): Add Create Quiz API calls for Mobile. [PR #415](https://github.com/bounswe/bounswe2024group5/pull/415)
 - [#367](https://github.com/bounswe/bounswe2024group5/issues/367): Implement delete and edit buttons for user's own created quizzes. [PR #368](https://github.com/bounswe/bounswe2024group5/pull/368)
 - [#411](https://github.com/bounswe/bounswe2024group5/issues/411): API calls && Mobile debugging and fixes. [PR #415](https://github.com/bounswe/bounswe2024group5/pull/415)
+
 
 ### Management-related significant issues
 
@@ -463,7 +461,7 @@ I encountered great difficulty trying to merge my branch `366-mobile-api-calls` 
 
 ### Additional Information
 
-I value the quality of documentation. Thus, I frequently review our wiki pages, specifically the home page and sidebar. I add links to missing recent meeting notes and lab reports. I also add the group's issues to the Github [Project](https://github.com/orgs/bounswe/projects/67), and add missing labels to the issues whenever I locate them.
+I value the quality of documentation. Thus, I frequently review our wiki pages, specifically the home page and sidebar. I add links to missing recent meeting notes and lab reports. I also add the group's issues to the Github [Project](https://github.com/orgs/bounswe/projects/67), and add missing labels to the issues whenever I locate them. 
 
 ## 5.3 [FAHREDDİN ÖZCAN](https://github.com/bounswe/bounswe2024group5/wiki/Fahreddin-%C3%96zcan)
 
@@ -483,119 +481,121 @@ I enhanced the profile system by integrating forum activity display and quiz his
 
 For project quality, I implemented WAI-ARIA accessibility standards and worked on maintaining consistent UI/UX between mobile and web platforms. I collaborated extensively with the mobile team to ensure feature parity and design system.
 
+
 ### API Contributions
 
 I developed core frontend features using our APIs, such as quiz progress management, image upload for profile and quiz pages, and word autocomplete. While implementing the REST API requests and response data, I used React Query library for client side memory.
 
-1.  Quiz Attempts API:
-    We are keeping track of the user's progression in the quizzes. When a user clicks on a quiz, we create an attempt for that quiz. As the user keeps solving questions, we send the answer of user to backend to keep in the related attempt.
+1. Quiz Attempts API:
+We are keeping track of the user's progression in the quizzes. When a user clicks on a quiz, we create an attempt for that quiz. As the user keeps solving questions, we send the answer of user to backend to keep in the related attempt. 
 
-        - **POST `/api/question-answers`**: Records user's answers during quiz solving
-
-```typescript
+    - **POST `/api/question-answers`**: Records user's answers during quiz solving
+  ```typescript
 const response = await fetch(`${hostUrl}/api/question-answers`, {
-method: 'POST',
-headers: {
-  'Authorization': `Bearer ${TOKEN}`,
-  'Content-Type': 'application/json',
-},
-body: JSON.stringify({
-  quizAttemptId,
-  questionId,
-  answer
-}),
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${TOKEN}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    quizAttemptId,
+    questionId,
+    answer
+  }),
 });
 
 // Response
 {
-"id": 789,
-"quizAttemptId": 123,
-"questionId": 456,
-"answer": "book",
-"isCorrect": true,
-"updatedAt": "2024-11-29T10:30:00Z"
+  "id": 789,
+  "quizAttemptId": 123,
+  "questionId": 456,
+  "answer": "book",
+  "isCorrect": true,
+  "updatedAt": "2024-11-29T10:30:00Z"
 }
-```
+  ```
 
 By using the API above, we're now aware of the users quiz progression. In order to utilize this data, we fetch the attempt details from the api, and then render the quiz on the frontend with the data from the backend. Once we got the response, we fill in the users answer to quiz, and then navigate them to the last question unsolved.
 
-- **GET `/api/quiz-attempts`**: Fetches quiz progress and attempts
-
-```typescript
+  - **GET `/api/quiz-attempts`**: Fetches quiz progress and attempts
+  ```typescript
 const params = new URLSearchParams();
-if (filters?.isCompleted) params.append("isCompleted", "true");
-if (filters?.quizId) params.append("quizId", quizId.toString());
-
+if (filters?.isCompleted) params.append('isCompleted', 'true');
+if (filters?.quizId) params.append('quizId', quizId.toString());
+  
 const response = await fetch(
-  `${hostUrl}/api/quiz-attempts?${params.toString()}`,
-  {
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-    },
-  }
+    `${hostUrl}/api/quiz-attempts?${params.toString()}`,
+    {
+      headers: {
+        'Authorization': `Bearer ${TOKEN}`,
+      },
+    }
 );
 
 [
   {
-    id: 123,
-    userId: 456,
-    quizId: 789,
-    score: 85,
-    completed: true,
-    completedAt: "2024-11-29T10:35:00Z",
-    updatedAt: "2024-11-29T10:35:00Z",
-  },
-];
-```
+    "id": 123,
+    "userId": 456,
+    "quizId": 789,
+    "score": 85,
+    "completed": true,
+    "completedAt": "2024-11-29T10:35:00Z",
+    "updatedAt": "2024-11-29T10:35:00Z"
+  }
+]
+  ```
 
 2. File Upload API
-   As per the feedback we've received in the milestone 1, we've decided to add image upload feature to Quizzard. This feature exists both in the user profile, and in the quiz creation page. In the quiz creation form, we provide option to upload the image from local. Once the image is uploaded, we recieve the image url and pass to quiz data while creating the quiz. This enabled us to make the UI more colorful.
+As per the feedback we've received in the milestone 1, we've decided to add image upload feature to Quizzard. This feature exists both in the user profile, and in the quiz creation page. In the quiz creation form, we provide option to upload the image from local. Once the image is uploaded, we recieve the image url and pass to quiz data while creating the quiz. This enabled us to make the UI more colorful. 
+  - **POST `/api/file/upload`**: Uploads the file to the Google Cloud Bucket
+  ```typescript
+  mutationFn: async (file: File) => {
+			const TOKEN = sessionStorage.getItem('token');
+			const formData = new FormData();
+			formData.append('file', file);
 
-- **POST `/api/file/upload`**: Uploads the file to the Google Cloud Bucket
+			const response = await fetch(`${hostUrl}/api/file/upload`, {
+				method: 'POST',
+				headers: {
+					'Authorization': `Bearer ${TOKEN}`,
+				},
+				body: formData,
+			});
 
-```typescript
-mutationFn: async (file: File) => {
-  const TOKEN = sessionStorage.getItem("token");
-  const formData = new FormData();
-  formData.append("file", file);
+			if (!response.ok) {
+				throw new Error('Failed to upload file');
+			}
 
-  const response = await fetch(`${hostUrl}/api/file/upload`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-    },
-    body: formData,
-  });
 
-  if (!response.ok) {
-    throw new Error("Failed to upload file");
-  }
-
-  return (await response.text()) as string;
-};
+			return (await response.text()) as string;
+		}
 // Response
-("https://storage.googleapis.com/quizzard-images/quiz-123.jpg");
-```
+"https://storage.googleapis.com/quizzard-images/quiz-123.jpg"
+  ```
 
 3. Word Autocomplete API
-   Since we're building an language learning application, our target audience might lack the word knowledge, so while providing word inputs for the questions they can sometimes have typos. Also, in order to keep track of the word data, the pool of the words should be a bit limited. For that, we've built a autocomplete feature, where both on the forum tags and question words, when user types in a prefix, we come up with some suggestions for that prefix. User can select the word from the dropdown displayed.
-
+Since we're building an language learning application, our target audience might lack the word knowledge, so while providing word inputs for the questions they can sometimes have typos. Also, in order to keep track of the word data, the pool of the words should be a bit limited. For that, we've built a autocomplete feature, where both on the forum tags and question words, when user types in a prefix, we come up with some suggestions for that prefix. User can select the word from the dropdown displayed.
 - **GET `/api/autocomplete`**:
-
 ```typescript
 const queryParams = new URLSearchParams({
   prefix,
-  language: "english" | "turkish",
+  language: 'english' | 'turkish'
 });
 
 const response = await fetch(`${hostUrl}/api/autocomplete?${queryParams}`, {
   headers: {
-    Authorization: `Bearer ${TOKEN}`,
-  },
+    'Authorization': `Bearer ${TOKEN}`
+  }
 });
 
 // Response
-["book", "boot", "boom", "booth", "bootstrap"];
+[
+  "book",
+  "boot",
+  "boom",
+  "booth",
+  "bootstrap"
+]
 ```
 
 ### Code-related significant issues
@@ -615,6 +615,7 @@ const response = await fetch(`${hostUrl}/api/autocomplete?${queryParams}`, {
 - [#375](https://github.com/bounswe/bounswe2024group5/issues/375): Implement Quiz Attempts and Progression [PR #376](https://github.com/bounswe/bounswe2024group5/pull/376)
 - [#359](https://github.com/bounswe/bounswe2024group5/issues/359): Create Profile Page [PR #392](https://github.com/bounswe/bounswe2024group5/pull/392)
 - [#350](https://github.com/bounswe/bounswe2024group5/issues/350): Implement and Document WAI-ARIA standard [PR #347](https://github.com/bounswe/bounswe2024group5/pull/347)
+
 
 ### Management-related significant issues
 
@@ -662,88 +663,83 @@ I had real difficulty implementing the quiz progression feature, because I had a
 Time to time, we had problems while having sync with backend team, since both teams were working hard to have their focus points finalized, we sometimes broke the parts needed by other teams.
 
 #### Additional Information
-
 I did the best I could trying to apply best frontend practices everywhere I could, also including the tests. At some points, using brand new/popular tools made it easy to achieve some features, like data fetching, or testing libraries for react. We were able to mock the hooks, functions at some parts, enabling us to write UI tests as well.
+
 
 ## 5.4 [HALİL UTKU ÇELİK](https://github.com/bounswe/bounswe2024group5/wiki/Halil-Utku-%C3%87elik)
 
-### Responsibilities
-
+### Responsibilities  
 Backend Development, Database Management, Deployment
 
-### Main Contributions
+### Main Contributions  
 
 As a member of the backend team, my primary contributions in this milestone revolved around the creation and optimization of the dictionary database, as well as implementing and enhancing critical API endpoints. I also deployed the application before the customer presentation. Below is a detailed summary of my work:
 
-#### Database Contributions
+#### Database Contributions  
+1. **Dictionary Database Creation**:  
+   - Compiled English-to-Turkish translation data from a publicly available GitHub repository.  
+   - Imported WordNet data and used it to generate a **sense table**, linking words to their respective senses for semantic analysis.  
 
-1. **Dictionary Database Creation**:
+2. **Word Scores Integration**:  
+   - Incorporated word scores into the English table. These scores were based on word usage frequency data provided by **Deniz** and **Süleyman**. My role involved integrating the scores seamlessly into the database.  
 
-   - Compiled English-to-Turkish translation data from a publicly available GitHub repository.
-   - Imported WordNet data and used it to generate a **sense table**, linking words to their respective senses for semantic analysis.
+3. **Optimization**:  
+   - Addressed performance issues in SQL queries fetching related posts by adding indexes to database tables, significantly improving query execution times.  
 
-2. **Word Scores Integration**:
+#### API Contributions  
+1. **Endpoints Implementation**:  
+   - **Search Endpoint**:  
+     - Developed an endpoint to handle semantic search requests. This involved linking categories and synonyms from the database to provide more accurate and meaningful results.  
 
-   - Incorporated word scores into the English table. These scores were based on word usage frequency data provided by **Deniz** and **Süleyman**. My role involved integrating the scores seamlessly into the database.
-
-3. **Optimization**:
-   - Addressed performance issues in SQL queries fetching related posts by adding indexes to database tables, significantly improving query execution times.
-
-#### API Contributions
-
-1. **Endpoints Implementation**:
-
-   - **Search Endpoint**:
-
-     - Developed an endpoint to handle semantic search requests. This involved linking categories and synonyms from the database to provide more accurate and meaningful results.
-
-   - **Related Posts Endpoint**:
-
-     - Implemented an endpoint for fetching posts related to a given post. To enhance its performance:
-       - Optimized slow SQL queries with additional indexing.
+   - **Related Posts Endpoint**:  
+     - Implemented an endpoint for fetching posts related to a given post. To enhance its performance:  
+       - Optimized slow SQL queries with additional indexing.  
        - Introduced a caching mechanism to reduce response times from ~10 seconds to significantly faster subsequent executions.
-     - The query takes the post id as a parameter and returns the related posts.
+     - The query takes the post id as a parameter and returns the related posts. 
+        - **GET `/api/posts/{postId}/relatedPosts`**:
+        - Example Response:
+        ```json
+        [
+            {
+                "id": 5,
+                "username": "a",
+                "title": "An apple a day keeps the doctor away.",
+                "content": "I was wondering what does \"an apple a day keeps the doctor away\" mean?",
+                "tags": [
+                    "apple"
+                ],
+                "noUpvote": 1,
+                "noReplies": 3,
+                "createdAt": "2024-11-25T17:00:02.000+00:00",
+                "updatedAt": "2024-11-25T17:00:02.000+00:00"
+            },
+            {
+                "id": 16,
+                "username": "arinc",
+                "title": "Journey, Trip, Voyage",
+                "content": "I’m confused about the word 'journey.' How is it different from 'trip' or 'voyage'?",
+                "tags": [
+                    "journey",
+                    "trip",
+                    "voyage"
+                ],
+                "noUpvote": 1,
+                "noReplies": 1,
+                "createdAt": "2024-11-26T12:43:55.000+00:00",
+                "updatedAt": "2024-11-26T12:43:55.000+00:00"
+            }
+        ]
 
-       - **GET `/api/posts/{postId}/relatedPosts`**:
-       - Example Response:
-
-       ```json
-       [
-         {
-           "id": 5,
-           "username": "a",
-           "title": "An apple a day keeps the doctor away.",
-           "content": "I was wondering what does \"an apple a day keeps the doctor away\" mean?",
-           "tags": ["apple"],
-           "noUpvote": 1,
-           "noReplies": 3,
-           "createdAt": "2024-11-25T17:00:02.000+00:00",
-           "updatedAt": "2024-11-25T17:00:02.000+00:00"
-         },
-         {
-           "id": 16,
-           "username": "arinc",
-           "title": "Journey, Trip, Voyage",
-           "content": "I’m confused about the word 'journey.' How is it different from 'trip' or 'voyage'?",
-           "tags": ["journey", "trip", "voyage"],
-           "noUpvote": 1,
-           "noReplies": 1,
-           "createdAt": "2024-11-26T12:43:55.000+00:00",
-           "updatedAt": "2024-11-26T12:43:55.000+00:00"
-         }
-       ]
-       ```
-
+        ```
      - Here is the SQL query that I used to fetch related posts:
-
      ```sql
         SELECT fp.*
         FROM (
             SELECT post_id, MIN(query_order) AS query_order, MAX(max_category_id) AS max_category_id
             FROM (
-                SELECT
-                    post_id,
-                    1 AS query_order,
+                SELECT 
+                    post_id, 
+                    1 AS query_order, 
                     NULL AS max_category_id
                 FROM post_tags
                 WHERE english_id IN (
@@ -753,9 +749,9 @@ As a member of the backend team, my primary contributions in this milestone revo
                 )
                 AND post_id != :postId
                 UNION ALL
-                SELECT
-                    post_id,
-                    2 AS query_order,
+                SELECT 
+                    post_id, 
+                    2 AS query_order, 
                     NULL AS max_category_id
                 FROM post_tags
                 WHERE english_id IN (
@@ -789,27 +785,24 @@ As a member of the backend team, my primary contributions in this milestone revo
         ORDER BY related_posts.query_order ASC, related_posts.max_category_id DESC, related_posts.post_id DESC;
      ```
 
-   - **Feed Endpoint**:
-     - Created an endpoint that returns posts ordered by their creation timestamps.
+   - **Feed Endpoint**:  
+     - Created an endpoint that returns posts ordered by their creation timestamps.  
 
-2. **Pagination**:
-   - Implemented pagination across all the endpoints mentioned above to reduce response sizes and avoid redundant posts in responses.
+2. **Pagination**:  
+   - Implemented pagination across all the endpoints mentioned above to reduce response sizes and avoid redundant posts in responses.  
 
-### Challenges Overcome
-
-- Collaborated effectively with **Deniz** and **Süleyman** to integrate complex datasets and ensure accurate representation in the database.
-- Tackled and resolved slow query execution issues through indexing and caching.
-- Ensured efficient API performance by designing scalable and responsive database interactions.
+### Challenges Overcome  
+- Collaborated effectively with **Deniz** and **Süleyman** to integrate complex datasets and ensure accurate representation in the database.  
+- Tackled and resolved slow query execution issues through indexing and caching.  
+- Ensured efficient API performance by designing scalable and responsive database interactions.  
 
 These contributions significantly enhanced our application's backend functionality, ensuring smooth performance and improved user experience.
 
 #### Code-related significant issues
-
 - [#383](https://github.com/bounswe/bounswe2024group5/issues/383): Integrate WordNet Data and Scoring into Database
 - [#390](https://github.com/bounswe/bounswe2024group5/issues/390): Implement Search and Related Posts Endpoints
 
 #### Reviewed/Merged
-
 - [#444](https://github.com/bounswe/bounswe2024group5/pull/444)
 - [#443](https://github.com/bounswe/bounswe2024group5/pull/443)
 - [#441](https://github.com/bounswe/bounswe2024group5/pull/441)
@@ -818,15 +811,14 @@ These contributions significantly enhanced our application's backend functionali
 - [#386](https://github.com/bounswe/bounswe2024group5/pull/386)
 - [#373](https://github.com/bounswe/bounswe2024group5/pull/373)
 
-#### Pull Requests:
 
+#### Pull Requests:
 - [#410](https://github.com/bounswe/bounswe2024group5/pull/410): Add search endpoints to api doc
 - [#407](https://github.com/bounswe/bounswe2024group5/pull/407): Implement Semantic Search
-- [#382](https://github.com/bounswe/bounswe2024group5/pull/382):
-  Add word senses and scores to database
+- [#382](https://github.com/bounswe/bounswe2024group5/pull/382): 
+Add word senses and scores to database
 
 #### Additional Information
-
 I also deployed the application to the cloud before the customer presentation. After the deployment, I also tested the application and addressed the issues that occured after the deployment.
 
 ## 5.5 [ÖZGÜR DENİZ DEMİR](https://github.com/bounswe/bounswe2024group5/wiki/%C3%96zg%C3%BCr-Deniz-Demir)
@@ -852,64 +844,65 @@ I integrated forum related API endpoints to the forum page. Two important one ar
 1. Related Posts Endpoint: This endpoints returns posts that are related to the post currently displayed. It helps users discover similar posts on the same topic.
 
 - **GET `/api/posts/{postId}/relatedPosts`**:
-
 ```typescript
 export const useFetchRelatedPosts = (postId: number | null) => {
-  const TOKEN = sessionStorage.getItem("token");
-  const hostUrl = useContext(HostContext);
+    const TOKEN = sessionStorage.getItem('token');
+    const hostUrl = useContext(HostContext);
 
-  return useQuery({
-    queryKey: ["related-posts", postId],
-    queryFn: async () => {
-      if (postId === null) return null;
-      const response = await fetch(`${hostUrl}/api/posts/${postId}/related`, {
-        headers: {
-          Authorization: `Bearer ${TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch replies!");
-      }
-      const body = await response.json();
-      return body as ForumPost[];
-    },
-  });
-};
+    return useQuery({
+        queryKey: ['related-posts', postId],
+        queryFn: async () => {
+            if (postId === null) return null;
+            const response = await fetch(`${hostUrl}/api/posts/${postId}/related`, {
+                headers: {
+					'Authorization': `Bearer ${TOKEN}`,
+					'Content-Type': 'application/json'
+				}
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch replies!');
+            }
+            const body = await response.json();
+            return body as ForumPost[];
+        }
+    });
+}
 
 // Response
 [
-  {
-    id: 15,
-    username: "arinc",
-    title: "Ambition and Hope",
-    content:
-      "Can someone explain the difference between 'ambition' and 'hope'? They both seem to involve wanting something in the future.",
-    tags: ["ambition", "hope"],
-    noUpvote: 1,
-    noReplies: 1,
-    createdAt: "2024-11-26T12:42:43.000+00:00",
-    updatedAt: "2024-11-26T12:42:43.000+00:00",
-  },
-  {
-    id: 8,
-    username: "ebrar",
-    title: "The usage of “fight” vs. “battle” etc.",
-    content:
-      'Hi everyone! 😊\nI\'m curious about the word "fight" and its synonyms. For example, when should I use "fight" instead of words like "battle," "struggle," or "quarrel"? Are they interchangeable, or do they have specific contexts? I also wonder if "fight" always means something physical or if it can describe emotional or verbal conflicts too.\n\nCould you share examples of how these words are used in daily conversations or in writing? Thank you! 🙏',
-    tags: ["fight", "battle"],
-    noUpvote: 0,
-    noReplies: 0,
-    createdAt: "2024-11-26T11:11:51.000+00:00",
-    updatedAt: "2024-11-26T11:11:51.000+00:00",
-  },
-];
+    {
+        "id": 15,
+        "username": "arinc",
+        "title": "Ambition and Hope",
+        "content": "Can someone explain the difference between 'ambition' and 'hope'? They both seem to involve wanting something in the future.",
+        "tags": [
+            "ambition",
+            "hope"
+        ],
+        "noUpvote": 1,
+        "noReplies": 1,
+        "createdAt": "2024-11-26T12:42:43.000+00:00",
+        "updatedAt": "2024-11-26T12:42:43.000+00:00"
+    },
+    {
+        "id": 8,
+        "username": "ebrar",
+        "title": "The usage of “fight” vs. “battle” etc.",
+        "content": "Hi everyone! 😊\nI'm curious about the word \"fight\" and its synonyms. For example, when should I use \"fight\" instead of words like \"battle,\" \"struggle,\" or \"quarrel\"? Are they interchangeable, or do they have specific contexts? I also wonder if \"fight\" always means something physical or if it can describe emotional or verbal conflicts too.\n\nCould you share examples of how these words are used in daily conversations or in writing? Thank you! 🙏",
+        "tags": [
+            "fight",
+            "battle"
+        ],
+        "noUpvote": 0,
+        "noReplies": 0,
+        "createdAt": "2024-11-26T11:11:51.000+00:00",
+        "updatedAt": "2024-11-26T11:11:51.000+00:00"
+    }
+]
 ```
-
 2. Get posts that are related to a certain word. We used this endpoint to fetch posts that are related to the words in the quiz solving page. This helps user read posts about words that confuses them without leaving the quiz solving page.
 
 - **GET `/api/posts?tag=<word>`**:
-
 ```typescript
 
 export const useFetchPosts = (params?: { username?: string; tag?: string }) => {
@@ -977,23 +970,23 @@ export const useFetchPosts = (params?: { username?: string; tag?: string }) => {
 
 #### Code-related significant issues
 
-- [#345](https://github.com/bounswe/bounswe2024group5/issues/345): Implement forum frontend
-- [#438](https://github.com/bounswe/bounswe2024group5/issues/438): Integrate forum into quiz solving page
-- [#448](https://github.com/bounswe/bounswe2024group5/issues/448): Forum search
+* [#345](https://github.com/bounswe/bounswe2024group5/issues/345): Implement forum frontend 
+* [#438](https://github.com/bounswe/bounswe2024group5/issues/438): Integrate forum into quiz solving page
+* [#448](https://github.com/bounswe/bounswe2024group5/issues/448): Forum search
 
 #### Management Related Significant Issues
 
-- [#379](https://github.com/bounswe/bounswe2024group5/issues/379): Document the user experience decisions made in the previous lab.
+* [#379](https://github.com/bounswe/bounswe2024group5/issues/379): Document the user experience decisions made in the previous lab.
 
 #### Pull Requests:
 
-- [346](https://github.com/bounswe/bounswe2024group5/pull/346): implement forum
-- [406](https://github.com/bounswe/bounswe2024group5/pull/406): enable cors
-- [418](https://github.com/bounswe/bounswe2024group5/pull/418): save username to session storage
-- [447](https://github.com/bounswe/bounswe2024group5/pull/447): integrate forum to quiz solving page
-- [451](https://github.com/bounswe/bounswe2024group5/pull/451): implement forum search
-- [454](https://github.com/bounswe/bounswe2024group5/pull/454): related posts
-- [457](https://github.com/bounswe/bounswe2024group5/pull/457): fix reply error
+* [346](https://github.com/bounswe/bounswe2024group5/pull/346): implement forum
+* [406](https://github.com/bounswe/bounswe2024group5/pull/406): enable cors
+* [418](https://github.com/bounswe/bounswe2024group5/pull/418): save username to session storage
+* [447](https://github.com/bounswe/bounswe2024group5/pull/447): integrate forum to quiz solving page
+* [451](https://github.com/bounswe/bounswe2024group5/pull/451): implement forum search
+* [454](https://github.com/bounswe/bounswe2024group5/pull/454): related posts
+* [457](https://github.com/bounswe/bounswe2024group5/pull/457): fix reply error
 
 #### Additional Information
 
@@ -1009,36 +1002,146 @@ Mobile Development
 
 I collaborated with Arınç and Ebrar during lab sessions to implement a word validity check. This feature ensures users enter valid words by verifying their input against a predefined dictionary, providing a smoother and more reliable interaction with the app.
 
-A significant part of my work focused on improving the mobile user interface to align more closely with the web application. I addressed discrepancies to enhance consistency and usability, creating a unified look and feel.
+A significant part of my work focused on improving the mobile user interface to align more closely with the web application. I addressed discrepancies to enhance consistency and usability, creating a unified look and feel. 
 
 In addition, I took charge of the development of mobile profile and profile settings pages. This involved not only designing and implementing the pages but also integrating API calls that enabled full functionality, such as user data retrieval and updates.
 
 Furthermore, I worked extensively on the forum page, implementing crucial API calls to manage features like post details, comments, and upvotes. This added interactivity to the forum, allowing users to engage meaningfully within the platform. These contributions were delivered through pull requests that also addressed bugs and improved the reliability of the home and forum screens.
 
-###API Contributions
+### API Contributions
 
-least 1 complex API endpoint you have developed if you worked as a back-end
-developer, or at least 1 complex API endpoint you have used if you worked as a
-front-end / mobile developer. Example call and response should be provided.
-Document here in what context / scenario the specific API endpoint is used in the
-project.
+One of my API contribution is implementing the `GET /autocomplete` endpoint for the mobile application. This endpoint is integral to the word validity check functionality, enabling users to receive real-time word suggestions as they type. This feature provides a list of up to five valid words that start with the prefix entered by the user, improving input accuracy and the overall user experience.
 
-### Code-related Significant Issues
+#### **`GET /autocomplete` endpoint**  
+The backend integration for this endpoint was implemented in the word validity check feature. Below is an example call to this endpoint:
 
-- Add Domain-Specific Check to the Mobile, for Ensuring the Users Enter Valid Words [#349](https://github.com/bounswe/bounswe2024group5/issues/349)
-- Increase Similarity between Mobile and Web UI [#355](https://github.com/bounswe/bounswe2024group5/issues/355)
-- Finalize Mobile Profile Pages for Milestone, add API Calls etc. [#360](https://github.com/bounswe/bounswe2024group5/issues/360)
-- Initialize Profile and Profile Settings Page for Mobile [#361](https://github.com/bounswe/bounswe2024group5/issues/361)
-- Add Mobile API Calls for Forum Page, Post Details, Comments and Upvotes [#423](https://github.com/bounswe/bounswe2024group5/issues/423)
+```javascript
+const fetchSuggestions = async () => {
+  setIsFetchingSuggestions(true);
+  try {
+    const response = await fetch(
+      `${hostUrl}/api/autocomplete?prefix=${encodeURIComponent(currentTerm)}&language=english`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`, // Include the token
+        },
+      }
+    );
+
+    const contentType = response.headers.get("content-type");
+
+    if (response.ok && contentType && contentType.includes("application/json")) {
+      const data = await response.json();
+      setSuggestions(data);
+    } else if (response.status === 401) {
+      console.log(`Unauthorized: ${response.status}.`);
+      Alert.alert("Unauthorized", "Your session has expired. Please log in again.");
+      setSuggestions([]);
+      setShowSuggestions(false);
+    } else {
+      const text = await response.text();
+      console.warn(`Unexpected response format: ${text}`);
+      setSuggestions([]);
+    }
+  } catch (error) {
+    console.error("Error fetching autocomplete suggestions:", error);
+    setSuggestions([]);
+  } finally {
+    setIsFetchingSuggestions(false);
+  }
+};
+
+```
+
+The endpoint responds with a JSON array of up to five words matching the prefix provided in the query parameters. For instance, if the prefix is "ca" and the language is "english," the response would be:
+
+```json
+[
+  "car",
+  "care",
+  "carry",
+  "carrier",
+  "cat"
+]
+```
+
+Also, one my other implementation is the integration for the `PUT /profile/me` endpoint in the mobile application, enabling users to update their profile settings. This functionality allows users to edit their name, email, and profile picture directly within the app. 
+
+#### **`PUT /profile/me` endpoint**  
+This endpoint is used to send updated user information to the server. Below is an example call to this endpoint:
+
+```javascript
+const response = await fetch(`${hostUrl}/api/profile/me`, {
+  method: "PUT",
+  headers: {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    name: name,
+    email: email,
+    profilePicture: uploadedProfilePictureUrl,
+  }),
+});
+
+if (response.ok) {
+  // Assuming the server returns JSON on successful update
+  const data = await response.json();
+  Alert.alert("Success", "Profile updated successfully.", [
+    {
+      text: "OK",
+      onPress: () => {
+        // Navigate back and trigger profile refresh
+        navigation.goBack();
+      },
+    },
+  ]);
+} else {
+  // Handle non-200 responses
+  let errorMessage = "Failed to update profile.";
+  try {
+    const errorData = await response.json();
+    errorMessage = errorData.message || errorMessage;
+  } catch (err) {
+    const errorText = await response.text();
+    console.error("Server Response:", errorText);
+    errorMessage = `Failed to update profile. Server responded with status ${response.status}.`;
+  }
+  Alert.alert("Error", errorMessage);
+}
+```
+
+The server responds with a JSON object confirming the updated profile information. For example, a successful response might look like this:
+
+```json
+{
+  "message": "Profile updated successfully",
+  "data": {
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "profilePicture": "https://example.com/uploads/profile-pic.jpg"
+  }
+}
+```
+
+### Code-related Significant Issues 
+
+* Add Domain-Specific Check to the Mobile, for Ensuring the Users Enter Valid Words [#349](https://github.com/bounswe/bounswe2024group5/issues/349) 
+* Increase Similarity between Mobile and Web UI [#355](https://github.com/bounswe/bounswe2024group5/issues/355) 
+* Finalize Mobile Profile Pages for Milestone, add API Calls etc. [#360](https://github.com/bounswe/bounswe2024group5/issues/360) 
+* Initialize Profile and Profile Settings Page for Mobile [#361](https://github.com/bounswe/bounswe2024group5/issues/361) 
+* Add Mobile API Calls for Forum Page, Post Details, Comments and Upvotes [#423](https://github.com/bounswe/bounswe2024group5/issues/423)
 
 ### Management-related Significant Issues
 
-No Issue.
+* Mobile App Fixes && Missing API calls  [#411](https://github.com/bounswe/bounswe2024group5/issues/411)
+
 
 ### Pull Requests
-
-- Created Adding mobile api calls for Profile and Forum Page, enhancing forum Page: [#426](https://github.com/bounswe/bounswe2024group5/pull/426)
-- Initialize mobile Profile and Profile Settings Pages, fixing bugs in Home and Forum Screen: [#362](https://github.com/bounswe/bounswe2024group5/pull/362)
+* Created Adding mobile api calls for Profile and Forum Page, enhancing forum Page: [#426](https://github.com/bounswe/bounswe2024group5/pull/426)
+* Initialize mobile Profile and Profile Settings Pages, fixing bugs in Home and Forum Screen: [#362](https://github.com/bounswe/bounswe2024group5/pull/362) 
 
 I faced no conflicts in my Pull Requests.
 
@@ -1073,14 +1176,12 @@ Finally, I wrote unit tests for autocomplete, wordchecker controllers and favori
 Apart from these, I tried to make the biggest contribution I could to the development of our application by coming to all labs and staying in constant communication with my friends via teams and whatsapp. Finally, I was one of the main writer of this report.
 
 ### API Contributions
-
 As I mentioned above, I wrote the file-upload, autocomplete, favoriteQuiz, favoriteQuestion, difficulty algorithm and scoring system that we thought were very necessary for our application.
 
 #### 1. File upload:
-
 We let user to upload any image and GIF to quizzes and their profile pictures.
 
-```java
+```java 
 //Controller:
 @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
@@ -1101,26 +1202,22 @@ public String uploadFile(MultipartFile file) throws IOException {
         return String.format("https://storage.googleapis.com/%s/%s", bucketName, fileName);
     }
 ```
-
 Fail response:
-
 ```json
+
 {
-  "path": "/file/upload",
-  "error": "Unauthorized",
-  "message": "Full authentication is required to access this resource",
-  "status": 401
+    "path": "/file/upload",
+    "error": "Unauthorized",
+    "message": "Full authentication is required to access this resource",
+    "status": 401
 }
 ```
-
 Successful response:
-
 ```json
 "https://storage.googleapis.com/quizzard-bucket/dcebfb60-f928-48c1-94a2-4c3cbad85080-example.png"
 ```
 
 #### 2. Auto-complete:
-
 ```java
 //Controller:
 @GetMapping
@@ -1142,7 +1239,7 @@ Successful response:
 @Query("SELECT e.word FROM English e WHERE e.word LIKE :prefix% AND e.score != 2000 ORDER BY e.score LIMIT 10")
     List<String> findTop5ByWordStartingWith(@Param("prefix") String prefix);
 @Query(value = """
-    SELECT word
+    SELECT word 
     FROM (
         SELECT t.word, MIN(e.score) AS score
         FROM turkish t
@@ -1159,25 +1256,24 @@ Successful response:
             nativeQuery = true)
     List<String> findTop5ByWordStartingWith(@Param("prefix") String prefix);
 ```
-
 Responses (for prefix "ne"):
-
 ```json
+
 [
-  "new",
-  "need",
-  "never",
-  "next",
-  "news",
-  "needs",
-  "near",
-  "network",
-  "nearly",
-  "necessary"
+    "new",
+    "need",
+    "never",
+    "next",
+    "news",
+    "needs",
+    "near",
+    "network",
+    "nearly",
+    "necessary"
 ]
 ```
-
 #### 3. FavoriteQuiz:
+
 
 ```java
 //Controller for Post /favorite-quiz
@@ -1216,17 +1312,16 @@ public FavoriteQuizResponse addFavoriteQuiz(String jwtToken, FavoriteQuizRequest
 //Repository:
 Optional<FavoriteQuiz> findByUserIdAndQuizId(Long userId, Long quizId);
 ```
-
 Request:
-
 ```json
+
 {
   "quizId": "2"
 }
 ```
 
-Failed responses:
 
+Failed responses:
 ```json
 {
     "path": "/favorite-quiz",
@@ -1239,17 +1334,15 @@ Failed responses:
 ```
 
 Successful responses:
-
 ```json
 {
-  "id": 2,
-  "userId": 7,
-  "quizId": 2,
-  "createdAt": "2024-11-29T17:24:03.650+00:00",
-  "updatedAt": "2024-11-29T17:24:03.650+00:00"
+    "id": 2,
+    "userId": 7,
+    "quizId": 2,
+    "createdAt": "2024-11-29T17:24:03.650+00:00",
+    "updatedAt": "2024-11-29T17:24:03.650+00:00"
 }
 ```
-
 ### Code related significant issues
 
 - [#424](https://github.com/bounswe/bounswe2024group5/issues/424): Revise for autocomplete
@@ -1281,33 +1374,31 @@ Successful responses:
 - [#363](https://github.com/bounswe/bounswe2024group5/pull/363): Implemented question answers backend
 - [#357](https://github.com/bounswe/bounswe2024group5/pull/357): Implement quiz attempts backend
 
+
 # 6. Deliverables
 
 ## 6.1 Project Repository
-
 You can access our project [repository](https://github.com/bounswe/bounswe2024group5).
 
 ## 6.2 RAM (Responsibility Assignment Matrix)
-
-You can access our project RAM [wiki](<https://github.com/bounswe/bounswe2024group5/wiki/RAM-(Responsibility-Assignment-Matrix)>).
+You can access our project RAM [wiki](https://github.com/bounswe/bounswe2024group5/wiki/RAM-(Responsibility-Assignment-Matrix)).
 
 ## 6.3 A pre-release Version of our Software
-
 You can access the customer-milestone-2 [release](https://github.com/bounswe/bounswe2024group5/releases/tag/customer-milestone-2).
 
 ## 6.4 UX Design
 
 With the focus of domain specificity, we did some changes to our UX design, some of them including:
 
-- When user tries to input a word both in the forum post creation and quiz creation, we provide them with the suggestions of english words with a dropdown. With this, even the users with low english word knowledge can type in their target words.
+* When user tries to input a word both in the forum post creation and quiz creation, we provide them with the suggestions of english words with a dropdown. With this, even the users with low english word knowledge can type in their target words.
 
-- We've implemented quiz progression tracking, which allows the users keep solving quizzes where they left off. So they don't have to type in the words they've already studied.
+* We've implemented quiz progression tracking, which allows the users keep solving quizzes where they left off. So they don't have to type in the words they've already studied.
 
-- Users can see the quizzes other players have solved, which enables users to learn about new and high quality quizzes.
+* Users can see the quizzes other players have solved, which enables users to learn about new and high quality quizzes.
 
-- While solving quizzes, users can see the related posts for that word, which enables them to learn about the word at instant if they would like to have some guidance.
+* While solving quizzes, users can see the related posts for that word, which enables them to learn about the word at instant if they would like to have some guidance.
 
-- Within a forum post, users can see related posts, which enables them to access other resources and knowledge easier with fewer clicks.
+* Within a forum post, users can see related posts, which enables them to access other resources and knowledge easier with fewer clicks.
 
 ## 6.5 Utilized Standards
 
@@ -1320,49 +1411,42 @@ Examples
 - **role="main"**: Describes the main content area of the page for screen readers.
 
 ```html
-<main role="main" aria-label="Quiz listing page"></main>
+<main role="main" aria-label="Quiz listing page">
 ```
 
 - **aria-label** for buttons and links
 
 ```html
-<link to="/add-quiz" aria-label="Create a new quiz" />
+<Link to="/add-quiz" aria-label="Create a new quiz">
 ```
 
 - **aria-labelledby** for section headings
-
 ```html
 <section aria-labelledby="all-quizzes-section">
   <h2 id="all-quizzes-section">All Quizzes</h2>
-</section>
 ```
 
 - **aria-label** for interactive components
-
 ```html
 <select
   aria-label="Filter quizzes by difficulty level"
-  aria-description="Filter quizzes by learning difficulty: beginner, intermediate, or advanced"
-></select>
+  aria-description="Filter quizzes by learning difficulty: beginner, intermediate, or advanced">
 ```
 
 - **aria-label** for dynamic quiz listings
-
 ```html
-<div
-  role="listitem"
-  aria-label="Educational quiz: Advanced Math - Advanced level quiz"
-></div>
+<div role="listitem" aria-label="Educational quiz: Advanced Math - Advanced level quiz">
 ```
 
 - **aria-label** for search input
-
 ```html
-<input aria-label="Search quizzes" role="searchbox" />
+<input
+  aria-label="Search quizzes"
+  role="searchbox"
+/>
 ```
 
 - **aria-label** for pagination
-
 ```html
 <div aria-label="Quiz pagination">
   <Pagination aria-label="Page 1 of 10" />
@@ -1370,24 +1454,23 @@ Examples
 ```
 
 ## 6.6 API Documentation
-
 API documentation provides detailed information on how to interact with our system's endpoints. We have included a few examples below, and you can access the full API documentation [here](https://editor.swagger.io/?url=https://raw.githubusercontent.com/bounswe/bounswe2024group5/refs/heads/main/doc/api-design.yml).
+ 
 
 ### 6.6.1 Post /auth/login
 
-- Example schema:
-
+- Example schema:  
   - ![image](https://github.com/user-attachments/assets/01d62a30-6697-48f4-892d-c59b1a86584c)
 
+
 - Responses:
-
-  - 200:
-
+  - 200: 
     - ![image](https://github.com/user-attachments/assets/7cf9145e-7e62-420e-9e09-ff7dafcf22b9)
+
 
   - 401:
     - ![image](https://github.com/user-attachments/assets/d1e98b17-0bbe-4151-aa8d-1445487c664d)
-
+  
 ### 6.6.2 Get /autocomplete?prefix={prefix}&language={language}
 
 - Example schema:
@@ -1395,11 +1478,9 @@ API documentation provides detailed information on how to interact with our syst
   - ![image](https://github.com/user-attachments/assets/c8349a7a-5b62-438a-8163-d5a12d8c0c90)
 
 - Responses:
-
   - 200:
-
     - ![image](https://github.com/user-attachments/assets/6a69dc51-9867-48d1-a5cd-d8b0dd60fc43)
-
+  
   - 400:
     - ![image](https://github.com/user-attachments/assets/cea09acb-0ba3-4e6d-9574-82ff1342050b)
 
@@ -1413,6 +1494,8 @@ API documentation provides detailed information on how to interact with our syst
   - 200:
     - ![image](https://github.com/user-attachments/assets/1538c099-530a-4736-ba8c-1d5920f7eb4c)
 
+
+
 ### 6.6.4 Delete /quiz-attempts/{id}
 
 - Example schema:
@@ -1424,6 +1507,8 @@ API documentation provides detailed information on how to interact with our syst
   - ![image](https://github.com/user-attachments/assets/d09777e7-6bab-44d4-b227-b2e37a67d33d)
 
 Note that the delete request does not expect a response.
+
+
 
 # 7. Testing
 
@@ -1443,7 +1528,6 @@ Note that the delete request does not expect a response.
 ### Backend (Spring)
 
 1. **Coverage Goals**
-
    - Service Layer: 80% coverage
    - Controller Layer: 80% coverage
    - Repository Layer: 70% coverage
@@ -1457,14 +1541,12 @@ Note that the delete request does not expect a response.
 ### Frontend (React)
 
 1. **Unit Testing**
-
    - Components testing
    - Hooks testing
    - Utility functions
    - State management
 
 2. **Integration Testing**
-
    - React Router navigation
    - API integration
    - Form submissions
@@ -1479,12 +1561,10 @@ Note that the delete request does not expect a response.
 ### Mobile Application Testing (React Native)
 
 1. **Coverage Goals**
-
    - Unit Testing: 75% coverage
    - Integration Testing: 75% coverage
 
 2. **Testing Areas**
-
    - **Unit Testing**
      - Components testing
      - Native module integration
@@ -1497,7 +1577,6 @@ Note that the delete request does not expect a response.
      - Data persistence
 
 3. **Quality Metrics**
-
    - Code coverage: 75%
    - App size and performance
    - Device compatibility
@@ -1505,7 +1584,6 @@ Note that the delete request does not expect a response.
    - Battery efficiency testing
 
 4. **End-to-End Testing**
-
    - Critical user flows:
      - User registration and login
      - Profile updates
@@ -1517,21 +1595,21 @@ Note that the delete request does not expect a response.
 
 </details>
 
+
 ## 7.2 Unit Tests
 
-### 7.2.1 Backend
-
+### 7.2.1 Backend 
 <details>
 <summary>Report</summary>
 
-#### 7.2.1.1 Test Execution Summary
 
+#### 7.2.1.1 Test Execution Summary
 - Total Test Files: 13 file (3 controllers and 10 services)
 - Total Tests: 76 passed (88% pass rate)
 - Execution Time: 3.256s
 
-#### 7.2.1.2 Test Distribution
 
+#### 7.2.1.2 Test Distribution
 - AutoCompleteTest.java: 1 test (passed)
 - PostControllerTest.java: 1 test (fail)
 - WordCheckerTest.java: 5 tests (5 passed)
@@ -1547,18 +1625,14 @@ Note that the delete request does not expect a response.
 - UserServiceTest.java: 6 tests (6 passed)
 
 #### 7.2.1.3 Coverage Analysis
-
 Overall Coverage:
-
 - Classes: 40% (31/77)
 - Methods: 27% (70/257)
 - Lines: 39% (393/987)
 - Branches: 27% (123/451)
 
 Notable Coverage:
-
 - controller
-
   - Classes: 7% (1/13)
   - Methods: 1% (1/54)
   - Lines: 6% (9/144)
@@ -1571,19 +1645,17 @@ Notable Coverage:
   - Branches: 48% (112/233)
 
 #### 7.2.1.4 Next Steps
-
 1. Create tests for untested components
 2. Get %100 rate for tests
 3. Improve coverage of services and controllers
 </details>
 
 ### 7.2.2 Frontend
-
 <details>
 <summary>Report</summary>
 
-#### 7.2.2.1 Test Execution Summary
 
+#### 7.2.2.1 Test Execution Summary
 - Total Test Files: 5 passed
 - Total Tests: 32 passed (100% pass rate)
 - Execution Time: 3.23s
@@ -1595,7 +1667,6 @@ Notable Coverage:
   - Preparation: 585ms
 
 #### 7.2.2.2 Test Distribution
-
 - `add-quiz-page.test.tsx`: 4 tests
 - `list-quiz-page.test.tsx`: 6 tests
 - `profile-page.test.tsx`: 9 tests
@@ -1603,30 +1674,27 @@ Notable Coverage:
 - `components/forum/CreatePost.test.tsx`: 1 test
 
 #### 7.2.2.3 Coverage Analysis
-
 Overall Coverage:
-
 - Statements: 4.94%
 - Branches: 4.65%
 - Functions: 6.17%
 - Lines: 5.08%
 
 Notable Coverage:
-
 - CreatePost.tsx (forum component) shows good coverage:
   - Statements: 83.92%
   - Branches: 71.87%
   - Functions: 80%
   - Lines: 85.18%
 
-#### 7.2.2.4 Issues
 
+#### 7.2.2.4 Issues
 - React 18 compatibility warnings present
 - Deprecated ReactDOM.render usage detected
 - ReactDOMTestUtils.act deprecation warnings
 
-#### 7.2.2.5 Next Steps
 
+#### 7.2.2.5 Next Steps
 1. Create test plan for untested components
 2. Update deprecated test methods
 3. Improve coverage of critical user paths
@@ -1634,12 +1702,10 @@ Notable Coverage:
 </details>
 
 ### 7.2.3 Mobile
-
 <details>
 <summary>Report</summary>
 
 #### 7.2.3.1 Test Execution Summary
-
 - **Total Test Files:** 1
 - **Total Test Suites:** 1
   - **Passed:** 0
@@ -1649,26 +1715,23 @@ Notable Coverage:
   - **Failed:** 3
 - **Execution Time:** 0.977s
 
-#### 7.2.3.2 Test Distribution
 
+#### 7.2.3.2 Test Distribution
 - `ProfileSettingsScreen.test.js`: 3 tests
   - `successfully updates the profile without changing the profile picture`
   - `successfully updates the profile with changing the profile picture`
   - `handles API failure when updating the profile`
 
 #### 7.2.3.3 Coverage Analysis
-
 Overall Coverage:
+- Statements: *Data not available*
+- Branches: *Data not available*
+- Functions: *Data not available*
+- Lines: *Data not available*
 
-- Statements: _Data not available_
-- Branches: _Data not available_
-- Functions: _Data not available_
-- Lines: _Data not available_
-
-_Note: Coverage data is unavailable due to test failures._
+*Note: Coverage data is unavailable due to test failures.*
 
 #### 7.2.3.4 Issues
-
 - **Test Failures:**
   - All test cases in `ProfileSettingsScreen.test.js` are failing.
   - **Error Summary:**
@@ -1682,7 +1745,6 @@ _Note: Coverage data is unavailable due to test failures._
   - Missing or outdated dependencies may contribute to test failures.
 
 #### 7.2.3.5 Next Steps
-
 1. **Investigate Test Failures:**
    - Review error logs to identify the root causes of the test failures.
    - Ensure all necessary dependencies and mocks are correctly configured.
@@ -1699,6 +1761,6 @@ _Note: Coverage data is unavailable due to test failures._
 
 </details>
 
-# Main Authors
 
+# Main Authors
 [Deniz](https://github.com/bounswe/bounswe2024group5/wiki/%C3%96zg%C3%BCr-Deniz-Demir), [Ebrar](https://github.com/bounswe/bounswe2024group5/wiki/Asude-Ebrar-K%C4%B1z%C4%B1lo%C4%9Flu), [Semih](https://github.com/bounswe/bounswe2024group5/wiki/Semih-Y%C4%B1lmaz), [Süleyman](https://github.com/bounswe/bounswe2024group5/wiki/S%C3%BCleyman-Emir-Ta%C5%9Fan)
