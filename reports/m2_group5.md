@@ -1155,6 +1155,89 @@ Generally I take the APK builds. For this milestone's final apk build, I led the
 
 ## 5.7 [SEMİH YILMAZ](https://github.com/bounswe/bounswe2024group5/wiki/Semih-Y%C4%B1lmaz)
 
+### Responsibilities
+
+Backend Development, API Documentor, Database Designer
+
+### Main Contributions
+
+My main responsibility was to develop backend endpoints. I developed endpoint sets of quizzes, quiz-attempts, question-answers, forum posts, forum upvotes and forum replies, user profile and answer suggestion. I documented the API for them. Also designed the databse to handle their operations. I helped client side teams to integrate API endpoints. Also I was responsible to maintain RAM.
+
+### API Contributions
+
+I developed most of the endpoints in the [API document](https://editor.swagger.io/?url=https://raw.githubusercontent.com/bounswe/bounswe2024group5/refs/heads/main/doc/api-design.yml)
+
+The categories quizzes, quiz-attempts, question-answers, forum posts, forum upvotes and forum replies, user profile have been developed and documented by me. So I just document one of them in here. You can refer to there to see others.
+
+
+* POST /api/quiz-attemps  
+Creates a new quiz attempt for a user if they don't have an incomplete attemp. Returns the existing one otherwise.
+    * request
+    ```
+    {
+    "quizId": 5
+    }
+    ```
+   
+    * response:
+    ```
+    {
+    "id": 0,
+    "userId": 0,
+    "quizId": 0,
+    "score": 0,
+    "completed": true,
+    "completedAt": "2024-11-29T18:54:11.475Z",
+    "updatedAt": "2024-11-29T18:54:11.475Z"
+    }
+    ```
+
+
+
+### Code-related significant issues
+
+- [#356](https://github.com/bounswe/bounswe2024group5/issues/356): Implement Quiz Attempts Backend [PR #357](https://github.com/bounswe/bounswe2024group5/pull/357)
+- [#358](https://github.com/bounswe/bounswe2024group5/issues/358): Implement Question Answers Backend  [PR #363](https://github.com/bounswe/bounswe2024group5/pull/363)
+- [#369](https://github.com/bounswe/bounswe2024group5/issues/369): Implement Forum Post Backend  [PR #381](https://github.com/bounswe/bounswe2024group5/pull/381)
+- [#380](https://github.com/bounswe/bounswe2024group5/issues/380): Implement Forum Post Upvotes and Replies [PR #381](https://github.com/bounswe/bounswe2024group5/pull/381)
+- [#384](https://github.com/bounswe/bounswe2024group5/issues/384): Implement Backend for User Profile [PR #386](https://github.com/bounswe/bounswe2024group5/pull/386)
+- [#385](https://github.com/bounswe/bounswe2024group5/issues/385): Enhance Backend for Quizzes and Questions [PR #399](https://github.com/bounswe/bounswe2024group5/pull/399)
+- [#393](https://github.com/bounswe/bounswe2024group5/issues/393): Update Forum Post Endpoints [PR #394](https://github.com/bounswe/bounswe2024group5/pull/394)
+- [#397](https://github.com/bounswe/bounswe2024group5/issues/397): Resolve Registration Problem [PR #398](https://github.com/bounswe/bounswe2024group5/pull/398)
+- [#427](https://github.com/bounswe/bounswe2024group5/issues/427): Implement Correct Answer Suggestion Endpoint [PR #428](https://github.com/bounswe/bounswe2024group5/pull/428)
+- [#430](https://github.com/bounswe/bounswe2024group5/issues/430):  Add Unit Tests for Backend [PR #444](https://github.com/bounswe/bounswe2024group5/pull/444)
+
+
+
+### Management-related significant issues
+
+- [#361](https://github.com/bounswe/bounswe2024group5/issues/461): Update [RAM](https://github.com/bounswe/bounswe2024group5/wiki/RAM-(Responsibility-Assignment-Matrix))
+
+
+### Pull Requests
+
+#### Created
+
+- [#357](https://github.com/bounswe/bounswe2024group5/pull/357): Implemented quiz attempts backend endpoints. Users can attempt a quiz and continue solving it later. They can submit their attempt any time they want. They can only have one incomplete attempt for each quiz. There is no restriction for complete ones.
+- [#363](https://github.com/bounswe/bounswe2024group5/pull/363): Implemented question answers backend endpoints. They enables users to answer quiz questions.
+- [#381](https://github.com/bounswe/bounswe2024group5/pull/381): I implemented forum posts CRUD endpoints. Also implemented upvoting logic and its endpoints. And finally coded forum post reply endpoints. API documentation has also been updated.
+- [#386](https://github.com/bounswe/bounswe2024group5/pull/386): Implemented backend for user profile. GET profile/me, GET profile/{username}, PUT profile/me
+- [#394](https://github.com/bounswe/bounswe2024group5/pull/394): Changed the filters of GET /posts endpoint from userId to username.
+- [#398](https://github.com/bounswe/bounswe2024group5/pull/398): Resolved the registration problem caused by not null constraint on user table.
+- [#399](https://github.com/bounswe/bounswe2024group5/pull/399): Integrated difficulty score of words to questions and hence quizzes.
+Also I re-implemented word-checker endpoint with turkish words.
+- [#421](https://github.com/bounswe/bounswe2024group5/pull/421): API update for /quizzes endpoints
+- [#428](https://github.com/bounswe/bounswe2024group5/pull/428): Implemented correct answer suggestion endpoint. It suggests correct answers for 3 different type of questions.
+- [#429](https://github.com/bounswe/bounswe2024group5/pull/429): Small API correction
+- [#441](https://github.com/bounswe/bounswe2024group5/pull/441): Revised the response of the PUT quiz-attempts/{id} endpoint so that it returns the score gained from the quiz.
+- [#444](https://github.com/bounswe/bounswe2024group5/pull/444): Added unit tests.
+
+
+
+#### Reviewed/Merged
+
+time did not permit to mention :(
+
 ## 5.8 [SÜLEYMAN EMİR TAŞAN](https://github.com/bounswe/bounswe2024group5/wiki/S%C3%BCleyman-Emir-Ta%C5%9Fan)
 
 ### Responsibilities
