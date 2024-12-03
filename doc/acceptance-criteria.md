@@ -49,13 +49,24 @@ See the section [below](#API-and-its-documentation) for more details into the AP
 
 Here, we list 4 domain-specific points we implement. We implemented the first 3 points and plan to implement the last one in the future:
 - [x] Quiz creationg question type: has to follow structure 
-- [x] Quiz creation word check
+- [ ] Quiz creation word check
 - [x] Tag constraint in the Forum posts
 - [ ] Bad word detection in the Forum posts
 
-### 1. 
+### 1.Quiz Creation Word Validity Check
+In the quiz creation, we check whether the question word is in our database. This ensures that the word entered is a valid word.
 
-### 2. 
+This is domain spesific because checking whether a question exists in our database is not a generic software feature. This is useful for our case of an English learning app to ensure the consistency and quality of the quiz content.
+
+The check for the input word was created in [this commit](https://github.com/bounswe/bounswe2024group5/commit/11ad2b427ad7c388fca06962819dc54d636202dc#diff-7382e3f108e33645a6c54363d5acf961175bc16a396a4e48b4da24e0c7a7042c). However, we did not connect this function yet to the other parts of the program. We want to add a 2 second delay after a character is entered to check whether a word is valid or not. We will finish the implementation before the final milestone.
+
+
+### 2. Quiz Creation Question Type
+In the quiz creation, we enforce the user to select one of the three question types: English => Turkish, Turkish => English and English => English Meaning.
+
+This is domain spesific because limiting the questions with types is not a generic software feature. This ensures that the type of questions in our English learning app are consistent. 
+
+We implemented the final version of the dropdown component in [this commit](https://github.com/bounswe/bounswe2024group5/commit/5df744898da7e640ad53353883b1dc6cfcefe8c0).
 
 ### 3. Tag Constraint in the Forum Post Creation 
 
@@ -82,9 +93,11 @@ If the entered tag words are not valid English words that do not exist in our da
 * Backend code: [PostService](https://github.com/bounswe/bounswe2024group5/blob/93bcb460b4407cafb2cb025e1beaef5701c1b323/backend/src/main/java/com/quizzard/quizzard/service/PostService.java#L4)
 * Mobile usage of this endpoint: [CreateQuizScreen](https://github.com/bounswe/bounswe2024group5/blob/93bcb460b4407cafb2cb025e1beaef5701c1b323/mobile/Quizzard/screens/CreateQuestionScreen.tsx#L55-L69).
 
+
 ### 4. Bad Word Detection in the Forum Post Creation
 
 In addition to the tags restriction above, we plan to implement additional checks to monitor the user's input in the forum posts creation. We plan to implement a bad word detector endpoint to detect any kind of vulgarism and offensive content to ensure the data safety and user trust in our application. This feature is planned to be implemented in the next and final milestone.
+
 
 ## API and its documentation
 
@@ -94,7 +107,7 @@ Some of the PRs which updated the API docs:
 * [PR #410](https://github.com/bounswe/bounswe2024group5/pull/410)
 * [PR #422](https://github.com/bounswe/bounswe2024group5/pull/422)
 
-We implemented the following endpoints, (we only need to add 40* responses to the API documentation for some features):
+Our team has developed a robust and well-documented API that covers crucial endpoints with precision and clarity. Our ongoing documentation updates show our commitment to high-quality, sustainable software development practices. We implemented the following endpoints, (we only need to add 40* responses to the API documentation for some features):
 
 - [x] **GET** /quizzes
 - [x] **POST** /quizzes
@@ -209,11 +222,11 @@ Successful response example:
 4. The use of ARIA roles, states, and properties is clearly documented in the project's API or component documentation.
 * The documentation has a section dedicated to explaining ARIA standard and how it's used in our application.
 
-## Testing strategies
+## Testing strategies (e.g. unit test coverage, integration testing, tools)
 
 
 
-### Table of Contents
+## Table of Contents
 
 - [Unit Testing](#unit-testing)
 - [Integration Testing](#integration-testing)
@@ -243,12 +256,6 @@ Ensure that individual components and functions operate correctly in isolation.
   - **Example:**
     - Leaving the email field empty should display: "Email is required."
 
-- [ ] **Password Strength Validation**
-  - **Acceptance Criteria:**
-    - Passwords must meet minimum security requirements (e.g., minimum length, inclusion of special characters).
-    - Weak passwords should be rejected with a clear message.
-  - **Example:**
-    - Entering "password" should trigger: "Password must be at least 8 characters long and include a special character."
 
 ### **2. Authentication**
 
@@ -291,12 +298,6 @@ Ensure that individual components and functions operate correctly in isolation.
   - **Example:**
     - Creating a quiz titled "Basic Vocabulary" with 5 valid questions should successfully save the quiz.
 
-- [ ] **Question Association**
-  - **Acceptance Criteria:**
-    - Questions are correctly linked to their respective quizzes.
-    - Deleting a quiz should also remove its associated questions.
-  - **Example:**
-    - Deleting the "Basic Vocabulary" quiz should remove all its 5 questions from the database.
 
 - [ ] **Scoring Algorithms**
   - **Acceptance Criteria:**
@@ -321,21 +322,123 @@ Ensure that individual components and functions operate correctly in isolation.
   - **Example:**
     - Replying to the above post should display the reply under the original post.
 
+- [ ] **Upvote Forum Posts**
+  - **Acceptance Criteria:**
+    - Users can upvate existing forum posts.
+    - Upvotes are calculated correctly.
+  - **Example:**
+    - Upvoting a post with 2 upvotes increases the upvote to 3.
+
 ### **6. Search Functionality**
 
-- [ ] **Word Search with Linked Data Integration**
+- [ ] **Word Search with Autocomplete**
   - **Acceptance Criteria:**
-    - Users can search for words and receive comprehensive results including definitions, translations, synonyms, antonyms, and example usages.
-    - The search leverages linked data sources for enriched information.
-  - **Example:**
-    - Searching for "run" should display its definitions, translations, synonyms like "sprint," and example sentences.
+    - Users can search for words and receive words including that input.
 
-- [ ] **Handling Invalid or Empty Search Queries**
-  - **Acceptance Criteria:**
-    - The system gracefully handles empty or invalid search inputs without crashing.
-    - Users receive helpful feedback or suggestions.
   - **Example:**
-    - Entering an empty search should prompt: "Please enter a word to search."
+    - Searching for "ca" should display cars, cats etc.
+
+
+---
+## **Backend**
+### **1. Account Creation & Registration**
+
+- [ ] **Unique Username Validation**
+  - **Acceptance Criteria:**
+    - The system must allow registration only if the username is unique.
+    - Attempting to register with an existing username should result in an error.
+  - **Example:**
+    - Registering with username "user123" twice should allow the first registration and reject the second with an appropriate error message.
+
+- [ ] **Input Field Validation**
+  - **Acceptance Criteria:**
+    - All mandatory fields (username, name, email, password, English proficiency level) must be validated.
+    - Invalid inputs should trigger specific error messages.
+  - **Example:**
+    - Leaving the email field empty should display: "Email is required."
+
+
+### **2. Authentication**
+
+- [ ] **Login with Valid Credentials**
+  - **Acceptance Criteria:**
+    - Users can log in using either their username or email along with the correct password.
+    - Successful login returns a valid authentication token/session.
+  - **Example:**
+    - Logging in with email "user@example.com" and password "Secure@123" should grant access.
+
+- [ ] **Login with Invalid Credentials**
+  - **Acceptance Criteria:**
+    - Incorrect username/email or password should prevent login.
+    - An appropriate error message should be displayed.
+  - **Example:**
+    - Logging in with email "user@example.com" and wrong password should display: "Invalid username/email or password."
+
+### **3. Profile Management**
+
+- [ ] **Update Profile Information**
+  - **Acceptance Criteria:**
+    - Users can update their name, email, and English proficiency level.
+    - Changes are accurately reflected in the user's profile.
+  - **Example:**
+    - Changing the name from "John Doe" to "Jane Doe" should update the profile accordingly.
+
+- [ ] **Profile Picture Upload**
+  - **Acceptance Criteria:**
+    - Users can upload and update their profile picture.
+    - The system should accept valid image formats and reject invalid ones.
+  - **Example:**
+    - Uploading a JPEG image should display it on the profile page, while uploading a TXT file should be rejected.
+
+### **4. Quiz Management**
+
+- [ ] **Quiz Creation Logic**
+  - **Acceptance Criteria:**
+    - Users can create quizzes by providing a title, description, and a set of questions.
+    - Each question must have a valid format and associated answers.
+  - **Example:**
+    - Creating a quiz titled "Basic Vocabulary" with 5 valid questions should successfully save the quiz.
+
+
+- [ ] **Scoring Algorithms**
+  - **Acceptance Criteria:**
+    - The system accurately calculates points based on quiz performance.
+    - Edge cases (e.g., all answers correct/incorrect) are handled correctly.
+  - **Example:**
+    - Completing a quiz with 4 correct answers out of 5 should award the appropriate number of points.
+
+### **5. Forum Functionality**
+
+- [ ] **Forum Post Creation**
+  - **Acceptance Criteria:**
+    - Users can create forum posts with a title and content.
+    - Posts are saved and retrievable from the database.
+  - **Example:**
+    - Creating a post titled "Difference between 'affect' and 'effect'" should make it visible in the forum list.
+
+- [ ] **Reply to Forum Posts**
+  - **Acceptance Criteria:**
+    - Users can reply to existing forum posts.
+    - Replies are correctly associated with their parent posts.
+  - **Example:**
+    - Replying to the above post should display the reply under the original post.
+
+- [ ] **Upvote Forum Posts**
+  - **Acceptance Criteria:**
+    - Users can upvate existing forum posts.
+    - Upvotes are calculated correctly.
+  - **Example:**
+    - Upvoting a post with 2 upvotes increases the upvote to 3.
+
+### **6. Search Functionality**
+
+- [ ] **Word Search with Autocomplete**
+  - **Acceptance Criteria:**
+    - Users can search for words and receive words including that input.
+
+  - **Example:**
+    - Searching for "ca" should display cars, cats etc.
+
 
 ---
 ## **Mobile**
@@ -386,6 +489,8 @@ Ensure that individual components and functions operate correctly in isolation.
     - Changes are accurately reflected in the user's profile.
   - **Example:**
     - Changing the name from "John Doe" to "Jane Doe" should update the profile accordingly.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/426/commits/d6878756f9d79ebfb86ce394730d25fb1c5020fe) commit is for this purpose, but test doesn't work properly.
 
 - [ ] **Profile Picture Upload**
   - **Acceptance Criteria:**
@@ -393,6 +498,8 @@ Ensure that individual components and functions operate correctly in isolation.
     - The system should accept valid image formats and reject invalid ones.
   - **Example:**
     - Uploading a JPEG image should display it on the profile page, while uploading a TXT file should be rejected.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/426/commits/d6878756f9d79ebfb86ce394730d25fb1c5020fe) commit is for this purpose, but test doesn't work properly.
 
 ### **4. Quiz Management**
 
@@ -433,27 +540,94 @@ Ensure that individual components and functions operate correctly in isolation.
   - **Example:**
     - Replying to the above post should display the reply under the original post.
 
+- [ ] **Upvote Forum Posts**
+  - **Acceptance Criteria:**
+    - Users can upvate existing forum posts.
+    - Upvotes are calculated correctly.
+  - **Example:**
+    - Upvoting a post with 2 upvotes increases the upvote to 3.
+
+
 ### **6. Search Functionality**
 
-- [ ] **Word Search with Linked Data Integration**
+- [ ] **Word Search with Autocomplete**
   - **Acceptance Criteria:**
-    - Users can search for words and receive comprehensive results including definitions, translations, synonyms, antonyms, and example usages.
-    - The search leverages linked data sources for enriched information.
-  - **Example:**
-    - Searching for "run" should display its definitions, translations, synonyms like "sprint," and example sentences.
+    - Users can search for words and receive words including that input.
 
-- [ ] **Handling Invalid or Empty Search Queries**
-  - **Acceptance Criteria:**
-    - The system gracefully handles empty or invalid search inputs without crashing.
-    - Users receive helpful feedback or suggestions.
   - **Example:**
-    - Entering an empty search should prompt: "Please enter a word to search."
+    - Searching for "ca" should display cars, cats etc.
 
 ---
 
-## Integration Testing
+## **Backend**
+### **1. User Registration and Login Flow**
 
-Ensure that different modules and services work together seamlessly.
+- [ ] **Complete Registration Process**
+  - **Acceptance Criteria:**
+    - Users can register with valid information and subsequently log in.
+    - Data flows correctly from frontend forms to backend storage.
+  - **Example:**
+    - A user registers with all valid details and is able to log in immediately after registration.
+
+- [ ] **Authentication Token Handling**
+  - **Acceptance Criteria:**
+    - Upon successful login, the system issues a valid token/session.
+    - Protected routes are accessible only with valid tokens.
+  - **Example:**
+    - Accessing the profile page without logging in redirects the user to the login page.
+
+### **2. Quiz Lifecycle Management**
+
+- [ ] **Quiz Creation to Availability**
+  - **Acceptance Criteria:**
+    - Created quizzes are immediately available for other users to attempt.
+    - Data consistency is maintained between quiz creation and availability.
+  - **Example:**
+    - Creating a quiz and then searching for it as another user should display the newly created quiz.
+
+- [ ] **Quiz Attempt and Scoring**
+  - **Acceptance Criteria:**
+    - Users can attempt quizzes, and their answers are recorded.
+    - Scores are calculated based on correct answers and updated in the user's profile.
+  - **Example:**
+    - Completing a quiz with 3 correct answers out of 5 should update the user's points accordingly.
+
+### **3. Forum Interaction Flow**
+
+- [ ] **Creating and Viewing Posts**
+  - **Acceptance Criteria:**
+    - Users can create posts and view them in the forum.
+    - Replies to posts are displayed correctly under their respective posts.
+  - **Example:**
+    - A user creates a post and another user replies; both should be visible in the forum thread.
+
+- [ ] **Search Integration in Forum**
+  - **Acceptance Criteria:**
+    - Searching within the forum retrieves relevant posts based on keywords or tags.
+    - Linked data sources enhance search relevance.
+  - **Example:**
+    - Searching for "grammar" in the forum should display all posts related to grammar topics.
+
+### **4. Profile and Points Synchronization**
+
+- [ ] **Profile Information Update**
+  - **Acceptance Criteria:**
+    - Updates to profile information reflect immediately across the system.
+    - Points earned from quizzes are accurately displayed in the user's profile.
+  - **Example:**
+    - After completing a quiz, the user's points increase and are visible on their profile page.
+
+### **5. Search and Data Retrieval Integration**
+
+- [ ] **End-to-End Search Functionality**
+  - **Acceptance Criteria:**
+    - Searches initiated from the frontend are processed by the backend and return accurate results.
+    - Linked data sources are queried and integrated into the search results.
+  - **Example:**
+    - Searching for "run" fetches data from both the application's database
+
+---
+
 ## **Mobile**
 ### **1. User Registration and Login Flow**
 
@@ -511,6 +685,8 @@ Ensure that different modules and services work together seamlessly.
     - Points earned from quizzes are accurately displayed in the user's profile.
   - **Example:**
     - After completing a quiz, the user's points increase and are visible on their profile page.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/426/commits/d6878756f9d79ebfb86ce394730d25fb1c5020fe) commit is for this purpose, but test doesn't work properly.
 
 ### **5. Search and Data Retrieval Integration**
 
@@ -519,11 +695,11 @@ Ensure that different modules and services work together seamlessly.
     - Searches initiated from the frontend are processed by the backend and return accurate results.
     - Linked data sources are queried and integrated into the search results.
   - **Example:**
-    - Searching for "run" fetches data from both the application's database and linked sources like Lexvo, displaying a comprehensive result.
+    - Searching for "run" fetches data from both the application's database
 
 ---
 
-
+## **Web**
 ### **1. User Registration and Login Flow**
 
 - [ ] **Complete Registration Process**
@@ -588,7 +764,7 @@ Ensure that different modules and services work together seamlessly.
     - Searches initiated from the frontend are processed by the backend and return accurate results.
     - Linked data sources are queried and integrated into the search results.
   - **Example:**
-    - Searching for "run" fetches data from both the application's database and linked sources like Lexvo, displaying a comprehensive result.
+    - Searching for "run" fetches data from both the application's database
 
 ---
 
@@ -644,3 +820,4 @@ Complementary activities to enhance overall testing effectiveness.
 
 
 ---
+
