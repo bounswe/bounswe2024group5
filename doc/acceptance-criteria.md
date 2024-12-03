@@ -96,6 +96,24 @@ Some of the PRs which updated the API docs:
 * [PR #410](https://github.com/bounswe/bounswe2024group5/pull/410)
 * [PR #422](https://github.com/bounswe/bounswe2024group5/pull/422)
 
+We only need to add 40* responses to the API documentation for some features we implemented. Here they are:
+
+- **GET** /quizzes
+- **POST** /quizzes
+- **PUT** /quizzes/{id}
+- **DELETE** /quizzes
+- **POST** /quiz-attempts
+- **GET** /quiz-attempts
+- **GET** /quiz-attempts/{id}
+- **DELETE** /quiz-attempts/{id}
+- **PUT** /quiz-attempts/{id}
+- **GET** /posts
+- **GET** /posts/{postId}/upvotes
+- **GET** /posts/upvotes
+- **GET** /posts/replies
+- **POST** /file/upload
+- **GET** /favorite-question
+
 ## Standard being followed
 
 1. Adherence to ARIA Roles and Properties
