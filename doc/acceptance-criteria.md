@@ -417,6 +417,8 @@ Ensure that individual components and functions operate correctly in isolation.
     - Changes are accurately reflected in the user's profile.
   - **Example:**
     - Changing the name from "John Doe" to "Jane Doe" should update the profile accordingly.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/426/commits/d6878756f9d79ebfb86ce394730d25fb1c5020fe) commit is for this purpose, but test doesn't work properly.
 
 - [ ] **Profile Picture Upload**
   - **Acceptance Criteria:**
@@ -424,6 +426,8 @@ Ensure that individual components and functions operate correctly in isolation.
     - The system should accept valid image formats and reject invalid ones.
   - **Example:**
     - Uploading a JPEG image should display it on the profile page, while uploading a TXT file should be rejected.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/426/commits/d6878756f9d79ebfb86ce394730d25fb1c5020fe) commit is for this purpose, but test doesn't work properly.
 
 ### **4. Quiz Management**
 
@@ -609,6 +613,8 @@ Ensure that individual components and functions operate correctly in isolation.
     - Points earned from quizzes are accurately displayed in the user's profile.
   - **Example:**
     - After completing a quiz, the user's points increase and are visible on their profile page.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/426/commits/d6878756f9d79ebfb86ce394730d25fb1c5020fe) commit is for this purpose, but test doesn't work properly.
 
 ### **5. Search and Data Retrieval Integration**
 
