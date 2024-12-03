@@ -16,7 +16,12 @@ This document outlines the acceptance criteria for the checklist items related t
 ### Semantic Search 
 We utilize semantic search in the forum related features of our app to enhance user search experience among the forum posts.
 
-...
+Firstly, we created a database containing english words, turkish words, their translation mappings and senses. The database also has the difficulty level of the words. The words are also categorized such as food, animals etc. [PR #382](https://github.com/bounswe/bounswe2024group5/pull/382)
+
+Secondly, we implemented tag based post search query. The query does not only retrieve the posts with requested tags but also others tagged by the synonym of requested tags. We utilized sql queries on our database to achieve this. Moreover, we implemented related posts endpoint which retrieves related posts given a post. [PR #407](https://github.com/bounswe/bounswe2024group5/pull/407)
+
+We also implemented feed endpoint and optimized the sql queries for semantic searches. [PR #432](https://github.com/bounswe/bounswe2024group5/pull/432)
+
 
 ### User Management
 
