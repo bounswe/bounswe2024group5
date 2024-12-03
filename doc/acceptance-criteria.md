@@ -23,9 +23,9 @@ Secondly, we implemented tag based post search query. The query does not only re
 We also implemented feed endpoint and optimized the sql queries for semantic searches. [PR #432](https://github.com/bounswe/bounswe2024group5/pull/432)
 
 ##### Related Works:
-- [PR #382](https://github.com/bounswe/bounswe2024group5/pull/382) - database
-- [PR #407](https://github.com/bounswe/bounswe2024group5/pull/407) - search
-- [PR #432](https://github.com/bounswe/bounswe2024group5/pull/432) - semantic search
+- [PR #382 - database creation](https://github.com/bounswe/bounswe2024group5/pull/382) 
+- [PR #407 - post search / related posts](https://github.com/bounswe/bounswe2024group5/pull/407)
+- [PR #432 - feed](https://github.com/bounswe/bounswe2024group5/pull/432) 
 
 ### User Management
 
@@ -579,6 +579,7 @@ Ensure that individual components and functions operate correctly in isolation.
     - Searching for "ca" should display cars, cats etc.
 
 ---
+## Integration Testing
 
 ## **Backend**
 ### **1. User Registration and Login Flow**
