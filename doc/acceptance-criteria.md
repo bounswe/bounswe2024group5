@@ -51,6 +51,12 @@ In addition to the tags restriction above, we plan to implement additional check
 
 ## API and its documentation (e.g. endpoints, expected inputs, outputs)
 
+We updated the API docs regularly along with the updates of the backend.  
+Some of the PRs which updated the API docs:
+* [PR #381](https://github.com/bounswe/bounswe2024group5/pull/381)
+* [PR #410](https://github.com/bounswe/bounswe2024group5/pull/410)
+* [PR #422](https://github.com/bounswe/bounswe2024group5/pull/422)
+
 ## Standard(s) being followed
 
 1. Adherence to ARIA Roles and Properties
