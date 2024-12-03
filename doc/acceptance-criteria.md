@@ -356,20 +356,22 @@ Ensure that individual components and functions operate correctly in isolation.
 ## **Backend**
 ### **1. Account Creation & Registration**
 
-- [ ] **Unique Username Validation**
+- [x] **Unique Username Validation**
   - **Acceptance Criteria:**
     - The system must allow registration only if the username is unique.
     - Attempting to register with an existing username should result in an error.
   - **Example:**
     - Registering with username "user123" twice should allow the first registration and reject the second with an appropriate error message.
-
-- [ ] **Input Field Validation**
+  - **Related Work:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/444) PR implements the unique username validation.
+- [x] **Input Field Validation**
   - **Acceptance Criteria:**
     - All mandatory fields (username, name, email, password, English proficiency level) must be validated.
     - Invalid inputs should trigger specific error messages.
   - **Example:**
     - Leaving the email field empty should display: "Email is required."
-
+  - **Related Work:**
+  - [This](https://github.com/bounswe/bounswe2024group5/pull/444) PR implements the input field validation.
 
 ### **2. Authentication**
 
@@ -389,13 +391,14 @@ Ensure that individual components and functions operate correctly in isolation.
 
 ### **3. Profile Management**
 
-- [ ] **Update Profile Information**
+- [X] **Update Profile Information**
   - **Acceptance Criteria:**
     - Users can update their name, email, and English proficiency level.
     - Changes are accurately reflected in the user's profile.
   - **Example:**
     - Changing the name from "John Doe" to "Jane Doe" should update the profile accordingly.
-
+  - **Related Work:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/444) PR implements the update profile information.
 - [ ] **Profile Picture Upload**
   - **Acceptance Criteria:**
     - Users can upload and update their profile picture.
@@ -405,44 +408,49 @@ Ensure that individual components and functions operate correctly in isolation.
 
 ### **4. Quiz Management**
 
-- [ ] **Quiz Creation Logic**
+- [X] **Quiz Creation Logic**
   - **Acceptance Criteria:**
     - Users can create quizzes by providing a title, description, and a set of questions.
     - Each question must have a valid format and associated answers.
   - **Example:**
     - Creating a quiz titled "Basic Vocabulary" with 5 valid questions should successfully save the quiz.
+  - **Related Work:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/444) PR implements the quiz creation logic.
 
-
-- [ ] **Scoring Algorithms**
+- [X] **Scoring Algorithms**
   - **Acceptance Criteria:**
     - The system accurately calculates points based on quiz performance.
     - Edge cases (e.g., all answers correct/incorrect) are handled correctly.
   - **Example:**
     - Completing a quiz with 4 correct answers out of 5 should award the appropriate number of points.
-
+- **Related Work:**
+  - [This](https://github.com/bounswe/bounswe2024group5/pull/444) PR implements the scoring algorithms.
 ### **5. Forum Functionality**
 
-- [ ] **Forum Post Creation**
+- [X] **Forum Post Creation**
   - **Acceptance Criteria:**
     - Users can create forum posts with a title and content.
     - Posts are saved and retrievable from the database.
   - **Example:**
     - Creating a post titled "Difference between 'affect' and 'effect'" should make it visible in the forum list.
-
-- [ ] **Reply to Forum Posts**
+  - **Related Work:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/444) PR implements the forum post creation.
+- [X] **Reply to Forum Posts**
   - **Acceptance Criteria:**
     - Users can reply to existing forum posts.
     - Replies are correctly associated with their parent posts.
   - **Example:**
     - Replying to the above post should display the reply under the original post.
-
-- [ ] **Upvote Forum Posts**
+  - **Related Work:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/444) PR implements the reply to forum posts.
+- [X] **Upvote Forum Posts**
   - **Acceptance Criteria:**
     - Users can upvate existing forum posts.
     - Upvotes are calculated correctly.
   - **Example:**
     - Upvoting a post with 2 upvotes increases the upvote to 3.
-
+  - **Related Work:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/444) PR implements the upvote forum posts.
 ### **6. Search Functionality**
 
 - [ ] **Word Search with Autocomplete**
