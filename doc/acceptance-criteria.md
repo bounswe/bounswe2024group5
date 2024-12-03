@@ -11,7 +11,7 @@ This document outlines the acceptance criteria for the checklist items related t
 5. [Testing strategies](#Testing-strategies)
 
 
-## Primary features (e.g. semantic search, user management)
+## Primary features
 
 ### Semantic Search 
 We utilize semantic search in the forum related features of our app to enhance user search experience among the forum posts.
@@ -25,26 +25,24 @@ We utilize semantic search in the forum related features of our app to enhance u
 
 - [x] Users can register with valid credentials (e.g., email and password).
 - [x] Users can log in and log out securely.
-- [x] Passwords are hashed securely.
-
-#### Database Integration:
-
-User data is stored securely in the database with appropriate schema design.
-
-....
+- [x] Passwords are hashed securely in the database.
+- [x] Utilize JWT Token for authentication.
 
 #### API Endpoints:
 
 See the section [below](#API-and-its-documentation) for more details into the API implementation. In terms of user management, we implemented the following endpoints:
-- POST /auth/register - Register a user.
-- POST /auth/login - Login with an exitsing user details.
-- GET /profile/:username - Fetch a user’s details with its username.
-- GET /profile/me - Fetch the authenticated user's profile
-- PUT /profile/me - Update the authenticated user's profile
-- DELETE /users/:id - Deactivate or delete a user.
+
+- [x] POST `/auth/register` - Register a user.
+- [x] POST `/auth/login` - Login with an exitsing user details.
+- [x] GET `/profile/:username` - Fetch a user’s details with its username.
+- [x] GET `/profile/me` - Fetch the authenticated user's profile
+- [x] PUT `/profile/me` - Update the authenticated user's profile
 
 ##### Related Works:
-- 
+- Issue [#288](https://github.com/bounswe/bounswe2024group5/issues/288)
+- PR [#301](https://github.com/bounswe/bounswe2024group5/pull/301)
+- Issue [#384](https://github.com/bounswe/bounswe2024group5/issues/384)
+- PR [#386](https://github.com/bounswe/bounswe2024group5/pull/386)
 
 
 ## Domain-specific features
@@ -90,9 +88,9 @@ If the entered tag words are not valid English words that do not exist in our da
 
 #### Related Work:
 
-* [Issue #369](https://github.com/bounswe/bounswe2024group5/issues/369)
-* [PR #381](https://github.com/bounswe/bounswe2024group5/pull/381)
-* [Post Service Backend implementation](https://github.com/bounswe/bounswe2024group5/blob/93bcb460b4407cafb2cb025e1beaef5701c1b323/backend/src/main/java/com/quizzard/quizzard/service/PostService.java#L4)
+* Issue [#369](https://github.com/bounswe/bounswe2024group5/issues/369)
+* PR [#381](https://github.com/bounswe/bounswe2024group5/pull/381)
+* Backend code: [PostService](https://github.com/bounswe/bounswe2024group5/blob/93bcb460b4407cafb2cb025e1beaef5701c1b323/backend/src/main/java/com/quizzard/quizzard/service/PostService.java#L4)
 * Mobile usage of this endpoint: [CreateQuizScreen](https://github.com/bounswe/bounswe2024group5/blob/93bcb460b4407cafb2cb025e1beaef5701c1b323/mobile/Quizzard/screens/CreateQuestionScreen.tsx#L55-L69).
 
 
@@ -101,33 +99,107 @@ If the entered tag words are not valid English words that do not exist in our da
 In addition to the tags restriction above, we plan to implement additional checks to monitor the user's input in the forum posts creation. We plan to implement a bad word detector endpoint to detect any kind of vulgarism and offensive content to ensure the data safety and user trust in our application. This feature is planned to be implemented in the next and final milestone.
 
 
-## API and its documentation (e.g. endpoints, expected inputs, outputs)
+## API and its documentation
 
-We updated the API docs regularly along with the updates of the backend.  
+We updated the API docs regularly along with the updates of the backend. Access the doc [here](https://editor.swagger.io/?url=https://raw.githubusercontent.com/bounswe/bounswe2024group5/refs/heads/main/doc/api-design.yml).
 Some of the PRs which updated the API docs:
 * [PR #381](https://github.com/bounswe/bounswe2024group5/pull/381)
 * [PR #410](https://github.com/bounswe/bounswe2024group5/pull/410)
 * [PR #422](https://github.com/bounswe/bounswe2024group5/pull/422)
 
-We only need to add 40* responses to the API documentation for some features we implemented. Here they are:
+Our team has developed a robust and well-documented API that covers crucial endpoints with precision and clarity. Our ongoing documentation updates show our commitment to high-quality, sustainable software development practices. We implemented the following endpoints, (we only need to add 40* responses to the API documentation for some features):
 
-- **GET** /quizzes
-- **POST** /quizzes
-- **PUT** /quizzes/{id}
-- **DELETE** /quizzes
-- **POST** /quiz-attempts
-- **GET** /quiz-attempts
-- **GET** /quiz-attempts/{id}
-- **DELETE** /quiz-attempts/{id}
-- **PUT** /quiz-attempts/{id}
-- **GET** /posts
-- **GET** /posts/{postId}/upvotes
-- **GET** /posts/upvotes
-- **GET** /posts/replies
-- **POST** /file/upload
-- **GET** /favorite-question
+- [x] **GET** /quizzes
+- [x] **POST** /quizzes
+- [x] **PUT** /quizzes/{id}
+- [x] **DELETE** /quizzes
+- [x] **POST** /quiz-attempts
+- [x] **GET** /quiz-attempts
+- [x] **GET** /quiz-attempts/{id}
+- [x] **DELETE** /quiz-attempts/{id}
+- [x] **PUT** /quiz-attempts/{id}
+- [x] **GET** /posts
+- [x] **GET** /posts/{postId}/upvotes
+- [x] **GET** /posts/upvotes
+- [x] **GET** /posts/replies
+- [x] **POST** /file/upload
+- [x] **GET** /favorite-question
 
-Our team has developed a robust and well-documented API that covers crucial endpoints with precision and clarity. Our ongoing documentation updates show our commitment to high-quality, sustainable software development practices.
+### Some Expected Input and Output Examples
+
+#### 1. GET `/posts/{postId}/replies`
+Request body example:
+```json
+{
+  "postId": 3
+}
+```
+
+Successful response example:
+```json
+[
+  {
+    "id": 0,
+    "postId": 3,
+    "username": "string",
+    "content": "string",
+    "createdAt": "2024-12-03T13:35:26.509Z",
+    "updatedAt": "2024-12-03T13:35:26.509Z"
+  }
+]
+```
+
+#### 2. POST `/question-answers`
+Request body example:
+```json
+{
+  "quizAttemptId": 0,
+  "questionId": 0,
+  "answer": "string"
+}
+```
+
+Successful response example:
+```json
+{
+  "id": 0,
+  "quizAttemptId": 0,
+  "questionId": 0,
+  "answer": "string",
+  "isCorrect": true,
+  "updatedAt": "2024-12-03T13:38:12.380Z"
+}
+```
+
+#### 3. PUT `/posts/{postId}`
+Request body example:
+```json
+{
+  "title": "Sample Title",
+  "content": "This is a sample post content.",
+  "tags": [
+    "fast"
+  ]
+}
+```
+
+Successful response example:
+```json
+{
+  "id": 0,
+  "username": "string",
+  "title": "string",
+  "content": "string",
+  "tags": [
+    "fast"
+  ],
+  "noUpvote": 0,
+  "noReplies": 0,
+  "createdAt": "2024-12-03T13:39:00.141Z",
+  "updatedAt": "2024-12-03T13:39:00.141Z"
+}
+```
+
 
 ## Standard being followed
 
@@ -760,9 +832,4 @@ Complementary activities to enhance overall testing effectiveness.
 
 
 ---
-
-
-
-
-## Main Authors
 
