@@ -5,18 +5,17 @@
 
 ## Domain-specific features (e.g. why they're specific, how they're implemented)
 
-Here, we list 4 domain-specific points we implement. We implemented the first 3 points and plan to implement the last one in the future.
-
+Here, we list 4 domain-specific points we implement. We implemented the first 3 points and plan to implement the last one in the future:
 - [x] Quiz creationg question type: has to follow structure 
 - [x] Quiz creation word check
-- [x] Tag Constraint in the Forum posts
+- [x] Tag constraint in the Forum posts
 - [ ] Bad word detection in the Forum posts
 
 ### 1. 
 
 ### 2. 
 
-### 3. Forum Post Creation 
+### 3. Tag Constraint in the Forum Post Creation 
 
 Users are required to provide tags (at least one) when creating a forum post. These tags have to be valid English words that exist in our database. This contraint help us keep the forum posts connected to our domain, by linking each post to at least one English word. Though we cannot directly monitor what users write in their forum posts, the tag requirement restricts users from creating posts that are completly unrelated to the domain of language learning.
 
@@ -35,14 +34,14 @@ We implemented (in the [PR #381](https://github.com/bounswe/bounswe2024group5/pu
 If the entered tag words are not valid English words that do not exist in our database, the endpoint responds with a `400 Bad Request` error. Hence, the user is unable to cretae posts with invalid tags. You can view the usage of this endpoint in mobile [here](https://github.com/bounswe/bounswe2024group5/blob/93bcb460b4407cafb2cb025e1beaef5701c1b323/mobile/Quizzard/screens/CreateQuestionScreen.tsx#L55-L69).
 
 
-### 4. Forum word input: block bad words. 
+### 4. Bad Word Detection in the Forum Post Creation
 
-In addition to the tags restriction above, 
+In addition to the tags restriction above, we plan to implement additional checks to monitor the user's input in the forum posts creation. We plan to implement a bad word detector endpoint to detect any kind of vulgarism and offensive content to ensure the data safety and user trust in our application. This feature is planned to be implemented in the next and final milestone.
 
 
 ## API and its documentation (e.g. endpoints, expected inputs, outputs)
 
-## Standard(s) being followed (e.g. its documentation, implementation)
+## Standard(s) being followed
 
 1. Adherence to ARIA Roles and Properties
 * All ARIA roles (role attributes) are used appropriately as per the W3C ARIA specification.
@@ -68,3 +67,4 @@ In addition to the tags restriction above,
 
 
 ## Main Authors
+
