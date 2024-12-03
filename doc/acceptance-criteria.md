@@ -182,12 +182,6 @@ Ensure that individual components and functions operate correctly in isolation.
   - **Example:**
     - Leaving the email field empty should display: "Email is required."
 
-- [ ] **Password Strength Validation**
-  - **Acceptance Criteria:**
-    - Passwords must meet minimum security requirements (e.g., minimum length, inclusion of special characters).
-    - Weak passwords should be rejected with a clear message.
-  - **Example:**
-    - Entering "password" should trigger: "Password must be at least 8 characters long and include a special character."
 
 ### **2. Authentication**
 
@@ -254,21 +248,22 @@ Ensure that individual components and functions operate correctly in isolation.
   - **Example:**
     - Replying to the above post should display the reply under the original post.
 
+- [ ] **Upvote Forum Posts**
+  - **Acceptance Criteria:**
+    - Users can upvate existing forum posts.
+    - Upvotes are calculated correctly.
+  - **Example:**
+    - Upvoting a post with 2 upvotes increases the upvote to 3.
+
 ### **6. Search Functionality**
 
-- [ ] **Word Search with Linked Data Integration**
+- [ ] **Word Search with Autocomplete**
   - **Acceptance Criteria:**
-    - Users can search for words and receive comprehensive results including definitions, translations, synonyms, antonyms, and example usages.
-    - The search leverages linked data sources for enriched information.
-  - **Example:**
-    - Searching for "run" should display its definitions, translations, synonyms like "sprint," and example sentences.
+    - Users can search for words and receive words including that input.
 
-- [ ] **Handling Invalid or Empty Search Queries**
-  - **Acceptance Criteria:**
-    - The system gracefully handles empty or invalid search inputs without crashing.
-    - Users receive helpful feedback or suggestions.
   - **Example:**
-    - Entering an empty search should prompt: "Please enter a word to search."
+    - Searching for "ca" should display cars, cats etc.
+
 
 ---
 ## **Mobile**
@@ -366,21 +361,22 @@ Ensure that individual components and functions operate correctly in isolation.
   - **Example:**
     - Replying to the above post should display the reply under the original post.
 
+- [ ] **Upvote Forum Posts**
+  - **Acceptance Criteria:**
+    - Users can upvate existing forum posts.
+    - Upvotes are calculated correctly.
+  - **Example:**
+    - Upvoting a post with 2 upvotes increases the upvote to 3.
+
+
 ### **6. Search Functionality**
 
-- [ ] **Word Search with Linked Data Integration**
+- [ ] **Word Search with Autocomplete**
   - **Acceptance Criteria:**
-    - Users can search for words and receive comprehensive results including definitions, translations, synonyms, antonyms, and example usages.
-    - The search leverages linked data sources for enriched information.
-  - **Example:**
-    - Searching for "run" should display its definitions, translations, synonyms like "sprint," and example sentences.
+    - Users can search for words and receive words including that input.
 
-- [ ] **Handling Invalid or Empty Search Queries**
-  - **Acceptance Criteria:**
-    - The system gracefully handles empty or invalid search inputs without crashing.
-    - Users receive helpful feedback or suggestions.
   - **Example:**
-    - Entering an empty search should prompt: "Please enter a word to search."
+    - Searching for "ca" should display cars, cats etc.
 
 ---
 
@@ -452,11 +448,12 @@ Ensure that different modules and services work together seamlessly.
     - Searches initiated from the frontend are processed by the backend and return accurate results.
     - Linked data sources are queried and integrated into the search results.
   - **Example:**
-    - Searching for "run" fetches data from both the application's database and linked sources like Lexvo, displaying a comprehensive result.
+    - Searching for "run" fetches data from both the application's database
 
 ---
 
 
+## **Web**
 ### **1. User Registration and Login Flow**
 
 - [ ] **Complete Registration Process**
@@ -521,7 +518,7 @@ Ensure that different modules and services work together seamlessly.
     - Searches initiated from the frontend are processed by the backend and return accurate results.
     - Linked data sources are queried and integrated into the search results.
   - **Example:**
-    - Searching for "run" fetches data from both the application's database and linked sources like Lexvo, displaying a comprehensive result.
+    - Searching for "run" fetches data from both the application's database
 
 ---
 
