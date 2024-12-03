@@ -21,31 +21,31 @@ We utilize semantic search in the forum related features of our app to enhance u
 ### User Management
 
 
-User Account Functionality:
+#### User Account Functionality:
 
-Users can register with valid credentials (e.g., email and password).
-Users can log in and log out securely.
-Passwords are hashed securely (e.g., using bcrypt or a similar library).
-Users can reset forgotten passwords via a token-based email workflow.
-Role-Based Access Control (RBAC):
+- [x] Users can register with valid credentials (e.g., email and password).
+- [x] Users can log in and log out securely.
+- [x] Passwords are hashed securely.
 
-Users can be assigned roles (e.g., admin, regular user).
-Admin users can manage other user accounts (e.g., view, update, or deactivate users).
-Regular users have restricted access to their own data only.
-Data Validation and Error Handling:
+#### Database Integration:
 
-Form submissions are validated (e.g., proper email format, strong password criteria).
-Errors (e.g., duplicate email during registration) are handled gracefully with user-friendly messages.
-Database Integration:
+User data is stored securely in the database with appropriate schema design.
 
-User data is stored securely in the database with appropriate schema design (e.g., unique identifiers for users).
-API Endpoints (if applicable):
+....
 
-Endpoints for all CRUD operations:
-POST /users - Create a user.
-GET /users/:id - Fetch a user’s details.
-PUT /users/:id - Update user details.
-DELETE /users/:id - Deactivate or delete a user.
+#### API Endpoints:
+
+See the section [below](#API-and-its-documentation) for more details into the API implementation. In terms of user management, we implemented the following endpoints:
+- POST /auth/register - Register a user.
+- POST /auth/login - Login with an exitsing user details.
+- GET /profile/:username - Fetch a user’s details with its username.
+- GET /profile/me - Fetch the authenticated user's profile
+- PUT /profile/me - Update the authenticated user's profile
+- DELETE /users/:id - Deactivate or delete a user.
+
+##### Related Works:
+- 
+
 
 ## Domain-specific features
 
