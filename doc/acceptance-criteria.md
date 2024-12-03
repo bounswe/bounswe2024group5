@@ -219,12 +219,14 @@ Ensure that individual components and functions operate correctly in isolation.
 
 ### **4. Quiz Management**
 
-- [ ] **Quiz Creation Logic**
+- [x] **Quiz Creation Logic**
   - **Acceptance Criteria:**
     - Users can create quizzes by providing a title, description, and a set of questions.
     - Each question must have a valid format and associated answers.
   - **Example:**
     - Creating a quiz titled "Basic Vocabulary" with 5 valid questions should successfully save the quiz.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/453) PR is for this purpose
 
 
 - [ ] **Scoring Algorithms**
@@ -236,12 +238,14 @@ Ensure that individual components and functions operate correctly in isolation.
 
 ### **5. Forum Functionality**
 
-- [ ] **Forum Post Creation**
+- [x] **Forum Post Creation**
   - **Acceptance Criteria:**
     - Users can create forum posts with a title and content.
     - Posts are saved and retrievable from the database.
   - **Example:**
     - Creating a post titled "Difference between 'affect' and 'effect'" should make it visible in the forum list.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/453) PR is for this purpose
 
 - [ ] **Reply to Forum Posts**
   - **Acceptance Criteria:**
@@ -616,6 +620,8 @@ Ensure that individual components and functions operate correctly in isolation.
   - **Related Workd:**
     - [This](https://github.com/bounswe/bounswe2024group5/pull/426/commits/d6878756f9d79ebfb86ce394730d25fb1c5020fe) commit is for this purpose, but test doesn't work properly.
 
+    
+
 ### **5. Search and Data Retrieval Integration**
 
 - [ ] **End-to-End Search Functionality**
@@ -646,28 +652,34 @@ Ensure that individual components and functions operate correctly in isolation.
 
 ### **2. Quiz Lifecycle Management**
 
-- [ ] **Quiz Creation to Availability**
+- [x] **Quiz Creation to Availability**
   - **Acceptance Criteria:**
     - Created quizzes are immediately available for other users to attempt.
     - Data consistency is maintained between quiz creation and availability.
   - **Example:**
     - Creating a quiz and then searching for it as another user should display the newly created quiz.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/453) PR is for this purpose
 
-- [ ] **Quiz Attempt and Scoring**
+- [x] **Quiz Attempt and Scoring**
   - **Acceptance Criteria:**
     - Users can attempt quizzes, and their answers are recorded.
     - Scores are calculated based on correct answers and updated in the user's profile.
   - **Example:**
     - Completing a quiz with 3 correct answers out of 5 should update the user's points accordingly.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/453) PR is for this purpose, however it only covers the attemps and records, not score calculations.
 
 ### **3. Forum Interaction Flow**
 
-- [ ] **Creating and Viewing Posts**
+- [x] **Creating and Viewing Posts**
   - **Acceptance Criteria:**
     - Users can create posts and view them in the forum.
     - Replies to posts are displayed correctly under their respective posts.
   - **Example:**
     - A user creates a post and another user replies; both should be visible in the forum thread.
+  - **Related Workd:**
+    - [This](https://github.com/bounswe/bounswe2024group5/pull/453) PR is for this purpose
 
 - [ ] **Search Integration in Forum**
   - **Acceptance Criteria:**
