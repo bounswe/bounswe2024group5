@@ -127,6 +127,8 @@ We only need to add 40* responses to the API documentation for some features we 
 - **POST** /file/upload
 - **GET** /favorite-question
 
+Our team has developed a robust and well-documented API that covers crucial endpoints with precision and clarity. Our ongoing documentation updates show our commitment to high-quality, sustainable software development practices.
+
 ## Standard being followed
 
 1. Adherence to ARIA Roles and Properties
