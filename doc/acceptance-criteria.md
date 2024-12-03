@@ -231,7 +231,7 @@ Successful response example:
 4. The use of ARIA roles, states, and properties is clearly documented in the project's API or component documentation.
 * The documentation has a section dedicated to explaining ARIA standard and how it's used in our application.
 
-## Testing strategies (e.g. unit test coverage, integration testing, tools)
+## Testing strategies
 
 
 
