@@ -58,7 +58,7 @@ In the quiz creation, we check whether the question word is in our database. Thi
 
 This is domain spesific because checking whether a question exists in our database is not a generic software feature. This is useful for our case of an English learning app to ensure the consistency and quality of the quiz content.
 
-The check for the input word was created in [this commit](https://github.com/bounswe/bounswe2024group5/commit/11ad2b427ad7c388fca06962819dc54d636202dc#diff-7382e3f108e33645a6c54363d5acf961175bc16a396a4e48b4da24e0c7a7042c). However, we did not connect this function yet to the other parts of the program. We want to add a 2 second delay after a character is entered to check whether a word is valid or not. We will finish the implementation before the final milestone.
+The check for the input word was created in [this commit](https://github.com/bounswe/bounswe2024group5/commit/11ad2b427ad7c388fca06962819dc54d636202dc#diff-7382e3f108e33645a6c54363d5acf961175bc16a396a4e48b4da24e0c7a7042c). However, we did not connect this function to the other parts of the program. We wanted to add a 2 second delay after a character is entered to check whether a word is valid or not. We fixed this in [this commit](https://github.com/bounswe/bounswe2024group5/commit/8fbc8ecc940c2bdf39ba98a12e32bd4ad240cf48) but still haven't connected to the program. We will finish the implementation before the final milestone.
 
 
 ### 2. Quiz Creation Question Type
@@ -66,7 +66,7 @@ In the quiz creation, we enforce the user to select one of the three question ty
 
 This is domain spesific because limiting the questions with types is not a generic software feature. This ensures that the type of questions in our English learning app are consistent. 
 
-We implemented the final version of the dropdown component in [this commit](https://github.com/bounswe/bounswe2024group5/commit/5df744898da7e640ad53353883b1dc6cfcefe8c0).
+We implemented the final version of the dropdown component in [this commit](https://github.com/bounswe/bounswe2024group5/commit/5df744898da7e640ad53353883b1dc6cfcefe8c0). The updated dropdown component was added to the Quiz Creation Page in [this commit](https://github.com/bounswe/bounswe2024group5/commit/6870678b0beae8987b5b0140c57db0e8399deb94#diff-7382e3f108e33645a6c54363d5acf961175bc16a396a4e48b4da24e0c7a7042c).
 
 ### 3. Tag Constraint in the Forum Post Creation 
 
