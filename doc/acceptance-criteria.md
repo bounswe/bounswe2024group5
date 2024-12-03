@@ -51,7 +51,7 @@ See the section [below](#API-and-its-documentation) for more details into the AP
 
 Here, we list 4 domain-specific points we implement. We implemented the first 3 points and plan to implement the last one in the future:
 - [x] Quiz creationg question type: has to follow structure 
-- [x] Quiz creation word check
+- [ ] Quiz creation word check
 - [x] Tag constraint in the Forum posts
 - [ ] Bad word detection in the Forum posts
 
