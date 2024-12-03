@@ -20,6 +20,33 @@ We utilize semantic search in the forum related features of our app to enhance u
 
 ### User Management
 
+
+User Account Functionality:
+
+Users can register with valid credentials (e.g., email and password).
+Users can log in and log out securely.
+Passwords are hashed securely (e.g., using bcrypt or a similar library).
+Users can reset forgotten passwords via a token-based email workflow.
+Role-Based Access Control (RBAC):
+
+Users can be assigned roles (e.g., admin, regular user).
+Admin users can manage other user accounts (e.g., view, update, or deactivate users).
+Regular users have restricted access to their own data only.
+Data Validation and Error Handling:
+
+Form submissions are validated (e.g., proper email format, strong password criteria).
+Errors (e.g., duplicate email during registration) are handled gracefully with user-friendly messages.
+Database Integration:
+
+User data is stored securely in the database with appropriate schema design (e.g., unique identifiers for users).
+API Endpoints (if applicable):
+
+Endpoints for all CRUD operations:
+POST /users - Create a user.
+GET /users/:id - Fetch a user’s details.
+PUT /users/:id - Update user details.
+DELETE /users/:id - Deactivate or delete a user.
+
 ## Domain-specific features
 
 Here, we list 4 domain-specific points we implement. We implemented the first 3 points and plan to implement the last one in the future:
