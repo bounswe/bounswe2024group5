@@ -51,7 +51,7 @@ See the section [below](#API-and-its-documentation) for more details into the AP
 
 Here, we list 4 domain-specific points we implement. We implemented the first 3 points and plan to implement the last one in the future:
 - [x] Quiz creationg question type: has to follow structure 
-- [x] Quiz creation word check
+- [ ] Quiz creation word check
 - [x] Tag constraint in the Forum posts
 - [ ] Bad word detection in the Forum posts
 
@@ -60,10 +60,15 @@ In the quiz creation, we check whether the question word is in our database. Thi
 
 This is domain spesific because checking whether a question exists in our database is not a generic software feature. This is useful for our case of an English learning app to ensure the consistency and quality of the quiz content.
 
-The check for the input word was created in [this commit](https://github.com/bounswe/bounswe2024group5/commit/11ad2b427ad7c388fca06962819dc54d636202dc#diff-7382e3f108e33645a6c54363d5acf961175bc16a396a4e48b4da24e0c7a7042c). However, we did not connect this function yet to the other parts of the program. We want to add a 2 second delay after a character is entered to check whether a word is valid or not.
+The check for the input word was created in [this commit](https://github.com/bounswe/bounswe2024group5/commit/11ad2b427ad7c388fca06962819dc54d636202dc#diff-7382e3f108e33645a6c54363d5acf961175bc16a396a4e48b4da24e0c7a7042c). However, we did not connect this function yet to the other parts of the program. We want to add a 2 second delay after a character is entered to check whether a word is valid or not. We will finish the implementation before the final milestone.
 
 
-### 2. 
+### 2. Quiz Creation Question Type
+In the quiz creation, we enforce the user to select one of the three question types: English => Turkish, Turkish => English and English => English Meaning.
+
+This is domain spesific because limiting the questions with types is not a generic software feature. This ensures that the type of questions in our English learning app are consistent. 
+
+We implemented the final version of the dropdown component in [this commit](https://github.com/bounswe/bounswe2024group5/commit/5df744898da7e640ad53353883b1dc6cfcefe8c0).
 
 ### 3. Tag Constraint in the Forum Post Creation 
 
@@ -89,12 +94,7 @@ If the entered tag words are not valid English words that do not exist in our da
 * [PR #381](https://github.com/bounswe/bounswe2024group5/pull/381)
 * [Post Service Backend implementation](https://github.com/bounswe/bounswe2024group5/blob/93bcb460b4407cafb2cb025e1beaef5701c1b323/backend/src/main/java/com/quizzard/quizzard/service/PostService.java#L4)
 * Mobile usage of this endpoint: [CreateQuizScreen](https://github.com/bounswe/bounswe2024group5/blob/93bcb460b4407cafb2cb025e1beaef5701c1b323/mobile/Quizzard/screens/CreateQuestionScreen.tsx#L55-L69).
-### 4. Quiz Creation Question Type
-In the quiz creation, we enforce the user to select one of the three question types: English => Turkish, Turkish => English and English => English Meaning.
 
-This is domain spesific because limiting the questions with types is not a generic software feature. This ensures that the type of questions in our English learning app are consistent. 
-
-We implemented the final version of the dropdown component in [this commit](https://github.com/bounswe/bounswe2024group5/commit/5df744898da7e640ad53353883b1dc6cfcefe8c0).
 
 ### 4. Bad Word Detection in the Forum Post Creation
 
@@ -126,6 +126,8 @@ We only need to add 40* responses to the API documentation for some features we 
 - **GET** /posts/replies
 - **POST** /file/upload
 - **GET** /favorite-question
+
+Our team has developed a robust and well-documented API that covers crucial endpoints with precision and clarity. Our ongoing documentation updates show our commitment to high-quality, sustainable software development practices.
 
 ## Standard being followed
 
