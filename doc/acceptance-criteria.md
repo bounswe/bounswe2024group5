@@ -1,15 +1,26 @@
 # Acceptance Criteria
 
+This document outlines the acceptance criteria for the checklist items related to the development and implementation of the key features of our project, as the bounswe2024group5. The following criteria are designed to align with project goals, adhere to industry best practices, and maintain high-quality standards. We include examples, implementation details, and testing requirements to provide a comprehensive framework for validating the functionality, usability, and reliability of each component. This document serves as a reference for contributors, us, and you, the customers, throughout our project lifecycle.
+
+## Table of Contents
+
+1. [Primary features](#Primary-features)
+2. [Domain-specific features](#Domain-specific-features)
+3. [API and its documentation](#API-and-its-documentation)
+4. [Standard being followed](#Standard-being-followed)
+5. [Testing strategies](#Testing-strategies)
+
 
 ## Primary features (e.g. semantic search, user management)
 
+### Semantic Search 
 We utilize semantic search in the forum related features of our app to enhance user search experience among the forum posts.
 
 ...
 
-In tem
+### User Management
 
-## Domain-specific features (e.g. why they're specific, how they're implemented)
+## Domain-specific features
 
 Here, we list 4 domain-specific points we implement. We implemented the first 3 points and plan to implement the last one in the future:
 - [x] Quiz creationg question type: has to follow structure 
@@ -40,6 +51,8 @@ We implemented a `POST /posts` endpoint to create forum posts. The following dis
 If the entered tag words are not valid English words that do not exist in our database, the endpoint responds with a `400 Bad Request` error. Hence, the user is unable to cretae posts with invalid tags.
 
 #### Related Work:
+
+* [Issue #369](https://github.com/bounswe/bounswe2024group5/issues/369)
 * [PR #381](https://github.com/bounswe/bounswe2024group5/pull/381)
 * [Post Service Backend implementation](https://github.com/bounswe/bounswe2024group5/blob/93bcb460b4407cafb2cb025e1beaef5701c1b323/backend/src/main/java/com/quizzard/quizzard/service/PostService.java#L4)
 * Mobile usage of this endpoint: [CreateQuizScreen](https://github.com/bounswe/bounswe2024group5/blob/93bcb460b4407cafb2cb025e1beaef5701c1b323/mobile/Quizzard/screens/CreateQuestionScreen.tsx#L55-L69).
@@ -47,7 +60,6 @@ If the entered tag words are not valid English words that do not exist in our da
 ### 4. Bad Word Detection in the Forum Post Creation
 
 In addition to the tags restriction above, we plan to implement additional checks to monitor the user's input in the forum posts creation. We plan to implement a bad word detector endpoint to detect any kind of vulgarism and offensive content to ensure the data safety and user trust in our application. This feature is planned to be implemented in the next and final milestone.
-
 
 ## API and its documentation (e.g. endpoints, expected inputs, outputs)
 
@@ -57,7 +69,7 @@ Some of the PRs which updated the API docs:
 * [PR #410](https://github.com/bounswe/bounswe2024group5/pull/410)
 * [PR #422](https://github.com/bounswe/bounswe2024group5/pull/422)
 
-## Standard(s) being followed
+## Standard being followed
 
 1. Adherence to ARIA Roles and Properties
 * All ARIA roles (role attributes) are used appropriately as per the W3C ARIA specification.
@@ -78,11 +90,11 @@ Some of the PRs which updated the API docs:
 4. The use of ARIA roles, states, and properties is clearly documented in the project's API or component documentation.
 * The documentation has a section dedicated to explaining ARIA standard and how it's used in our application.
 
-## Testing strategies (e.g. unit test coverage, integration testing, tools)
+## Testing strategies
 
 
 
-## Table of Contents
+### Table of Contents
 
 - [Unit Testing](#unit-testing)
 - [Integration Testing](#integration-testing)
