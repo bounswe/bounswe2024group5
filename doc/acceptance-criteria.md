@@ -148,11 +148,11 @@ We only need to add 40* responses to the API documentation for some features we 
 4. The use of ARIA roles, states, and properties is clearly documented in the project's API or component documentation.
 * The documentation has a section dedicated to explaining ARIA standard and how it's used in our application.
 
-## Testing strategies
+## Testing strategies (e.g. unit test coverage, integration testing, tools)
 
 
 
-### Table of Contents
+## Table of Contents
 
 - [Unit Testing](#unit-testing)
 - [Integration Testing](#integration-testing)
@@ -230,12 +230,6 @@ Ensure that individual components and functions operate correctly in isolation.
   - **Example:**
     - Creating a quiz titled "Basic Vocabulary" with 5 valid questions should successfully save the quiz.
 
-- [ ] **Question Association**
-  - **Acceptance Criteria:**
-    - Questions are correctly linked to their respective quizzes.
-    - Deleting a quiz should also remove its associated questions.
-  - **Example:**
-    - Deleting the "Basic Vocabulary" quiz should remove all its 5 questions from the database.
 
 - [ ] **Scoring Algorithms**
   - **Acceptance Criteria:**
@@ -583,6 +577,7 @@ Complementary activities to enhance overall testing effectiveness.
 
 
 ---
+
 
 
 
