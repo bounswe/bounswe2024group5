@@ -1,19 +1,46 @@
+// Mock warnOnce before any other imports or mocks
+jest.mock('react-native/Libraries/Utilities/warnOnce', () => {
+  return jest.fn();
+});
+
 import 'react-native-gesture-handler/jestSetup';
 
-// Mock the entire react-native module first
+// Mock the native modules before any imports
+jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+
+// Mock Settings
+jest.mock('react-native/Libraries/Settings/Settings', () => ({
+  get: jest.fn(),
+  set: jest.fn(),
+  watchKeys: jest.fn(),
+  clearWatch: jest.fn(),
+}));
+
+// Mock Alert
+jest.mock('react-native/Libraries/Alert/Alert', () => ({
+  alert: jest.fn(),
+}));
+
+// Mock the entire react-native module
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
-  RN.NativeModules.SettingsManager = {
-    settings: {
-      AppleLocale: 'en_US',
-      AppleLanguages: ['en'],
-    },
-    getConstants: () => ({
+
+  // Mock native modules that might be missing
+  RN.NativeModules = {
+    ...RN.NativeModules,
+    SettingsManager: {
       settings: {
         AppleLocale: 'en_US',
         AppleLanguages: ['en'],
-      }
-    })
+      },
+      getConstants: () => ({
+        settings: {
+          AppleLocale: 'en_US',
+          AppleLanguages: ['en'],
+        }
+      })
+    },
   };
 
   return {
@@ -22,34 +49,18 @@ jest.mock('react-native', () => {
       ...RN.Platform,
       OS: 'ios',
       Version: 123,
-      isTesting: true,
       select: (obj) => obj.ios,
     },
-    NativeModules: {
-      ...RN.NativeModules,
-      SettingsManager: RN.NativeModules.SettingsManager,
+    Alert: {
+      ...RN.Alert,
+      alert: jest.fn(),
     },
-    Settings: {
-      get: jest.fn(() => ({})),
-      set: jest.fn(),
-      watchKeys: jest.fn(),
-      clearWatch: jest.fn(),
-    },
-    Animated: {
-      Value: jest.fn(() => ({
-        interpolate: jest.fn(),
-        setValue: jest.fn(),
-      })),
-      timing: jest.fn(() => ({
-        start: jest.fn(),
-      })),
-    },
+    // Mock deprecated components to prevent warnings
+    ProgressBarAndroid: 'ProgressBarAndroid',
+    Clipboard: 'Clipboard',
+    PushNotificationIOS: 'PushNotificationIOS',
   };
 });
-
-jest.mock('@expo/vector-icons', () => ({
-  Ionicons: '',
-}));
 
 // Mock expo-image-picker
 jest.mock('expo-image-picker', () => ({
@@ -71,17 +82,9 @@ jest.mock('expo-image-picker', () => ({
   },
 }));
 
-// Updated navigation mock with all required hooks and functions
-jest.mock('@react-navigation/native', () => ({
-  useRoute: () => ({
-    name: 'MockedScreen',
-    params: {},
-  }),
-  useNavigation: () => ({
-    navigate: jest.fn(),
-    goBack: jest.fn(),
-  }),
-  useIsFocused: () => true,
+// Mock @expo/vector-icons
+jest.mock('@expo/vector-icons', () => ({
+  Ionicons: '',
 }));
 
 // Mock AsyncStorage
@@ -91,6 +94,3 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   removeItem: jest.fn(),
   clear: jest.fn(),
 }));
-
-// Silence the warning: Animated: `useNativeDriver` is not supported
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');

@@ -8,6 +8,7 @@ interface BaseDropdownProps {
   styleOverrides: any;
   selectedValue: string;
   onValueChange: (value: string) => void;
+  testID?: string;
 }
 
 const BaseDropdown: React.FC<BaseDropdownProps> = ({
@@ -16,6 +17,7 @@ const BaseDropdown: React.FC<BaseDropdownProps> = ({
   styleOverrides,
   selectedValue,
   onValueChange,
+  testID,
 }) => {
   const [value, setValue] = useState<string | null>(selectedValue);
 
@@ -47,6 +49,7 @@ const BaseDropdown: React.FC<BaseDropdownProps> = ({
         setValue(item.value);
         onValueChange(item.value); // Notify parent of value change
       }}
+      testID={testID}
     />
   );
 };

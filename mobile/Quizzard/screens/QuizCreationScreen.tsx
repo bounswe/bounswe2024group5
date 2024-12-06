@@ -1,4 +1,4 @@
-import React, { useState, useContext} from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -7,14 +7,14 @@ import {
   StyleSheet,
   ScrollView,
   FlatList,
-  Alert
+  Alert,
 } from "react-native";
-import DropdownComponent from "../components/QuestionTypeDropdown"; 
+import DropdownComponent from "../components/QuestionTypeDropdown";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";  // Import FileSystem for base64 conversion
+import * as FileSystem from "expo-file-system"; // Import FileSystem for base64 conversion
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "./AuthProvider";
-import HostUrlContext from '../app/HostContext';
+import HostUrlContext from "../app/HostContext";
 
 const QuizCreationPage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
@@ -36,27 +36,25 @@ const QuizCreationPage = ({ navigation }) => {
     try {
       // Prepare the form data
       const formData = new FormData();
-      formData.append('file', {
+      formData.append("file", {
         uri: fileUri,
-        type: 'image/jpeg', // Adjust this based on your file type
-        name: 'upload.jpg', // You can customize the file name
+        type: "image/jpeg", // Adjust this based on your file type
+        name: "upload.jpg", // You can customize the file name
       });
-  
+
       // Make the POST request to upload the file
-      const response = await fetch(
-        `${hostUrl}/api/file/upload`,
-        {
-        method: 'POST',
+      const response = await fetch(`${hostUrl}/api/file/upload`, {
+        method: "POST",
         body: formData,
         headers: {
           Authorization: `Bearer ${token}`,
           // 'Content-Type': 'multipart/form-data',
         },
       });
-  
+
       if (response.ok) {
         const result = await response.text();
-        console.log('File uploaded successfully:', result);
+        console.log("File uploaded successfully:", result);
         return result;
       } else {
         const errorText = await response.text();
@@ -68,9 +66,13 @@ const QuizCreationPage = ({ navigation }) => {
   };
 
   const pickImageAndUpload = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
-      alert('Permission to access media library is required!');
+      Alert.alert(
+        "Permission Required",
+        "Permission to access media library is required!"
+      );
       return;
     }
 
@@ -83,12 +85,12 @@ const QuizCreationPage = ({ navigation }) => {
       setUploading(true);
       try {
         const fileUrl = await uploadFile(result.assets[0].uri);
-        console.log('Uploaded file URL:', fileUrl);
+        console.log("Uploaded file URL:", fileUrl);
         setImageUrl(fileUrl);
-        alert('File uploaded successfully!');
+        Alert.alert("Success", "File uploaded successfully!");
       } catch (error) {
-        console.error('Failed to upload file:', error);
-        alert('File upload failed. Try a smaller image.');
+        console.error("Failed to upload file:", error);
+        Alert.alert("Error", "File upload failed. Try a smaller image.");
       } finally {
         setUploading(false);
       }
@@ -97,8 +99,8 @@ const QuizCreationPage = ({ navigation }) => {
 
   const handleAddQuestion = () => {
     setQuestions([
-      ...questions, 
-      { word: "", options: { A: "", B: "", C: "", D: "" }, questionType: ""}
+      ...questions,
+      { word: "", options: { A: "", B: "", C: "", D: "" }, questionType: "" },
     ]);
     setSelectedType("");
   };
@@ -117,7 +119,11 @@ const QuizCreationPage = ({ navigation }) => {
       questionType: question.questionType,
       word: question.word,
       correctAnswer: question.options.A,
-      wrongAnswers: [question.options.B, question.options.C, question.options.D],
+      wrongAnswers: [
+        question.options.B,
+        question.options.C,
+        question.options.D,
+      ],
     }));
 
     const quizData = {
@@ -145,9 +151,7 @@ const QuizCreationPage = ({ navigation }) => {
     });
 
     console.log("Request Body:", JSON.stringify(quizData)); // Log the payload
-    const response = await fetch(
-      `${hostUrl}/api/quizzes`,
-      {
+    const response = await fetch(`${hostUrl}/api/quizzes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -191,18 +195,20 @@ const QuizCreationPage = ({ navigation }) => {
 
   // Fetch question answers
   const fetchQuestionAnswers = async (
-    word: string, 
-    type: 'english_to_turkish' | 'turkish_to_english' | 'english_to_sense', 
+    word: string,
+    type: "english_to_turkish" | "turkish_to_english" | "english_to_sense",
     token: string
   ): Promise<void> => {
     try {
-      const apiUrl = `${hostUrl}/api/question_answers?word=${encodeURIComponent(word)}&type=${type}`;
+      const apiUrl = `${hostUrl}/api/question_answers?word=${encodeURIComponent(
+        word
+      )}&type=${type}`;
       const response = await fetch(apiUrl, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
       if (response.ok) {
@@ -239,9 +245,9 @@ const QuizCreationPage = ({ navigation }) => {
           },
         }
       );
-      
+
       const data = await response.json();
-  
+
       if (!data.isValid) {
         Alert.alert("Invalid Word", "Please enter a valid word!");
       } else {
@@ -253,40 +259,43 @@ const QuizCreationPage = ({ navigation }) => {
       console.error("Error validating word:", error);
       Alert.alert("Error", "Failed to validate the word. Please try again.");
     }
-  }
+  };
 
   const handleInputChange = (index: number, word: string) => {
-      if (!selectedType) {
-        Alert.alert("Select Type", "Please select a type first.");
-        return;
-      }
+    if (!selectedType) {
+      Alert.alert("Select Type", "Please select a type first.");
+      return;
+    }
 
-      // if (checkInputTimeoutId != -1) {
-      //   clearTimeout(checkInputTimeoutId);
-      // }
-      // console.log('====================================');
-      // console.log();
-      // console.log('====================================');
-      // let timeOutId = setTimeout(checkInputWord, 2000)
-      // setCheckInputTimeoutId(timeOutId);
+    // if (checkInputTimeoutId != -1) {
+    //   clearTimeout(checkInputTimeoutId);
+    // }
+    // console.log('====================================');
+    // console.log();
+    // console.log('====================================');
+    // let timeOutId = setTimeout(checkInputWord, 2000)
+    // setCheckInputTimeoutId(timeOutId);
 
-      const updatedQuestions = [...questions];
-      const updatedQuestion = { ...updatedQuestions[index] };
-      updatedQuestion.word = word;
-      updatedQuestions[index] = updatedQuestion;
-      setQuestions(updatedQuestions);
-      console.log(`1- Question ${index + 1} word:`, updatedQuestions[index].word);
+    const updatedQuestions = [...questions];
+    const updatedQuestion = { ...updatedQuestions[index] };
+    updatedQuestion.word = word;
+    updatedQuestions[index] = updatedQuestion;
+    setQuestions(updatedQuestions);
+    console.log(`1- Question ${index + 1} word:`, updatedQuestions[index].word);
   };
 
   const updateQuestionType = (index: number, type: string) => {
     const updatedQuestions = [...questions];
     const updatedQuestion = { ...updatedQuestions[index] };
-    updatedQuestion.questionType = type; 
+    updatedQuestion.questionType = type;
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
     setSelectedType(type);
-    console.log(`2- Question ${index + 1} questionType:`, updatedQuestions[index].questionType);
-};
+    console.log(
+      `2- Question ${index + 1} questionType:`,
+      updatedQuestions[index].questionType
+    );
+  };
 
   const updateQuestion = (index: number, option: string, text: string) => {
     const updatedQuestions = [...questions];
@@ -295,7 +304,10 @@ const QuizCreationPage = ({ navigation }) => {
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
     // console.log(`Question is: ${questions[index].options}`);
-    console.log(`3- Question ${index + 1} options:`, updatedQuestions[index].options);
+    console.log(
+      `3- Question ${index + 1} options:`,
+      updatedQuestions[index].options
+    );
   };
 
   return (
@@ -309,7 +321,10 @@ const QuizCreationPage = ({ navigation }) => {
           <TouchableOpacity style={styles.iconButton}>
             <Ionicons name="person-outline" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate("Login")}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.navigate("Login")}
+          >
             <Ionicons name="log-out-outline" size={24} color="black" />
           </TouchableOpacity>
         </View>
@@ -324,7 +339,10 @@ const QuizCreationPage = ({ navigation }) => {
       />
 
       {/* Image Upload Box */}
-      <TouchableOpacity style={styles.imageUploadBox} onPress={pickImageAndUpload}>
+      <TouchableOpacity
+        style={styles.imageUploadBox}
+        onPress={pickImageAndUpload}
+      >
         <Text style={styles.imageUploadText}>
           {image ? "Image Uploaded" : "+ Upload Image"}
         </Text>
@@ -350,7 +368,8 @@ const QuizCreationPage = ({ navigation }) => {
               onChangeText={(word) => handleInputChange(index, word)}
             />
             <View style={styles.dropdownContainer}>
-                <DropdownComponent
+              <DropdownComponent
+                testID="question-type-dropdown"
                 selectedValue={questions[index].questionType}
                 onValueChange={(type) => updateQuestionType(index, type)}
               />
@@ -391,12 +410,13 @@ const QuizCreationPage = ({ navigation }) => {
 
       {/* Bottom Cancel and Submit Buttons */}
       <View style={styles.bottomButtons}>
-        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => navigation.goBack()}
+        >
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-        style={styles.submitButton}
-        onPress={submitQuiz}>
+        <TouchableOpacity style={styles.submitButton} onPress={submitQuiz}>
           <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
       </View>
