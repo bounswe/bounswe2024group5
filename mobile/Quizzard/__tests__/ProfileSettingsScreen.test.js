@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import ProfileSettingsScreen from '../screens/ProfileSettingsScreen'; // Update the path accordingly
-import { AuthProvider } from '../__mocks__/AuthProvider';
+import { AuthProvider, mockAuth } from '../__mocks__/AuthProvider';
 import HostUrlContext from '../app/HostContext';
 import { Alert } from 'react-native';
 
@@ -13,6 +13,11 @@ global.fetch = jest.fn();
 const mockGoBack = jest.fn();
 const mockNavigate = jest.fn();
 
+// Mock the auth hook
+jest.mock('../screens/AuthProvider', () => ({
+  useAuth: () => mockAuth,
+}));
+
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
@@ -21,11 +26,22 @@ jest.mock('@react-navigation/native', () => ({
   useFocusEffect: jest.fn(),
 }));
 
+jest.mock('../screens/BaseLayout', () => {
+  return function MockBaseLayout({ children }) {
+    return children;
+  };
+});
+
 describe('ProfileSettingsScreen', () => {
   beforeEach(() => {
     fetch.mockClear();
     mockGoBack.mockClear();
     mockNavigate.mockClear();
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it('successfully updates the profile without changing the profile picture', async () => {
@@ -66,6 +82,11 @@ describe('ProfileSettingsScreen', () => {
       </AuthProvider>
     );
 
+    // Wait for initial render and animations
+    await act(async () => {
+      jest.runAllTimers();
+    });
+
     // Wait for the initial profile data to load
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
 
@@ -80,6 +101,7 @@ describe('ProfileSettingsScreen', () => {
     const saveButton = getByText('Save Changes');
     await act(async () => {
       fireEvent.press(saveButton);
+      jest.runAllTimers();
     });
 
     // Wait for the PUT request to be called
@@ -163,6 +185,11 @@ describe('ProfileSettingsScreen', () => {
       </AuthProvider>
     );
 
+    // Wait for initial render and animations
+    await act(async () => {
+      jest.runAllTimers();
+    });
+
     // Wait for the initial profile data to load
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
 
@@ -190,12 +217,14 @@ describe('ProfileSettingsScreen', () => {
     const changePhotoButton = getByText('Change Photo');
     await act(async () => {
       fireEvent.press(changePhotoButton);
+      jest.runAllTimers();
     });
 
     // Press the 'Save Changes' button
     const saveButton = getByText('Save Changes');
     await act(async () => {
       fireEvent.press(saveButton);
+      jest.runAllTimers();
     });
 
     // Wait for the upload and PUT requests to be called
@@ -279,6 +308,11 @@ describe('ProfileSettingsScreen', () => {
       </AuthProvider>
     );
 
+    // Wait for initial render and animations
+    await act(async () => {
+      jest.runAllTimers();
+    });
+
     // Wait for the initial profile data to load
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
 
@@ -293,6 +327,7 @@ describe('ProfileSettingsScreen', () => {
     const saveButton = getByText('Save Changes');
     await act(async () => {
       fireEvent.press(saveButton);
+      jest.runAllTimers();
     });
 
     // Wait for the PUT request to be called
