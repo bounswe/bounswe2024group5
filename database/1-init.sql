@@ -139,7 +139,14 @@ CREATE TABLE IF NOT EXISTS post_tags (
     FOREIGN KEY (english_id) REFERENCES english(id) ON DELETE CASCADE
 );
 
-
+CREATE TABLE IF NOT EXISTS followings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    follower INT NOT NULL references users (id) ON DELETE CASCADE,
+    followed INT NOT NULL references users (id) ON DELETE CASCADE,
+    UNIQUE(follower, followed),
+    check(follower != followed),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 
 -- Add indexes on the email and username columns in the users table

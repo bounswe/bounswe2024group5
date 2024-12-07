@@ -129,6 +129,12 @@ components:
         noCreatedQuizzes:
           type: integer
           description: The number of quizzes created by the user.
+        noFollowers:
+          type: integer
+          description: Number of followers the user has.
+        noFollowing:
+          type: integer
+          description: Number of users the user is following.
       example:
         username: johndoe
         email: johndoe@example.com
@@ -137,6 +143,8 @@ components:
         score: 1500.0
         englishProficiency: B1
         noCreatedQuizzes: 5
+        noFollowers: 25
+        noFollowing: 15
     CreateQuizRequest:
       type: object
       properties:
@@ -1918,5 +1926,116 @@ paths:
           description: Successfully deleted the favorite question.
         404:
           description: Favorite question not found.
+  /profile/follow/{followingUsername}:
+    post:
+      summary: Follow a user
+      description: Allows the authenticated user to follow another user.
+      tags:
+        - Follow
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Bearer JWT token for authentication.
+        - name: followingUsername
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Username of the user to follow.
+      responses:
+        '200':
+          description: Successfully followed the user.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Followed user
+        '400':
+          description: Invalid request.
+        '404':
+          description: User not found.
+    delete:
+      summary: Unfollow a user
+      description: Allows the authenticated user to unfollow another user.
+      tags:
+        - Follow
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Bearer JWT token for authentication.
+        - name: followingUsername
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Username of the user to unfollow.
+      responses:
+        '200':
+          description: Successfully unfollowed the user.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Unfollowed user
+        '400':
+          description: Invalid request.
+        '404':
+          description: User not found.
+
+  /profile/{username}/followers:
+    get:
+      summary: Get followers of a user
+      description: Retrieves a list of followers for a specified user.
+      tags:
+        - Follow
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Username of the user whose followers are being retrieved.
+      responses:
+        '200':
+          description: List of followers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileResponse'
+        '404':
+          description: User not found.
+
+  /profile/{username}/following:
+    get:
+      summary: Get users a user is following
+      description: Retrieves a list of users that a specified user is following.
+      tags:
+        - Follow
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Username of the user whose following list is being retrieved.
+      responses:
+        '200':
+          description: List of followings.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileResponse'
+        '404':
+          description: User not found.
 security:
   - bearerAuth: []
