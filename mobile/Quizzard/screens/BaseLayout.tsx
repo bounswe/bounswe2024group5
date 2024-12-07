@@ -23,6 +23,7 @@ const BaseLayout = ({ children, navigation }) => {
   // Determine which icon should be filled based on the current route
   const isHome = route.name === "Home";
   const isForum = route.name === "Forum";
+  const isLeaderboard = route.name === "Leaderboard";
 
   return (
     <View style={styles.container}>
@@ -65,6 +66,16 @@ const BaseLayout = ({ children, navigation }) => {
         >
           <Ionicons
             name={isForum ? "chatbox" : "chatbox-outline"} // Fill the icon if on Forum page
+            size={24}
+            color="#6a0dad"
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navButton}
+          onPress={() => navigation.navigate("Leaderboard")}
+        >
+          <Ionicons
+            name={isLeaderboard ? "trophy" : "trophy-outline"}
             size={24}
             color="#6a0dad"
           />
