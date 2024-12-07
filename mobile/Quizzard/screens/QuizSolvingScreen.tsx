@@ -1,11 +1,37 @@
 // QuizSolvingScreen.tsx
-import React, { useState, useContext, useEffect} from "react";
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons"; // Import the icon
+import React, {
+  useState,
+  useContext,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+  ActivityIndicator,
+  FlatList,
+} from "react-native";
 import QuizHeader from "../components/QuizSolveQuizHeader";
 import { useAuth } from "./AuthProvider";
-import HostUrlContext from '../app/HostContext';
-// import { Quiz, Question, QuestionType } from "../database/types";
+import HostUrlContext from "../app/HostContext";
+import { Post, Reply } from "../types/forum";
+import { Ionicons } from "@expo/vector-icons"; // Add missing import
+import { Question } from "../database/types"; // Add proper type import
+
+// Add missing type for route params
+interface RouteParams {
+  quiz: {
+    id: number;
+    title: string;
+  };
+  questions: Question[];
+}
 
 // types from the database/types.ts file:
 // type Question = {
@@ -24,24 +50,162 @@ import HostUrlContext from '../app/HostContext';
 //   | "turkish_to_english"
 //   | "english_to_sense";
 
+interface PostPreviewProps {
+  post: Post;
+  onPress: () => void;
+}
+
+interface SelectedPostViewProps {
+  post: Post;
+  replies: Reply[];
+  onBack: () => void;
+}
+
+// 1. Move these components outside of the main component
+const PostPreview = React.memo<PostPreviewProps>(({ post, onPress }) => (
+  <TouchableOpacity style={styles.postPreview} onPress={onPress}>
+    <Text style={styles.postTitle}>{post.title}</Text>
+    <Text style={styles.postContent}>{post.content}</Text>
+    <Text style={styles.postMeta}>
+      {post.username} • {new Date(post.createdAt).toLocaleDateString()}
+    </Text>
+  </TouchableOpacity>
+));
+
+const SelectedPostView = React.memo<SelectedPostViewProps>(
+  ({ post, replies, onBack }) => (
+    <ScrollView style={styles.postsList} showsVerticalScrollIndicator={false}>
+      <TouchableOpacity onPress={onBack} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={20} color="#6a0dad" />
+        <Text style={styles.backButtonText}>Back to posts</Text>
+      </TouchableOpacity>
+      <View style={styles.postContainer}>
+        <Text style={styles.postTitle}>{post.title}</Text>
+        <Text style={styles.postContent}>{post.content}</Text>
+        <Text style={styles.postMeta}>
+          Posted by {post.username} •{" "}
+          {new Date(post.createdAt).toLocaleDateString()}
+        </Text>
+        <View style={styles.repliesSection}>
+          <Text style={styles.repliesTitle}>Replies</Text>
+          {replies.map((reply) => (
+            <View key={reply.id} style={styles.replyContainer}>
+              <Text style={styles.replyContent}>{reply.content}</Text>
+              <Text style={styles.replyMeta}>
+                {reply.username} •{" "}
+                {new Date(reply.createdAt).toLocaleDateString()}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    </ScrollView>
+  )
+);
+
+const ForumModal = React.memo<{
+  visible: boolean;
+  onClose: () => void;
+  word: string;
+  isLoadingPosts: boolean;
+  selectedPost: Post | null;
+  relatedPosts: Post[];
+  postReplies: Reply[];
+  onPostSelect: (post: Post) => void;
+  onBackToList: () => void;
+}>(
+  ({
+    visible,
+    onClose,
+    word,
+    isLoadingPosts,
+    selectedPost,
+    relatedPosts,
+    postReplies,
+    onPostSelect,
+    onBackToList,
+  }) => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Posts about '{word}'</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Ionicons name="close" size={24} color="#1a1a1a" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.modalBody}>
+            {isLoadingPosts ? (
+              <ActivityIndicator size="large" color="#6a0dad" />
+            ) : selectedPost ? (
+              <SelectedPostView
+                post={selectedPost}
+                replies={postReplies}
+                onBack={onBackToList}
+              />
+            ) : (
+              <FlatList
+                data={relatedPosts}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.flatListContent}
+                ListEmptyComponent={
+                  <View style={styles.noPostsContainer}>
+                    <Ionicons
+                      name="chatbox-outline"
+                      size={40}
+                      color="#6c757d"
+                    />
+                    <Text style={styles.noPostsText}>
+                      No related posts found for '{word}'
+                    </Text>
+                  </View>
+                }
+                renderItem={({ item: post }) => (
+                  <PostPreview post={post} onPress={() => onPostSelect(post)} />
+                )}
+                keyExtractor={(post) => post.id.toString()}
+              />
+            )}
+          </View>
+        </View>
+      </View>
+    </Modal>
+  )
+);
+
 const QuizSolvingScreen = ({ route, navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   // const { quiz } = route.params; // Access the passed data
-  const { quiz, questions } = route.params; // Access the passed data
+  const { quiz, questions } = route.params as RouteParams; // Access the passed data
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState([]);
+  const [selectedAnswers, setSelectedAnswers] = useState<(string | null)[]>([]);
   const [quizQuestions, setQuestions] = useState<Question[]>([]);
-  const [isQuestionAnswered, setIsQuestionAnswered] = useState(questions.map(() => false));
+  const [isQuestionAnswered, setIsQuestionAnswered] = useState(
+    questions.map(() => false)
+  );
   const question = questions[questionIndex];
   // const [question, setQuestion] = useState<Question | null>(null);
   const [quizAttemptId, setQuizAttemptId] = useState(null);
   const [previousAnswers, setPreviousAnswers] = useState({});
   const authContext = useAuth(); // Get the authentication context
-//   const [selectedAnswers, setSelectedAnswers] = useState(
-//     Array(questions.length).fill(null)
-//   );
+  //   const [selectedAnswers, setSelectedAnswers] = useState(
+  //     Array(questions.length).fill(null)
+  //   );
   const [alreadyFinished, setAlreadyFinished] = useState(false);
   const token = authContext ? authContext.token : null;
+  const [forumModalVisible, setForumModalVisible] = useState(false);
+  const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [postReplies, setPostReplies] = useState<Reply[]>([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
 
   const initializeQuiz = async () => {
     console.log("### Initializing quiz:", quiz.id);
@@ -55,13 +219,13 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         },
         body: JSON.stringify({ quizId: quiz.id }),
       });
-  
+
       if (!attemptResponse.ok) {
         throw new Error("Failed to create/get quiz attempt");
       }
       const attemptData = await attemptResponse.json();
       setQuizAttemptId(attemptData.id);
-  
+
       // Fetch quiz details with questions
       const quizResponse = await fetch(`${hostUrl}/api/quizzes/${quiz.id}`, {
         method: "GET",
@@ -69,18 +233,18 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (!quizResponse.ok) {
         throw new Error("Failed to fetch quiz details");
       }
-  
+
       const quizData = await quizResponse.json();
       const questions = quizData.quiz.questions;
-  
+
       setQuestions(questions);
       setIsQuestionAnswered(new Array(questions.length).fill(false));
       setSelectedAnswers(new Array(questions.length).fill(null));
-  
+
       // Fetch previous answers
       const answersResponse = await fetch(
         `${hostUrl}/api/question-answers?quizAttemptId=${attemptData.id}`,
@@ -91,17 +255,17 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           },
         }
       );
-  
+
       if (answersResponse.ok) {
         const answersData = await answersResponse.json();
-  
+
         // Map previous answers
         const answersMap = {};
         answersData.forEach((answer) => {
           answersMap[answer.questionId] = answer.answer;
         });
         setPreviousAnswers(answersMap);
-  
+
         // Update selectedAnswers and isQuestionAnswered
         const updatedSelectedAnswers = questions.map(
           (q) => answersMap[q.id] || null
@@ -109,49 +273,47 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         const updatedIsQuestionAnswered = questions.map(
           (q) => answersMap[q.id] !== undefined
         );
-  
+
         setSelectedAnswers(updatedSelectedAnswers);
         setIsQuestionAnswered(updatedIsQuestionAnswered);
       }
     } catch (error) {
       console.error("Error initializing quiz:", error);
-      Alert.alert(
-        "Error",
-        "Failed to load quiz. Please try again later.",
-        [{ text: "OK", onPress: () => navigation.goBack() }]
-      );
+      Alert.alert("Error", "Failed to load quiz. Please try again later.", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
     }
   };
 
   useEffect(() => {
-    console.log(`### QuizSolvingScreen: quiz ID: ${quiz.id}` );
+    console.log(`### QuizSolvingScreen: quiz ID: ${quiz.id}`);
     initializeQuiz();
-  },[quiz.id, hostUrl, token]);
+  }, [quiz.id, hostUrl, token]);
 
   const handleAnswer = async (answer) => {
     if (alreadyFinished) return;
     if (isQuestionAnswered[questionIndex]) return;
 
     try {
-      const response = await fetch(
-        `${hostUrl}/api/question-answers`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            quizAttemptId: quizAttemptId,
-            questionId: questions[questionIndex].id,
-            answer: answer
-          }),
-        }
-      );
+      // First, create the question answer
+      const response = await fetch(`${hostUrl}/api/question-answers`, {
+        method: "POST", // Changed from PUT to POST
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          quizAttemptId,
+          questionId: questions[questionIndex].id,
+          answer: answer,
+        }),
+      });
 
       if (!response.ok) {
         console.log(`Response status: ${response.status}`);
-        throw new Error('Failed to submit answer');
+        const errorText = await response.text();
+        console.log(`Error response: ${errorText}`);
+        throw new Error("Failed to submit answer");
       }
 
       const updatedIsQuestionAnswered = [...isQuestionAnswered];
@@ -164,47 +326,24 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     } catch (error) {
       console.error("Error submitting answer:", error);
       Alert.alert("Error", "Failed to submit answer. Please try again.");
-//     const updatedSelectedAnswers = [...selectedAnswers];
-//     updatedSelectedAnswers[questionIndex] = answer;
-//     setSelectedAnswers(updatedSelectedAnswers);
-
-//     const updatedIsQuestionAnswered = [...isQuestionAnswered];
-//     updatedIsQuestionAnswered[questionIndex] = true;
-//     setIsQuestionAnswered(updatedIsQuestionAnswered);
-
-//     console.log(`Question ${questionIndex} answered with: ${answer}`);
-
-//     const answerData = {
-//       questionID: questionIndex,
-//       selectedChoice: answer,
-//     };
-
-//     try {
-//       const uploadResponse = await fetch("http://34.55.188.177/quiz-solve", {
-//         method: "POST",
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(answerData),
-//       });
-//     } catch (err) {
-//       console.error("Error sending answer to backend:", err);
     }
   };
 
   const handlePrevious = () => {
-    console.log('handling previous');
+    console.log("handling previous");
     if (questionIndex > 0) {
       setQuestionIndex(questionIndex - 1);
       console.log(`Is answered? ${isQuestionAnswered}`);
     } else {
-      Alert.alert("Start of the Quiz:", "This is the first question of the quiz.");
+      Alert.alert(
+        "Start of the Quiz:",
+        "This is the first question of the quiz."
+      );
     }
   };
 
   const handleNext = () => {
-    console.log('handling next');
+    console.log("handling next");
     if (questionIndex < questions.length - 1) {
       setQuestionIndex(questionIndex + 1);
       console.log(`Is answered? ${isQuestionAnswered}`);
@@ -214,14 +353,14 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   };
 
   const handleFinish = async () => {
-
-    if(alreadyFinished) {
+    if (alreadyFinished) {
       navigation.navigate("QuizFinish", {
-        quiz, 
-        questions, 
+        quiz,
+        questions,
         selectedAnswers,
-        alreadyFinished});
-        return;
+        alreadyFinished,
+      });
+      return;
     }
     setAlreadyFinished(true);
 
@@ -239,17 +378,15 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to complete quiz');
+        throw new Error("Failed to complete quiz");
       }
 
       navigation.navigate("QuizFinish", {
-        quiz, 
-        questions, 
+        quiz,
+        questions,
         selectedAnswers,
-        alreadyFinished});
-      
-      
-
+        alreadyFinished,
+      });
     } catch (error) {
       console.error("Error completing quiz:", error);
       Alert.alert("Error", "Failed to complete quiz. Please try again.");
@@ -272,13 +409,53 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     }
   };
 
-  // // question = questions[questionIndex];
-  // console.log(`224 224`);
-  // console.log(`## Questions: ${questions[questionIndex].correctAnswer}`);
-  // setQuestion(questions[questionIndex]);
-  let answers = [question.correctAnswer];
-  question.wrongAnswers.forEach((answer) => answers.push(answer));
-  console.log("Answers:", answers);
+  // Move the answers array creation and shuffling into useMemo
+  const shuffledAnswers = useMemo(() => {
+    const answers = [...question.wrongAnswers, question.correctAnswer];
+    return answers.sort(() => Math.random() - 0.5);
+  }, [question]); // Only re-shuffle when question changes
+
+  const fetchRelatedPosts = useCallback(
+    async (word: string) => {
+      setIsLoadingPosts(true);
+      try {
+        const response = await fetch(
+          `${hostUrl}/api/posts?tag=${encodeURIComponent(word)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setRelatedPosts(data);
+        }
+      } catch (error) {
+        console.error("Error fetching related posts:", error);
+        Alert.alert("Error", "Failed to load related posts");
+      } finally {
+        setIsLoadingPosts(false);
+      }
+    },
+    [hostUrl, token]
+  );
+
+  const fetchPostReplies = async (postId: number) => {
+    try {
+      const response = await fetch(`${hostUrl}/api/posts/${postId}/replies`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPostReplies(data);
+      }
+    } catch (error) {
+      console.error("Error fetching replies:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -291,8 +468,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         <Text style={styles.questionText}>
           {generateQuestionSentence(question)}
         </Text>
-        <Text style={styles.questionText}>{question.body}</Text>
-        {answers.map((answer, index) => {
+        {shuffledAnswers.map((answer, index) => {
           let backgroundColor;
           if (!isQuestionAnswered[questionIndex]) {
             backgroundColor = "#ddd6fe"; // Match the background color
@@ -319,40 +495,56 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       </View>
       {/* Container for Next Button */}
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={styles.nextButton}
-          onPress={handlePrevious}
-        >
+        <TouchableOpacity style={styles.nextButton} onPress={handlePrevious}>
           {/* Replace text with right-pointing arrow icon */}
-          <Icon name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.nextButton}
-          onPress={handleNext}
-        >
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           {/* Replace text with right-pointing arrow icon */}
-          <Icon name="arrow-forward" size={24} color="#000" />
+          <Ionicons name="arrow-forward" size={24} color="#000" />
         </TouchableOpacity>
       </View>
 
       {/* Cancel and Submit Buttons */}
-            <View style={styles.bottomButtons}>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
-          onPress={handleCancel}
-        >
+      <View style={styles.bottomButtons}>
+        <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleFinish}
-        >
-          <Text style={styles.submitButtonText}>Finish</Text>
-        </TouchableOpacity>
+        {questionIndex === questions.length - 1 && (
+          <TouchableOpacity style={styles.submitButton} onPress={handleFinish}>
+            <Text style={styles.submitButtonText}>Finish</Text>
+          </TouchableOpacity>
+        )}
       </View>
+      <TouchableOpacity
+        style={styles.forumButton}
+        onPress={() => {
+          fetchRelatedPosts(question.word);
+          setForumModalVisible(true);
+        }}
+      >
+        <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
+        <Text style={styles.forumButtonText}>See Related Posts</Text>
+      </TouchableOpacity>
+      <ForumModal
+        visible={forumModalVisible}
+        onClose={() => {
+          setForumModalVisible(false);
+          setSelectedPost(null);
+        }}
+        word={question.word}
+        isLoadingPosts={isLoadingPosts}
+        selectedPost={selectedPost}
+        relatedPosts={relatedPosts}
+        postReplies={postReplies}
+        onPostSelect={(post) => {
+          setSelectedPost(post);
+          fetchPostReplies(post.id);
+        }}
+        onBackToList={() => setSelectedPost(null)}
+      />
     </View>
   );
 };
@@ -428,6 +620,167 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  forumButton: {
+    backgroundColor: "#f8f9fa",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#6a0dad",
+  },
+  forumButtonText: {
+    color: "#6a0dad",
+    fontWeight: "600",
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "flex-end", // Makes modal slide from bottom
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: "80%", // Takes up 80% of screen height
+    width: "100%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e9ecef",
+    marginBottom: 15,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+  },
+  modalBody: {
+    flex: 1,
+    width: "100%",
+  },
+  flatListContent: {
+    paddingHorizontal: 10,
+    paddingBottom: 20, // Add padding at the bottom
+  },
+  postsList: {
+    flex: 1,
+  },
+  postPreview: {
+    width: 300,
+    height: "25%",
+    minHeight: 150,
+    marginHorizontal: 10,
+    padding: 15,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  postTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+    marginBottom: 8,
+  },
+  postMeta: {
+    fontSize: 14,
+    color: "#6c757d",
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    marginBottom: 15,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: "#6a0dad",
+    marginLeft: 8,
+  },
+  postContainer: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  repliesSection: {
+    marginTop: 20,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: "#e9ecef",
+  },
+  repliesTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1a1a1a",
+    marginBottom: 12,
+  },
+  replyContainer: {
+    backgroundColor: "#f8f9fa",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  replyContent: {
+    fontSize: 15,
+    color: "#4a4a4a",
+    marginBottom: 6,
+  },
+  replyMeta: {
+    fontSize: 13,
+    color: "#6c757d",
+  },
+  postContent: {
+    fontSize: 16,
+    color: "#4a4a4a",
+    lineHeight: 22,
+    marginBottom: 12,
+  },
+  noPostsContainer: {
+    width: 300,
+    height: 200,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    marginHorizontal: 10,
+  },
+  noPostsText: {
+    fontSize: 16,
+    color: "#6c757d",
+    textAlign: "center",
+    paddingHorizontal: 20,
+  },
+  closeButton: {
+    padding: 8,
   },
 });
 

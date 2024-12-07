@@ -16,6 +16,7 @@ import QuizWelcomePage from "../screens/QuizWelcomePage";
 import QuizFinishScreen from "../screens/QuizFinishScreen"; // Import the finish screen
 import { AuthProvider } from "../screens/AuthProvider";
 import SearchResultsScreen from "../screens/SearchResultsScreen";
+import LeaderboardScreen from "../screens/LeaderboardScreen";
 
 export type RootStackParamList = {
   Login: undefined;
@@ -69,6 +70,7 @@ export type RootStackParamList = {
     };
   };
   SearchResults: { keyword: string };
+  Leaderboard: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -146,6 +148,11 @@ function MyStack() {
       <Stack.Screen
         name="ProfileSettings"
         component={ProfileSettingsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Leaderboard"
+        component={LeaderboardScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
