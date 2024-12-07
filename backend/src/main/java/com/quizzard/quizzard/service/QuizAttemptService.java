@@ -105,10 +105,16 @@ public class QuizAttemptService {
         if (quizAttemptUpdateRequest.get("completed") == null)
             throw new RuntimeException("completed field is required.");
         else {
+            boolean isGraded = false;
             if (quizAttempt.getIsCompleted())
                 throw new RuntimeException("Quiz attempt is already completed.");
             else if ((boolean) quizAttemptUpdateRequest.get("completed")) {
-                quizAttempt.setScore(calculateQuizScore(user, id));
+                if(isUserAbleToGainScore(user, quizAttempt.getQuiz())){
+                    quizAttempt.setScore(calculateQuizScore(user, id));
+                    isGraded = true;
+                } else {
+                    quizAttempt.setScore(0);
+                }
                 quizAttempt.setCompletedAt(new Date());
                 quizAttempt.setIsCompleted(true);
                 quizAttemptRepository.save(quizAttempt);
@@ -116,10 +122,17 @@ public class QuizAttemptService {
                 quizAttempt.setIsCompleted(false);
                 quizAttemptRepository.save(quizAttempt);
             }
-            return new QuizAttemptResponse(quizAttempt);
+            return new QuizAttemptResponse(quizAttempt, isGraded);
         }
     }
 
+    private boolean isUserAbleToGainScore(User user, Quiz quiz) {
+        if(quizAttemptRepository.existsByUserIdAndQuizIdAndIsCompleted(user.getId(), quiz.getId(), true))
+            return false;
+        if(quiz.getAuthor().equals(user))
+            return false;
+        return true;
+    }
 
     public int calculateQuizScore(User user, Long quizAttemptId) {
         QuizAttempt quizAttempt = quizAttemptRepository.findById(quizAttemptId)
@@ -130,6 +143,11 @@ public class QuizAttemptService {
         Long quizId = quizAttempt.getQuiz().getId();
         if(quizAttemptRepository.existsByUserIdAndQuizIdAndIsCompleted(user.getId(), quizId, true)){
             // already has completed quiz attempt so get zero
+            return 0;
+        }
+
+        if(quizAttempt.getQuiz().getAuthor().equals(user)){
+            // author of the quiz cannot get points from their own quiz
             return 0;
         }
 
