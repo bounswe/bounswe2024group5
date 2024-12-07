@@ -108,8 +108,7 @@ public class QuizAttemptService {
             if (quizAttempt.getIsCompleted())
                 throw new RuntimeException("Quiz attempt is already completed.");
             else if ((boolean) quizAttemptUpdateRequest.get("completed")) {
-                //quizAttempt.setScore(quizAttempt.getQuiz().getQuestions().size());
-                quizAttempt.setScore(calculateQuestionPoint(user, id));
+                quizAttempt.setScore(calculateQuizScore(user, id));
                 quizAttempt.setCompletedAt(new Date());
                 quizAttempt.setIsCompleted(true);
                 quizAttemptRepository.save(quizAttempt);
@@ -122,11 +121,17 @@ public class QuizAttemptService {
     }
 
 
-    public int calculateQuestionPoint(User user, Long quizAttemptId) {
+    public int calculateQuizScore(User user, Long quizAttemptId) {
         QuizAttempt quizAttempt = quizAttemptRepository.findById(quizAttemptId)
                 .orElseThrow(() -> new RuntimeException("Quiz attempt not found with id: " + quizAttemptId));
 
         List<QuestionAnswer> questionAnswers = questionAnswerRepository.findAllByQuizAttemptId(quizAttemptId);
+
+        Long quizId = quizAttempt.getQuiz().getId();
+        if(quizAttemptRepository.existsByUserIdAndQuizIdAndIsCompleted(user.getId(), quizId, true)){
+            // already has completed quiz attempt so get zero
+            return 0;
+        }
 
         int totalScoreOfQuiz = 0;
 
@@ -168,7 +173,8 @@ public class QuizAttemptService {
         int finalScore = userScore + totalScoreOfQuiz;
         if (finalScore < 0) {
             finalScore = 0;
-        } else if (finalScore > 4000) {
+        } // here should be updated if score range changes
+        else if (finalScore > 4000) {
             finalScore = 4000;
         }
         userService.updateUserPoint(user, finalScore);

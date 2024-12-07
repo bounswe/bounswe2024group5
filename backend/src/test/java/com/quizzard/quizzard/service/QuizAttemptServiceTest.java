@@ -194,7 +194,7 @@ public class QuizAttemptServiceTest {
         when(quizAttemptRepository.findById(1L)).thenReturn(Optional.of(quizAttempt));
         when(questionAnswerRepository.findAllByQuizAttemptId(1L)).thenReturn(List.of(questionAnswer));
 
-        quizAttemptService.calculateQuestionPoint(user, 1L);
+        quizAttemptService.calculateQuizScore(user, 1L);
 
         verify(userService, times(1)).updateUserPoint(user, 1001);
     }
