@@ -196,6 +196,9 @@ components:
         updatedAt:
           type: string
           format: date-time
+        noFavorites:
+          type: integer
+          example: 5
         questions:
           type: array
           items:
