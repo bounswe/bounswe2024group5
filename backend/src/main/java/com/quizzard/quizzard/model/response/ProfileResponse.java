@@ -13,26 +13,41 @@ public class ProfileResponse {
     private float score;
     private String englishProficiency;
     private int noCreatedQuizzes;
+    private Long noFollowers;
+    private Long noFollowing;
 
-    public ProfileResponse(User user){
-        this.username = user.getUsername();
-        this.email = user.getEmail();
-        this.name = user.getName();
-        this.profilePicture = user.getProfilePicture();
-        this.score = user.getPoints();
-        this.noCreatedQuizzes = user.getCreatedQuizzes();
-        if (score < 400)
-            englishProficiency = "A1";
-        else if(score < 1000)
-            englishProficiency = "A2";
-        else if(score < 1800)
-            englishProficiency = "B1";
-        else if(score < 2600)
-            englishProficiency = "B2";
-        else if(score < 3300)
-            englishProficiency = "C1";
+    public ProfileResponse(){
+
+    }
+
+    public ProfileResponse profileResponseByUser(User user){
+        ProfileResponse profileResponse = new ProfileResponse();
+        profileResponse.setUsername(user.getUsername());
+        profileResponse.setEmail(user.getEmail());
+        profileResponse.setName(user.getName());
+        profileResponse.setProfilePicture(user.getProfilePicture());
+        profileResponse.setScore(user.getPoints());
+        profileResponse.setNoCreatedQuizzes(user.getCreatedQuizzes());
+        if (profileResponse.getScore() < 400)
+            profileResponse.setEnglishProficiency("A1");
+        else if(profileResponse.getScore() < 1000)
+            profileResponse.setEnglishProficiency("A2");
+        else if(profileResponse.getScore() < 1800)
+            profileResponse.setEnglishProficiency("B1");
+        else if(profileResponse.getScore() < 2600)
+            profileResponse.setEnglishProficiency("B2");
+        else if(profileResponse.getScore() < 3300)
+            profileResponse.setEnglishProficiency("C1");
         else
-            englishProficiency = "C2";
+            profileResponse.setEnglishProficiency("C2");
+        return profileResponse;
+    }
+
+    public ProfileResponse profileResponseByUserAndNoFollowersAndNoFollowing(User user, Long noFollowers, Long noFollowing){
+       ProfileResponse profileResponse = profileResponseByUser(user);
+       profileResponse.setNoFollowers(noFollowers);
+       profileResponse.setNoFollowing(noFollowing);
+       return profileResponse;
     }
 
 }

@@ -30,10 +30,10 @@ public class FollowingService {
         if (followerUsername.equals(followingUsername)) {
             throw new InvalidRequestException("You cannot follow yourself");
         }
-        System.out.println(followerUsername);
-        System.out.println(followingUsername);
         User following = userService.getOneUserByUsername(followingUsername);
         User follower =  userService.getOneUserByUsername(followerUsername);
+        if(following == null)
+            throw new ResourceNotFoundException("User not found");
         if (followingRepository.findByFollowerAndFollowed(follower, following) != null)
             throw new InvalidRequestException("You are already following this user");
         else
@@ -43,6 +43,8 @@ public class FollowingService {
     public void unfollow(String followerUsername, String followingUsername) {
         User following = userService.getOneUserByUsername(followingUsername);
         User follower =  userService.getOneUserByUsername(followerUsername);
+        if(following == null)
+            throw new ResourceNotFoundException("User not found");
         Following follow = followingRepository.findByFollowerAndFollowed(follower, following);
         if (follow == null)
             throw new ResourceNotFoundException("You are not following this user");
@@ -63,7 +65,7 @@ public class FollowingService {
         List<Following> followings = followingRepository.findByFollowed(user);
         // map into users
         List<User> users = followings.stream().map(Following::getFollower).toList();
-        List<ProfileResponse> userResponses = users.stream().map(ProfileResponse::new).collect(Collectors.toList());
+        List<ProfileResponse> userResponses = users.stream().map(userService::getProfile).collect(Collectors.toList());
         return userResponses;
     }
 
@@ -72,7 +74,7 @@ public class FollowingService {
         List<Following> followings = followingRepository.findByFollower(user);
         // map into users
         List<User> users = followings.stream().map(Following::getFollowed).toList();
-        return users.stream().map(ProfileResponse::new).collect(Collectors.toList());
+        return users.stream().map(userService::getProfile).collect(Collectors.toList());
     }
 
     public boolean isFollowing(User follower, User followed) {
