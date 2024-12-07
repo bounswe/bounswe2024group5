@@ -16,9 +16,10 @@ public class QuizResponse {
     private String username;
     private String createdAt;
     private String updatedAt;
+    private Long noFavorites;
     private List<QuestionResponse> questions;
 
-    public QuizResponse(Quiz quiz, List<QuestionResponse> questions) {
+    public QuizResponse(Quiz quiz, List<QuestionResponse> questions, Long noFavorites) {
         this.id = quiz.getId();
         this.title = quiz.getTitle();
         this.description = quiz.getDescription();
@@ -28,5 +29,6 @@ public class QuizResponse {
         this.createdAt = quiz.getCreatedAt().toString();
         this.updatedAt = quiz.getUpdatedAt().toString();
         this.questions = questions;
+        this.noFavorites = noFavorites;
     }
 }

@@ -21,6 +21,7 @@ public interface FavoriteQuizRepository extends JpaRepository<FavoriteQuiz, Long
 
     void deleteByUserIdAndQuizId(Long userId, Long quizId);
 
+    Long countByQuizId(Long quizId);
 
     List<FavoriteQuiz> findAllByUser(User user);
 }

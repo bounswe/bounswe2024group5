@@ -12,6 +12,7 @@ import com.quizzard.quizzard.model.request.UpdateQuizRequest;
 import com.quizzard.quizzard.model.response.QuestionResponse;
 import com.quizzard.quizzard.model.response.QuizResponse;
 import com.quizzard.quizzard.model.response.SolveQuizResponse;
+import com.quizzard.quizzard.repository.FavoriteQuizRepository;
 import com.quizzard.quizzard.repository.QuestionRepository;
 import com.quizzard.quizzard.repository.QuizRepository;
 import jakarta.transaction.Transactional;
@@ -36,13 +37,17 @@ public class QuizService {
     @Autowired
     private QuestionService questionService;
 
+    @Autowired
+    private FavoriteQuizRepository favoriteQuizRepository;
+
     private List<QuestionResponse> mapQuestionsToQuestionResponses(List<Question> questions) {
         return questions.stream().map(QuestionResponse::new).toList();
     }
 
     private QuizResponse mapQuizToQuizResponse(Quiz quiz) {
         List<Question> questions = questionRepository.findByQuizId(quiz.getId());
-        return new QuizResponse(quiz, mapQuestionsToQuestionResponses(questions));
+        Long numberOfFavorites = favoriteQuizRepository.countByQuizId(quiz.getId());
+        return new QuizResponse(quiz, mapQuestionsToQuestionResponses(questions), numberOfFavorites);
     }
 
     private List<QuizResponse> mapQuizzesToQuizResponses(List<Quiz> quizzes) {
