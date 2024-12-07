@@ -62,6 +62,8 @@ public class FollowingService {
 
     public List<ProfileResponse> getFollowers(String username) {
         User user = userService.getOneUserByUsername(username);
+        if(user == null)
+            throw new ResourceNotFoundException("User not found");
         List<Following> followings = followingRepository.findByFollowed(user);
         // map into users
         List<User> users = followings.stream().map(Following::getFollower).toList();
@@ -71,6 +73,9 @@ public class FollowingService {
 
     public List<ProfileResponse> getFollowings(String username) {
         User user = userService.getOneUserByUsername(username);
+        if(user == null){
+            throw new ResourceNotFoundException("User not found");
+        }
         List<Following> followings = followingRepository.findByFollower(user);
         // map into users
         List<User> users = followings.stream().map(Following::getFollowed).toList();
