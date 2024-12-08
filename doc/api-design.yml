@@ -399,6 +399,10 @@ components:
           type: string
           format: date-time
           description: Last updated time of the quiz attempt.
+        graded:
+          type: boolean
+          description: It is true only when responsing the put request and the quiz is graded. Otherwise, it is false.
+          example: false
     QuestionAnswerRequest:
       type: object
       properties:
