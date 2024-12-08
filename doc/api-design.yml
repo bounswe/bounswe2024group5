@@ -181,7 +181,7 @@ components:
           type: array
           items:
             type: string
-          example: ["answer1", "answer2", "answer3"]  
+          example: ["answer1", "answer2", "answer3"]
     QuizResponse:
       type: object
       properties:
@@ -229,7 +229,7 @@ components:
           type: array
           items:
             type: string
-          example: ["answer1", "answer2", "answer3"]  
+          example: ["answer1", "answer2", "answer3"]
         difficulty:
           type: number
           format: float
@@ -848,6 +848,46 @@ paths:
                     - example_wrong_2
         '400':
           description: Invalid parameters provided.
+  /hint:
+    get:
+      summary: "Returns two images according to the word"
+      tags:
+        - Word Related
+      parameters:
+        - name: word
+          in: query
+          required: true
+          description: "The word to be found images"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Successful response, two image URL of the word"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uri
+        "400":
+          description: "Invalid request, 'word' parameter is missing or wrong"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "500":
+          description: "Server fault."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
   /quizzes:
     get:
       summary: Get all quizzes optionally by filters
@@ -1687,7 +1727,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-                
+
   /file/upload:
     post:
       tags:
