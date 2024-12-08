@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     width: 140,
     height: 220,
     marginRight: 16,
-    backgroundColor: "#f3e8ff",
+    backgroundColor: "#ede9fe", 
     borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   editButton: {
-    backgroundColor: "#f3e8ff",
+    backgroundColor: "#ede9fe",
     paddingVertical: 6,
     borderRadius: 4,  // 8
     flexShrink: 0,
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
   },
   deleteButton: {
-    backgroundColor: "#f3e8ff",
+    backgroundColor: "#ede9fe",
     paddingVertical: 6,
     borderRadius: 4,
     width: "48%",
