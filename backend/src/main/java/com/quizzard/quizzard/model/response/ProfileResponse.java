@@ -28,15 +28,15 @@ public class ProfileResponse {
         profileResponse.setProfilePicture(user.getProfilePicture());
         profileResponse.setScore(user.getPoints());
         profileResponse.setNoCreatedQuizzes(user.getCreatedQuizzes());
-        if (profileResponse.getScore() < 400)
+        if (profileResponse.getScore() < 1500)
             profileResponse.setEnglishProficiency("A1");
-        else if(profileResponse.getScore() < 1000)
+        else if(profileResponse.getScore() < 3500)
             profileResponse.setEnglishProficiency("A2");
-        else if(profileResponse.getScore() < 1800)
+        else if(profileResponse.getScore() < 5000)
             profileResponse.setEnglishProficiency("B1");
-        else if(profileResponse.getScore() < 2600)
+        else if(profileResponse.getScore() < 6500)
             profileResponse.setEnglishProficiency("B2");
-        else if(profileResponse.getScore() < 3300)
+        else if(profileResponse.getScore() < 8500)
             profileResponse.setEnglishProficiency("C1");
         else
             profileResponse.setEnglishProficiency("C2");
