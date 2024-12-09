@@ -8,6 +8,16 @@ import {
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 
 const MyPostsView = ({ myPosts, navigation }) => {
+
+    const navigateToQuestionDetail = (
+        questionId: number,
+    ) => {
+        console.log("Navigating to QuestionDetail with ID:", questionId);
+        navigation.navigate("QuestionDetail", {
+            questionId,
+        });
+    };
+
     return (
         <View style={styles.section}>
             {myPosts && myPosts.length > 0 ? (
@@ -16,9 +26,9 @@ const MyPostsView = ({ myPosts, navigation }) => {
                         key={post.id}
                         style={styles.card}
                         onPress={() =>
-                            navigation.navigate("QuestionDetail", {
-                                questionId: post.id,
-                            })
+                            navigateToQuestionDetail(
+                                post.id,
+                            )
                         }
                     >
                         <Text style={styles.itemTitle}>{post.title}</Text>

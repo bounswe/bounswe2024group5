@@ -203,6 +203,7 @@ const ProfileScreen = ({ route, navigation }) => {
       const posts = await Promise.all(
         myPosts.map(async (post) => {
           return {
+            id: post.id,
             title: post.title,
             createdAt: new Date(post.createdAt).toLocaleString("en-US", {
               year: "numeric",
