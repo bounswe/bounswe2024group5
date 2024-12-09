@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Button,
+  Pressable,
   ScrollView,
   Alert,
   ActivityIndicator,
@@ -16,26 +18,26 @@ import QuizViewComponent from "../components/QuizViewComponent";
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from "../app/HostContext";
 import { useFocusEffect } from "@react-navigation/native";
-import { TabView, SceneMap } from "react-native-tab-view";
-
+import { Ionicons } from "@expo/vector-icons";
+import MyQuizzesView from "../components/MyQuizzesView";
+import MyPostsView from '../components/MyPostsView';
+import MyQuizAttemptsView from '../components/MyQuizAttemptsView';
 
 const ProfileScreen = ({ route, navigation }) => {
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, ""); // Remove trailing slash
   const authContext = useAuth(); // Get the authentication context
   const token = authContext ? authContext.token : null;
 
-  const [tabIndex, setTabIndex] = useState(0);
-  const [routes] = useState([
-    { key: "createdQuizzes", title: "My Quizzes" },
-    { key: "quizHistory", title: "Quiz History" },
-    { key: "posts", title: "My Posts" },
-  ]);
   const [userProfile, setUserProfile] = useState(null);
   const [username, setUsername] = useState(null);
   const [loading, setLoading] = useState(true);
   const [createdQuizzes, setCreatedQuizzes] = useState(null);
   const [quizHistory, setQuizHistory] = useState(null);
   const [posts, setPosts] = useState(null);
+
+  const [showMyQuizzes, setShowMyQuizzes] = useState(false);
+  const [showMyPosts, setShowMyPosts] = useState(false);
+  const [showMyQuizAttempts, setShowMyQuizAttempts] = useState(false);
 
   const fetchUserProfile = async () => {
     setLoading(true); // Ensure loading indicator shows during fetch
@@ -63,6 +65,9 @@ const ProfileScreen = ({ route, navigation }) => {
           setUserProfile(data);
           console.log("User Profile:", data);
           setUsername(data.username);
+          handleMyQuizzes();
+          handleMyPosts();
+          handleMyQuizAttempts();
         } else {
           // Handle specific error messages from API
           Alert.alert("Error", data.message || "Failed to fetch profile data.");
@@ -89,8 +94,11 @@ const ProfileScreen = ({ route, navigation }) => {
   };
 
   const fetchMyQuizzes = async () => {
-    if(!userProfile) {
+    if (!userProfile) {
       fetchUserProfile();
+    }
+    if (!username) {
+      return;
     }
     try {
       const response = await fetch(`${hostUrl}/api/quizzes?username=${userProfile.username}`, {
@@ -107,6 +115,7 @@ const ProfileScreen = ({ route, navigation }) => {
       const quizzes = await response.json();
       console.log("My Quizzes:", quizzes.quizzes);
       setCreatedQuizzes(quizzes.quizzes);
+      console.log(" 'createdQuizzes' IS JUST SET.");
     } catch (error) {
       console.error("Error fetching my quizzes:", error);
     }
@@ -121,7 +130,7 @@ const ProfileScreen = ({ route, navigation }) => {
           "Content-Type": "application/json",
         },
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to fetch quiz history");
       }
@@ -170,8 +179,11 @@ const ProfileScreen = ({ route, navigation }) => {
   };
 
   const fetchMyPosts = async () => {
-    if(!userProfile) {
+    if (!userProfile) {
       fetchUserProfile();
+    }
+    if (!username) {
+      return;
     }
     try {
       const response = await fetch(`${hostUrl}/api/posts?username=${userProfile.username}`, {
@@ -190,20 +202,21 @@ const ProfileScreen = ({ route, navigation }) => {
       // Fetch quiz details in parallel
       const posts = await Promise.all(
         myPosts.map(async (post) => {
-            return {
-              title: post.title,
-              createdAt: new Date(post.createdAt).toLocaleString("en-US", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-              }),
-              noReplies: post.noReplies,
-              noUpvote: post.noUpvote,
-            };
+          return {
+            title: post.title,
+            createdAt: new Date(post.createdAt).toLocaleString("en-US", {
+              year: "numeric",
+              month: "numeric",
+              day: "numeric",
+            }),
+            noReplies: post.noReplies,
+            noUpvote: post.noUpvote,
+          };
         })
       );
 
-      setPosts(posts); // Assuming setPosts is a state setter
+      setPosts(posts);
+      console.log(" 'posts' IS JUST SET.");
     } catch (error) {
       console.error("Error fetching my posts:", error);
     }
@@ -211,19 +224,84 @@ const ProfileScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     fetchUserProfile();
-    fetchMyQuizzes();
-    fetchQuizHistory();
-    fetchMyPosts();
   }, []);
 
   useFocusEffect(
     useCallback(() => {
       fetchUserProfile();
-      fetchMyQuizzes();
-      fetchQuizHistory();
-      fetchMyPosts();
     }, [])
   );
+
+  const handleDeleteQuiz = async (quizId) => {
+    Alert.alert("Delete Quiz", "Are you sure you want to delete this quiz?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const response = await fetch(
+              `${hostUrl}/api/quizzes/${quizId}`, // Ensure correct path
+              {
+                method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            if (response.status === 204) {
+              Alert.alert("Success", "Quiz deleted successfully!");
+              // Refresh the profile to reflect the deleted quiz
+              if (showMyQuizzes) {
+                if (!username) {
+                  fetchUserProfile();
+                }
+                fetchMyQuizzes();
+              }
+            } else {
+              const error = await response.json();
+              Alert.alert("Error", error.message || "Failed to delete quiz.");
+              console.error("Delete Quiz Error:", error);
+            }
+          } catch (error) {
+            Alert.alert("Error", "Could not delete quiz.");
+            console.error(`Error deleting quiz with ID ${quizId}:`, error);
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleMyQuizzes = () => {
+    setShowMyQuizzes(!showMyQuizzes);
+    if (showMyQuizzes) {
+      if (!username) {
+        fetchUserProfile();
+      }
+      fetchMyQuizzes();
+    }
+  }
+
+  const handleMyPosts = () => {
+    setShowMyPosts(!showMyPosts);
+    if (showMyPosts) {
+      if (!username) {
+        fetchUserProfile();
+      }
+      fetchMyPosts();
+    }
+  }
+
+  const handleMyQuizAttempts = () => {
+    setShowMyQuizAttempts(!showMyQuizAttempts);
+    if (showMyQuizAttempts) {
+      if (!username) {
+        fetchUserProfile();
+      }
+      fetchQuizHistory();
+    }
+  }
 
   if (loading) {
     return (
@@ -263,42 +341,6 @@ const ProfileScreen = ({ route, navigation }) => {
     noFollowing
   } = userProfile;
 
-  const handleDeleteQuiz = async (quizId) => {
-    Alert.alert("Delete Quiz", "Are you sure you want to delete this quiz?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            const response = await fetch(
-              `${hostUrl}/api/quizzes/${quizId}`, // Ensure correct path
-              {
-                method: "DELETE",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-            if (response.status === 204) {
-              Alert.alert("Success", "Quiz deleted successfully!");
-              // Refresh the profile to reflect the deleted quiz
-              fetchUserProfile();
-            } else {
-              const error = await response.json();
-              Alert.alert("Error", error.message || "Failed to delete quiz.");
-              console.error("Delete Quiz Error:", error);
-            }
-          } catch (error) {
-            Alert.alert("Error", "Could not delete quiz.");
-            console.error(`Error deleting quiz with ID ${quizId}:`, error);
-          }
-        },
-      },
-    ]);
-  };
-
   return (
     <BaseLayout navigation={navigation}>
       <ScrollView contentContainerStyle={styles.contentContainer}>
@@ -313,7 +355,7 @@ const ProfileScreen = ({ route, navigation }) => {
           <View style={styles.headerInfo}>
             <Text style={styles.name}>{name}</Text>
             <Text style={styles.subheading}>
-              <AntDesignIcon name="user" size={16} color="gray" />  @{username}
+              <AntDesignIcon name="user" size={16} color="gray" /> @{username}
             </Text>
 
             {/* Disable emails in the profile page as it is too long*/}
@@ -325,7 +367,11 @@ const ProfileScreen = ({ route, navigation }) => {
 
             <View style={styles.statistics}>
               <Text style={styles.score}>
-                <FontAwesomeIcon name="trophy" size={16} color="#f1d800" /> {score} Points
+                <Ionicons
+                  name="trophy-outline"
+                  size={16}
+                  color="#fbbf24"
+                /> {score} Points
               </Text>
               <View style={styles.englishProficiency}>
                 <Text style={styles.proficiencyText}>Level: {englishProficiency}</Text>
@@ -345,91 +391,52 @@ const ProfileScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.subheading}>{noCreatedQuizzes} Quizzes Created </Text>
+          <Pressable title="My Quizzes" style={styles.sectionButton} onPress={() => handleMyQuizzes()} >
+            <Text style={styles.sectionTitle}>My Quizzes</Text>
+            {
+              showMyQuizzes ? <MyQuizzesView createdQuizzes={createdQuizzes} onDelete={handleDeleteQuiz} navigation={navigation} /> : null
+            }
+          </Pressable>
 
-        <View style={styles.quizSection}>
-          <Text style={styles.sectionTitle}>My Quizzes</Text>
-          {createdQuizzes && createdQuizzes.length > 0 ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.quizScroll}
-              contentContainerStyle={styles.quizScrollContent}
-            >
-              {createdQuizzes.map((quiz) => (
-                <QuizViewComponent
-                key={quiz.id}
-                quiz={quiz}
-                onPress={() =>
-                  navigation.navigate("MyQuizPreviewScreen", {
-                    username: username,
-                    quizId: quiz.id,
-                  })
-                }
-                onDelete={() => handleDeleteQuiz(quiz.id)}
-                showActions={true} // Show buttons on the profile page
-              />
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={styles.noDataText}>
-              You haven't created any quizzes yet.
-            </Text>
-          )}
+        <View>
+          <Pressable title="My Posts" style={styles.sectionButton} color="#2e1065" onPress={() => handleMyPosts()} >
+            <Text style={styles.sectionTitle}>My Posts</Text>
+            {
+              showMyPosts ? <MyPostsView myPosts={posts} navigation={navigation} /> : null
+            }
+          </Pressable>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quiz History</Text>
-          {quizHistory && quizHistory.length > 0 ? (
-            quizHistory.map((quiz) => (
-              <View key={quiz.id} style={styles.card}>
-                <Text style={styles.quizHistoryTitle}>{quiz.title}</Text>
-                <Text style={styles.quizHistoryDetail}>{quiz.completedAt}</Text>
-                <Text style={styles.quizHistoryDetail}>
-                <FontAwesomeIcon name="star-o" size={12} color="#4c1d95" /> {quiz.score} points gained
-                </Text>
-                <Text style={styles.quizHistoryDetail}>
-                  {quiz.status}
-                </Text>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noDataText}>No quiz history available.</Text>
-          )}
+        <View>
+          <Pressable title="Quiz History" style={styles.sectionButton} color="#2e1065" onPress={() => handleMyQuizAttempts()} >
+            <Text style={styles.sectionTitle}>Quiz History</Text>
+            {
+              showMyQuizAttempts ? <MyQuizAttemptsView quizHistory={quizHistory} navigation={navigation} /> : null
+            }
+          </Pressable>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>My Posts</Text>
-          {posts && posts.length > 0 ? (
-            posts.map((post) => (
-              <View key={post.id} style={styles.card}>
-                <Text style={styles.quizHistoryTitle}>{post.title}</Text>
-                <View style={styles.forumDetailLine}> 
-                <Text style={styles.forumDetail}>{post.createdAt}</Text>
-                <View style={styles.forumStats}> 
-                  <Text style={styles.forumDetail}>
-                  <AntDesignIcon name="like2" size={12} color="red" /> {post.noUpvote} | </Text>
-                  <Text style={styles.forumDetail}>
-                  <AntDesignIcon name="message1" size={12} color="#4c1d95" /> {post.noReplies}</Text>
+        {/* {selectedSection === "quiz-history" && ( */}
+        {/* <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Quiz History</Text>
+            {quizHistory && quizHistory.length > 0 ? (
+              quizHistory.map((quiz) => (
+                <View key={quiz.id} style={styles.card}>
+                  <Text style={styles.itemTitle}>{quiz.title}</Text>
+                  <Text style={styles.itemDetail}>{quiz.completedAt}</Text>
+                  <Text style={styles.itemDetail}>
+                    <FontAwesomeIcon name="star-o" size={12} color="#2e1065" /> {quiz.score} points gained
+                  </Text>
+                  <Text style={styles.itemDetail}>
+                    {quiz.status}
+                  </Text>
                 </View>
-                </View>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noDataText}>No posts available.</Text>
-          )}
-        </View>
-
-        {/* title: post.title,
-              createdAt: new Date(post.createdAt).toLocaleString("en-US", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-              noReplies: post.noReplies,
-              noUpvote: post.noUpvote, */}
+              ))
+            ) : (
+              <Text style={styles.noDataText}>No quiz history available.</Text>
+            )}
+          </View> */}
+        {/* )} */}
 
       </ScrollView>
     </BaseLayout>
@@ -463,7 +470,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#4c1d95",
+    color: "#2e1065",
     textAlign: "left",
   },
   subheading: {
@@ -498,36 +505,44 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // marginHorizontal: 20,
   },
+  dropdownContainer: {
+    marginHorizontal: 20,
+    marginLeft: 160,
+  },
   score: {
-    fontSize: 16,
-    color: "#4c1d95",
+    fontSize: 14,
+    color: "#2e1065",
     fontWeight: "bold",
-    marginTop: 8,
     textAlign: "left",
-    marginRight: 55,
+    marginRight: 20,
   },
   englishProficiency: {
-    marginTop: 8,
     marginLeft: 30,
     paddingHorizontal: 10, // Add padding inside the box
     borderRadius: 12,
-    backgroundColor: "#ede9fe",
+    backgroundColor: "#fef3c7",
     justifyContent: "center", // Centers text vertically
     alignItems: "center", // Centers text horizontally
   },
   proficiencyText: {
-    fontSize: 16,
-    color: "#4c1d95",
+    fontSize: 14,
+    color: "#2e1065",
     fontWeight: "bold",
   },
   quizSection: {
-    height: 340,
+    height: 180,
+  },
+  sectionButton: {
+    backgroundColor: "#f5f3ff",
+    borderRadius: 8,
+    marginBottom: 12,
   },
   sectionTitle: {
     marginTop: 10,
-    fontSize: 22,
+    marginLeft: 10,
+    fontSize: 20,
     fontWeight: "600",
-    color: "#333",
+    color: "#2e1065",
     marginBottom: 15,
     textAlign: "left",
   },
@@ -535,7 +550,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   quizScrollContent: {
-    paddingHorizontal: 12,
+    // paddingHorizontal: 12,
   },
   noDataText: {
     textAlign: "center",
@@ -555,16 +570,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderColor: "#ddd",
     borderWidth: 1,
-    width: "100%",
+    marginHorizontal: 4,
   },
-  quizHistoryTitle: {
+  itemTitle: {
     fontSize: 16,
-    color: "#4c1d95",
+    color: "#2e1065",
     fontWeight: "bold",
     marginBottom: 5,
     textAlign: "left",
   },
-  quizHistoryDetail: {
+  itemDetail: {
     fontSize: 12,
     color: "#666",
     textAlign: "left",
@@ -608,6 +623,11 @@ const styles = StyleSheet.create({
   },
   forumStats: {
     flexDirection: "row",
+  },
+  cardFooter: {
+    flexDirection: "row", // Align children in a row
+    justifyContent: "space-between", // Space out favorites and delete button
+    alignItems: "center", // Center them vertically
   },
 });
 
