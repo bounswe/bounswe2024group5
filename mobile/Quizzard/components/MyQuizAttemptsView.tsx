@@ -6,6 +6,7 @@ import {
     View,
     Text,
     StyleSheet,
+    TouchableOpacity,
 } from "react-native";
 import FontAwesomeIcon from "react-native-vector-icons/FontAwesome";
 
@@ -14,7 +15,12 @@ const MyQuizAttemptsView = ({ quizHistory, navigation }) => {
         <View style={styles.section}>
             {quizHistory && quizHistory.length > 0 ? (
                 quizHistory.map((quiz) => (
-                    <View key={quiz.id} style={styles.card}>
+                    <TouchableOpacity
+                        key={quiz.id}
+                        style={styles.card}
+                        onPress={() => navigation.navigate("QuizWelcome", { quiz })
+                        }
+                    >
                         <Text style={styles.itemTitle}>{quiz.title}</Text>
                         <Text style={styles.itemDetail}>{quiz.completedAt}</Text>
                         <Text style={styles.itemDetail}>
@@ -23,7 +29,7 @@ const MyQuizAttemptsView = ({ quizHistory, navigation }) => {
                         <Text style={styles.itemDetail}>
                             {quiz.status}
                         </Text>
-                    </View>
+                    </TouchableOpacity>
                 ))
             ) : (
                 <Text style={styles.noDataText}>No quiz history available.</Text>

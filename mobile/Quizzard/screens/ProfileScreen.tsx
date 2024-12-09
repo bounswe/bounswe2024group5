@@ -22,6 +22,7 @@ import { Ionicons } from "@expo/vector-icons";
 import MyQuizzesView from "../components/MyQuizzesView";
 import MyPostsView from '../components/MyPostsView';
 import MyQuizAttemptsView from '../components/MyQuizAttemptsView';
+// import calculateQuizDifficultyFromElo from './HomeScreen';
 
 const ProfileScreen = ({ route, navigation }) => {
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, ""); // Remove trailing slash
@@ -38,6 +39,15 @@ const ProfileScreen = ({ route, navigation }) => {
   const [showMyQuizzes, setShowMyQuizzes] = useState(false);
   const [showMyPosts, setShowMyPosts] = useState(false);
   const [showMyQuizAttempts, setShowMyQuizAttempts] = useState(false);
+
+  const calculateQuizDifficultyFromElo = (elo: number) => {
+    if (elo < 400) return "A1";
+    else if (elo < 1000) return "A2";
+    else if (elo < 1800) return "B1";
+    else if (elo < 2600) return "B2";
+    else if (elo < 3300) return "C1";
+    else return "C2";
+  }
 
   const fetchUserProfile = async () => {
     setLoading(true); // Ensure loading indicator shows during fetch
@@ -112,9 +122,16 @@ const ProfileScreen = ({ route, navigation }) => {
       if (!response.ok) {
         throw new Error("Failed to fetch quizzes");
       }
-      const quizzes = await response.json();
-      console.log("My Quizzes:", quizzes.quizzes);
-      setCreatedQuizzes(quizzes.quizzes);
+      const data = await response.json();
+
+      data.quizzes = data.quizzes.map((quiz) => ({
+        ...quiz,
+        elo: quiz.difficulty,
+        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty)
+      }));
+      console.log("My Quizzes:", data.quizzes);
+
+      setCreatedQuizzes(data.quizzes);
       console.log(" 'createdQuizzes' IS JUST SET.");
     } catch (error) {
       console.error("Error fetching my quizzes:", error);
@@ -154,7 +171,17 @@ const ProfileScreen = ({ route, navigation }) => {
             const quizDetails = await response.json();
 
             return {
+              id: quiz.id,
               title: quizDetails.quiz.title,
+              description: quizDetails.quiz.description,
+              image: quizDetails.quiz.image,
+              elo: quizDetails.quiz.difficulty,
+              difficulty: calculateQuizDifficultyFromElo(quizDetails.quiz.difficulty),
+              username: quizDetails.quiz.username,
+              createdAt: quizDetails.quiz.createdAt,
+              updatedAt: quizDetails.quiz.updatedAt,
+              noFavorites: quizDetails.quiz.noFavorites,
+              questions: quizDetails.quiz.questions,
               completedAt: new Date(quiz.completedAt).toLocaleString("en-US", {
                 year: "numeric",
                 month: "numeric",

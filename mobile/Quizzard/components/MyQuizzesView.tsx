@@ -20,7 +20,12 @@ const MyQuizzesView = ({ createdQuizzes, onDelete, navigation }) => {
                     contentContainerStyle={styles.quizScrollContent}
                 >
                     {createdQuizzes.map((quiz) => (
-                        <View key={quiz.id} style={styles.card}>
+                        <TouchableOpacity
+                            key={quiz.id}
+                            style={styles.card}
+                            onPress={() => navigation.navigate("QuizWelcome", { quiz })
+                            }
+                        >
                             <Text style={styles.itemTitle}>{quiz.title}</Text>
                             <Text style={styles.itemDetail}>{quiz.questions.length} Questions</Text>
                             {/* TODO: Convert the following ELO to CEFR */}
@@ -40,8 +45,7 @@ const MyQuizzesView = ({ createdQuizzes, onDelete, navigation }) => {
                                     </Text>
                                 </TouchableOpacity>
                             </View>
-
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </ScrollView>
             ) : (
