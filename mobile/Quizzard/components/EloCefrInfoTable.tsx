@@ -28,7 +28,7 @@ export const EloCefrInfoTable = () => {
                 We offer quizzes to help you learn English with fun!
             </Text>
 
-            <Text style={styles.modalSectionSubtitle}>The ELO - CEFR Levels Conversion</Text>
+            <Text style={styles.modalSectionSubtitle}>ELO - CEFR Levels Conversion</Text>
 
             <Text style={styles.modalText}>You can see the conversion logic:</Text>
 
