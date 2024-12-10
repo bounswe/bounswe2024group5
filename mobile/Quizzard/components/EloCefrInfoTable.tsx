@@ -21,28 +21,35 @@ export const EloCefrInfoTable = () => {
 
     return (
         <View style={styles.modalContentContainer}>
-            <Text style={styles.modalSectionTitle}>Welcome to Quizzard!</Text>
+            <Text style={styles.modalSectionTitle}>Welcome to Quizzard! 🔮</Text>
 
             <Text style={styles.modalText}>
-                We are your ultimate friend in language learning.{"\n"}
+                We are your friend in language learning.{"\n"}
                 We offer quizzes to help you learn English with fun!
             </Text>
 
             <Text style={styles.modalSectionSubtitle}>The ELO - CEFR Levels Conversion</Text>
 
             <Text style={styles.modalText}>You can see the conversion logic:</Text>
+
             <View style={styles.bulletPoint}>
                 <Text style={styles.bullet}>•</Text>
-                <Text style={styles.levelText}>
-                    000 <FontAwesome6 name="less-than-equal" size={16} color="#333" /> A1 <FontAwesome6 name="less-than-equal" size={16} color="#333" /> 400
+                <Text style={styles.bulletText}>
+                    <Text style={styles.levelText}>A1 </Text>
+                    <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
+                    <Text style={styles.rangeText}> [000, 400]</Text>
                 </Text>
             </View>
+            
             <View style={styles.bulletPoint}>
                 <Text style={styles.bullet}>•</Text>
-                <Text style={styles.levelText}>
-                    400 <FontAwesome6 name="less-than-equal" size={16} color="#333" /> A2 <FontAwesome6 name="less-than-equal" size={16} color="#333" /> 1800
+                <Text style={styles.bulletText}>
+                    <Text style={styles.levelText}>A2 </Text>
+                    <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
+                    <Text style={styles.rangeText}> [400, 1800]</Text>
                 </Text>
             </View>
+
             <View style={styles.bulletPoint}>
                 <Text style={styles.bullet}>•</Text>
                 <Text style={styles.bulletText}>
@@ -50,19 +57,33 @@ export const EloCefrInfoTable = () => {
                     <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
                     <Text style={styles.rangeText}> [1000, 1800]</Text>
                 </Text>
-
             </View>
+            
             <View style={styles.bulletPoint}>
                 <Text style={styles.bullet}>•</Text>
-                <Text style={styles.bulletText}>B2 <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" /> [1800, 2600]</Text>
+                <Text style={styles.bulletText}>
+                    <Text style={styles.levelText}>B2 </Text>
+                    <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
+                    <Text style={styles.rangeText}> [1800, 2600]</Text>
+                </Text>
             </View>
+            
             <View style={styles.bulletPoint}>
                 <Text style={styles.bullet}>•</Text>
-                <Text style={styles.bulletText}>C1 <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" /> [2600, 3300]</Text>
+                <Text style={styles.bulletText}>
+                    <Text style={styles.levelText}>C1 </Text>
+                    <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
+                    <Text style={styles.rangeText}> [2600, 3300]</Text>
+                </Text>
             </View>
+            
             <View style={styles.bulletPoint}>
                 <Text style={styles.bullet}>•</Text>
-                <Text style={styles.bulletText}>C2 <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" /> [3300, 400]</Text>
+                <Text style={styles.bulletText}>
+                    <Text style={styles.levelText}>C2 </Text>
+                    <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
+                    <Text style={styles.rangeText}> [3300, 10000]</Text>
+                </Text>
             </View>
         </View>
     );
@@ -113,6 +134,6 @@ const styles = StyleSheet.create({
       },
       rangeText: {
         color: "#333",
-        // fontStyle: "italic",
+        fontWeight: "bold",
       },
 });
