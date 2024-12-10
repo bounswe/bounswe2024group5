@@ -1,11 +1,10 @@
-import React, { useState, useContext, useEffect, useCallback } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Image,
-  Button,
   Pressable,
   ScrollView,
   Alert,
@@ -14,15 +13,24 @@ import {
 import BaseLayout from "./BaseLayout";
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import FontAwesomeIcon from "react-native-vector-icons/FontAwesome";
-import QuizViewComponent from "../components/QuizViewComponent";
+import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from "../app/HostContext";
-import { useFocusEffect } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
 import MyQuizzesView from "../components/MyQuizzesView";
-import MyPostsView from '../components/MyPostsView';
-import MyQuizAttemptsView from '../components/MyQuizAttemptsView';
-// import calculateQuizDifficultyFromElo from './HomeScreen';
+import MyPostsView from "../components/MyPostsView";
+import MyQuizAttemptsView from "../components/MyQuizAttemptsView";
+
+interface QuizAttempt {
+  id: number;
+  title: string;
+  // ... other properties
+}
+
+interface Post {
+  id: number;
+  title: string;
+  // ... other properties
+}
 
 const ProfileScreen = ({ route, navigation }) => {
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, ""); // Remove trailing slash
@@ -32,14 +40,15 @@ const ProfileScreen = ({ route, navigation }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [username, setUsername] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [createdQuizzes, setCreatedQuizzes] = useState(null);
-  const [quizAttempts, setQuizAttempts] = useState(null);
-  const [posts, setPosts] = useState(null);
+  const [createdQuizzes, setCreatedQuizzes] = useState<any[]>([]);
+  const [quizAttempts, setQuizAttempts] = useState<QuizAttempt[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   const [showMyQuizzes, setShowMyQuizzes] = useState(true);
   const [showMyPosts, setShowMyPosts] = useState(true);
   const [showMyQuizAttempts, setShowMyQuizAttempts] = useState(true);
 
+  // Function to calculate quiz difficulty based on Elo score
   const calculateQuizDifficultyFromElo = (elo: number) => {
     if (elo < 400) return "A1";
     else if (elo < 1000) return "A2";
@@ -47,8 +56,9 @@ const ProfileScreen = ({ route, navigation }) => {
     else if (elo < 2600) return "B2";
     else if (elo < 3300) return "C1";
     else return "C2";
-  }
+  };
 
+  // Function to fetch user profile
   const fetchUserProfile = async () => {
     setLoading(true); // Ensure loading indicator shows during fetch
     try {
@@ -100,21 +110,25 @@ const ProfileScreen = ({ route, navigation }) => {
     }
   };
 
+  // Function to fetch created quizzes
   const fetchMyQuizzes = async () => {
     if (!userProfile) {
-      fetchUserProfile();
+      await fetchUserProfile();
     }
     if (!username) {
       return;
     }
     try {
-      const response = await fetch(`${hostUrl}/api/quizzes?username=${username}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${hostUrl}/api/quizzes?username=${username}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch quizzes");
@@ -124,7 +138,7 @@ const ProfileScreen = ({ route, navigation }) => {
       data.quizzes = data.quizzes.map((quiz) => ({
         ...quiz,
         elo: quiz.difficulty,
-        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty)
+        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
       }));
       console.log("My Quizzes:", data.quizzes);
 
@@ -135,6 +149,7 @@ const ProfileScreen = ({ route, navigation }) => {
     }
   };
 
+  // Function to fetch and process quiz attempts
   const fetchMyQuizAttempts = async () => {
     try {
       const response = await fetch(`${hostUrl}/api/quiz-attempts`, {
@@ -148,113 +163,179 @@ const ProfileScreen = ({ route, navigation }) => {
       if (!response.ok) {
         throw new Error("Failed to fetch quiz attempts");
       }
-      const quizAttempts = await response.json();
-      console.log("Quiz Attempts:", quizAttempts);
+      const quizAttemptsRaw = await response.json();
+      console.log("Quiz Attempts (Raw):", quizAttemptsRaw);
 
       // Fetch quiz details in parallel
-      const quizAttemptsData = await Promise.all(
-        quizAttempts.map(async (quiz) => {
+      const quizAttemptsDetailed = await Promise.all(
+        quizAttemptsRaw.map(async (attempt) => {
           try {
-            const response = await fetch(`${hostUrl}/api/quizzes/${quiz.quizId}`, {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            });
+            const response = await fetch(
+              `${hostUrl}/api/quizzes/${attempt.quizId}`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
             if (!response.ok) {
-              throw new Error(`Failed to fetch quiz with ID ${quiz.quizId}`);
+              throw new Error(`Failed to fetch quiz with ID ${attempt.quizId}`);
             }
             const quizDetails = await response.json();
 
             return {
-              id: quiz.id,
+              id: attempt.id,
+              quizId: attempt.quizId,
               title: quizDetails.quiz.title,
               description: quizDetails.quiz.description,
               image: quizDetails.quiz.image,
               elo: quizDetails.quiz.difficulty,
-              difficulty: calculateQuizDifficultyFromElo(quizDetails.quiz.difficulty),
+              difficulty: calculateQuizDifficultyFromElo(
+                quizDetails.quiz.difficulty
+              ),
               username: quizDetails.quiz.username,
               createdAt: quizDetails.quiz.createdAt,
               updatedAt: quizDetails.quiz.updatedAt,
               noFavorites: quizDetails.quiz.noFavorites,
               questions: quizDetails.quiz.questions,
-              completedAt: new Date(quiz.completedAt).toLocaleString("en-US", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-              score: quiz.score,
-              status: quiz.completed ? "Completed" : "In Progress"
+              completedAt: attempt.completed
+                ? new Date(attempt.completedAt).toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : new Date(attempt.updatedAt).toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }),
+              score: attempt.score,
+              status: attempt.completed ? "Completed" : "In Progress",
+              rawCompleted: attempt.completed,
+              rawUpdatedAt: new Date(attempt.updatedAt),
             };
           } catch (error) {
-            console.error(`Error fetching quiz with ID ${quiz.quizId}:`, error);
+            console.error(
+              `Error fetching quiz with ID ${attempt.quizId}:`,
+              error
+            );
             return null; // Return null or skip this quiz
           }
         })
       );
 
-      setQuizAttempts(quizAttemptsData.filter((item) => item !== null));
+      // Filter out any null attempts due to fetch errors
+      const validAttempts = quizAttemptsDetailed.filter(
+        (item) => item !== null
+      );
+      console.log("Quiz Attempts (Detailed):", validAttempts);
+
+      // Process attempts to meet the criteria
+      const processedAttemptsMap = new Map();
+
+      validAttempts.forEach((attempt) => {
+        const existing = processedAttemptsMap.get(attempt.quizId);
+        if (attempt.rawCompleted) {
+          if (!existing || !existing.rawCompleted) {
+            // If current attempt is completed and either:
+            // - No existing attempt
+            // - Existing attempt is not completed
+            processedAttemptsMap.set(attempt.quizId, attempt);
+          }
+          // If existing attempt is also completed, keep the first one (do nothing)
+        } else {
+          if (!existing) {
+            // If there's no existing attempt, set the current as in progress
+            processedAttemptsMap.set(attempt.quizId, attempt);
+          } else if (!existing.rawCompleted) {
+            // If existing attempt is also in progress, keep the latest one
+            if (attempt.rawUpdatedAt > existing.rawUpdatedAt) {
+              processedAttemptsMap.set(attempt.quizId, attempt);
+            }
+          }
+          // If existing attempt is completed, do nothing
+        }
+      });
+
+      const processedAttempts = Array.from(processedAttemptsMap.values());
+      console.log("Processed Quiz Attempts:", processedAttempts);
+
+      setQuizAttempts(processedAttempts);
     } catch (error) {
       console.error("Error fetching quiz attempts:", error);
     }
   };
 
+  // Function to fetch user's posts
   const fetchMyPosts = async () => {
     if (!userProfile) {
-      fetchUserProfile();
+      await fetchUserProfile();
     }
     if (!username) {
       return;
     }
     try {
-      const response = await fetch(`${hostUrl}/api/posts?username=${username}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${hostUrl}/api/posts?username=${username}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (!response.ok) {
-        throw new Error(`Failed to fetch posts: ${response.status} and ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch posts: ${response.status} and ${response.statusText}`
+        );
       }
       const myPosts = await response.json();
       console.log("My Posts:", myPosts);
 
-      // Fetch quiz details in parallel
-      const posts = await Promise.all(
-        myPosts.map(async (post) => {
-          return {
-            id: post.id,
-            title: post.title,
-            createdAt: new Date(post.createdAt).toLocaleString("en-US", {
-              year: "numeric",
-              month: "numeric",
-              day: "numeric",
-            }),
-            noReplies: post.noReplies,
-            noUpvote: post.noUpvote,
-          };
-        })
-      );
+      // Process posts
+      const processedPosts = myPosts.map((post) => ({
+        id: post.id,
+        title: post.title,
+        createdAt: new Date(post.createdAt).toLocaleString("en-US", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        }),
+        noReplies: post.noReplies,
+        noUpvote: post.noUpvote,
+      }));
 
-      setPosts(posts);
+      setPosts(processedPosts);
       console.log(" 'posts' IS JUST SET.");
     } catch (error) {
       console.error("Error fetching my posts:", error);
     }
   };
 
+  // useEffect to fetch data when userProfile changes
   useEffect(() => {
-
     const fetchData = async () => {
       setLoading(true);
       try {
-        await Promise.all([fetchMyQuizAttempts(), fetchMyQuizzes(), fetchMyPosts()]);
+        // Ensure userProfile is fetched first
+        if (!userProfile) {
+          await fetchUserProfile();
+        }
+
+        await Promise.all([
+          fetchMyQuizAttempts(),
+          fetchMyQuizzes(),
+          fetchMyPosts(),
+        ]);
       } catch (error) {
-        console.error("Error fetching quizzes:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -262,7 +343,7 @@ const ProfileScreen = ({ route, navigation }) => {
     fetchData();
   }, [userProfile]);
 
-
+  // Handler to delete a quiz
   const handleDeleteQuiz = async (quizId) => {
     Alert.alert("Delete Quiz", "Are you sure you want to delete this quiz?", [
       { text: "Cancel", style: "cancel" },
@@ -286,7 +367,7 @@ const ProfileScreen = ({ route, navigation }) => {
               // Refresh the profile to reflect the deleted quiz
               if (showMyQuizzes) {
                 if (!username) {
-                  fetchUserProfile();
+                  await fetchUserProfile();
                 }
                 fetchMyQuizzes();
               }
@@ -304,6 +385,7 @@ const ProfileScreen = ({ route, navigation }) => {
     ]);
   };
 
+  // Handlers to toggle visibility of sections
   const handleMyQuizzes = () => {
     setShowMyQuizzes(!showMyQuizzes);
     if (showMyQuizzes) {
@@ -312,7 +394,7 @@ const ProfileScreen = ({ route, navigation }) => {
       }
       fetchMyQuizzes();
     }
-  }
+  };
 
   const handleMyPosts = () => {
     setShowMyPosts(!showMyPosts);
@@ -322,7 +404,7 @@ const ProfileScreen = ({ route, navigation }) => {
       }
       fetchMyPosts();
     }
-  }
+  };
 
   const handleMyQuizAttempts = () => {
     setShowMyQuizAttempts(!showMyQuizAttempts);
@@ -332,8 +414,9 @@ const ProfileScreen = ({ route, navigation }) => {
       }
       fetchMyQuizAttempts();
     }
-  }
+  };
 
+  // Render loading indicator
   if (loading) {
     return (
       <BaseLayout navigation={navigation}>
@@ -345,6 +428,7 @@ const ProfileScreen = ({ route, navigation }) => {
     );
   }
 
+  // Render error if userProfile is not available
   if (!userProfile) {
     return (
       <BaseLayout navigation={navigation}>
@@ -361,6 +445,7 @@ const ProfileScreen = ({ route, navigation }) => {
     );
   }
 
+  // Destructure userProfile data
   const {
     name,
     email,
@@ -369,7 +454,7 @@ const ProfileScreen = ({ route, navigation }) => {
     profilePicture,
     englishProficiency,
     noFollowers,
-    noFollowing
+    noFollowing,
   } = userProfile;
 
   return (
@@ -389,7 +474,7 @@ const ProfileScreen = ({ route, navigation }) => {
               <AntDesignIcon name="user" size={16} color="gray" /> @{username}
             </Text>
 
-            {/* Disable emails in the profile page as it is too long*/}
+            {/* Disable emails in the profile page as it is too long */}
             {/* <Text style={styles.subheading}>
               <Icon name="envelope" size={16} color="gray" /> {email}
             </Text> */}
@@ -398,14 +483,13 @@ const ProfileScreen = ({ route, navigation }) => {
 
             <View style={styles.statistics}>
               <Text style={styles.score}>
-                <Ionicons
-                  name="trophy-outline"
-                  size={16}
-                  color="#fbbf24"
-                /> {score} Points
+                <Ionicons name="trophy-outline" size={16} color="#fbbf24" />{" "}
+                {score} Points
               </Text>
               <View style={styles.englishProficiency}>
-                <Text style={styles.proficiencyText}>Level: {englishProficiency}</Text>
+                <Text style={styles.proficiencyText}>
+                  Level: {englishProficiency}
+                </Text>
               </View>
             </View>
           </View>
@@ -417,36 +501,58 @@ const ProfileScreen = ({ route, navigation }) => {
               navigation.navigate("ProfileSettings", { username: username })
             }
           >
-            <FontAwesomeIcon name="pencil-square-o" size={16} style={styles.editIcon} />
+            <FontAwesomeIcon
+              name="pencil-square-o"
+              size={16}
+              style={styles.editIcon}
+            />
             <Text style={styles.buttonText}>Edit</Text>
           </TouchableOpacity>
         </View>
 
-          <Pressable style={styles.sectionButton} onPress={() => handleMyQuizzes()} >
-            <Text style={styles.sectionTitle}>My Quizzes</Text>
-            {
-              showMyQuizzes ? <MyQuizzesView createdQuizzes={createdQuizzes} onDelete={handleDeleteQuiz} navigation={navigation} /> : null
-            }
-          </Pressable>
+        {/* My Quizzes Section */}
+        <Pressable
+          style={styles.sectionButton}
+          onPress={() => handleMyQuizzes()}
+        >
+          <Text style={styles.sectionTitle}>My Quizzes</Text>
+          {showMyQuizzes ? (
+            <MyQuizzesView
+              createdQuizzes={createdQuizzes}
+              onDelete={handleDeleteQuiz}
+              navigation={navigation}
+            />
+          ) : null}
+        </Pressable>
 
+        {/* My Posts Section */}
         <View>
-          <Pressable style={styles.sectionButton} color="#2e1065" onPress={() => handleMyPosts()} >
+          <Pressable
+            style={styles.sectionButton}
+            onPress={() => handleMyPosts()}
+          >
             <Text style={styles.sectionTitle}>My Posts</Text>
-            {
-              showMyPosts ? <MyPostsView myPosts={posts} navigation={navigation} /> : null
-            }
+            {showMyPosts ? (
+              <MyPostsView myPosts={posts} navigation={navigation} />
+            ) : null}
           </Pressable>
         </View>
 
+        {/* Quiz Attempts Section */}
         <View>
-          <Pressable style={styles.sectionButton} color="#2e1065" onPress={() => handleMyQuizAttempts()} >
+          <Pressable
+            style={styles.sectionButton}
+            onPress={() => handleMyQuizAttempts()}
+          >
             <Text style={styles.sectionTitle}>Quiz Attempts</Text>
-            {
-              showMyQuizAttempts ? <MyQuizAttemptsView quizHistory={quizAttempts} navigation={navigation} /> : null
-            }
+            {showMyQuizAttempts ? (
+              <MyQuizAttemptsView
+                quizHistory={quizAttempts}
+                navigation={navigation}
+              />
+            ) : null}
           </Pressable>
         </View>
-
       </ScrollView>
     </BaseLayout>
   );
@@ -514,10 +620,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // marginHorizontal: 20,
   },
-  dropdownContainer: {
-    marginHorizontal: 20,
-    marginLeft: 160,
-  },
   score: {
     fontSize: 14,
     color: "#2e1065",
@@ -538,59 +640,17 @@ const styles = StyleSheet.create({
     color: "#2e1065",
     fontWeight: "bold",
   },
-  quizSection: {
-    height: 180,
-  },
   sectionButton: {
     backgroundColor: "#f5f3ff",
     borderRadius: 8,
     marginBottom: 12,
+    padding: 10,
   },
   sectionTitle: {
-    marginTop: 10,
-    marginLeft: 10,
     fontSize: 20,
     fontWeight: "600",
     color: "#2e1065",
     marginBottom: 15,
-    textAlign: "left",
-  },
-  quizScroll: {
-    paddingVertical: 8,
-  },
-  quizScrollContent: {
-    // paddingHorizontal: 12,
-  },
-  noDataText: {
-    textAlign: "center",
-    marginTop: 20,
-    color: "gray",
-    fontSize: 14,
-    marginVertical: 20,
-  },
-  section: {
-    marginBottom: 30,
-    width: "100%",
-  },
-  card: {
-    backgroundColor: "#ede9fe",
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 10,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    marginHorizontal: 4,
-  },
-  itemTitle: {
-    fontSize: 16,
-    color: "#2e1065",
-    fontWeight: "bold",
-    marginBottom: 5,
-    textAlign: "left",
-  },
-  itemDetail: {
-    fontSize: 12,
-    color: "#666",
     textAlign: "left",
   },
   loadingContainer: {
@@ -620,23 +680,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
-  },
-  forumDetailLine: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  forumDetail: {
-    fontSize: 12,
-    color: "#666",
-    textAlign: "left",
-  },
-  forumStats: {
-    flexDirection: "row",
-  },
-  cardFooter: {
-    flexDirection: "row", // Align children in a row
-    justifyContent: "space-between", // Space out favorites and delete button
-    alignItems: "center", // Center them vertically
   },
 });
 
