@@ -1,14 +1,23 @@
 // BaseLayout.tsx
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView,
+  Modal, 
+  TouchableWithoutFeedback 
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRoute } from "@react-navigation/native"; // Import useRoute hook to get the current route
+import { useRoute } from "@react-navigation/native";
+import { EloCefrInfoTable } from "../components/EloCefrInfoTable";
 
 const BaseLayout = ({ children, navigation }) => {
-  const route = useRoute(); // Get the current route
+  const route = useRoute();
+  const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
 
   const handleLogout = () => {
-    // Simulate logout and navigate back to the login screen
     navigation.navigate("Login");
   };
 
@@ -18,6 +27,10 @@ const BaseLayout = ({ children, navigation }) => {
 
   const navigateToProfile = () => {
     navigation.navigate("Profile");
+  };
+
+  const toggleInfoModal = () => {
+    setIsInfoModalVisible(!isInfoModalVisible);
   };
 
   // Determine which icon should be filled based on the current route
@@ -33,6 +46,12 @@ const BaseLayout = ({ children, navigation }) => {
           <Text style={styles.appName}>Quizzard</Text>
         </TouchableOpacity>
         <View style={styles.icons}>
+          <TouchableOpacity 
+            style={styles.iconButton}
+            onPress={toggleInfoModal}
+          >
+            <Ionicons name="help-circle-outline" size={28} color="black" />
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={navigateToProfile}
@@ -45,7 +64,36 @@ const BaseLayout = ({ children, navigation }) => {
         </View>
       </View>
 
-      {/* Dynamic Content Section - Modified styles */}
+      {/* Information Modal */}
+      <Modal
+        transparent={true}
+        visible={isInfoModalVisible}
+        animationType="fade"
+        onRequestClose={toggleInfoModal}
+      >
+        <TouchableWithoutFeedback onPress={toggleInfoModal}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <TouchableOpacity 
+                  style={styles.closeButton} 
+                  onPress={toggleInfoModal}
+                >
+                  <Ionicons name="close" size={24} color="black" />
+                </TouchableOpacity>
+                <ScrollView 
+                  contentContainerStyle={styles.scrollViewContent}
+                  showsVerticalScrollIndicator={false}
+                >
+                  {EloCefrInfoTable()}
+                </ScrollView>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Dynamic Content Section */}
       <View style={styles.body}>{children}</View>
 
       {/* Bottom Navigation Bar */}
@@ -55,7 +103,7 @@ const BaseLayout = ({ children, navigation }) => {
           onPress={() => navigation.navigate("Home")}
         >
           <Ionicons
-            name={isHome ? "home" : "home-outline"} // Fill the icon if on Home page
+            name={isHome ? "home" : "home-outline"}
             size={24}
             color="#6a0dad"
           />
@@ -65,7 +113,7 @@ const BaseLayout = ({ children, navigation }) => {
           onPress={() => navigation.navigate("Forum")}
         >
           <Ionicons
-            name={isForum ? "chatbox" : "chatbox-outline"} // Fill the icon if on Forum page
+            name={isForum ? "chatbox" : "chatbox-outline"}
             size={24}
             color="#6a0dad"
           />
@@ -124,6 +172,32 @@ const styles = StyleSheet.create({
   },
   navButton: {
     padding: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#ede9fe',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
 });
 
