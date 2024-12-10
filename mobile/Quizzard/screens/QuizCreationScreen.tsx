@@ -1,5 +1,16 @@
-import React, { useState, useContext } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, FlatList, Alert, Image } from "react-native";
+import React, { useState, useContext, useEffect } from "react";
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  StyleSheet, 
+  ScrollView, 
+  FlatList, 
+  Alert, 
+  Image,
+  ActivityIndicator 
+} from "react-native";
 import DropdownComponent from "../components/QuestionTypeDropdown";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system"; // Import FileSystem for base64 conversion
@@ -21,6 +32,9 @@ const QuizCreationPage = ({ navigation }) => {
   const [image, setMedia] = useState<string | null>(null);
   const authContext = useAuth();
   const token = authContext ? authContext.token : null;
+  const [wordSuggestions, setWordSuggestions] = useState<string[]>([]);
+  const [showWordSuggestions, setShowWordSuggestions] = useState(false);
+  const [isLoadingWordSuggestions, setIsLoadingWordSuggestions] = useState(false);
 
   // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready
 
@@ -241,14 +255,27 @@ const QuizCreationPage = ({ navigation }) => {
     updatedQuestion.word = word;
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
+
+    // Reset suggestions if word is empty
+    if (word.trim() === '') {
+      setWordSuggestions([]);
+      setShowWordSuggestions(false);
+      return;
+    }
   
-    // Set a new timeout for word validation, passing the current word directly
+    // Set a new timeout for word validation and suggestions
+    
+    /*
     const timeoutId = setTimeout(() => {
-      checkInputWord(word);  // Pass word directly
-    }, 2000);
+      checkInputWord(word);
+      fetchWordSuggestions(word);
+    }, 300);
+    */
+    fetchWordSuggestions(word);
   
     // Store the timeout ID
-    setCheckInputTimeoutId(timeoutId);
+    //setCheckInputTimeoutId(timeoutId);
+    setShowWordSuggestions(true);
   };
   
   const checkInputWord = async (word: string) => {  // Accept word as a parameter
@@ -299,6 +326,56 @@ const QuizCreationPage = ({ navigation }) => {
       console.error("Error validating word:", error);
       Alert.alert("Error", "Failed to validate the word. Please try again.");
     }
+  };
+
+   // New method to fetch word suggestions
+   const fetchWordSuggestions = async (word: string) => {
+    // Determine language based on question type
+    const language = selectedType.includes('english') ? 'english' : 'turkish';
+    
+    try {
+      setIsLoadingWordSuggestions(true);
+      const response = await fetch(
+        `${hostUrl}/api/autocomplete?prefix=${encodeURIComponent(word)}&language=${language}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setWordSuggestions(data);
+      } else {
+        console.error("Failed to fetch word suggestions");
+        setWordSuggestions([]);
+      }
+    } catch (error) {
+      console.error("Error fetching word suggestions:", error);
+      setWordSuggestions([]);
+    } finally {
+      setIsLoadingWordSuggestions(false);
+    }
+  };
+
+  const handleWordSuggestionSelect = (index: number, suggestion: string) => {
+    const updatedQuestions = [...questions];
+    const updatedQuestion = { ...updatedQuestions[index] };
+    updatedQuestion.word = suggestion;
+    updatedQuestions[index] = updatedQuestion;
+    setQuestions(updatedQuestions);
+
+    // Trigger word validation and answer fetching
+    checkInputWord(suggestion);
+    fetchQuestionWord(suggestion, selectedType);
+    fetchQuestionAnswers(suggestion, selectedType, token);
+
+    // Clear suggestions
+    setWordSuggestions([]);
+    setShowWordSuggestions(false);
   };
 
   const updateQuestionType = (index: number, type: string) => {
@@ -388,33 +465,49 @@ const QuizCreationPage = ({ navigation }) => {
 
       {/* Render all question boxes */}
       {questions.map((question, index) => (
-        <View key={index} style={styles.questionBox}>
-          {/* Header with Title and Dropdown */}
-          <View style={styles.headerContainer}>
-            <TextInput
-              style={styles.questionTitle}
-              placeholder="Enter a word"
-              onChangeText={(word) => handleInputChange(index, word)}
-            />
-            <View style={styles.dropdownContainer}>
-              <DropdownComponent
-                testID="question-type-dropdown"
-                selectedValue={questions[index].questionType}
-                onValueChange={(type) => updateQuestionType(index, type)}
-              />
-            </View>
-          </View>
+    <View key={index} style={styles.questionBox}>
+      {/* Existing header container */}
+      <View style={styles.headerContainer}>
+        <TextInput
+          style={styles.questionTitle}
+          placeholder="Enter a word"
+          value={question.word}
+          onChangeText={(word) => handleInputChange(index, word)}
+        />
+        {/* Loading indicator for suggestions */}
+        {isLoadingWordSuggestions && (
+          <ActivityIndicator 
+            size="small" 
+            color="#6a0dad" 
+            style={styles.suggestionLoadingIndicator} 
+          />
+        )}
+        <View style={styles.dropdownContainer}>
+          <DropdownComponent
+            testID="question-type-dropdown"
+            selectedValue={questions[index].questionType}
+            onValueChange={(type) => updateQuestionType(index, type)}
+          />
+        </View>
+      </View>
 
-          {/* Display suggestions */}
-          {suggestions.length > 0 && (
-            <FlatList
-              data={suggestions}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <Text style={styles.suggestionText}>{item}</Text>
-              )}
-            />
-          )}
+      {/* Word Suggestions Dropdown */}
+      {showWordSuggestions && wordSuggestions.length > 0 && (
+        <View style={styles.wordSuggestionsContainer}>
+          <FlatList
+            data={wordSuggestions}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.wordSuggestionItem}
+                onPress={() => handleWordSuggestionSelect(index, item)}
+              >
+                <Text>{item}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      )}
 
           {/* Answer Choices */}
           {["A", "B", "C", "D"].map((option) => (
@@ -454,6 +547,21 @@ const QuizCreationPage = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  wordSuggestionsContainer: {
+    maxHeight: 150,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  wordSuggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  suggestionLoadingIndicator: {
+    marginLeft: 10,
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -535,33 +643,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     marginRight: 10,
   },
   dropdownContainer: {
-    width: "42%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    fontSize: 14,
-  },
-  dropdown: {
-    height: 40,
+    flex: 1,
   },
   choiceInput: {
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     marginBottom: 10,
     fontSize: 14,
+    backgroundColor: "#fff",
+    borderRadius: 5,
   },
   addQuestionButton: {
     backgroundColor: "#6a0dad",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: "flex-end",
-    marginBottom: 40,
+    borderRadius: 5,
+    alignItems: "center",
+    marginBottom: 20,
   },
   addQuestionButtonText: {
     color: "#fff",
@@ -571,16 +676,17 @@ const styles = StyleSheet.create({
   bottomButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginTop: 20,
   },
   cancelButton: {
-    backgroundColor: "#555",
+    backgroundColor: "#ccc",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 5,
+    alignItems: "center",
   },
   cancelButtonText: {
-    color: "#fff",
+    color: "#333",
     fontWeight: "bold",
     fontSize: 16,
   },
@@ -588,7 +694,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#6a0dad",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 5,
+    alignItems: "center",
   },
   submitButtonText: {
     color: "#fff",
