@@ -1,14 +1,5 @@
 import React, { useState, useContext } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  FlatList,
-  Alert,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, FlatList, Alert, Image } from "react-native";
 import DropdownComponent from "../components/QuestionTypeDropdown";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system"; // Import FileSystem for base64 conversion
@@ -23,6 +14,7 @@ const QuizCreationPage = ({ navigation }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
   const [selectedType, setSelectedType] = useState(""); // Default type
+  const [typedQuestionWord, setTypedQuestionWord] = useState("");
   const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -232,56 +224,81 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-  const checkInputWord = async () => {
-    let word = typedQuestionWord;
+  const handleInputChange = (index: number, word: string) => {
+    if (!selectedType) {
+      Alert.alert("Select Type", "Please select a type first.");
+      return;
+    }
+  
+    // Clear previous timeout if exists
+    if (checkInputTimeoutId) {
+      clearTimeout(checkInputTimeoutId);
+    }
+  
+    // Update the word in state
+    const updatedQuestions = [...questions];
+    const updatedQuestion = { ...updatedQuestions[index] };
+    updatedQuestion.word = word;
+    updatedQuestions[index] = updatedQuestion;
+    setQuestions(updatedQuestions);
+  
+    // Set a new timeout for word validation, passing the current word directly
+    const timeoutId = setTimeout(() => {
+      checkInputWord(word);  // Pass word directly
+    }, 2000);
+  
+    // Store the timeout ID
+    setCheckInputTimeoutId(timeoutId);
+  };
+  
+  const checkInputWord = async (word: string) => {  // Accept word as a parameter
+    console.log(word);
+    
+    // Determine language based on question type
+    const language = selectedType.includes('english') ? 'english' : 'turkish';
+    console.log(`${hostUrl}/api/word-checker?word=${word}&language=${language}`);
     try {
       const response = await fetch(
-        `${hostUrl}/api/word-checker?word=${word}&type=${selectedType}`,
+        `${hostUrl}/api/word-checker?word=${word}&language=${language}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
       );
-
-      const data = await response.json();
-
-      if (!data.isValid) {
-        Alert.alert("Invalid Word", "Please enter a valid word!");
-      } else {
-        // setSelectedWord(word);
-        fetchQuestionWord(word, selectedType);
-        fetchQuestionAnswers(word, selectedType, token);
+  
+      // Check if response is ok
+      if (!response.ok) {
+        // Try to get error text
+        const errorText = await response.text();
+        console.error('Full error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+  
+      // Try to parse JSON
+      const text = await response.text();
+      console.log('Raw response:', text);
+      
+      try {
+        const data = JSON.parse(text);
+  
+        if (!data.isValid) {
+          Alert.alert("Invalid Word", "Please enter a valid word!");
+        } else {
+          // Word is valid, proceed with fetching suggestions and answers
+          fetchQuestionWord(word, selectedType);
+          fetchQuestionAnswers(word, selectedType, token);
+        }
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        Alert.alert("Error", "Failed to parse server response");
       }
     } catch (error) {
       console.error("Error validating word:", error);
       Alert.alert("Error", "Failed to validate the word. Please try again.");
     }
-  };
-
-  const handleInputChange = (index: number, word: string) => {
-    if (!selectedType) {
-      Alert.alert("Select Type", "Please select a type first.");
-      return;
-    }
-
-    // if (checkInputTimeoutId != -1) {
-    //   clearTimeout(checkInputTimeoutId);
-    // }
-    // console.log('====================================');
-    // console.log();
-    // console.log('====================================');
-    // let timeOutId = setTimeout(checkInputWord, 2000)
-    // setCheckInputTimeoutId(timeOutId);
-
-    const updatedQuestions = [...questions];
-    const updatedQuestion = { ...updatedQuestions[index] };
-    updatedQuestion.word = word;
-    updatedQuestions[index] = updatedQuestion;
-    setQuestions(updatedQuestions);
-    console.log(`1- Question ${index + 1} word:`, updatedQuestions[index].word);
   };
 
   const updateQuestionType = (index: number, type: string) => {
@@ -343,9 +360,21 @@ const QuizCreationPage = ({ navigation }) => {
         style={styles.imageUploadBox}
         onPress={pickImageAndUpload}
       >
-        <Text style={styles.imageUploadText}>
-          {image ? "Image Uploaded" : "+ Upload Image"}
-        </Text>
+        {imageUrl ? (
+          <Image 
+            source={{ uri: imageUrl }} 
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              borderRadius: 10 
+            }} 
+            resizeMode="cover" 
+          />
+        ) : (
+          <Text style={styles.imageUploadText}>
+            + Upload Image
+          </Text>
+        )}
       </TouchableOpacity>
 
       {/* Description Input */}
