@@ -3,7 +3,7 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const QuizViewComponent = ({ quiz, onPress, onEdit, onDelete, showActions = false }) => {
+const QuizViewComponent = ({ quiz, onPress, onDelete, showActions = false }) => {
 
   return (
     <View style={styles.quizContainer}>
@@ -37,9 +37,6 @@ const QuizViewComponent = ({ quiz, onPress, onEdit, onDelete, showActions = fals
 
       {showActions && (
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.editButton} onPress={onEdit}>
-            <Text style={styles.editbuttonText}>Edit</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
             <Text style={styles.deletebuttonText}>Delete</Text>
           </TouchableOpacity>
@@ -54,7 +51,7 @@ const styles = StyleSheet.create({
     width: 140,
     height: 220,
     marginRight: 16,
-    backgroundColor: "#f3e8ff",
+    backgroundColor: "#ede9fe", 
     borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -114,25 +111,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
     paddingHorizontal: 4,
   },
-  editButton: {
-    backgroundColor: "#f3e8ff",
-    paddingVertical: 6,
-    borderRadius: 4,  // 8
-    flexShrink: 0,
-    width: "48%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-    borderWidth: 0.5,
-    borderColor: "#ccc",
-  },
   deleteButton: {
-    backgroundColor: "#f3e8ff",
+    backgroundColor: "#ede9fe",
+    justifyContent: "center",
     paddingVertical: 6,
     borderRadius: 4,
-    width: "48%",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -140,12 +123,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderWidth: 0.5,
     borderColor: "#ccc",
-  },
-  editbuttonText: {
-    color: "#6a0dad",
-    fontWeight: "bold",
-    fontSize: 14,
-    textAlign: "center",
   },
   deletebuttonText: {
     color: "#e13528",

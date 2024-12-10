@@ -63,7 +63,7 @@ export type ForumQuestion = {
     content: string;
     username: string;
     noUpvote: number;
-    hasUpvoted: boolean;
+    // hasUpvoted: boolean;
     createdAt: string;
     tags: string[];
     noReplies: number;
