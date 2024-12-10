@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   Text,
   StyleSheet,
@@ -14,7 +14,7 @@ import QuizViewComponent from "../components/QuizViewComponent";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
-import HostUrlContext from '../app/HostContext';
+import HostUrlContext from "../app/HostContext";
 
 const calculateQuizDifficultyFromElo = (elo: number) => {
   if (elo < 400) return "A1";
@@ -23,19 +23,23 @@ const calculateQuizDifficultyFromElo = (elo: number) => {
   else if (elo < 2600) return "B2";
   else if (elo < 3300) return "C1";
   else return "C2";
-}
+};
 
 const HomePage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
-  const [otherQuizzesFilterDifficulty, setOtherQuizzesFilterDifficulty] = useState("a1"); // Default difficulty
+  const [otherQuizzesFilterDifficulty, setOtherQuizzesFilterDifficulty] =
+    useState("a1"); // Default difficulty
   const authContext = useAuth(); // Get the authentication context
   const [userProfile, setUserProfile] = useState(null);
   const token = authContext ? authContext.token : null; // Get the token if authContext is not null
   const [userElo, setUserElo] = useState(200);
-
+  const [quizAttempts, setQuizAttempts] = useState<Map<number, string>>(
+    new Map()
+  );
+  const [hideCompleted, setHideCompleted] = useState(false);
 
   const fetchUserProfile = async () => {
     try {
@@ -61,7 +65,7 @@ const HomePage = ({ navigation }) => {
         console.log("Response Data:", data);
         if (response.ok) {
           setUserProfile(data);
-          setUserElo(data.score)
+          setUserElo(data.score);
         } else {
           // Handle specific error messages from API
           Alert.alert("Error", data.message || "Failed to fetch profile data.");
@@ -85,48 +89,83 @@ const HomePage = ({ navigation }) => {
     }
   };
 
+  const fetchQuizAttempts = async () => {
+    try {
+      const response = await fetch(`${hostUrl}/api/quiz-attempts`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch quiz attempts");
+      }
+      const attempts = await response.json();
+
+      // Create a map of quizId to attempt status
+      const attemptsMap = new Map();
+      attempts.forEach((attempt) => {
+        const existing = attemptsMap.get(attempt.quizId);
+        if (attempt.completed) {
+          attemptsMap.set(attempt.quizId, "Completed");
+        } else if (!existing) {
+          attemptsMap.set(attempt.quizId, "In Progress");
+        }
+      });
+
+      setQuizAttempts(attemptsMap);
+    } catch (error) {
+      console.error("Error fetching quiz attempts:", error);
+    }
+  };
+
   useEffect(() => {
-    // Fetch both quizzes whenever difficulty changes
     const fetchData = async () => {
       setLoading(true);
       try {
-        await Promise.all([fetchQuizzesForYou(), fetchOtherQuizzes(), fetchUserProfile()]);
+        // First fetch attempts
+        await fetchQuizAttempts();
+        // Then fetch quizzes after we have the attempts
+        await Promise.all([
+          fetchQuizzesForYou(),
+          fetchOtherQuizzes(),
+          fetchUserProfile(),
+        ]);
       } catch (error) {
-        console.error("Error fetching quizzes:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-    fetchQuizzesForYou();
-    fetchOtherQuizzes();
-  }, [otherQuizzesFilterDifficulty]); // Dependency array includes 'difficulty'
+  }, [otherQuizzesFilterDifficulty]);
 
-  const fetchQuizzesForYou = async () => {
+  const fetchQuizzesForYou = useCallback(async () => {
     try {
-      const response = await fetch(
-        `${hostUrl}/api/quizzes?page=1&limit=10`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${hostUrl}/api/quizzes?page=1&limit=10`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       let data = await response.json();
       console.log(data);
-     
+
       data.quizzes = data.quizzes.map((quiz) => ({
         ...quiz,
         elo: quiz.difficulty,
-        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty)
+        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
+        status: quizAttempts.get(quiz.id) || null,
       }));
-      
-       
+
       // sort the quizzes for being closest to the userElo
-      data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
+      data.quizzes.sort(
+        (a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo)
+      );
 
       if (response.ok) {
         setQuizzesForYou(data.quizzes);
@@ -137,48 +176,48 @@ const HomePage = ({ navigation }) => {
     } catch (error) {
       console.error("Error fetching quizzes for you:", error);
     }
-  };
+  }, [hostUrl, token, userElo, quizAttempts]);
 
-  const fetchOtherQuizzes = async () => {
+  const fetchOtherQuizzes = useCallback(async () => {
     try {
       console.log(`Token is ${token}`);
-      const response = await fetch(
-        `${hostUrl}/api/quizzes?page=1&limit=10`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${hostUrl}/api/quizzes?page=1&limit=10`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       let data = await response.json();
       data.quizzes = data.quizzes.map((quiz) => ({
         ...quiz,
         elo: quiz.difficulty,
-        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty)
+        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
+        status: quizAttempts.get(quiz.id) || null,
       }));
-      data.quizzes = data.quizzes.filter((quiz)=>quiz.difficulty==otherQuizzesFilterDifficulty.toUpperCase());
-      // sort the quizzes for being closest to the userElo
-      data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
+      data.quizzes = data.quizzes.filter(
+        (quiz) => quiz.difficulty == otherQuizzesFilterDifficulty.toUpperCase()
+      );
+      data.quizzes.sort(
+        (a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo)
+      );
 
       if (response.ok) {
         setOtherQuizzes(data.quizzes);
-        console.log("Other quizzes:", data.quizzes); // TODO: Remove or comment out after debugging
       } else {
         console.error("Failed to fetch other quizzes", data);
       }
     } catch (error) {
       console.error("Error fetching other quizzes:", error);
     }
-  };
+  }, [hostUrl, token, userElo, quizAttempts, otherQuizzesFilterDifficulty]);
 
   const navigateToQuizCreation = () => {
     navigation.navigate("QuizCreation");
   };
 
   const navigateToQuiz = (quiz, questions) => {
-    navigation.navigate("QuizWelcome", { quiz});
+    navigation.navigate("QuizWelcome", { quiz });
   };
 
   const renderOtherQuizzes = ({ item }: { item: Quiz }) => (
@@ -186,18 +225,19 @@ const HomePage = ({ navigation }) => {
       <QuizViewComponent
         quiz={item}
         onPress={() => navigateToQuiz(item, item.questions)}
+        onDelete={() => {}}
+        showActions={false}
+        status={item.status}
       />
     </View>
   );
 
-  const renderQuizzesForYou = ({ item }: { item: Quiz }) => (
-    <View style={styles.quizWrapper}>
-      <QuizViewComponent
-        quiz={item}
-        onPress={() => navigateToQuiz(item, item.questions)}
-      />
-    </View>
-  );
+  const filterQuizzes = (quizzes) => {
+    if (hideCompleted) {
+      return quizzes.filter((quiz) => quiz.status !== "Completed");
+    }
+    return quizzes;
+  };
 
   if (loading) {
     return (
@@ -216,12 +256,22 @@ const HomePage = ({ navigation }) => {
         {/* Quizzes For You Section */}
         <View style={styles.quizzesForYouHeader}>
           <Text style={styles.sectionTitle}>Quizzes For You</Text>
-          <TouchableOpacity
-            style={styles.addQuizButton}
-            onPress={navigateToQuizCreation}
-          >
-            <Text style={styles.addQuizButtonText}>Create a quiz</Text>
-          </TouchableOpacity>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity
+              style={styles.hideCompletedButton}
+              onPress={() => setHideCompleted(!hideCompleted)}
+            >
+              <Text style={styles.hideCompletedText}>
+                {hideCompleted ? "Show Completed" : "Hide Completed"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.addQuizButton}
+              onPress={navigateToQuizCreation}
+            >
+              <Text style={styles.addQuizButtonText}>Create a quiz</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Horizontally Scrollable Quizzes For You */}
@@ -231,19 +281,16 @@ const HomePage = ({ navigation }) => {
             showsHorizontalScrollIndicator={false}
             style={styles.quizScroll}
           >
-            {quizzesForYou.length > 0 ? (
-              quizzesForYou.map((quiz) => (
-                <QuizViewComponent
-                  key={quiz.id}
-                  quiz={quiz}
-                  onPress={() => navigateToQuiz(quiz, quiz.questions)}
-                />
-              ))
-            ) : (
-              <Text style={styles.noQuizzesText}>
-                No quizzes available for you.
-              </Text>
-            )}
+            {filterQuizzes(quizzesForYou).map((quiz) => (
+              <QuizViewComponent
+                key={quiz.id}
+                quiz={quiz}
+                onPress={() => navigateToQuiz(quiz, quiz.questions)}
+                onDelete={() => {}}
+                showActions={false}
+                status={quiz.status}
+              />
+            ))}
           </ScrollView>
         </View>
 
@@ -263,7 +310,7 @@ const HomePage = ({ navigation }) => {
           <View style={styles.sectionDivider} />
           {otherQuizzes.length > 0 ? (
             <FlatList
-              data={otherQuizzes}
+              data={filterQuizzes(otherQuizzes)}
               renderItem={renderOtherQuizzes}
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
@@ -368,6 +415,24 @@ const styles = StyleSheet.create({
     color: "#666",
     marginTop: 20,
     fontSize: 16,
+  },
+  headerButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  hideCompletedButton: {
+    backgroundColor: "#f3f4f6",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#6a0dad",
+  },
+  hideCompletedText: {
+    color: "#6a0dad",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });
 
