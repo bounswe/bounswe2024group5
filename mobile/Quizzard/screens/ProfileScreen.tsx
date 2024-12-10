@@ -19,6 +19,7 @@ import HostUrlContext from "../app/HostContext";
 import MyQuizzesView from "../components/MyQuizzesView";
 import MyPostsView from "../components/MyPostsView";
 import MyQuizAttemptsView from "../components/MyQuizAttemptsView";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface QuizAttempt {
   id: number;
@@ -55,7 +56,7 @@ const ProfileScreen = ({ route, navigation }) => {
     else if (elo < 2600) return "B2";
     else if (elo < 3300) return "C1";
     else return "C2";
-  }
+  };
 
   // Function to fetch user profile
   const fetchUserProfile = async () => {
@@ -143,7 +144,7 @@ const ProfileScreen = ({ route, navigation }) => {
         difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
       }));
       console.log("My Quizzes:", data.quizzes);
-      
+
       setCreatedQuizzes(data.quizzes);
       console.log(" 'createdQuizzes' IS JUST SET.");
     } catch (error) {
@@ -198,11 +199,14 @@ const ProfileScreen = ({ route, navigation }) => {
                 quizDetails.quiz.difficulty
               ),
               username: quizDetails.quiz.username,
-              createdAt: new Date(quizDetails.quiz.createdAt).toLocaleString("en-US", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-              }),
+              createdAt: new Date(quizDetails.quiz.createdAt).toLocaleString(
+                "en-US",
+                {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                }
+              ),
               noFavorites: quizDetails.quiz.noFavorites,
               questions: quizDetails.quiz.questions,
               completedAt: attempt.completed
@@ -220,7 +224,7 @@ const ProfileScreen = ({ route, navigation }) => {
                     hour: "2-digit",
                     minute: "2-digit",
                   }),
-              score: attempt.score,
+              score: attempt.completed ? attempt.score : null,
               status: attempt.completed ? "Completed" : "In Progress",
               rawCompleted: attempt.completed,
               rawUpdatedAt: new Date(attempt.updatedAt),
@@ -236,35 +240,37 @@ const ProfileScreen = ({ route, navigation }) => {
       );
 
       // Filter out any null attempts due to fetch errors
-      const validAttempts = quizAttemptsDetailed.filter(
-        (item) => item !== null
-      );
-      console.log("Quiz Attempts (Detailed):", validAttempts);
+      const validAttempts = quizAttemptsDetailed.filter((attempt) => attempt);
 
       // Process attempts to meet the criteria
       const processedAttemptsMap = new Map();
 
+      // First sort attempts by completedAt date for each quiz
+      const attemptsByQuiz = new Map();
       validAttempts.forEach((attempt) => {
-        const existing = processedAttemptsMap.get(attempt.quizId);
-        if (attempt.rawCompleted) {
-          if (!existing || !existing.rawCompleted) {
-            // If current attempt is completed and either:
-            // - No existing attempt
-            // - Existing attempt is not completed
-            processedAttemptsMap.set(attempt.quizId, attempt);
-          }
-          // If existing attempt is also completed, keep the first one (do nothing)
+        if (!attemptsByQuiz.has(attempt.id)) {
+          attemptsByQuiz.set(attempt.id, []);
+        }
+        attemptsByQuiz.get(attempt.id).push(attempt);
+      });
+
+      // For each quiz, find the first completion or latest in-progress
+      attemptsByQuiz.forEach((attempts, quizId) => {
+        // Sort attempts by date
+        attempts.sort(
+          (a, b) => a.rawUpdatedAt.getTime() - b.rawUpdatedAt.getTime()
+        );
+
+        // Find first completed attempt
+        const firstCompleted = attempts.find((a) => a.rawCompleted);
+
+        if (firstCompleted) {
+          // Use the first completed attempt
+          processedAttemptsMap.set(quizId, firstCompleted);
         } else {
-          if (!existing) {
-            // If there's no existing attempt, set the current as in progress
-            processedAttemptsMap.set(attempt.quizId, attempt);
-          } else if (!existing.rawCompleted) {
-            // If existing attempt is also in progress, keep the latest one
-            if (attempt.rawUpdatedAt > existing.rawUpdatedAt) {
-              processedAttemptsMap.set(attempt.quizId, attempt);
-            }
-          }
-          // If existing attempt is completed, do nothing
+          // If no completed attempts, use the latest in-progress attempt
+          const latestInProgress = attempts[attempts.length - 1];
+          processedAttemptsMap.set(quizId, latestInProgress);
         }
       });
 
@@ -324,30 +330,6 @@ const ProfileScreen = ({ route, navigation }) => {
     }
   };
 
-  // useEffect to fetch data when userProfile changes
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Ensure userProfile is fetched first
-        if (!userProfile) {
-          await fetchUserProfile();
-        }
-
-        await Promise.all([
-          fetchMyQuizAttempts(),
-          fetchMyQuizzes(),
-          fetchMyPosts(),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [userProfile]);
-
   // Handler to delete a quiz
   const handleDeleteQuiz = async (quizId) => {
     Alert.alert("Delete Quiz", "Are you sure you want to delete this quiz?", [
@@ -393,33 +375,40 @@ const ProfileScreen = ({ route, navigation }) => {
   // Handlers to toggle visibility of sections
   const handleMyQuizzes = () => {
     setShowMyQuizzes(!showMyQuizzes);
-    if (showMyQuizzes) {
-      if (!username) {
-        fetchUserProfile();
-      }
-      fetchMyQuizzes();
-    }
   };
 
   const handleMyPosts = () => {
     setShowMyPosts(!showMyPosts);
-    if (showMyPosts) {
-      if (!username) {
-        fetchUserProfile();
-      }
-      fetchMyPosts();
-    }
   };
 
   const handleMyQuizAttempts = () => {
     setShowMyQuizAttempts(!showMyQuizAttempts);
-    if (showMyQuizAttempts) {
-      if (!username) {
-        fetchUserProfile();
-      }
-      fetchMyQuizAttempts();
-    }
   };
+
+  // Keep only useFocusEffect for data fetching
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          await fetchUserProfile();
+          if (username) {
+            await Promise.all([
+              fetchMyQuizAttempts(),
+              fetchMyQuizzes(),
+              fetchMyPosts(),
+            ]);
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    }, [username]) // Only depend on username
+  );
 
   // Render loading indicator
   if (loading) {

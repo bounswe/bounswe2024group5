@@ -1,3 +1,4 @@
+// HomePage.js
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   Text,
@@ -8,6 +9,7 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
+  Modal,
 } from "react-native";
 import BaseLayout from "./BaseLayout";
 import QuizViewComponent from "../components/QuizViewComponent";
@@ -15,6 +17,7 @@ import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
 import HostUrlContext from "../app/HostContext";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const calculateQuizDifficultyFromElo = (elo: number) => {
   if (elo < 400) return "A1";
@@ -40,7 +43,10 @@ const HomePage = ({ navigation }) => {
     new Map()
   );
   const [hideCompleted, setHideCompleted] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
 
+  // Fetch user profile
   const fetchUserProfile = async () => {
     try {
       console.log(`Fetching profile from: ${hostUrl}/api/profile/me`);
@@ -89,7 +95,8 @@ const HomePage = ({ navigation }) => {
     }
   };
 
-  const fetchQuizAttempts = async () => {
+  // Fetch quiz attempts
+  const fetchQuizAttempts = useCallback(async () => {
     try {
       const response = await fetch(`${hostUrl}/api/quiz-attempts`, {
         method: "GET",
@@ -104,33 +111,110 @@ const HomePage = ({ navigation }) => {
       }
       const attempts = await response.json();
 
-      // Create a map of quizId to attempt status
       const attemptsMap = new Map();
       attempts.forEach((attempt) => {
-        const existing = attemptsMap.get(attempt.quizId);
+        const existingStatus = attemptsMap.get(attempt.quizId);
         if (attempt.completed) {
           attemptsMap.set(attempt.quizId, "Completed");
-        } else if (!existing) {
+        } else if (!existingStatus && !attempt.completed) {
           attemptsMap.set(attempt.quizId, "In Progress");
         }
       });
 
       setQuizAttempts(attemptsMap);
+      return attemptsMap; // Return the map for immediate use
     } catch (error) {
       console.error("Error fetching quiz attempts:", error);
+      return new Map(); // Return an empty map on error
     }
-  };
+  }, [hostUrl, token]);
 
+  // Fetch quizzes for you
+  const fetchQuizzesForYou = useCallback(
+    async (attemptsMap: Map<number, string>) => {
+      try {
+        const response = await fetch(`${hostUrl}/api/quizzes?page=1&limit=10`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        let data = await response.json();
+
+        data.quizzes = data.quizzes.map((quiz) => ({
+          ...quiz,
+          elo: quiz.difficulty,
+          difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
+          status: attemptsMap.get(quiz.id) || null,
+        }));
+
+        // Sort the quizzes based on closeness to userElo
+        data.quizzes.sort(
+          (a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo)
+        );
+
+        if (response.ok) {
+          setQuizzesForYou(data.quizzes);
+          console.log("Quizzes for you:", data.quizzes);
+        } else {
+          console.error("Failed to fetch quizzes for you", data);
+        }
+      } catch (error) {
+        console.error("Error fetching quizzes for you:", error);
+      }
+    },
+    [hostUrl, token, userElo]
+  );
+
+  // Fetch other quizzes
+  const fetchOtherQuizzes = useCallback(
+    async (attemptsMap: Map<number, string>) => {
+      try {
+        console.log(`Token is ${token}`);
+        const response = await fetch(`${hostUrl}/api/quizzes?page=1&limit=10`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        let data = await response.json();
+        data.quizzes = data.quizzes.map((quiz) => ({
+          ...quiz,
+          elo: quiz.difficulty,
+          difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
+          status: attemptsMap.get(quiz.id) || null,
+        }));
+        data.quizzes = data.quizzes.filter(
+          (quiz) =>
+            quiz.difficulty === otherQuizzesFilterDifficulty.toUpperCase()
+        );
+        data.quizzes.sort(
+          (a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo)
+        );
+
+        if (response.ok) {
+          setOtherQuizzes(data.quizzes);
+        } else {
+          console.error("Failed to fetch other quizzes", data);
+        }
+      } catch (error) {
+        console.error("Error fetching other quizzes:", error);
+      }
+    },
+    [hostUrl, token, userElo, otherQuizzesFilterDifficulty]
+  );
+
+  // Main data fetching function
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // First fetch attempts
-        await fetchQuizAttempts();
-        // Then fetch quizzes after we have the attempts
+        const attemptsMap = await fetchQuizAttempts(); // Fetch quiz attempts first
         await Promise.all([
-          fetchQuizzesForYou(),
-          fetchOtherQuizzes(),
+          fetchQuizzesForYou(attemptsMap),
+          fetchOtherQuizzes(attemptsMap),
           fetchUserProfile(),
         ]);
       } catch (error) {
@@ -141,90 +225,38 @@ const HomePage = ({ navigation }) => {
     };
 
     fetchData();
-  }, [otherQuizzesFilterDifficulty]);
-
-  const fetchQuizzesForYou = useCallback(async () => {
-    try {
-      const response = await fetch(`${hostUrl}/api/quizzes?page=1&limit=10`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      let data = await response.json();
-      console.log(data);
-
-      data.quizzes = data.quizzes.map((quiz) => ({
-        ...quiz,
-        elo: quiz.difficulty,
-        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
-        status: quizAttempts.get(quiz.id) || null,
-      }));
-
-      // sort the quizzes for being closest to the userElo
-      data.quizzes.sort(
-        (a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo)
-      );
-
-      if (response.ok) {
-        setQuizzesForYou(data.quizzes);
-        console.log("Quizzes for you:", data.quizzes); // TODO: Remove or comment out after debugging
-      } else {
-        console.error("Failed to fetch quizzes for you", data);
-      }
-    } catch (error) {
-      console.error("Error fetching quizzes for you:", error);
-    }
-  }, [hostUrl, token, userElo, quizAttempts]);
-
-  const fetchOtherQuizzes = useCallback(async () => {
-    try {
-      console.log(`Token is ${token}`);
-      const response = await fetch(`${hostUrl}/api/quizzes?page=1&limit=10`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      let data = await response.json();
-      data.quizzes = data.quizzes.map((quiz) => ({
-        ...quiz,
-        elo: quiz.difficulty,
-        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
-        status: quizAttempts.get(quiz.id) || null,
-      }));
-      data.quizzes = data.quizzes.filter(
-        (quiz) => quiz.difficulty == otherQuizzesFilterDifficulty.toUpperCase()
-      );
-      data.quizzes.sort(
-        (a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo)
-      );
-
-      if (response.ok) {
-        setOtherQuizzes(data.quizzes);
-      } else {
-        console.error("Failed to fetch other quizzes", data);
-      }
-    } catch (error) {
-      console.error("Error fetching other quizzes:", error);
-    }
-  }, [hostUrl, token, userElo, quizAttempts, otherQuizzesFilterDifficulty]);
+  }, [
+    fetchQuizAttempts,
+    fetchQuizzesForYou,
+    fetchOtherQuizzes,
+    otherQuizzesFilterDifficulty,
+  ]);
 
   const navigateToQuizCreation = () => {
     navigation.navigate("QuizCreation");
   };
 
-  const navigateToQuiz = (quiz, questions) => {
-    navigation.navigate("QuizWelcome", { quiz });
+  const navigateToQuiz = (quiz) => {
+    if (quiz.status === "Completed") {
+      setSelectedQuiz(quiz);
+      setShowModal(true);
+    } else {
+      navigation.navigate("QuizWelcome", { quiz });
+    }
+  };
+
+  const handleContinue = () => {
+    setShowModal(false);
+    if (selectedQuiz) {
+      navigation.navigate("QuizWelcome", { quiz: selectedQuiz });
+    }
   };
 
   const renderOtherQuizzes = ({ item }: { item: Quiz }) => (
     <View style={styles.quizWrapper}>
       <QuizViewComponent
         quiz={item}
-        onPress={() => navigateToQuiz(item, item.questions)}
+        onPress={() => navigateToQuiz(item)}
         onDelete={() => {}}
         showActions={false}
         status={item.status}
@@ -255,23 +287,34 @@ const HomePage = ({ navigation }) => {
       <View style={{ flex: 1 }}>
         {/* Quizzes For You Section */}
         <View style={styles.quizzesForYouHeader}>
-          <Text style={styles.sectionTitle}>Quizzes For You</Text>
-          <View style={styles.headerButtons}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.sectionTitle}>Quizzes For You</Text>
             <TouchableOpacity
               style={styles.hideCompletedButton}
               onPress={() => setHideCompleted(!hideCompleted)}
             >
+              <Ionicons
+                name={hideCompleted ? "eye-off" : "eye"}
+                size={20}
+                color="#fff"
+              />
               <Text style={styles.hideCompletedText}>
-                {hideCompleted ? "Show Completed" : "Hide Completed"}
+                {hideCompleted ? "Show" : "Hide"}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.addQuizButton}
-              onPress={navigateToQuizCreation}
-            >
-              <Text style={styles.addQuizButtonText}>Create a quiz</Text>
-            </TouchableOpacity>
           </View>
+          <TouchableOpacity
+            style={styles.addQuizButton}
+            onPress={navigateToQuizCreation}
+          >
+            <Ionicons
+              name="pencil"
+              size={16}
+              color="#fff"
+              style={styles.addQuizIcon}
+            />
+            <Text style={styles.addQuizButtonText}>Create</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Horizontally Scrollable Quizzes For You */}
@@ -285,7 +328,7 @@ const HomePage = ({ navigation }) => {
               <QuizViewComponent
                 key={quiz.id}
                 quiz={quiz}
-                onPress={() => navigateToQuiz(quiz, quiz.questions)}
+                onPress={() => navigateToQuiz(quiz)}
                 onDelete={() => {}}
                 showActions={false}
                 status={quiz.status}
@@ -325,6 +368,41 @@ const HomePage = ({ navigation }) => {
           )}
         </View>
       </View>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showModal}
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Ionicons name="information-circle" size={50} color="#059669" />
+            <Text style={styles.modalTitle}>Already Completed</Text>
+            <Text style={styles.modalText}>
+              You've already completed this quiz. You won't receive additional
+              points, but you can practice again!
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setShowModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.continueButton]}
+                onPress={handleContinue}
+              >
+                <Text
+                  style={[styles.modalButtonText, styles.continueButtonText]}
+                >
+                  Continue
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </BaseLayout>
   );
 };
@@ -346,6 +424,9 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   addQuizButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#6a0dad",
     paddingVertical: 6,
     paddingHorizontal: 12,
@@ -422,17 +503,84 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   hideCompletedButton: {
-    backgroundColor: "#f3f4f6",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#6a0dad",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: "#059669",
   },
   hideCompletedText: {
-    color: "#6a0dad",
     fontSize: 12,
+    color: "#fff",
     fontWeight: "bold",
+  },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  addQuizIcon: {
+    marginRight: 6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
+    width: "85%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+    marginVertical: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 10,
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    minWidth: 100,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#666",
+  },
+  continueButton: {
+    backgroundColor: "#059669",
+  },
+  continueButtonText: {
+    color: "white",
   },
 });
 
