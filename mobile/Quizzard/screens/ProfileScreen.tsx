@@ -33,12 +33,12 @@ const ProfileScreen = ({ route, navigation }) => {
   const [username, setUsername] = useState(null);
   const [loading, setLoading] = useState(true);
   const [createdQuizzes, setCreatedQuizzes] = useState(null);
-  const [quizHistory, setQuizHistory] = useState(null);
+  const [quizAttempts, setQuizAttempts] = useState(null);
   const [posts, setPosts] = useState(null);
 
-  const [showMyQuizzes, setShowMyQuizzes] = useState(false);
-  const [showMyPosts, setShowMyPosts] = useState(false);
-  const [showMyQuizAttempts, setShowMyQuizAttempts] = useState(false);
+  const [showMyQuizzes, setShowMyQuizzes] = useState(true);
+  const [showMyPosts, setShowMyPosts] = useState(true);
+  const [showMyQuizAttempts, setShowMyQuizAttempts] = useState(true);
 
   const calculateQuizDifficultyFromElo = (elo: number) => {
     if (elo < 400) return "A1";
@@ -75,9 +75,6 @@ const ProfileScreen = ({ route, navigation }) => {
           setUserProfile(data);
           console.log("User Profile:", data);
           setUsername(data.username);
-          handleMyQuizzes();
-          handleMyPosts();
-          handleMyQuizAttempts();
         } else {
           // Handle specific error messages from API
           Alert.alert("Error", data.message || "Failed to fetch profile data.");
@@ -111,7 +108,7 @@ const ProfileScreen = ({ route, navigation }) => {
       return;
     }
     try {
-      const response = await fetch(`${hostUrl}/api/quizzes?username=${userProfile.username}`, {
+      const response = await fetch(`${hostUrl}/api/quizzes?username=${username}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -138,7 +135,7 @@ const ProfileScreen = ({ route, navigation }) => {
     }
   };
 
-  const fetchQuizHistory = async () => {
+  const fetchMyQuizAttempts = async () => {
     try {
       const response = await fetch(`${hostUrl}/api/quiz-attempts`, {
         method: "GET",
@@ -149,13 +146,13 @@ const ProfileScreen = ({ route, navigation }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch quiz history");
+        throw new Error("Failed to fetch quiz attempts");
       }
       const quizAttempts = await response.json();
-      console.log("Quiz History:", quizAttempts);
+      console.log("Quiz Attempts:", quizAttempts);
 
       // Fetch quiz details in parallel
-      const quizhistory = await Promise.all(
+      const quizAttemptsData = await Promise.all(
         quizAttempts.map(async (quiz) => {
           try {
             const response = await fetch(`${hostUrl}/api/quizzes/${quiz.quizId}`, {
@@ -199,9 +196,9 @@ const ProfileScreen = ({ route, navigation }) => {
         })
       );
 
-      setQuizHistory(quizhistory.filter((item) => item !== null));
+      setQuizAttempts(quizAttemptsData.filter((item) => item !== null));
     } catch (error) {
-      console.error("Error fetching quiz history:", error);
+      console.error("Error fetching quiz attempts:", error);
     }
   };
 
@@ -213,7 +210,7 @@ const ProfileScreen = ({ route, navigation }) => {
       return;
     }
     try {
-      const response = await fetch(`${hostUrl}/api/posts?username=${userProfile.username}`, {
+      const response = await fetch(`${hostUrl}/api/posts?username=${username}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -251,14 +248,20 @@ const ProfileScreen = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    fetchUserProfile();
-  }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchUserProfile();
-    }, [])
-  );
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([fetchMyQuizAttempts(), fetchMyQuizzes(), fetchMyPosts()]);
+      } catch (error) {
+        console.error("Error fetching quizzes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [userProfile]);
+
 
   const handleDeleteQuiz = async (quizId) => {
     Alert.alert("Delete Quiz", "Are you sure you want to delete this quiz?", [
@@ -327,7 +330,7 @@ const ProfileScreen = ({ route, navigation }) => {
       if (!username) {
         fetchUserProfile();
       }
-      fetchQuizHistory();
+      fetchMyQuizAttempts();
     }
   }
 
@@ -419,7 +422,7 @@ const ProfileScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
 
-          <Pressable title="My Quizzes" style={styles.sectionButton} onPress={() => handleMyQuizzes()} >
+          <Pressable style={styles.sectionButton} onPress={() => handleMyQuizzes()} >
             <Text style={styles.sectionTitle}>My Quizzes</Text>
             {
               showMyQuizzes ? <MyQuizzesView createdQuizzes={createdQuizzes} onDelete={handleDeleteQuiz} navigation={navigation} /> : null
@@ -427,7 +430,7 @@ const ProfileScreen = ({ route, navigation }) => {
           </Pressable>
 
         <View>
-          <Pressable title="My Posts" style={styles.sectionButton} color="#2e1065" onPress={() => handleMyPosts()} >
+          <Pressable style={styles.sectionButton} color="#2e1065" onPress={() => handleMyPosts()} >
             <Text style={styles.sectionTitle}>My Posts</Text>
             {
               showMyPosts ? <MyPostsView myPosts={posts} navigation={navigation} /> : null
@@ -436,35 +439,13 @@ const ProfileScreen = ({ route, navigation }) => {
         </View>
 
         <View>
-          <Pressable title="Quiz History" style={styles.sectionButton} color="#2e1065" onPress={() => handleMyQuizAttempts()} >
-            <Text style={styles.sectionTitle}>Quiz History</Text>
+          <Pressable style={styles.sectionButton} color="#2e1065" onPress={() => handleMyQuizAttempts()} >
+            <Text style={styles.sectionTitle}>Quiz Attempts</Text>
             {
-              showMyQuizAttempts ? <MyQuizAttemptsView quizHistory={quizHistory} navigation={navigation} /> : null
+              showMyQuizAttempts ? <MyQuizAttemptsView quizHistory={quizAttempts} navigation={navigation} /> : null
             }
           </Pressable>
         </View>
-
-        {/* {selectedSection === "quiz-history" && ( */}
-        {/* <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Quiz History</Text>
-            {quizHistory && quizHistory.length > 0 ? (
-              quizHistory.map((quiz) => (
-                <View key={quiz.id} style={styles.card}>
-                  <Text style={styles.itemTitle}>{quiz.title}</Text>
-                  <Text style={styles.itemDetail}>{quiz.completedAt}</Text>
-                  <Text style={styles.itemDetail}>
-                    <FontAwesomeIcon name="star-o" size={12} color="#2e1065" /> {quiz.score} points gained
-                  </Text>
-                  <Text style={styles.itemDetail}>
-                    {quiz.status}
-                  </Text>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.noDataText}>No quiz history available.</Text>
-            )}
-          </View> */}
-        {/* )} */}
 
       </ScrollView>
     </BaseLayout>
