@@ -8,7 +8,7 @@ const MyQuizAttemptsView = ({ quizHistory, navigation }) => {
       {quizHistory && quizHistory.length > 0 ? (
         quizHistory.map((quiz) => (
           <TouchableOpacity
-            key={quiz.id}
+            key={quiz.attemptId}
             style={styles.card}
             onPress={() => navigation.navigate("QuizWelcome", { quiz })}
           >

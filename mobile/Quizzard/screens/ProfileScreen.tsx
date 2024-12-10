@@ -48,7 +48,6 @@ const ProfileScreen = ({ route, navigation }) => {
   const [showMyPosts, setShowMyPosts] = useState(true);
   const [showMyQuizAttempts, setShowMyQuizAttempts] = useState(true);
 
-  // Function to calculate quiz difficulty based on Elo score
   const calculateQuizDifficultyFromElo = (elo: number) => {
     if (elo < 400) return "A1";
     else if (elo < 1000) return "A2";
@@ -56,7 +55,7 @@ const ProfileScreen = ({ route, navigation }) => {
     else if (elo < 2600) return "B2";
     else if (elo < 3300) return "C1";
     else return "C2";
-  };
+  }
 
   // Function to fetch user profile
   const fetchUserProfile = async () => {
@@ -85,6 +84,9 @@ const ProfileScreen = ({ route, navigation }) => {
           setUserProfile(data);
           console.log("User Profile:", data);
           setUsername(data.username);
+          // handleMyQuizzes();
+          // handleMyPosts();
+          // handleMyQuizAttempts();
         } else {
           // Handle specific error messages from API
           Alert.alert("Error", data.message || "Failed to fetch profile data.");
@@ -141,7 +143,7 @@ const ProfileScreen = ({ route, navigation }) => {
         difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
       }));
       console.log("My Quizzes:", data.quizzes);
-
+      
       setCreatedQuizzes(data.quizzes);
       console.log(" 'createdQuizzes' IS JUST SET.");
     } catch (error) {
@@ -186,8 +188,8 @@ const ProfileScreen = ({ route, navigation }) => {
             const quizDetails = await response.json();
 
             return {
-              id: attempt.id,
-              quizId: attempt.quizId,
+              attemptId: attempt.id,
+              id: quizDetails.quiz.id,
               title: quizDetails.quiz.title,
               description: quizDetails.quiz.description,
               image: quizDetails.quiz.image,
@@ -196,8 +198,11 @@ const ProfileScreen = ({ route, navigation }) => {
                 quizDetails.quiz.difficulty
               ),
               username: quizDetails.quiz.username,
-              createdAt: quizDetails.quiz.createdAt,
-              updatedAt: quizDetails.quiz.updatedAt,
+              createdAt: new Date(quizDetails.quiz.createdAt).toLocaleString("en-US", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+              }),
               noFavorites: quizDetails.quiz.noFavorites,
               questions: quizDetails.quiz.questions,
               completedAt: attempt.completed
