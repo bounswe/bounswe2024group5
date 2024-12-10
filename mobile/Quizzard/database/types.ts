@@ -39,6 +39,7 @@ export type Quiz = {
     likes: number;
     createdAt?: string;
     updatedAt?: string;
+    status?: string | null;
 }
 export type Question = {
     id: number;
