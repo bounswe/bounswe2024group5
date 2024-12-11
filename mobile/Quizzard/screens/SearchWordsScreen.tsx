@@ -169,7 +169,7 @@ const SearchWordsScreen: React.FC = () => {
           returnKeyType="search"
         />
         <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-          <Ionicons name="search" size={24} color="#6a0dad" />
+          <Ionicons name="search" size={24} color="#6d28d9" />
         </TouchableOpacity>
 
         {/* Loading Indicator for Suggestions */}
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 40,
-    borderColor: "#6a0dad",
+    borderColor: "#6d28d9",
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,

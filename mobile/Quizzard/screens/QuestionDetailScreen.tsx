@@ -213,7 +213,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6a0dad" />
+        <ActivityIndicator size="large" color="#6d28d9" />
       </View>
     );
   }
@@ -255,7 +255,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             <Ionicons
               name={question.hasUpvoted ? "heart" : "heart-outline"}
               size={20}
-              color={question.hasUpvoted ? "#e0245e" : "#6a0dad"}
+              color={question.hasUpvoted ? "#e0245e" : "#6d28d9"}
             />
             <Text style={styles.upvoteText}>{question.noUpvote}</Text>
           </TouchableOpacity>
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 12,
-    color: "#6a0dad",
+    color: "#6d28d9",
     fontWeight: "bold",
   },
   upvoteContainer: {
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   upvoteText: {
     marginLeft: 4,
     fontSize: 14,
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   tagsContainer: {
     flexDirection: "row",
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   footer: {
     flexDirection: "row",
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
   },
   replyUsername: {
     fontWeight: "bold",
-    color: "#6a0dad",
+    color: "#6d28d9",
     marginBottom: 4,
   },
   replyText: {
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     borderRadius: 8,
     padding: 12,
     alignItems: "center",

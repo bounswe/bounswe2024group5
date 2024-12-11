@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   detailsContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f3ff",
     borderRadius: 12,
     padding: 15,
     marginBottom: 30,

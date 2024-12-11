@@ -269,7 +269,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6a0dad" />
+        <ActivityIndicator size="large" color="#6d28d9" />
       </View>
     );
   }
@@ -307,7 +307,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
         onEndReachedThreshold={0.5}
         ListFooterComponent={
           isFetchingMore ? (
-            <ActivityIndicator size="small" color="#6a0dad" />
+            <ActivityIndicator size="small" color="#6d28d9" />
           ) : null
         }
       />

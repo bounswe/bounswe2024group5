@@ -396,7 +396,7 @@ const ProfileScreen = ({ route, navigation }) => {
     return (
       <BaseLayout navigation={navigation}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6a0dad" />
+          <ActivityIndicator size="large" color="#6d28d9" />
           <Text>Loading...</Text>
         </View>
       </BaseLayout>
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
   },
   sectionButton: {
     backgroundColor: "#f5f3ff",
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 12,
     padding: 10,
   },
@@ -646,10 +646,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   retryButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   retryButtonText: {
     color: "#fff",

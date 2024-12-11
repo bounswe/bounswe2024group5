@@ -76,7 +76,7 @@ const SelectedPostView = React.memo<SelectedPostViewProps>(
   ({ post, replies, onBack }) => (
     <ScrollView style={styles.postsList} showsVerticalScrollIndicator={false}>
       <TouchableOpacity onPress={onBack} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={20} color="#6a0dad" />
+        <Ionicons name="arrow-back" size={20} color="#6d28d9" />
         <Text style={styles.backButtonText}>Back to posts</Text>
       </TouchableOpacity>
       <View style={styles.postContainer}>
@@ -142,7 +142,7 @@ const ForumModal = React.memo<{
 
           <View style={styles.modalBody}>
             {isLoadingPosts ? (
-              <ActivityIndicator size="large" color="#6a0dad" />
+              <ActivityIndicator size="large" color="#6d28d9" />
             ) : selectedPost ? (
               <SelectedPostView
                 post={selectedPost}
@@ -525,7 +525,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           setForumModalVisible(true);
         }}
       >
-        <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
+        <Ionicons name="chatbox-outline" size={20} color="#6d28d9" />
         <Text style={styles.forumButtonText}>See Related Posts</Text>
       </TouchableOpacity>
       <ForumModal
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -631,10 +631,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#6a0dad",
+    borderColor: "#6d28d9",
   },
   forumButtonText: {
-    color: "#6a0dad",
+    color: "#6d28d9",
     fontWeight: "600",
     fontSize: 16,
     marginLeft: 8,
@@ -722,7 +722,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    color: "#6a0dad",
+    color: "#6d28d9",
     marginLeft: 8,
   },
   postContainer: {

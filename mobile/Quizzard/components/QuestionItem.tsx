@@ -49,7 +49,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
           <Ionicons
             name={question.hasUpvoted ? "heart" : "heart-outline"}
             size={20}
-            color={question.hasUpvoted ? "#e0245e" : "#6a0dad"}
+            color={question.hasUpvoted ? "#e0245e" : "#4c1d95"}
           />
           <Text style={styles.upvoteText}>{question.upvotes}</Text>
         </TouchableOpacity>
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   upvoteText: {
     marginLeft: 4,
     fontSize: 14,
-    color: "#6a0dad",
+    color: "#4c1d95",
   },
   tagsContainer: {
     flexDirection: "row",
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    color: "#6a0dad",
+    color: "#4c1d95",
   },
   footer: {
     flexDirection: "row",

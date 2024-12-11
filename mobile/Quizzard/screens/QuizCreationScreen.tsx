@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6a0dad", // Dark purple color for the app name
+    color: "#6d28d9", // Dark purple color for the app name
   },
   icons: {
     flexDirection: "row",
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   addQuestionButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
