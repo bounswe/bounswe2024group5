@@ -3,7 +3,7 @@ import { useContext } from "react";
 import HostContext from "../../../HostContext";
 import { Question } from "../../../types/question";
 
-type QuestionFavoriteResponse = {
+export type QuestionFavoriteResponse = {
     id: number,
     question: Question,
     createdAt: string,

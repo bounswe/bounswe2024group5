@@ -19,6 +19,7 @@ import { useUpdateQuizAttempt } from "../hooks/api/attempts/update";
 import { ForumForQuizSolvePage } from "../components/solve-quiz/forum-integration";
 import { IconHeart } from "@tabler/icons-react";
 import { usePostQuestionFavorite } from "../hooks/api/question-favorite/post-question-favorite";
+import { useFetchQuestionFavorites } from "../hooks/api/question-favorite/get-question-favorite";
 
 export const SolveQuizPage = () => {
   const currentPath = useLocation().pathname;
@@ -60,8 +61,11 @@ export const SolveQuizPage = () => {
   });
 
   const { mutateAsync: postQuestionFavorite } = usePostQuestionFavorite();
+  const { data: favoriteQuestions } = useFetchQuestionFavorites();
 
   const quiz = quizzes?.find((q) => q.id?.toString() === quizId);
+
+  const isCurrentQuestionFavorite = favoriteQuestions?.filter(favoriteQuestions => favoriteQuestions.id === quiz?.questions[currentQuestion].id).length === 1;
 
   useEffect(() => {
     const initializeQuizAttempt = async () => {
@@ -257,7 +261,7 @@ export const SolveQuizPage = () => {
             >
 
               <div onClick={handleQuestionLike} className="absolute right-2 -top-8 bg-red-200 shadow-md rounded-full w-12 h-12 flex justify-center items-center cursor-pointer">
-                 <IconHeart size={32} stroke={1} color="red"/>
+                 <IconHeart size={32} stroke={1} color="red" fill={isCurrentQuestionFavorite ? "red" : "none"}/>
               </div>
 
               <ProgressBar
