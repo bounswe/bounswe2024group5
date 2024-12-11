@@ -157,7 +157,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    navigation.setOptions({ title: `Search: "${keyword}"` });
+    navigation.setOptions({ title: `Posts for "${keyword}":` });
     fetchSearchResults(0);
   }, [keyword]);
 
@@ -318,7 +318,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#faf5ff",
   },
   loadingContainer: {
     flex: 1,
