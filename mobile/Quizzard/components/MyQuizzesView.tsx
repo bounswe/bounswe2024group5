@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 
-const MyQuizzesView = ({ createdQuizzes, onDelete, navigation }) => {
+const MyQuizzesView = ({ createdQuizzes, onDelete, navigation, deleteFunctionality = true }) => {
 
     return (
         <View style={styles.quizSection}>
@@ -36,14 +36,18 @@ const MyQuizzesView = ({ createdQuizzes, onDelete, navigation }) => {
                                 <Text style={styles.itemDetail}>
                                     <AntDesignIcon name="like2" size={12} color="#e13528" /> {quiz.noFavorites}
                                 </Text>
-                                <TouchableOpacity
-                                    style={styles.deleteButton}
-                                    onPress={() => onDelete(quiz.id)}
-                                >
-                                    <Text style={styles.deletebuttonText}>
-                                        <AntDesignIcon name="delete" size={12} />
-                                    </Text>
-                                </TouchableOpacity>
+                                {deleteFunctionality && (
+                                    <TouchableOpacity
+                                        style={styles.deleteButton}
+                                        onPress={() => onDelete && onDelete(quiz.id)}
+                                    >
+                                        <AntDesignIcon
+                                            name="delete"
+                                            size={16}
+                                            color="#e13528"
+                                        />
+                                    </TouchableOpacity>
+                                )}
                             </View>
                         </TouchableOpacity>
                     ))}

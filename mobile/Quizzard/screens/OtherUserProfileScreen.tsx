@@ -174,7 +174,7 @@ const OtherUserProfileScreen: React.FC<OtherUserProfileScreenProps> = ({ route, 
         return (
             <BaseLayout navigation={navigation}>
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#6a0dad" />
+                    <ActivityIndicator size="large" color="#6d28d9" />
                     <Text>Loading...</Text>
                 </View>
             </BaseLayout>
@@ -246,7 +246,9 @@ const OtherUserProfileScreen: React.FC<OtherUserProfileScreenProps> = ({ route, 
                     {showMyQuizzes ? (
                         <MyQuizzesView
                             createdQuizzes={createdQuizzes}
+                            onDelete={null}
                             navigation={navigation}
+                            deleteFunctionality={false}
                         // Remove onDelete prop as we don't want to allow deletion
                         />
                     ) : null}
@@ -366,7 +368,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     retryButton: {
-        backgroundColor: "#6a0dad",
+        backgroundColor: "#6d28d9",
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 8,
