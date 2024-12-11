@@ -54,18 +54,20 @@ const QuizWelcomePage = ({ route, navigation }) => {
             <View style={styles.separator} />
             <View style={styles.detailRow}>
               <Text style={styles.detailsLabel}>Created by:</Text>
-              <Text style={styles.detailsValue}>{quiz.username}</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: quiz.username })}>
+                <Text style={styles.detailsValue}>@{quiz.username}</Text>
+              </TouchableOpacity>
             </View>
             <View style={styles.separator} />
             <View style={styles.detailRow}>
               <Text style={styles.detailsLabel}>Created at:</Text>
               <Text style={styles.detailsValue}>{new Date(quiz.createdAt).toLocaleString("en-US", {
-                  year: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}</Text>
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}</Text>
             </View>
             <View style={styles.separator} />
             <View style={styles.detailRow}>
