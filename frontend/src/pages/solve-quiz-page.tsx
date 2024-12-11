@@ -20,6 +20,7 @@ import { ForumForQuizSolvePage } from "../components/solve-quiz/forum-integratio
 import { IconHeart } from "@tabler/icons-react";
 import { usePostQuestionFavorite } from "../hooks/api/question-favorite/post-question-favorite";
 import { useFetchQuestionFavorites } from "../hooks/api/question-favorite/get-question-favorite";
+import { useDeleteQuestionFavorite } from "../hooks/api/question-favorite/delete-question-favorite";
 
 export const SolveQuizPage = () => {
   const currentPath = useLocation().pathname;
@@ -61,11 +62,12 @@ export const SolveQuizPage = () => {
   });
 
   const { mutateAsync: postQuestionFavorite } = usePostQuestionFavorite();
+  const { mutateAsync: deleteQuestionFavorite } = useDeleteQuestionFavorite();
   const { data: favoriteQuestions } = useFetchQuestionFavorites();
 
   const quiz = quizzes?.find((q) => q.id?.toString() === quizId);
 
-  const isCurrentQuestionFavorite = favoriteQuestions?.filter(favoriteQuestions => favoriteQuestions.id === quiz?.questions[currentQuestion].id).length === 1;
+  const isCurrentQuestionFavorite = favoriteQuestions?.filter(favoriteQuestion => favoriteQuestion?.question?.id === quiz?.questions[currentQuestion].id).length === 1;
 
   useEffect(() => {
     const initializeQuizAttempt = async () => {
@@ -235,8 +237,11 @@ export const SolveQuizPage = () => {
   };
 
   const handleQuestionLike = () => {
-    console.log("Liking question:", quiz.questions[currentQuestion].id);
-    postQuestionFavorite(quiz.questions[currentQuestion].id);
+    if (!isCurrentQuestionFavorite) {
+      postQuestionFavorite(quiz.questions[currentQuestion].id);
+    } else {
+      deleteQuestionFavorite(quiz.questions[currentQuestion].id);
+    }
   }
 
   return (
