@@ -199,31 +199,12 @@ const ProfileScreen = ({ route, navigation }) => {
                 quizDetails.quiz.difficulty
               ),
               username: quizDetails.quiz.username,
-              createdAt: new Date(quizDetails.quiz.createdAt).toLocaleString(
-                "en-US",
-                {
-                  year: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                }
-              ),
+              createdAt: quizDetails.quiz.createdAt,
               noFavorites: quizDetails.quiz.noFavorites,
               questions: quizDetails.quiz.questions,
               completedAt: attempt.completed
-                ? new Date(attempt.completedAt).toLocaleString("en-US", {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : new Date(attempt.updatedAt).toLocaleString("en-US", {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }),
+                ? attempt.completedAt
+                : attempt.updatedAt,
               score: attempt.completed ? attempt.score : null,
               status: attempt.completed ? "Completed" : "In Progress",
               rawCompleted: attempt.completed,
