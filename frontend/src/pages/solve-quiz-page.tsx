@@ -18,6 +18,7 @@ import { QuizResult } from "../components/solve-quiz/quiz-result";
 import { useUpdateQuizAttempt } from "../hooks/api/attempts/update";
 import { ForumForQuizSolvePage } from "../components/solve-quiz/forum-integration";
 import { IconHeart } from "@tabler/icons-react";
+import { usePostQuestionFavorite } from "../hooks/api/question-favorite/post-question-favorite";
 
 export const SolveQuizPage = () => {
   const currentPath = useLocation().pathname;
@@ -57,6 +58,8 @@ export const SolveQuizPage = () => {
   const { data: currentAttempt } = useQuestionAnswers({
     quizAttemptId: quizAttempt?.id ?? -1,
   });
+
+  const { mutateAsync: postQuestionFavorite } = usePostQuestionFavorite();
 
   const quiz = quizzes?.find((q) => q.id?.toString() === quizId);
 
@@ -228,7 +231,8 @@ export const SolveQuizPage = () => {
   };
 
   const handleQuestionLike = () => {
-    console.log("Like");
+    console.log("Liking question:", quiz.questions[currentQuestion].id);
+    postQuestionFavorite(quiz.questions[currentQuestion].id);
   }
 
   return (
