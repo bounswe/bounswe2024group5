@@ -74,7 +74,7 @@ const App = () => {
               }
             />
             <Route
-              path="profile/:id?"
+              path="profile/:username?"
               element={
                 <ProtectedRoute>
                   <ProfilePage />
