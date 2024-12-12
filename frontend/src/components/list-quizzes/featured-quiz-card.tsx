@@ -13,16 +13,24 @@ import {
 } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
 import { useFetchQuizFavorites } from "../../hooks/api/quiz-favorite/get-quiz-favorite";
+import { usePostQuizFavorite } from "../../hooks/api/quiz-favorite/post-quiz-favorite";
+import { useDeleteQuizFavorite } from "../../hooks/api/quiz-favorite/delete-quiz-favorite";
 
 export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
 
   const { data: favoriteQuizzes } = useFetchQuizFavorites();
+  const { mutateAsync: postQuizFavorite } = usePostQuizFavorite();
+  const { mutateAsync: deleteQuizFavorite } = useDeleteQuizFavorite();
 
   const isCurrentQuizFavorite = favoriteQuizzes?.filter(favoriteQuizzes => favoriteQuizzes?.quiz?.id === quiz.id).length == 1;
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    console.log("Like button clicked");
+    if (!isCurrentQuizFavorite) {
+      postQuizFavorite(quiz.id);
+    } else {
+      deleteQuizFavorite(quiz.id);
+    }
   };
 
   return (
