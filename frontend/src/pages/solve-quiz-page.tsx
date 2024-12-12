@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { QuizAttempt } from "../hooks/api/attempts/list";
+import {Modal} from "antd";
 import { motion } from "framer-motion";
 import { OptionButton } from "../components/solve-quiz/option";
 import Confetti from "react-confetti";
@@ -7,7 +8,7 @@ import { QuizOverview } from "../components/solve-quiz/quiz-overview";
 import { ProgressBar } from "../components/solve-quiz/progress-bar";
 import { QuizActionButtons } from "../components/solve-quiz/quiz-action-buttons";
 import { questionTemplate } from "../utils";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 import { Spin } from "antd";
 import { useCreateQuizAttempt } from "../hooks/api/attempts/create";
@@ -17,17 +18,19 @@ import { useQuestionAnswers } from "../hooks/api/questions-answers/list";
 import { QuizResult } from "../components/solve-quiz/quiz-result";
 import { useUpdateQuizAttempt } from "../hooks/api/attempts/update";
 import { ForumForQuizSolvePage } from "../components/solve-quiz/forum-integration";
-import { IconHeart } from "@tabler/icons-react";
+import { IconHeart,  IconInfoCircleFilled } from "@tabler/icons-react";
 import { usePostQuestionFavorite } from "../hooks/api/question-favorite/post-question-favorite";
 import { useFetchQuestionFavorites } from "../hooks/api/question-favorite/get-question-favorite";
 import { useDeleteQuestionFavorite } from "../hooks/api/question-favorite/delete-question-favorite";
 
 export const SolveQuizPage = () => {
   const currentPath = useLocation().pathname;
+  const navigate = useNavigate();
 
   const quizId = currentPath.split("/").pop() || "";
   const quizIdAsNumber = Number.parseInt(quizId);
 
+  const [showCompletedWarning, setShowCompletedWarning] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [lastSolvedQuestion, setLastSolvedQuestion] = useState(-1);
 
@@ -52,6 +55,10 @@ export const SolveQuizPage = () => {
     useQuizAttempts({
       quizId: quizIdAsNumber,
       isCompleted: false,
+    });
+
+    const { data: attempts } = useQuizAttempts({
+      quizId: quizIdAsNumber,
     });
 
   const { mutateAsync: updateQuizAttempt } = useUpdateQuizAttempt(
@@ -102,6 +109,19 @@ export const SolveQuizPage = () => {
     createQuizAttempt,
     quizAttempt,
   ]);
+
+  useEffect(() => {
+    const checkQuizCompletion = () => {
+      if (attempts?.length) {
+        const hasCompletedAttempt = attempts.some((attempt) => attempt.completed);
+        if (hasCompletedAttempt) {
+          setShowCompletedWarning(true);
+        }
+      }
+    };
+
+    checkQuizCompletion();
+  }, [attempts]);
 
   useEffect(() => {
     if (answers[currentQuestion]) {
@@ -193,6 +213,14 @@ export const SolveQuizPage = () => {
     }
   };
 
+  const handleContinueAnyway = () => {
+    setShowCompletedWarning(false);
+  };
+
+  const handleCancel = () => {
+    navigate('/'); // Navigate to main page
+  };
+
   const handleNavigateToQuestion = (questionIndex: number) => {
     setCurrentQuestion(questionIndex);
   };
@@ -246,6 +274,42 @@ export const SolveQuizPage = () => {
 
   return (
     <>
+    <Modal
+        open={showCompletedWarning}
+        closable={false}
+        footer={null}
+        centered
+        maskClosable={false}
+        width={400}
+        className="overflow-hidden rounded-2xl"
+      >
+        <div className="flex flex-col items-center py-4">
+          <div className="flex items-center justify-center w-12 h-12 mb-4 rounded-full bg-emerald-600">
+            <IconInfoCircleFilled size={60} stroke={1} className="text-emerald-100" />
+          </div>
+          
+          <h3 className="mb-2 text-xl font-semibold">Already Completed</h3>
+          
+          <p className="mb-6 text-center text-gray-600">
+            You've already completed this quiz. You won't receive additional points, but you can practice again!
+          </p>
+          
+          <div className="flex justify-center w-full gap-3">
+            <button
+              onClick={handleCancel}
+              className="px-6 py-2 text-base border border-gray-200 rounded-lg hover:bg-gray-50"
+            >
+              Return to Quizzes
+            </button>
+            <button
+              onClick={handleContinueAnyway}
+              className="px-6 py-2 text-base text-white rounded-lg bg-emerald-600 hover:bg-emerald-700"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </Modal>
       <div className="flex w-full">
         {confettiEnabled && <Confetti />}
         {isQuizFinished ? (
@@ -262,10 +326,10 @@ export const SolveQuizPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="flex-grow p-6 mr-4 rounded-xl bg-violet-50 relative"
+              className="relative flex-grow p-6 mr-4 rounded-xl bg-violet-50"
             >
 
-              <div onClick={handleQuestionLike} className="absolute right-2 -top-8 bg-red-200 shadow-md rounded-full w-12 h-12 flex justify-center items-center cursor-pointer">
+              <div onClick={handleQuestionLike} className="absolute flex items-center justify-center w-12 h-12 bg-red-200 rounded-full shadow-md cursor-pointer right-2 -top-8">
                  <IconHeart size={32} stroke={1} color="red" fill={isCurrentQuestionFavorite ? "red" : "none"}/>
               </div>
 
