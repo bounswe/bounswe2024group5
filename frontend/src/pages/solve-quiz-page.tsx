@@ -17,6 +17,11 @@ import { useQuestionAnswers } from "../hooks/api/questions-answers/list";
 import { QuizResult } from "../components/solve-quiz/quiz-result";
 import { useUpdateQuizAttempt } from "../hooks/api/attempts/update";
 import { ForumForQuizSolvePage } from "../components/solve-quiz/forum-integration";
+import { IconHeart } from "@tabler/icons-react";
+import { usePostQuestionFavorite } from "../hooks/api/question-favorite/post-question-favorite";
+import { useFetchQuestionFavorites } from "../hooks/api/question-favorite/get-question-favorite";
+import { useDeleteQuestionFavorite } from "../hooks/api/question-favorite/delete-question-favorite";
+
 export const SolveQuizPage = () => {
   const currentPath = useLocation().pathname;
 
@@ -56,7 +61,13 @@ export const SolveQuizPage = () => {
     quizAttemptId: quizAttempt?.id ?? -1,
   });
 
+  const { mutateAsync: postQuestionFavorite } = usePostQuestionFavorite();
+  const { mutateAsync: deleteQuestionFavorite } = useDeleteQuestionFavorite();
+  const { data: favoriteQuestions } = useFetchQuestionFavorites();
+
   const quiz = quizzes?.find((q) => q.id?.toString() === quizId);
+
+  const isCurrentQuestionFavorite = favoriteQuestions?.filter(favoriteQuestion => favoriteQuestion?.question?.id === quiz?.questions[currentQuestion].id).length === 1;
 
   useEffect(() => {
     const initializeQuizAttempt = async () => {
@@ -225,6 +236,14 @@ export const SolveQuizPage = () => {
     }
   };
 
+  const handleQuestionLike = () => {
+    if (!isCurrentQuestionFavorite) {
+      postQuestionFavorite(quiz.questions[currentQuestion].id);
+    } else {
+      deleteQuestionFavorite(quiz.questions[currentQuestion].id);
+    }
+  }
+
   return (
     <>
       <div className="flex w-full">
@@ -243,8 +262,13 @@ export const SolveQuizPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="flex-grow p-6 mr-4 rounded-xl bg-violet-50"
+              className="flex-grow p-6 mr-4 rounded-xl bg-violet-50 relative"
             >
+
+              <div onClick={handleQuestionLike} className="absolute right-2 -top-8 bg-red-200 shadow-md rounded-full w-12 h-12 flex justify-center items-center cursor-pointer">
+                 <IconHeart size={32} stroke={1} color="red" fill={isCurrentQuestionFavorite ? "red" : "none"}/>
+              </div>
+
               <ProgressBar
                 currentQuestion={currentQuestion}
                 questions={quiz.questions}
