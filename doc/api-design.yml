@@ -943,6 +943,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuizResponse'
+  /quizzes/from-favorites:
+    post:
+      summary: Create a quiz from the user's favorite questions
+      description: Creates a quiz using the favorite questions of the authenticated user. The user must be authenticated via a JWT token.
+      tags:
+        - Quizzes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  description: The number of favorite questions to include in the quiz.
+                title:
+                  type: string
+                  description: The title of the quiz to be created.
+              required:
+                - count
+                - title
+            example:
+              count: 5
+              title: "My Favorite Quiz"
+      responses:
+        '200':
+          description: Quiz created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizResponse'
+        '400':
+          description: Bad request. Could occur if the input parameters are invalid.
+        '401':
+          description: Unauthorized. Occurs when the provided JWT is invalid or missing.
+        '500':
+          description: Internal server error. Occurs if an unexpected error happens on the server.
   /quizzes/{id}:
     get:
       summary: Get a quiz by ID
