@@ -150,6 +150,9 @@ public class QuizService {
 
     public List<QuizResponse> getRecommendedQuizzes(String username, Long givenQuizId) {
         Pageable pageable = PageRequest.of(0, 5);
+        Optional<Quiz> quiz = quizRepository.findById(givenQuizId);
+        if (quiz.isEmpty())
+            throw new ResourceNotFoundException("Quiz not found with id " + givenQuizId);
         return mapQuizzesToQuizResponses(quizRepository.findRecommendedQuizzes(givenQuizId, username, pageable));
     }
 
