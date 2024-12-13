@@ -17,6 +17,8 @@ import com.quizzard.quizzard.repository.QuestionRepository;
 import com.quizzard.quizzard.repository.QuizRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -144,6 +146,11 @@ public class QuizService {
         if (quiz.get().getAuthor().getId() != user.getId())
             throw new AccessDeniedException("You are not the author of this quiz");
         quizRepository.deleteById(id);
+    }
+
+    public List<QuizResponse> getRecommendedQuizzes(String username, Long givenQuizId) {
+        Pageable pageable = PageRequest.of(0, 5);
+        return mapQuizzesToQuizResponses(quizRepository.findRecommendedQuizzes(givenQuizId, username, pageable));
     }
 
 }
