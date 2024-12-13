@@ -10,7 +10,7 @@ export const usePostQuizFavorite = () => {
     return useMutation({
         mutationFn: async ( quizId: number | undefined ) => {
             if (!quizId) return;
-            const TOKEN = sessionStorage.getItem('token');
+            const TOKEN = localStorage.getItem('token');
             const response = await fetch(`${hostUrl}/api/favorite-quiz`, {
                 method: 'POST',
                 headers: {

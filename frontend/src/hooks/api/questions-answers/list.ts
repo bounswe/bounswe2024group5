@@ -18,7 +18,7 @@ export const useQuestionAnswers = (filters?: { quizAttemptId?: number; questionI
 		queryKey: ['question-answers', filters],
 		queryFn: async () => {
 
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 			const params = new URLSearchParams();
 
 			if (filters?.quizAttemptId !== undefined) {
