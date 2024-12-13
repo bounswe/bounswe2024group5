@@ -12,18 +12,25 @@ import {
   IconPhotoOff,
 } from "@tabler/icons-react";
 import { cx } from "class-variance-authority";
-import { useState } from "react";
+import { useFetchQuizFavorites } from "../../hooks/api/quiz-favorite/get-quiz-favorite";
+import { usePostQuizFavorite } from "../../hooks/api/quiz-favorite/post-quiz-favorite";
+import { useDeleteQuizFavorite } from "../../hooks/api/quiz-favorite/delete-quiz-favorite";
 
 export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
-  const [liked, setLiked] = useState<boolean>(Math.random() < 0.5);
-  const [likeCount, setLikeCount] = useState<number>(
-    Math.floor(Math.random() * 100)
-  );
+
+  const { data: favoriteQuizzes } = useFetchQuizFavorites();
+  const { mutateAsync: postQuizFavorite } = usePostQuizFavorite();
+  const { mutateAsync: deleteQuizFavorite } = useDeleteQuizFavorite();
+
+  const isCurrentQuizFavorite = favoriteQuizzes?.filter(favoriteQuizzes => favoriteQuizzes?.quiz?.id === quiz.id).length == 1;
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setLiked(!liked);
-    setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+    if (!isCurrentQuizFavorite) {
+      postQuizFavorite(quiz.id);
+    } else {
+      deleteQuizFavorite(quiz.id);
+    }
   };
 
   return (
@@ -91,13 +98,13 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
                     className={cx(
                       "stroke-red-500 cursor-pointer transition-colors duration-200",
                       {
-                        "fill-red-500": liked,
-                        "hover:fill-red-300": !liked,
+                        "fill-red-500": isCurrentQuizFavorite,
+                        "hover:fill-red-300": !isCurrentQuizFavorite,
                       }
                     )}
                     onClick={handleLikeClick}
                   />
-                  {likeCount}
+                  
                 </div>
               </div>
             </motion.div>

@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import { Quiz } from "../../types/question";
 import { motion } from "framer-motion";
 import {
@@ -15,12 +14,28 @@ import { IconCircleDashedCheck } from "@tabler/icons-react";
 import { useQuizAttempts } from "../../hooks/api/attempts/list";
 
 import { DifficultyBadge } from "../badges/level";
+import { useFetchQuizFavorites } from "../../hooks/api/quiz-favorite/get-quiz-favorite";
+import { usePostQuizFavorite } from "../../hooks/api/quiz-favorite/post-quiz-favorite";
+import { useDeleteQuizFavorite } from "../../hooks/api/quiz-favorite/delete-quiz-favorite";
 
 export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
-  const [liked, setLiked] = useState<boolean>(Math.random() < 0.5);
-  const [likeCount, setLikeCount] = useState<number>(
-    Math.floor(Math.random() * 100)
-  );
+  
+  
+  const { data: favoriteQuizzes } = useFetchQuizFavorites();
+  const { mutateAsync: postQuizFavorite } = usePostQuizFavorite();
+  const { mutateAsync: deleteQuizFavorite } = useDeleteQuizFavorite();
+
+  const isCurrentQuizFavorite = favoriteQuizzes?.filter(favoriteQuizzes => favoriteQuizzes?.quiz?.id === quiz.id).length == 1;
+
+  const handleLikeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!isCurrentQuizFavorite) {
+      postQuizFavorite(quiz.id);
+    } else {
+      deleteQuizFavorite(quiz.id);
+    }
+  };
+
 
   const { data: attempts } = useQuizAttempts({
     quizId: quiz.id,
@@ -51,12 +66,6 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
     }
 
     return null;
-  };
-
-  const handleLikeClick = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent Link navigation when clicking the heart
-    setLiked(!liked);
-    setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
   };
 
   return (
@@ -135,12 +144,11 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
               <div className="flex items-center gap-1 text-zinc-500">
                 <IconHeart
                   className={cx("stroke-red-500", {
-                    "fill-red-500": liked,
-                    "hover:fill-red-300": !liked,
+                    "fill-red-500": isCurrentQuizFavorite,
+                    "hover:fill-red-300": !isCurrentQuizFavorite,
                   })}
                   onClick={handleLikeClick}
                 />
-                {likeCount}
               </div>
             </div>
           </motion.div>

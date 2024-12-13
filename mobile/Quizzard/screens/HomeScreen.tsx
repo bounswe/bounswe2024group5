@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
+// HomePage.js
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   Text,
   StyleSheet,
@@ -8,13 +9,15 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
+  Modal,
 } from "react-native";
 import BaseLayout from "./BaseLayout";
 import QuizViewComponent from "../components/QuizViewComponent";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
-import HostUrlContext from '../app/HostContext';
+import HostUrlContext from "../app/HostContext";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const calculateQuizDifficultyFromElo = (elo: number) => {
   if (elo < 400) return "A1";
@@ -23,20 +26,27 @@ const calculateQuizDifficultyFromElo = (elo: number) => {
   else if (elo < 2600) return "B2";
   else if (elo < 3300) return "C1";
   else return "C2";
-}
+};
 
 const HomePage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
-  const [otherQuizzesFilterDifficulty, setOtherQuizzesFilterDifficulty] = useState("a1"); // Default difficulty
+  const [otherQuizzesFilterDifficulty, setOtherQuizzesFilterDifficulty] =
+    useState("a1"); // Default difficulty
   const authContext = useAuth(); // Get the authentication context
   const [userProfile, setUserProfile] = useState(null);
   const token = authContext ? authContext.token : null; // Get the token if authContext is not null
   const [userElo, setUserElo] = useState(200);
+  const [quizAttempts, setQuizAttempts] = useState<Map<number, string>>(
+    new Map()
+  );
+  const [hideCompleted, setHideCompleted] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
 
-
+  // Fetch user profile
   const fetchUserProfile = async () => {
     try {
       console.log(`Fetching profile from: ${hostUrl}/api/profile/me`);
@@ -61,7 +71,7 @@ const HomePage = ({ navigation }) => {
         console.log("Response Data:", data);
         if (response.ok) {
           setUserProfile(data);
-          setUserElo(data.score)
+          setUserElo(data.score);
         } else {
           // Handle specific error messages from API
           Alert.alert("Error", data.message || "Failed to fetch profile data.");
@@ -85,119 +95,181 @@ const HomePage = ({ navigation }) => {
     }
   };
 
+  // Fetch quiz attempts
+  const fetchQuizAttempts = useCallback(async () => {
+    try {
+      const response = await fetch(`${hostUrl}/api/quiz-attempts`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch quiz attempts");
+      }
+      const attempts = await response.json();
+
+      const attemptsMap = new Map();
+      attempts.forEach((attempt) => {
+        const existingStatus = attemptsMap.get(attempt.quizId);
+        if (attempt.completed) {
+          attemptsMap.set(attempt.quizId, "Completed");
+        } else if (!existingStatus && !attempt.completed) {
+          attemptsMap.set(attempt.quizId, "In Progress");
+        }
+      });
+
+      setQuizAttempts(attemptsMap);
+      return attemptsMap; // Return the map for immediate use
+    } catch (error) {
+      console.error("Error fetching quiz attempts:", error);
+      return new Map(); // Return an empty map on error
+    }
+  }, [hostUrl, token]);
+
+  // Fetch quizzes for you
+  const fetchQuizzesForYou = useCallback(
+    async (attemptsMap: Map<number, string>) => {
+      try {
+        const response = await fetch(`${hostUrl}/api/quizzes?page=1&limit=10`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        let data = await response.json();
+
+        data.quizzes = data.quizzes.map((quiz) => ({
+          ...quiz,
+          elo: quiz.difficulty,
+          difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
+          status: attemptsMap.get(quiz.id) || null,
+        }));
+
+        // Sort the quizzes based on closeness to userElo
+        data.quizzes.sort(
+          (a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo)
+        );
+
+        if (response.ok) {
+          setQuizzesForYou(data.quizzes);
+          console.log("Quizzes for you:", data.quizzes);
+        } else {
+          console.error("Failed to fetch quizzes for you", data);
+        }
+      } catch (error) {
+        console.error("Error fetching quizzes for you:", error);
+      }
+    },
+    [hostUrl, token, userElo]
+  );
+
+  // Fetch other quizzes
+  const fetchOtherQuizzes = useCallback(
+    async (attemptsMap: Map<number, string>) => {
+      try {
+        console.log(`Token is ${token}`);
+        const response = await fetch(`${hostUrl}/api/quizzes?page=1&limit=10`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        let data = await response.json();
+        data.quizzes = data.quizzes.map((quiz) => ({
+          ...quiz,
+          elo: quiz.difficulty,
+          difficulty: calculateQuizDifficultyFromElo(quiz.difficulty),
+          status: attemptsMap.get(quiz.id) || null,
+        }));
+        data.quizzes = data.quizzes.filter(
+          (quiz) =>
+            quiz.difficulty === otherQuizzesFilterDifficulty.toUpperCase()
+        );
+        data.quizzes.sort(
+          (a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo)
+        );
+
+        if (response.ok) {
+          setOtherQuizzes(data.quizzes);
+        } else {
+          console.error("Failed to fetch other quizzes", data);
+        }
+      } catch (error) {
+        console.error("Error fetching other quizzes:", error);
+      }
+    },
+    [hostUrl, token, userElo, otherQuizzesFilterDifficulty]
+  );
+
+  // Main data fetching function
   useEffect(() => {
-    // Fetch both quizzes whenever difficulty changes
     const fetchData = async () => {
       setLoading(true);
       try {
-        await Promise.all([fetchQuizzesForYou(), fetchOtherQuizzes(), fetchUserProfile()]);
+        const attemptsMap = await fetchQuizAttempts(); // Fetch quiz attempts first
+        await Promise.all([
+          fetchQuizzesForYou(attemptsMap),
+          fetchOtherQuizzes(attemptsMap),
+          fetchUserProfile(),
+        ]);
       } catch (error) {
-        console.error("Error fetching quizzes:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-    fetchQuizzesForYou();
-    fetchOtherQuizzes();
-  }, [otherQuizzesFilterDifficulty]); // Dependency array includes 'difficulty'
-
-  const fetchQuizzesForYou = async () => {
-    try {
-      const response = await fetch(
-        `${hostUrl}/api/quizzes?page=1&limit=10`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      let data = await response.json();
-      console.log(data);
-     
-      data.quizzes = data.quizzes.map((quiz) => ({
-        ...quiz,
-        elo: quiz.difficulty,
-        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty)
-      }));
-      
-       
-      // sort the quizzes for being closest to the userElo
-      data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
-
-      if (response.ok) {
-        setQuizzesForYou(data.quizzes);
-        console.log("Quizzes for you:", data.quizzes); // TODO: Remove or comment out after debugging
-      } else {
-        console.error("Failed to fetch quizzes for you", data);
-      }
-    } catch (error) {
-      console.error("Error fetching quizzes for you:", error);
-    }
-  };
-
-  const fetchOtherQuizzes = async () => {
-    try {
-      console.log(`Token is ${token}`);
-      const response = await fetch(
-        `${hostUrl}/api/quizzes?page=1&limit=10`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      let data = await response.json();
-      data.quizzes = data.quizzes.map((quiz) => ({
-        ...quiz,
-        elo: quiz.difficulty,
-        difficulty: calculateQuizDifficultyFromElo(quiz.difficulty)
-      }));
-      data.quizzes = data.quizzes.filter((quiz)=>quiz.difficulty==otherQuizzesFilterDifficulty.toUpperCase());
-      // sort the quizzes for being closest to the userElo
-      data.quizzes.sort((a, b) => Math.abs(a.elo - userElo) - Math.abs(b.elo - userElo));
-
-      if (response.ok) {
-        setOtherQuizzes(data.quizzes);
-        console.log("Other quizzes:", data.quizzes); // TODO: Remove or comment out after debugging
-      } else {
-        console.error("Failed to fetch other quizzes", data);
-      }
-    } catch (error) {
-      console.error("Error fetching other quizzes:", error);
-    }
-  };
+  }, [
+    fetchQuizAttempts,
+    fetchQuizzesForYou,
+    fetchOtherQuizzes,
+    otherQuizzesFilterDifficulty,
+  ]);
 
   const navigateToQuizCreation = () => {
     navigation.navigate("QuizCreation");
   };
 
-  const navigateToQuiz = (quiz, questions) => {
-    navigation.navigate("QuizWelcome", { quiz});
+  const navigateToQuiz = (quiz) => {
+    if (quiz.status === "Completed") {
+      setSelectedQuiz(quiz);
+      setShowModal(true);
+    } else {
+      navigation.navigate("QuizWelcome", { quiz });
+    }
+  };
+
+  const handleContinue = () => {
+    setShowModal(false);
+    if (selectedQuiz) {
+      navigation.navigate("QuizWelcome", { quiz: selectedQuiz });
+    }
   };
 
   const renderOtherQuizzes = ({ item }: { item: Quiz }) => (
     <View style={styles.quizWrapper}>
       <QuizViewComponent
         quiz={item}
-        onPress={() => navigateToQuiz(item, item.questions)}
+        onPress={() => navigateToQuiz(item)}
+        onDelete={() => {}}
+        showActions={false}
+        status={item.status}
       />
     </View>
   );
 
-  const renderQuizzesForYou = ({ item }: { item: Quiz }) => (
-    <View style={styles.quizWrapper}>
-      <QuizViewComponent
-        quiz={item}
-        onPress={() => navigateToQuiz(item, item.questions)}
-      />
-    </View>
-  );
+  const filterQuizzes = (quizzes) => {
+    if (hideCompleted) {
+      return quizzes.filter((quiz) => quiz.status !== "Completed");
+    }
+    return quizzes;
+  };
 
   if (loading) {
     return (
@@ -215,12 +287,33 @@ const HomePage = ({ navigation }) => {
       <View style={{ flex: 1 }}>
         {/* Quizzes For You Section */}
         <View style={styles.quizzesForYouHeader}>
-          <Text style={styles.sectionTitle}>Quizzes For You</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.sectionTitle}>Quizzes For You</Text>
+            <TouchableOpacity
+              style={styles.hideCompletedButton}
+              onPress={() => setHideCompleted(!hideCompleted)}
+            >
+              <Ionicons
+                name={hideCompleted ? "eye-off" : "eye"}
+                size={20}
+                color="#fff"
+              />
+              <Text style={styles.hideCompletedText}>
+                {hideCompleted ? "Show" : "Hide"}
+              </Text>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity
             style={styles.addQuizButton}
             onPress={navigateToQuizCreation}
           >
-            <Text style={styles.addQuizButtonText}>Create a quiz</Text>
+            <Ionicons
+              name="pencil"
+              size={16}
+              color="#fff"
+              style={styles.addQuizIcon}
+            />
+            <Text style={styles.addQuizButtonText}>Create</Text>
           </TouchableOpacity>
         </View>
 
@@ -231,19 +324,16 @@ const HomePage = ({ navigation }) => {
             showsHorizontalScrollIndicator={false}
             style={styles.quizScroll}
           >
-            {quizzesForYou.length > 0 ? (
-              quizzesForYou.map((quiz) => (
-                <QuizViewComponent
-                  key={quiz.id}
-                  quiz={quiz}
-                  onPress={() => navigateToQuiz(quiz, quiz.questions)}
-                />
-              ))
-            ) : (
-              <Text style={styles.noQuizzesText}>
-                No quizzes available for you.
-              </Text>
-            )}
+            {filterQuizzes(quizzesForYou).map((quiz) => (
+              <QuizViewComponent
+                key={quiz.id}
+                quiz={quiz}
+                onPress={() => navigateToQuiz(quiz)}
+                onDelete={() => {}}
+                showActions={false}
+                status={quiz.status}
+              />
+            ))}
           </ScrollView>
         </View>
 
@@ -263,7 +353,7 @@ const HomePage = ({ navigation }) => {
           <View style={styles.sectionDivider} />
           {otherQuizzes.length > 0 ? (
             <FlatList
-              data={otherQuizzes}
+              data={filterQuizzes(otherQuizzes)}
               renderItem={renderOtherQuizzes}
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
@@ -278,6 +368,41 @@ const HomePage = ({ navigation }) => {
           )}
         </View>
       </View>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showModal}
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Ionicons name="information-circle" size={50} color="#059669" />
+            <Text style={styles.modalTitle}>Already Completed</Text>
+            <Text style={styles.modalText}>
+              You've already completed this quiz. You won't receive additional
+              points, but you can practice again!
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setShowModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.continueButton]}
+                onPress={handleContinue}
+              >
+                <Text
+                  style={[styles.modalButtonText, styles.continueButtonText]}
+                >
+                  Continue
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </BaseLayout>
   );
 };
@@ -299,6 +424,9 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   addQuizButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#6a0dad",
     paddingVertical: 6,
     paddingHorizontal: 12,
@@ -368,6 +496,91 @@ const styles = StyleSheet.create({
     color: "#666",
     marginTop: 20,
     fontSize: 16,
+  },
+  headerButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  hideCompletedButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: "#059669",
+  },
+  hideCompletedText: {
+    fontSize: 12,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  addQuizIcon: {
+    marginRight: 6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
+    width: "85%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+    marginVertical: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 10,
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    minWidth: 100,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#666",
+  },
+  continueButton: {
+    backgroundColor: "#059669",
+  },
+  continueButtonText: {
+    color: "white",
   },
 });
 

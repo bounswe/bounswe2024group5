@@ -3,17 +3,43 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const QuizViewComponent = ({ quiz, onPress, onDelete, showActions = false }) => {
+interface QuizViewComponentProps {
+  quiz: any;
+  onPress: any;
+  onDelete: any;
+  showActions?: boolean;
+  status?: string | null;
+}
 
+const QuizViewComponent: React.FC<QuizViewComponentProps> = ({
+  quiz,
+  onPress,
+  onDelete,
+  showActions = false,
+  status,
+}) => {
   return (
     <View style={styles.quizContainer}>
       <TouchableOpacity
         onPress={onPress ? onPress : undefined}
         activeOpacity={onPress ? 0.7 : 1}
       >
-        {/* Quiz Image */}        
-        <Image source={{uri: quiz.image }} style={styles.quizImage} />
-        
+        {/* Quiz Image */}
+        <Image source={{ uri: quiz.image }} style={styles.quizImage} />
+
+        {/* Status Badge */}
+        {status && (
+          <View
+            style={[
+              styles.statusContainer,
+              status === "Completed"
+                ? styles.completedStatus
+                : styles.inProgressStatus,
+            ]}
+          >
+            <Text style={styles.statusText}>{status}</Text>
+          </View>
+        )}
 
         {/* Quiz Details */}
         <View style={styles.quizDetails}>
@@ -26,7 +52,9 @@ const QuizViewComponent = ({ quiz, onPress, onDelete, showActions = false }) => 
           <View style={styles.quizInfo}>
             <Text style={styles.difficultyLevel}>{quiz.difficulty}</Text>
             <Text style={styles.difficultyLevel}> | </Text>
-            <Text style={styles.difficultyLevel}>ELO: {Math.round(quiz.elo)}</Text>
+            <Text style={styles.difficultyLevel}>
+              ELO: {Math.round(quiz.elo)}
+            </Text>
             <View style={styles.likesContainer}>
               <Ionicons name="heart-outline" size={16} color="#6a0dad" />
               <Text style={styles.likeCount}>{quiz.likes}</Text>
@@ -51,7 +79,7 @@ const styles = StyleSheet.create({
     width: 140,
     height: 220,
     marginRight: 16,
-    backgroundColor: "#ede9fe", 
+    backgroundColor: "#ede9fe",
     borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -129,6 +157,25 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 14,
     textAlign: "center",
+  },
+  statusContainer: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  completedStatus: {
+    backgroundColor: "#059669", // green
+  },
+  inProgressStatus: {
+    backgroundColor: "#d97706", // amber
+  },
+  statusText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });
 
