@@ -31,6 +31,7 @@ export const SolveQuizPage = () => {
   const quizIdAsNumber = Number.parseInt(quizId);
 
   const [showCompletedWarning, setShowCompletedWarning] = useState(false);
+  const [isNewCompletion, setIsNewCompletion] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [lastSolvedQuestion, setLastSolvedQuestion] = useState(-1);
 
@@ -112,7 +113,7 @@ export const SolveQuizPage = () => {
 
   useEffect(() => {
     const checkQuizCompletion = () => {
-      if (attempts?.length) {
+      if (attempts?.length && !isNewCompletion) {
         const hasCompletedAttempt = attempts.some((attempt) => attempt.completed);
         if (hasCompletedAttempt) {
           setShowCompletedWarning(true);
@@ -121,7 +122,7 @@ export const SolveQuizPage = () => {
     };
 
     checkQuizCompletion();
-  }, [attempts]);
+  }, [attempts, isNewCompletion]);
 
   useEffect(() => {
     if (answers[currentQuestion]) {
@@ -185,6 +186,7 @@ export const SolveQuizPage = () => {
   useEffect(() => {
     if (isQuizFinished) {
       setConfettiEnabled(true);
+      setIsNewCompletion(true);
       updateQuizAttempt({ completed: true }).then((updatedAttempt) => {
         setQuizAttempt(updatedAttempt);
       });
