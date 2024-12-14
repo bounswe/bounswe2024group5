@@ -115,12 +115,14 @@ const ProfilePage = () => {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1 mt-2">
+                  { isOwnProfile && (  
+                    <div className="flex items-center gap-1 mt-2">
                     <IconMail className="text-zinc-700" size={20} stroke={3} />
                     <p className="text-gray-600 place-self-start">
                       {profile.email}
                     </p>
                   </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-4 mt-8">
@@ -212,7 +214,7 @@ const ProfilePage = () => {
                     </div>
                   ),
                 },
-                {
+                ...(isOwnProfile ? [{
                   key: "history",
                   label: "Quiz History",
                   children: (
@@ -222,7 +224,7 @@ const ProfilePage = () => {
                       ))}
                     </div>
                   ),
-                },
+                }] : []),
                 {
                   key: "forum",
                   label: "Forum Posts",
