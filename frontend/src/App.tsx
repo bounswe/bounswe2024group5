@@ -37,6 +37,7 @@ const App = () => {
   console.log(hostUrl);
 
   return (
+
     <HostContext.Provider value={`http://${hostUrl}:80`}>
       <Router>
         <Routes>
