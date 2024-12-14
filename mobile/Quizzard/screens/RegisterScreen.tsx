@@ -18,7 +18,6 @@ const RegisterScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
-  const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,7 +25,7 @@ const RegisterScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const { login, token } = useAuth();
+  const { login, saveUsername, token} = useAuth();
 
   const showError = (message) => {
     setErrorMessage(message);
@@ -151,7 +150,7 @@ const RegisterScreen = ({ navigation }) => {
           email: registeredUser.email,
           profile: userProfile,
         };
-        setUser(user);
+        saveUsername(user.username);
         console.log("Logged in user:", user);
         navigation.navigate("Home", { registeredUser: user });
 

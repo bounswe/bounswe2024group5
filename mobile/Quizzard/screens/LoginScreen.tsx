@@ -21,7 +21,7 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
-  const { login, token } = useAuth();
+  const { login, saveUsername, token} = useAuth();
 
   const fetchUserProfile = async (token) => {
     try {
@@ -93,6 +93,7 @@ const LoginScreen = ({ navigation }) => {
           email: registeredUser.email,
           profile: userProfile,
         };
+        saveUsername(user.username);
         console.log("Logged in user:", user);
         navigation.navigate("Home", { registeredUser: user });
       } else {

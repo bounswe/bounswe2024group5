@@ -175,3 +175,6 @@ END //
 
 DELIMITER ;
 
+
+CREATE INDEX idx_post_tags_post_id ON post_tags(post_id);
+CREATE INDEX idx_post_tags_english_id ON post_tags(english_id);

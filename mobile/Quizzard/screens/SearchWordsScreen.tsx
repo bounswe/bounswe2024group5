@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#faf5ff",
   },
   backButton: {
     marginBottom: 20,
@@ -228,8 +228,8 @@ const styles = StyleSheet.create({
   },
   suggestionsContainer: {
     marginTop: 10, // Space between search input and suggestions
-    backgroundColor: "#fff",
-    borderColor: "gray",
+    backgroundColor: "#f3e8ff",
+    borderColor: "#6a0dad",
     borderWidth: 1,
     maxHeight: 150,
     borderRadius: 5,
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   suggestionItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "gray",
+    borderBottomColor: "#6a0dad",
   },
   loadingIndicator: {
     position: "absolute",

@@ -44,8 +44,8 @@ export const SignUpPage = () => {
       })
       .then((response) => {
         console.log("Registration successfull.");
-        sessionStorage.setItem("token", response.token);
-        sessionStorage.setItem("username", username);
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("username", username);
         navigate("/");
       })
       .catch((error) => {

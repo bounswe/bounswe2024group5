@@ -24,7 +24,7 @@ export const useCreateQuestionAnswer = () => {
 
 	return useMutation({
 		mutationFn: async (payload: CreateQuestionAnswerPayload): Promise<QuestionAnswer> => {
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 			const response = await fetch(`${hostUrl}/api/question-answers`, {
 				method: 'POST',
 				headers: {

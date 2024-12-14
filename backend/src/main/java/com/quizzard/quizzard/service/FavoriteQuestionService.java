@@ -6,6 +6,7 @@ import com.quizzard.quizzard.model.Question;
 import com.quizzard.quizzard.model.User;
 import com.quizzard.quizzard.model.request.FavoriteQuestionRequest;
 import com.quizzard.quizzard.model.response.FavoriteQuestionResponse;
+import com.quizzard.quizzard.model.response.FavoriteQuizResponse;
 import com.quizzard.quizzard.repository.FavoriteQuestionRepository;
 import com.quizzard.quizzard.repository.FavoriteQuizRepository;
 import com.quizzard.quizzard.repository.QuestionRepository;
@@ -14,6 +15,7 @@ import com.quizzard.quizzard.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +39,9 @@ public class FavoriteQuestionService {
         this.questionRepository = questionRepository;
     }
 
+    private FavoriteQuestionResponse mapToFavoriteQuestionResponse(FavoriteQuestion favoriteQuestion) {
+        return new FavoriteQuestionResponse(favoriteQuestion);
+    }
 
     public FavoriteQuestionResponse addFavoriteQuestion(String jwtToken, FavoriteQuestionRequest favoriteQuestionRequest) {
         String solverUsername = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
@@ -62,10 +67,11 @@ public class FavoriteQuestionService {
     }
 
 
-    public List<FavoriteQuestion> getAllFavoriteQuestions(String jwtToken) {
+    public List<FavoriteQuestionResponse> getAllFavoriteQuestions(String jwtToken) {
         String solverUsername = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
         User user = userService.getOneUserByUsername(solverUsername);
-        return favoriteQuestionRepository.findAllByUser(user);
+        List<FavoriteQuestion> favoriteQuestions = favoriteQuestionRepository.findAllByUser(user);
+        return favoriteQuestions.stream().map(this::mapToFavoriteQuestionResponse).toList();
     }
 
     public void deleteFavoriteQuestion(String jwtToken, Long id) {

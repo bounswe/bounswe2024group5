@@ -49,6 +49,13 @@ const ProfileScreen = ({ route, navigation }) => {
   const [showMyPosts, setShowMyPosts] = useState(true);
   const [showMyQuizAttempts, setShowMyQuizAttempts] = useState(true);
 
+  const [isOwnProfile, setIsOwnProfile] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+
+  const [hideCompleted, setHideCompleted] = useState(false);
+
   const calculateQuizDifficultyFromElo = (elo: number) => {
     if (elo < 400) return "A1";
     else if (elo < 1000) return "A2";
@@ -391,6 +398,87 @@ const ProfileScreen = ({ route, navigation }) => {
     }, [username]) // Only depend on username
   );
 
+  // Update useEffect to check if it's own profile and fetch follow data
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Check if viewing own profile or another user's
+        const viewingUsername = route.params?.username;
+        const isOwn = !viewingUsername || viewingUsername === username;
+        setIsOwnProfile(isOwn);
+
+        // Fetch followers and following
+        const followersResponse = await fetch(
+          `${hostUrl}/api/profile/${viewingUsername || username}/followers`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const followingResponse = await fetch(
+          `${hostUrl}/api/profile/${viewingUsername || username}/following`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (followersResponse.ok && followingResponse.ok) {
+          const followersData = await followersResponse.json();
+          const followingData = await followingResponse.json();
+          setFollowers(followersData);
+          setFollowing(followingData);
+
+          // Check if current user is following this profile
+          if (!isOwn) {
+            setIsFollowing(followersData.some((f) => f.username === username));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching follow data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [username, route.params?.username]);
+
+  // Add follow/unfollow handler
+  const handleFollowToggle = async () => {
+    const targetUsername = route.params?.username;
+    try {
+      const response = await fetch(
+        `${hostUrl}/api/profile/follow/${targetUsername}`,
+        {
+          method: isFollowing ? "DELETE" : "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setIsFollowing(!isFollowing);
+        // Update followers count
+        const newFollowers = await fetch(
+          `${hostUrl}/api/profile/${targetUsername}/followers`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        ).then((res) => res.json());
+        setFollowers(newFollowers);
+      }
+    } catch (error) {
+      console.error("Error toggling follow:", error);
+    }
+  };
+
   // Render loading indicator
   if (loading) {
     return (
@@ -467,22 +555,45 @@ const ProfileScreen = ({ route, navigation }) => {
                 </Text>
               </View>
             </View>
+
+            <View style={styles.followStats}>
+              <Text style={styles.followText}>
+                {followers.length} followers
+              </Text>
+              <Text style={styles.followText}>
+                {following.length} following
+              </Text>
+            </View>
           </View>
 
-          {/* Profile Settings Button */}
-          <TouchableOpacity
-            style={styles.settingsButton}
-            onPress={() =>
-              navigation.navigate("ProfileSettings", { username: username })
-            }
-          >
-            <FontAwesomeIcon
-              name="pencil-square-o"
-              size={16}
-              style={styles.editIcon}
-            />
-            <Text style={styles.buttonText}>Edit</Text>
-          </TouchableOpacity>
+          {/* Show Edit or Follow button based on profile type */}
+          {isOwnProfile ? (
+            <TouchableOpacity
+              style={styles.settingsButton}
+              onPress={() =>
+                navigation.navigate("ProfileSettings", { username })
+              }
+            >
+              <FontAwesomeIcon
+                name="pencil-square-o"
+                size={16}
+                style={styles.editIcon}
+              />
+              <Text style={styles.buttonText}>Edit</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[
+                styles.followButton,
+                isFollowing && styles.followingButton,
+              ]}
+              onPress={handleFollowToggle}
+            >
+              <Text style={styles.followButtonText}>
+                {isFollowing ? "Following" : "Follow"}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* My Quizzes Section */}
@@ -490,11 +601,13 @@ const ProfileScreen = ({ route, navigation }) => {
           style={styles.sectionButton}
           onPress={() => handleMyQuizzes()}
         >
-          <Text style={styles.sectionTitle}>My Quizzes</Text>
+          <Text style={styles.sectionTitle}>
+            {isOwnProfile ? "My Quizzes" : `${username}'s Quizzes`}
+          </Text>
           {showMyQuizzes ? (
             <MyQuizzesView
               createdQuizzes={createdQuizzes}
-              onDelete={handleDeleteQuiz}
+              onDelete={isOwnProfile ? handleDeleteQuiz : undefined}
               navigation={navigation}
             />
           ) : null}
@@ -506,7 +619,9 @@ const ProfileScreen = ({ route, navigation }) => {
             style={styles.sectionButton}
             onPress={() => handleMyPosts()}
           >
-            <Text style={styles.sectionTitle}>My Posts</Text>
+            <Text style={styles.sectionTitle}>
+              {isOwnProfile ? "My Posts" : `${username}'s Posts`}
+            </Text>
             {showMyPosts ? (
               <MyPostsView myPosts={posts} navigation={navigation} />
             ) : null}
@@ -519,13 +634,33 @@ const ProfileScreen = ({ route, navigation }) => {
             style={styles.sectionButton}
             onPress={() => handleMyQuizAttempts()}
           >
-            <Text style={styles.sectionTitle}>Quiz Attempts</Text>
-            {showMyQuizAttempts ? (
+            <View style={styles.sectionTitleRow}>
+              <Text style={styles.sectionTitle}>
+                {isOwnProfile ? "Quiz Attempts" : `${username}'s Quiz Attempts`}
+              </Text>
+              {showMyQuizAttempts && (
+                <TouchableOpacity
+                  style={styles.hideCompletedButton}
+                  onPress={() => setHideCompleted(!hideCompleted)}
+                >
+                  <Ionicons
+                    name={hideCompleted ? "eye-off" : "eye"}
+                    size={20}
+                    color="#fff"
+                  />
+                  <Text style={styles.hideCompletedText}>
+                    {hideCompleted ? "Show Completed" : "Hide Completed"}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            {showMyQuizAttempts && (
               <MyQuizAttemptsView
                 quizHistory={quizAttempts}
                 navigation={navigation}
+                hideCompleted={hideCompleted}
               />
-            ) : null}
+            )}
           </Pressable>
         </View>
       </ScrollView>
@@ -655,6 +790,51 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  followStats: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    gap: 15,
+    marginTop: 8,
+  },
+  followText: {
+    fontSize: 14,
+    color: "#666",
+  },
+  followButton: {
+    backgroundColor: "#6a0dad",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginTop: 25,
+  },
+  followingButton: {
+    backgroundColor: "#e5e7eb",
+  },
+  followButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  sectionTitleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  hideCompletedButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: "#059669",
+  },
+  hideCompletedText: {
+    fontSize: 12,
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 

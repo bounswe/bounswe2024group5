@@ -9,7 +9,7 @@ export const useUpdateProfile = () => {
 
 	return useMutation({
 		mutationFn: async (payload: ProfileRequest) => {
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 			if (!TOKEN) {
 				throw new Error('No authentication token found');
 			}

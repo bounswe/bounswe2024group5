@@ -16,17 +16,9 @@ import QuizViewComponent from "../components/QuizViewComponent";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
-import HostUrlContext from "../app/HostContext";
+import HostUrlContext from '../app/HostContext';
 import Ionicons from "react-native-vector-icons/Ionicons";
-
-const calculateQuizDifficultyFromElo = (elo: number) => {
-  if (elo < 400) return "A1";
-  else if (elo < 1000) return "A2";
-  else if (elo < 1800) return "B1";
-  else if (elo < 2600) return "B2";
-  else if (elo < 3300) return "C1";
-  else return "C2";
-};
+import { calculateQuizDifficultyFromElo } from "../components/EloCefrInfoTable";
 
 const HomePage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);

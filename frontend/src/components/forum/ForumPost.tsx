@@ -25,8 +25,8 @@ export const ForumPostComponent = ({ postId, setPostId }: ForumPostProps) => {
     const hostUrl = useContext(HostContext);
 
     useEffect(() => {
-        const TOKEN = sessionStorage.getItem('token');
-        const username = sessionStorage.getItem('username');
+        const TOKEN = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
         const fetchUpvote = async () => {
             const response = await fetch(`${hostUrl}/api/posts/${postId}/upvotes?username=${username}`, {
                 headers: {

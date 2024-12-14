@@ -4,7 +4,7 @@ import HostContext from "../../HostContext";
 import { useContext } from "react";
 
 export const useFetchPosts = (params?: { username?: string; tag?: string }) => {
-    const TOKEN = sessionStorage.getItem('token');
+    const TOKEN = localStorage.getItem('token');
     const hostUrl = useContext(HostContext);
 
     return useQuery({
@@ -35,7 +35,7 @@ export const useFetchPosts = (params?: { username?: string; tag?: string }) => {
 
 export const useFetchPost = (postId: number | null) => {
 
-    const TOKEN = sessionStorage.getItem('token');
+    const TOKEN = localStorage.getItem('token');
     const hostUrl = useContext(HostContext);
     return useQuery({
         queryKey: ['posts', postId],
