@@ -187,7 +187,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const { quiz, questions } = route.params as RouteParams; // Access the passed data
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<(string | null)[]>([]);
-  const [quizQuestions, setQuestions] = useState<Question[]>([]);
   const [isQuestionAnswered, setIsQuestionAnswered] = useState(
     questions.map(() => false)
   );
@@ -244,7 +243,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       const quizData = await quizResponse.json();
       const questions = quizData.quiz.questions;
 
-      setQuestions(questions);
       setIsQuestionAnswered(new Array(questions.length).fill(false));
       setSelectedAnswers(new Array(questions.length).fill(null));
 
@@ -302,7 +300,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (response.ok) {
         const images = await response.json();
         setHintImages(images);
@@ -485,52 +483,104 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     }
   };
 
-    return (
-      <View style={styles.container}>
-        <QuizHeader
-          quizName={quiz.title}
-          questionIndex={questionIndex}
-          totalQuestions={questions.length}
-        />
-        <View style={styles.roundQuestionContainer}>
-          <Text style={styles.questionText}>
-            {generateQuestionSentence(question)}
-          </Text>
-          {shuffledAnswers.map((answer, index) => {
-            let backgroundColor;
-            if (!isQuestionAnswered[questionIndex]) {
-              backgroundColor = "#ddd6fe";
-            } else {
-              if (answer === question.correctAnswer) {
-                backgroundColor = "green";
-              } else if (answer === selectedAnswers[questionIndex]) {
-                backgroundColor = "red";
-              } else {
-                backgroundColor = "#ddd6fe";
-              }
-            }
-  
-            return (
-              <TouchableOpacity
-                key={index}
-                style={[styles.button, { backgroundColor }]}
-                onPress={() => handleAnswer(answer)}
-              >
-                <Text style={styles.buttonText}>{answer}</Text>
-              </TouchableOpacity>
-            );
-          })}
+  const addToFavorites = async () => {
+    const questionId = questions[questionIndex].id;
+
+    try {
+      const response = await fetch(`${hostUrl}/api/favorite-question`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ questionId })
+      });
+
+      if (response.status === 201) {
+      } else if (response.status === 400) {
+        Alert.alert('Info', 'This question is already in your favorites.');
+      } else if (response.status === 404) {
+        Alert.alert('Error', 'Question not found.');
+      } else {
+        Alert.alert('Error', 'Failed to add question to favorites.');
+      }
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      Alert.alert('Error', 'Failed to add question to favorites.');
+    } finally {
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <QuizHeader
+        quizName={quiz.title}
+        questionIndex={questionIndex}
+        totalQuestions={questions.length}
+      />
+      <View style={styles.heartContainer}>
+        <View style={styles.heartContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              addToFavorites();
+              console.log('Favorite clicked');
+            }}
+            style={styles.heartButton}
+          >
+            <View style={styles.heartButtonContent}>
+              <Text style={styles.heartButtonText}>Add To Favorite Questions</Text>
+              <Ionicons
+                name="heart-outline"
+                size={24}
+                color="#6a0dad"
+                style={styles.heartIcon}
+              />
+            </View>
+          </TouchableOpacity>
         </View>
-  
-        
-    
-        
+      </View>
+      <View style={styles.roundQuestionContainer}>
+        <Text style={styles.questionText}>
+          {generateQuestionSentence(question)}
+        </Text>
+
+        {shuffledAnswers.map((answer, index) => {
+          let backgroundColor;
+          if (!isQuestionAnswered[questionIndex]) {
+            backgroundColor = "#ddd6fe";
+          } else {
+            if (answer === question.correctAnswer) {
+              backgroundColor = "green";
+            } else if (answer === selectedAnswers[questionIndex]) {
+              backgroundColor = "red";
+            } else {
+              backgroundColor = "#ddd6fe";
+            }
+          }
+
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[styles.button, { backgroundColor }]}
+              onPress={() => handleAnswer(answer)}
+            >
+              <Text style={styles.buttonText}>{answer}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+
+
+
       {/* Container for Next Button */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.nextButton} onPress={handlePrevious}>
           {/* Replace text with right-pointing arrow icon */}
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
+
+
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           {/* Replace text with right-pointing arrow icon */}
@@ -552,14 +602,14 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       </View>
       {/* Container for Hint and Related Posts Buttons */}
       <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.hintButton}
-            onPress={() => fetchHintImages(question.word)}
-          >
-            <Ionicons name="help-circle-outline" size={20} color="#6a0dad" />
-            <Text style={styles.hintButtonText}>Hint</Text>
-          </TouchableOpacity>
-          {/* Hint Images Modal */}
+        <TouchableOpacity
+          style={styles.hintButton}
+          onPress={() => fetchHintImages(question.word)}
+        >
+          <Ionicons name="help-circle-outline" size={20} color="#6a0dad" />
+          <Text style={styles.hintButtonText}>Hint</Text>
+        </TouchableOpacity>
+        {/* Hint Images Modal */}
         <Modal
           visible={isHintModalVisible}
           transparent={true}
@@ -570,19 +620,19 @@ const QuizSolvingScreen = ({ route, navigation }) => {
             <View style={styles.hintModalContent}>
               <View style={styles.hintModalHeader}>
                 <Text style={styles.hintModalTitle}>Hints for '{question.word}'</Text>
-                <TouchableOpacity 
-                  style={styles.closeButton} 
+                <TouchableOpacity
+                  style={styles.closeButton}
                   onPress={() => setIsHintModalVisible(false)}
                 >
                   <Ionicons name="close" size={24} color="#1a1a1a" />
                 </TouchableOpacity>
               </View>
-    
+
               {isLoadingHintImages ? (
                 <ActivityIndicator size="large" color="#6a0dad" />
               ) : (
-                <ScrollView 
-                  horizontal 
+                <ScrollView
+                  horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.hintImagesContainer}
                 >
@@ -599,18 +649,18 @@ const QuizSolvingScreen = ({ route, navigation }) => {
             </View>
           </View>
         </Modal>
-    
-          <TouchableOpacity
-            style={styles.forumButton}
-            onPress={() => {
-              fetchRelatedPosts(question.word);
-              setForumModalVisible(true);
-            }}
-          >
-            <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
-            <Text style={styles.forumButtonText}>See Related Posts</Text>
-          </TouchableOpacity>
-        </View>
+
+        <TouchableOpacity
+          style={styles.forumButton}
+          onPress={() => {
+            fetchRelatedPosts(question.word);
+            setForumModalVisible(true);
+          }}
+        >
+          <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
+          <Text style={styles.forumButtonText}>See Related Posts</Text>
+        </TouchableOpacity>
+      </View>
       <ForumModal
         visible={forumModalVisible}
         onClose={() => {
@@ -931,6 +981,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
+  heartContainer: {
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  heartButton: {
+    padding: 10,
+  },
+  heartButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heartButtonText: {
+    marginRight: 8,
+    color: '#6a0dad',
+    fontSize: 16,
+  },
+  heartIcon: {
+    marginLeft: 4,
+  }
 });
 
 export default QuizSolvingScreen;
