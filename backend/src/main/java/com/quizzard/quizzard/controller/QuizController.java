@@ -2,6 +2,7 @@ package com.quizzard.quizzard.controller;
 
 import com.quizzard.quizzard.model.Quiz;
 import com.quizzard.quizzard.model.User;
+import com.quizzard.quizzard.model.request.CreateFromFavQuestionToQuizRequest;
 import com.quizzard.quizzard.model.request.CreateQuizRequest;
 import com.quizzard.quizzard.model.request.SolveQuizRequest;
 import com.quizzard.quizzard.model.request.UpdateQuizRequest;
@@ -70,5 +71,20 @@ public class QuizController {
         quizService.deleteQuiz(authorUsername, id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/recommended")
+    public ResponseEntity<List<QuizResponse>> getRecommendedQuizzes(@RequestHeader("Authorization") String jwt, @PathVariable Long id) {
+        String username = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
+        List<QuizResponse> recommendedQuizzes = quizService.getRecommendedQuizzes(username, id);
+        return ResponseEntity.ok(recommendedQuizzes);
+    }
+
+    @PostMapping("/from-favorites")
+        public ResponseEntity<QuizResponse> createQuizFromFavorites(@RequestHeader("Authorization") String jwt, @RequestBody CreateFromFavQuestionToQuizRequest request) {
+        String authorUsername = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
+        QuizResponse createdQuiz = quizService.createQuizFromFavorites(authorUsername, request);
+        return ResponseEntity.ok(createdQuiz);
+    }
+
 
 }

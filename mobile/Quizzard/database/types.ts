@@ -39,6 +39,7 @@ export type Quiz = {
     likes: number;
     createdAt?: string;
     updatedAt?: string;
+    status?: string | null;
 }
 export type Question = {
     id: number;
@@ -63,7 +64,7 @@ export type ForumQuestion = {
     content: string;
     username: string;
     noUpvote: number;
-    hasUpvoted: boolean;
+    // hasUpvoted: boolean;
     createdAt: string;
     tags: string[];
     noReplies: number;

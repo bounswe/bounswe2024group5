@@ -181,7 +181,7 @@ components:
           type: array
           items:
             type: string
-          example: ["answer1", "answer2", "answer3"]  
+          example: ["answer1", "answer2", "answer3"]
     QuizResponse:
       type: object
       properties:
@@ -229,7 +229,7 @@ components:
           type: array
           items:
             type: string
-          example: ["answer1", "answer2", "answer3"]  
+          example: ["answer1", "answer2", "answer3"]
         difficulty:
           type: number
           format: float
@@ -579,7 +579,6 @@ components:
           description: The ID of the question to add to favorites.
       required:
         - questionId
-
     FavoriteQuestionResponse:
       type: object
       properties:
@@ -600,6 +599,58 @@ components:
           type: string
           format: date-time
           description: When the favorite question was last updated.
+    LeaderboardResponse:
+      type: object
+      properties:
+        weekly:
+          $ref: '#/components/schemas/LeaderboardLists'
+        monthly:
+          $ref: '#/components/schemas/LeaderboardLists'
+    LeaderboardLists:
+      type: object
+      properties:
+        quizSolved:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizSolved'
+        quizCreated:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizCreated'
+        pointsEarned:
+          type: array
+          items:
+            $ref: '#/components/schemas/PointsEarned'
+    QuizSolved:
+      type: object
+      properties:
+        username:
+          type: string
+          example: john_doe
+        solved:
+          type: integer
+          format: int64
+          example: 42
+    QuizCreated:
+      type: object
+      properties:
+        username:
+          type: string
+          example: jane_doe
+        created:
+          type: integer
+          format: int64
+          example: 10
+    PointsEarned:
+      type: object
+      properties:
+        username:
+          type: string
+          example: sam_smith
+        points:
+          type: integer
+          format: int64
+          example: 500
 paths:
   /auth/register:
     post:
@@ -646,8 +697,8 @@ paths:
                 properties:
                   token:
                     type: string
-                  user:
-                    $ref: '#/components/schemas/User'
+                  message:
+                    type: string
         '401':
           description: Unauthorized
           content:
@@ -848,6 +899,46 @@ paths:
                     - example_wrong_2
         '400':
           description: Invalid parameters provided.
+  /hint:
+    get:
+      summary: "Returns two images according to the word"
+      tags:
+        - Word Related
+      parameters:
+        - name: word
+          in: query
+          required: true
+          description: "The word to be found images"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Successful response, two image URL of the word"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uri
+        "400":
+          description: "Invalid request, 'word' parameter is missing or wrong"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "500":
+          description: "Server fault."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
   /quizzes:
     get:
       summary: Get all quizzes optionally by filters
@@ -903,6 +994,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuizResponse'
+  /quizzes/from-favorites:
+    post:
+      summary: Create a quiz from the user's favorite questions
+      description: Creates a quiz using the favorite questions of the authenticated user. The user must be authenticated via a JWT token.
+      tags:
+        - Quizzes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  description: The number of favorite questions to include in the quiz.
+                title:
+                  type: string
+                  description: The title of the quiz to be created.
+              required:
+                - count
+                - title
+            example:
+              count: 5
+              title: "My Favorite Quiz"
+      responses:
+        '200':
+          description: Quiz created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizResponse'
+        '400':
+          description: Bad request. Could occur if the input parameters are invalid.
+        '401':
+          description: Unauthorized. Occurs when the provided JWT is invalid or missing.
+        '500':
+          description: Internal server error. Occurs if an unexpected error happens on the server.
   /quizzes/{id}:
     get:
       summary: Get a quiz by ID
@@ -968,6 +1097,30 @@ paths:
       responses:
         '204':
           description: Quiz deleted
+  /quizzes/{id}/recommended:
+    get:
+      summary: Get recommended quizzes by quiz ID
+      description: Retrieves up to 5 quizzes which has similar difficulty level with the given quiz and has not been attempted yet.
+      tags:
+        - Quizzes
+      parameters:
+        - name: id
+          in: path
+          description: ID of the quiz
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Quiz details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuizResponse'
+        '404':
+          description: Quiz not found
   /quiz-attempts:
     post:
       summary: Attempt a quiz
@@ -1687,7 +1840,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-                
+
   /file/upload:
     post:
       tags:
@@ -2041,5 +2194,53 @@ paths:
                   $ref: '#/components/schemas/ProfileResponse'
         '404':
           description: User not found.
+  /leaderboard:
+    get:
+      summary: Get leaderboard data
+      description: Retrieves weekly and monthly leaderboard statistics for quizzes solved, quizzes created, and points earned.
+      tags:
+        - Leaderboard
+      responses:
+        '200':
+          description: Successful response with leaderboard data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardResponse'
+              example:
+                weekly:
+                  quizSolved:
+                    - username: john_doe
+                      solved: 42
+                    - username: alice_wonder
+                      solved: 35
+                  quizCreated:
+                    - username: jane_doe
+                      created: 10
+                    - username: bob_builder
+                      created: 5
+                  pointsEarned:
+                    - username: sam_smith
+                      points: 500
+                    - username: chris_pine
+                      points: 450
+                monthly:
+                  quizSolved:
+                    - username: john_doe
+                      solved: 120
+                    - username: alice_wonder
+                      solved: 110
+                  quizCreated:
+                    - username: jane_doe
+                      created: 25
+                    - username: bob_builder
+                      created: 15
+                  pointsEarned:
+                    - username: sam_smith
+                      points: 1500
+                    - username: chris_pine
+                      points: 1300
+        '500':
+          description: Internal server error.
 security:
   - bearerAuth: []

@@ -9,7 +9,7 @@ export const useGetQuestionAnswer = (id: number) => {
 	return useQuery({
 		queryKey: ['question-answer', id],
 		queryFn: async () => {
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 
 			const response = await fetch(
 				`${hostUrl}/api/question-answers/${id}`,

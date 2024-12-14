@@ -22,7 +22,7 @@ export const useUpdateQuizAttempt = (id: number) => {
 
 	return useMutation<QuizAttempt, Error, UpdateQuizAttemptRequest>({
 		mutationFn: async ({ completed }): Promise<QuizAttempt> => {
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 			const response = await fetch(`${hostUrl}/api/quiz-attempts/${id}`, {
 				method: 'PUT',
 				headers: {

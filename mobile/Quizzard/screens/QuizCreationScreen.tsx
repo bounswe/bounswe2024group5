@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   ScrollView,
   FlatList,
   Alert,
+  Image,
+  ActivityIndicator
 } from "react-native";
 import DropdownComponent from "../components/QuestionTypeDropdown";
 import * as ImagePicker from "expo-image-picker";
@@ -20,15 +22,35 @@ const QuizCreationPage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([
+    {
+      word: "",
+      options: { A: "", B: "", C: "", D: "" },
+      questionType: "",
+      wordSuggestions: [], // Add per-question suggestions
+      showWordSuggestions: false,
+      isLoadingWordSuggestions: false,
+      answerSuggestions: [],
+      showAnswerSuggestions: false,
+      isLoadingAnswerSuggestions: false
+    }
+  ]);
   const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
   const [selectedType, setSelectedType] = useState(""); // Default type
+  const [typedQuestionWord, setTypedQuestionWord] = useState("");
   const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [image, setMedia] = useState<string | null>(null);
   const authContext = useAuth();
   const token = authContext ? authContext.token : null;
+  const [wordSuggestions, setWordSuggestions] = useState<string[]>([]);
+  const [showWordSuggestions, setShowWordSuggestions] = useState(false);
+  const [isLoadingWordSuggestions, setIsLoadingWordSuggestions] = useState(false);
+  const [answerSuggestions, setAnswerSuggestions] = useState<string[]>([]);
+  const [showAnswerSuggestions, setShowAnswerSuggestions] = useState(false);
+  const [isLoadingAnswerSuggestions, setIsLoadingAnswerSuggestions] = useState(false);
+  const [activeWordSuggestionIndex, setActiveWordSuggestionIndex] = useState<number | null>(null);
 
   // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready
 
@@ -168,39 +190,16 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-  // Fetch question word suggestions
-  const fetchQuestionWord = async (word, type) => {
-    const apiUrl = `${hostUrl}/api/question_word?word=${word}&type=${type}`;
-    try {
-      const response = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setSuggestions(data); // Store the suggestions
-        console.log("Suggestions:", data);
-      } else {
-        console.error("Failed to fetch suggestions", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
-    }
-  };
 
-  // Fetch question answers
-  const fetchQuestionAnswers = async (
-    word: string,
-    type: "english_to_turkish" | "turkish_to_english" | "english_to_sense",
-    token: string
-  ): Promise<void> => {
+  const fetchAnswerSuggestions = async (index, question) => {
+    const updatedQuestions = [...questions];
+
     try {
-      const apiUrl = `${hostUrl}/api/question_answers?word=${encodeURIComponent(
-        word
-      )}&type=${type}`;
+      // Set loading state for the specific question
+      updatedQuestions[index].isLoadingAnswerSuggestions = true;
+      setQuestions(updatedQuestions);
+
+      const apiUrl = `${hostUrl}/api/answer-suggestion?word=${encodeURIComponent(question.word)}&questionType=${question.questionType}`;
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -211,32 +210,89 @@ const QuizCreationPage = ({ navigation }) => {
 
       if (response.ok) {
         const data = await response.json();
-        if (data) {
-          const updatedQuestions = [...questions];
-          const newChoices = {
-            A: data.correct_answer,
-            B: data.wrong_answer1,
-            C: data.wrong_answer2,
-            D: data.wrong_answer3,
-          };
-          updatedQuestions[questions.length - 1].options = newChoices; // Update options for the latest question
-          setQuestions(updatedQuestions);
+
+        // Ensure we're updating the specific question's state
+        const newQuestions = [...questions];
+        question.answerSuggestions = data.correctAnswerSuggestions;
+        question.showAnswerSuggestions = data.correctAnswerSuggestions.length > 0;
+        if (data.wrongAnswerSuggestions.length >= 3) {
+          question.options["B"] = data.wrongAnswerSuggestions[0]
+          question.options["C"] = data.wrongAnswerSuggestions[1]
+          question.options["D"] = data.wrongAnswerSuggestions[2]
         }
+        question.isLoadingAnswerSuggestions = false;
+        newQuestions[index] = question
+
+        setQuestions(newQuestions);
       } else {
-        console.error("Failed to fetch question answers:", response.statusText);
+        console.error("Failed to fetch answer suggestions");
       }
     } catch (error) {
-      console.error("Error fetching question answers:", error);
+      console.error("Error fetching answer suggestions:", error);
     }
   };
 
-  const checkInputWord = async () => {
-    let word = typedQuestionWord;
+
+  const handleAnswerSuggestionSelect = (index: number, suggestion: string) => {
+    const updatedQuestions = [...questions];
+    const updatedQuestion = { ...updatedQuestions[index] };
+
+    // Set the first option (A) with the selected suggestion
+    updatedQuestion.options = {
+      ...updatedQuestion.options,
+      A: suggestion
+    };
+
+    // Reset suggestion-related states for this specific question
+    updatedQuestion.answerSuggestions = [];
+    updatedQuestion.showAnswerSuggestions = false;
+
+    // Update the questions state
+    updatedQuestions[index] = updatedQuestion;
+    setQuestions(updatedQuestions);
+  };
+
+  const handleInputChange = (index: number, word: string) => {
+    if (!questions[index].questionType) {
+      Alert.alert("Select Type", "Please select a type first.");
+      return;
+    }
+    console.log(word)
+
+    // Update the word in state
+    const updatedQuestions = [...questions];
+    const updatedQuestion = { ...updatedQuestions[index] };
+    updatedQuestion.word = word;
+    updatedQuestions[index] = updatedQuestion;
+    setQuestions(updatedQuestions);
+
+    // Only fetch suggestions if word is longer than 1 character
+    if (word.length > 1) {
+      fetchWordSuggestions(index, updatedQuestion);
+    } else {
+      // Reset suggestions for short inputs
+      updatedQuestion.wordSuggestions = [];
+      updatedQuestion.showWordSuggestions = false;
+      updatedQuestions[index] = updatedQuestion;
+      setQuestions(updatedQuestions);
+    }
+  };
+
+
+  // New method to fetch word suggestions
+  const fetchWordSuggestions = async (index, question) => {
+    const updatedQuestions = [...questions];
+    const language = question.questionType.includes('english') ? 'english' : 'turkish';
+
     try {
+      question.isLoadingWordSuggestions = true;
+      updatedQuestions[index] = question;
+      setQuestions(updatedQuestions);
+
       const response = await fetch(
-        `${hostUrl}/api/word-checker?word=${word}&type=${selectedType}`,
+        `${hostUrl}/api/autocomplete?prefix=${encodeURIComponent(question.word)}&language=${language}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -244,43 +300,56 @@ const QuizCreationPage = ({ navigation }) => {
         }
       );
 
-      const data = await response.json();
+      if (response.ok) {
+        const data = await response.json();
 
-      if (!data.isValid) {
-        Alert.alert("Invalid Word", "Please enter a valid word!");
+        // Ensure we're updating the specific question's state
+        const newQuestions = [...questions];
+        question.wordSuggestions = data;
+        question.showWordSuggestions = data.length > 0;
+        question.isLoadingWordSuggestions = false;
+        newQuestions[index] = question
+
+        setQuestions(newQuestions);
       } else {
-        // setSelectedWord(word);
-        fetchQuestionWord(word, selectedType);
-        fetchQuestionAnswers(word, selectedType, token);
+        console.error("Failed to fetch word suggestions");
+
+        const newQuestions = [...questions];
+        newQuestions[index].wordSuggestions = [];
+        newQuestions[index].showWordSuggestions = false;
+        newQuestions[index].isLoadingWordSuggestions = false;
+
+        setQuestions(newQuestions);
       }
     } catch (error) {
-      console.error("Error validating word:", error);
-      Alert.alert("Error", "Failed to validate the word. Please try again.");
+      console.error("Error fetching word suggestions:", error);
+
+      const newQuestions = [...questions];
+      newQuestions[index].wordSuggestions = [];
+      newQuestions[index].showWordSuggestions = false;
+      newQuestions[index].isLoadingWordSuggestions = false;
+
+      setQuestions(newQuestions);
     }
   };
 
-  const handleInputChange = (index: number, word: string) => {
-    if (!selectedType) {
-      Alert.alert("Select Type", "Please select a type first.");
-      return;
-    }
-
-    // if (checkInputTimeoutId != -1) {
-    //   clearTimeout(checkInputTimeoutId);
-    // }
-    // console.log('====================================');
-    // console.log();
-    // console.log('====================================');
-    // let timeOutId = setTimeout(checkInputWord, 2000)
-    // setCheckInputTimeoutId(timeOutId);
-
+  const handleWordSuggestionSelect = (index: number, suggestion: string) => {
     const updatedQuestions = [...questions];
     const updatedQuestion = { ...updatedQuestions[index] };
-    updatedQuestion.word = word;
+
+    console.log(index)
+    console.log(suggestion)
+    // Set the word
+    updatedQuestion.word = suggestion;
+    updatedQuestion.wordSuggestions = [];
+    updatedQuestion.showWordSuggestions = false;
+
+    // Update the question in the state
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
-    console.log(`1- Question ${index + 1} word:`, updatedQuestions[index].word);
+    fetchAnswerSuggestions(index, updatedQuestion);
   };
+
 
   const updateQuestionType = (index: number, type: string) => {
     const updatedQuestions = [...questions];
@@ -309,7 +378,10 @@ const QuizCreationPage = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       {/* Header Section */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate("Home")}>
@@ -341,9 +413,21 @@ const QuizCreationPage = ({ navigation }) => {
         style={styles.imageUploadBox}
         onPress={pickImageAndUpload}
       >
-        <Text style={styles.imageUploadText}>
-          {image ? "Image Uploaded" : "+ Upload Image"}
-        </Text>
+        {imageUrl ? (
+          <Image
+            source={{ uri: imageUrl }}
+            style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: 10
+            }}
+            resizeMode="cover"
+          />
+        ) : (
+          <Text style={styles.imageUploadText}>
+            + Upload Image
+          </Text>
+        )}
       </TouchableOpacity>
 
       {/* Description Input */}
@@ -358,13 +442,22 @@ const QuizCreationPage = ({ navigation }) => {
       {/* Render all question boxes */}
       {questions.map((question, index) => (
         <View key={index} style={styles.questionBox}>
-          {/* Header with Title and Dropdown */}
+          {/* Existing header container */}
           <View style={styles.headerContainer}>
             <TextInput
               style={styles.questionTitle}
               placeholder="Enter a word"
+              value={question.word}
               onChangeText={(word) => handleInputChange(index, word)}
             />
+            {/* Loading indicator for suggestions */}
+            {isLoadingWordSuggestions && (
+              <ActivityIndicator
+                size="small"
+                color="#6a0dad"
+                style={styles.suggestionLoadingIndicator}
+              />
+            )}
             <View style={styles.dropdownContainer}>
               <DropdownComponent
                 testID="question-type-dropdown"
@@ -374,29 +467,65 @@ const QuizCreationPage = ({ navigation }) => {
             </View>
           </View>
 
-          {/* Display suggestions */}
-          {suggestions.length > 0 && (
-            <FlatList
-              data={suggestions}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <Text style={styles.suggestionText}>{item}</Text>
-              )}
-            />
+          {/* Word Suggestions Dropdown */}
+          {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
+            <View style={styles.wordSuggestionsContainer}>
+              <FlatList
+                data={question.wordSuggestions}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.wordSuggestionItem}
+                    onPress={() => handleWordSuggestionSelect(index, item)}
+                  >
+                    <Text>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
           )}
 
           {/* Answer Choices */}
           {["A", "B", "C", "D"].map((option) => (
-            <TextInput
-              key={option}
-              style={styles.choiceInput}
-              placeholder={`Choice ${option}`}
-              value={question.options[option]} // Now options will be populated from the API response
-              onChangeText={(text) => updateQuestion(index, option, text)}
-            />
+            <View key={option}>
+              <TextInput
+                style={styles.choiceInput}
+                placeholder={`Choice ${option}`}
+                value={question.options[option]}
+                editable={option === 'A'}
+                onChangeText={(text) => {
+                  if (option === 'A') {
+                    updateQuestion(index, option, text);
+                    // Trigger answer suggestions only for option A
+                    fetchAnswerSuggestions(index, questions[index])
+                  }
+                }}
+              />
+
+              {/* Answer Suggestions Dropdown - Only for Option A */}
+              {option === 'A' &&
+                question.showAnswerSuggestions &&
+                question.answerSuggestions.length > 0 && (
+                  <View style={styles.answerSuggestionsContainer}>
+                    <FlatList
+                      data={question.answerSuggestions}
+                      keyExtractor={(item) => item}
+                      renderItem={({ item }) => (
+                        <TouchableOpacity
+                          style={styles.answerSuggestionItem}
+                          onPress={() => handleAnswerSuggestionSelect(index, item)}
+                        >
+                          <Text>{item}</Text>
+                        </TouchableOpacity>
+                      )}
+                    />
+                  </View>
+                )}
+            </View>
           ))}
         </View>
       ))}
+
 
       {/* + Question Button */}
       <TouchableOpacity
@@ -423,9 +552,25 @@ const QuizCreationPage = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  wordSuggestionsContainer: {
+    maxHeight: 150,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  wordSuggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  suggestionLoadingIndicator: {
+    marginLeft: 10,
+  },
   container: {
     flex: 1,
     padding: 20,
+    paddingBottom: 100, // Keep extra padding at the bottom
     backgroundColor: "#fff",
   },
   header: {
@@ -504,52 +649,62 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     marginRight: 10,
   },
   dropdownContainer: {
-    width: "42%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    fontSize: 14,
-  },
-  dropdown: {
-    height: 40,
+    flex: 1,
   },
   choiceInput: {
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     marginBottom: 10,
     fontSize: 14,
+    backgroundColor: "#fff",
+    borderRadius: 5,
   },
   addQuestionButton: {
     backgroundColor: "#6a0dad",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: "flex-end",
-    marginBottom: 40,
+    borderRadius: 5,
+    alignItems: "center",
+    marginBottom: 20,
   },
   addQuestionButtonText: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
   },
+  
+  contentContainer: {
+    paddingBottom: 100, // Add extra padding to the bottom of the scrollable content
+  },
   bottomButtons: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    zIndex: 10, // Ensure buttons are above other content
   },
   cancelButton: {
-    backgroundColor: "#555",
+    backgroundColor: "#ccc",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 5,
+    alignItems: "center",
   },
   cancelButtonText: {
-    color: "#fff",
+    color: "#333",
     fontWeight: "bold",
     fontSize: 16,
   },
@@ -557,12 +712,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#6a0dad",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 5,
+    alignItems: "center",
   },
   submitButtonText: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  answerSuggestionsContainer: {
+    maxHeight: 150,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginTop: 5,
+    zIndex: 10, // Ensure it appears above other elements
+  },
+  answerSuggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
 });
 

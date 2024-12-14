@@ -35,6 +35,9 @@ public class FavoriteQuizService {
         this.quizRepository = quizRepository;
     }
 
+    public FavoriteQuizResponse mapToFavoriteQuizResponse(FavoriteQuiz favoriteQuiz) {
+        return new FavoriteQuizResponse(favoriteQuiz);
+    }
 
     public FavoriteQuizResponse addFavoriteQuiz(String jwtToken, FavoriteQuizRequest favoriteQuizRequest) {
         String solverUsername = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
@@ -55,10 +58,10 @@ public class FavoriteQuizService {
         return new FavoriteQuizResponse(favoriteQuiz2);
     }
 
-    public List<FavoriteQuiz> getAllFavoriteQuizzes(String jwtToken) {
+    public List<FavoriteQuizResponse> getAllFavoriteQuizzes(String jwtToken) {
         String solverUsername = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
         User user = userService.getOneUserByUsername(solverUsername);
-        return favoriteQuizRepository.findAllByUser(user);
+        return favoriteQuizRepository.findAllByUser(user).stream().map(this::mapToFavoriteQuizResponse).toList();
     }
 
     public void deleteFavoriteQuiz(String jwtToken, Long id) {

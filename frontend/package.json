@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:local": "VITE_HOST_URL=localhost vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

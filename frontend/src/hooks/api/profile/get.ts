@@ -17,7 +17,7 @@ export const useGetProfile = (username?: string) => {
 			const headers: HeadersInit = {};
 
 
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 			if (!TOKEN) {
 				throw new Error('No authentication token found');
 			}

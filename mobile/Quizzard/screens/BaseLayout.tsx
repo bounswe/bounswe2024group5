@@ -15,10 +15,11 @@ import { EloCefrInfoTable } from "../components/EloCefrInfoTable";
 
 const BaseLayout = ({ children, navigation }) => {
   const route = useRoute();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
 
   const handleLogout = () => {
-    navigation.navigate("Login");
+    setShowLogoutModal(true);
   };
 
   const navigateToHome = () => {
@@ -74,7 +75,7 @@ const BaseLayout = ({ children, navigation }) => {
         <TouchableWithoutFeedback onPress={toggleInfoModal}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
-              <View style={styles.modalContent}>
+              <View style={styles.infoModalContent}>
                 <TouchableOpacity 
                   style={styles.closeButton} 
                   onPress={toggleInfoModal}
@@ -129,6 +130,41 @@ const BaseLayout = ({ children, navigation }) => {
           />
         </TouchableOpacity>
       </View>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showLogoutModal}
+        onRequestClose={() => setShowLogoutModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.logoutModalContent}>
+            <Ionicons name="warning" size={50} color="#d97706" />
+            <Text style={styles.modalTitle}>Confirm Logout</Text>
+            <Text style={styles.modalText}>Are you sure you want to quit?</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setShowLogoutModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.quitButton]}
+                onPress={() => {
+                  setShowLogoutModal(false);
+                  navigation.navigate("Login");
+                }}
+              >
+                <Text style={[styles.modalButtonText, styles.quitButtonText]}>
+                  Quit
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -179,7 +215,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalContent: {
+  infoModalContent: {
     width: '80%',
     backgroundColor: '#ede9fe',
     borderRadius: 10,
@@ -194,10 +230,62 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  logoutModalContent: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
+    width: "85%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
   closeButton: {
     position: 'absolute',
     top: 10,
     right: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+    marginVertical: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 10,
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    minWidth: 100,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#666",
+  },
+  quitButton: {
+    backgroundColor: "#dc2626",
+  },
+  quitButtonText: {
+    color: "white",
   },
 });
 

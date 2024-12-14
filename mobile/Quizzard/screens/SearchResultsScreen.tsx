@@ -15,7 +15,6 @@ import HostUrlContext from "../app/HostContext";
 import { useAuth } from "./AuthProvider";
 import QuestionItem from "../components/QuestionItem";
 import { RootStackParamList } from "../app/index";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Define the SearchResultsScreen route prop
 type SearchResultsScreenRouteProp = RouteProp<
@@ -45,7 +44,8 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { keyword } = route.params;
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
   const authContext = useAuth();
-  const token = authContext ? authContext.token : null;
+  // const token = authContext ? authContext.token : null;
+  const { token, username } = authContext;  // Now you can destructure both token and username
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,63 +53,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   const size = 20; // Number of items per page
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-
-  const [upvotedPostIds, setUpvotedPostIds] = useState(new Set<number>());
-
-  // Load upvoted post IDs from AsyncStorage when the component mounts
-  useEffect(() => {
-    const loadUpvotedPosts = async () => {
-      try {
-        const storedUpvoted = await AsyncStorage.getItem("upvotedPostIds");
-        if (storedUpvoted) {
-          const parsedUpvoted = JSON.parse(storedUpvoted);
-          setUpvotedPostIds(new Set(parsedUpvoted));
-        }
-      } catch (error) {
-        console.error("Error loading upvoted posts from storage:", error);
-      }
-    };
-
-    loadUpvotedPosts();
-  }, []);
-
-  // Save upvoted post IDs to AsyncStorage whenever it changes
-  useEffect(() => {
-    const saveUpvotedPosts = async () => {
-      try {
-        const upvotedArray = Array.from(upvotedPostIds);
-        await AsyncStorage.setItem(
-          "upvotedPostIds",
-          JSON.stringify(upvotedArray)
-        );
-      } catch (error) {
-        console.error("Error saving upvoted posts to storage:", error);
-      }
-    };
-
-    saveUpvotedPosts();
-  }, [upvotedPostIds]);
-
-  // Function to map API data to Question interface
-  const mapDataToQuestions = (data: any[]): Question[] => {
-    return data.map((item) => ({
-      id: item.id,
-      title: item.title,
-      description: item.content, // Map 'content' to 'description'
-      createdAt: new Date(item.createdAt).toLocaleString("en-US", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      commentCount: item.noReplies || 0,
-      tags: item.tags || [],
-      username: item.username || item.user?.username || "Anonymous",
-      upvotes: item.noUpvote || 0,
-      hasUpvoted: upvotedPostIds.has(item.id),
-    }));
-  };
+  const [upvotedPosts, setUpvotedPosts] = useState(new Set<number>());
 
   // Fetch search results
   const fetchSearchResults = async (currentPage: number) => {
@@ -128,7 +72,39 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
       if (response.ok) {
         const data = await response.json();
 
-        const formattedData = mapDataToQuestions(data);
+        // Get upvote status for all fetched posts
+        const upvotesPromises = data.map(post => 
+          fetch(`${hostUrl}/api/posts/${post.id}/upvotes?username=${username}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }).then(res => res.json())
+        );
+
+        const upvotesResults = await Promise.all(upvotesPromises);
+        const upvotedPostIds = new Set(
+          upvotesResults
+            .map((result, index) => result.length > 0 ? data[index].id : null)
+            .filter(id => id !== null)
+        );
+        setUpvotedPosts(upvotedPostIds);
+        const formattedData = data.map((item) => ({
+          id: item.id,
+          title: item.title,
+          description: item.content, // Map 'content' to 'description'
+          createdAt: new Date(item.createdAt).toLocaleString("en-US", {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          commentCount: item.noReplies || 0,
+          tags: item.tags || [],
+          username: item.username || item.user?.username || "Anonymous",
+          upvotes: item.noUpvote || 0,
+          hasUpvoted: upvotedPostIds.has(item.id),
+        }));
 
         if (currentPage === 0) {
           setQuestions(formattedData);
@@ -141,11 +117,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
           setHasMore(false);
         }
       } else {
-        const errorData = await response.json();
-        Alert.alert(
-          "Error",
-          errorData.message || "Failed to fetch search results."
-        );
+        throw new Error('Failed to fetch search results');
       }
     } catch (error) {
       console.error("Error fetching search results:", error);
@@ -157,7 +129,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    navigation.setOptions({ title: `Search: "${keyword}"` });
+    navigation.setOptions({ title: `Posts for "${keyword}":` });
     fetchSearchResults(0);
   }, [keyword]);
 
@@ -176,76 +148,71 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
     if (questionIndex === -1) return;
 
     const question = questions[questionIndex];
+    const isCurrentlyUpvoted = upvotedPosts.has(postId);
 
-    if (question.hasUpvoted) {
-      // If already upvoted, remove upvote
-      try {
-        const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.status === 204) {
-          // Successfully removed upvote
-          // Update the state
-          const updatedQuestions = [...questions];
-          updatedQuestions[questionIndex].upvotes -= 1;
-          updatedQuestions[questionIndex].hasUpvoted = false;
-          setQuestions(updatedQuestions);
-
-          // Remove from upvotedPostIds
-          setUpvotedPostIds((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(postId);
-            return newSet;
+    try{ 
+      if (isCurrentlyUpvoted) {
+        // If already upvoted, remove upvote
+          const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           });
-        } else if (response.status === 401) {
-          Alert.alert("Unauthorized", "Please log in to remove upvote.");
-        } else {
-          const errorData = await response.json();
-          Alert.alert("Error", errorData.message || "Failed to remove upvote.");
+
+          if (response.status === 204) {
+            const updatedQuestions = [...questions];
+            updatedQuestions[questionIndex] = {
+              ...question,
+              upvotes: question.upvotes - 1,
+              hasUpvoted: false,
+            };
+    
+            setQuestions(updatedQuestions);
+
+            // Remove from upvotedPostIds
+            setUpvotedPosts(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(postId);
+              return newSet;
+            });
+          } else if (response.status === 401) {
+            Alert.alert("Unauthorized", "Please log in to remove upvote.");
+          } else {
+            throw new Error('Failed to remove upvote');
+          }
+      } else {
+        // If not upvoted, add upvote
+          const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          console.log(response);
+          if (response.ok) {
+            const data = await response.json();
+            const updatedQuestions = [...questions];
+            updatedQuestions[questionIndex] = {
+              ...question,
+              upvotes: data.upvotes || question.upvotes + 1,
+              hasUpvoted: true,
+            };
+            setQuestions(updatedQuestions);
+
+            // Add to upvotedPosts
+            setUpvotedPosts(prev => new Set(prev).add(postId));
+          } else if (response.status === 401) {
+            Alert.alert("Unauthorized", "Please log in to upvote.");
+          } else {
+            throw new Error('Failed to add upvote');
+          }
         }
       } catch (error) {
-        console.error("Error removing upvote:", error);
-        Alert.alert("Error", "Failed to remove upvote.");
+          console.error("Error handling upvote:", error);
+          Alert.alert("Error", "Failed to upvote the post.");
       }
-    } else {
-      // If not upvoted, add upvote
-      try {
-        const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log(response);
-        if (response.status === 200) {
-          const data = await response.json();
-          console.log("Upvote response data:", data);
-          // Assuming the response contains the updated upvote count
-          const updatedUpvotes = data.upvotes || question.upvotes + 1;
-
-          // Update the state
-          const updatedQuestions = [...questions];
-          updatedQuestions[questionIndex].upvotes = updatedUpvotes;
-          updatedQuestions[questionIndex].hasUpvoted = true;
-          setQuestions(updatedQuestions);
-
-          // Add to upvotedPostIds
-          setUpvotedPostIds((prev) => new Set(prev).add(postId));
-        } else if (response.status === 401) {
-          Alert.alert("Unauthorized", "Please log in to upvote.");
-        } else {
-          const errorData = await response.json();
-          Alert.alert("Error", errorData.message || "Failed to upvote.");
-        }
-      } catch (error) {
-        console.error("Error upvoting post:", error);
-        Alert.alert("Error", "Failed to upvote the post.");
-      }
-    }
+      
   };
 
   const navigateToQuestionDetail = (
@@ -318,7 +285,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#faf5ff",
   },
   loadingContainer: {
     flex: 1,

@@ -5,12 +5,14 @@ import {
   IconPlus,
   IconLoader2,
 } from "@tabler/icons-react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import type { Quiz, Question, QuestionType } from "../types/question";
 import { QuestionInputWithTemplate } from "../components/create-quiz/word-input-with-question-template";
 import { useCreateQuiz } from "../hooks/api/create-quiz";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUploadFile } from "../hooks/api/upload-image";
+import { useGetQuiz } from "../hooks/api/quizzes/get";
+import { useUpdateQuiz } from "../hooks/api/quizzes/update";
 
 export const AddQuizPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +27,18 @@ export const AddQuizPage: React.FC = () => {
     image: "none",
     questions: [],
   });
+
+  const quizIdParam = useParams().quizId;
+  const quizId = quizIdParam ? parseInt(quizIdParam) : undefined;
+  const { data: quizData } = useGetQuiz(quizId);
+
+  const { mutateAsync: updateQuiz } = useUpdateQuiz();
+
+  useEffect(() => {
+    if (quizData) {
+      setQuiz(quizData);
+    }
+  }, [quizData]);
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -95,7 +109,14 @@ export const AddQuizPage: React.FC = () => {
   };
 
   const onSubmit = async () => {
-    await createQuiz(quiz);
+    if (!quizId) {
+      console.log("Creating new quiz...");
+      await createQuiz(quiz);
+    } else {
+      // Update quiz
+      console.log("Updating quiz...");
+      await updateQuiz(quiz);
+    }
     navigate("/quizzes");
   };
 
@@ -103,7 +124,7 @@ export const AddQuizPage: React.FC = () => {
     <div className="min-h-screen p-8 bg-purple-50 rounded-3xl">
       <div className="max-w-4xl mx-auto">
         <h1 className="mb-8 text-3xl font-bold text-purple-800">
-          Create a Quiz
+          {!quizId ? "Create a Quiz" : "Edit Quiz" }
         </h1>
 
         <div className="p-6 mb-8 bg-white rounded-lg shadow-md">
@@ -167,11 +188,13 @@ export const AddQuizPage: React.FC = () => {
           </div>
         </div>
 
+        { !quizId && 
         <h2 className="mb-4 text-2xl font-semibold text-purple-800">
           Questions
         </h2>
+        }
 
-        {quiz.questions.map((question, index) => (
+        {!quizId && quiz.questions.map((question, index) => (
           <div
             key={question.id}
             className="p-6 mb-6 bg-white rounded-lg shadow-md"
@@ -244,19 +267,21 @@ export const AddQuizPage: React.FC = () => {
           </div>
         ))}
 
-        <button
+        { !quizId &&
+          <button
           onClick={addQuestion}
           className="flex items-center justify-center w-full p-4 mb-8 text-purple-800 transition-colors bg-purple-100 rounded-lg hover:bg-purple-200"
-        >
+          >
           <IconCirclePlus className="mr-2" />
           Add Question
         </button>
+        }
 
         <button
           onClick={onSubmit}
           className="w-full p-4 font-semibold text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700"
         >
-          Submit Quiz
+          {!quizId ? "Submit Quiz" : "Update Quiz"}
         </button>
       </div>
     </div>
