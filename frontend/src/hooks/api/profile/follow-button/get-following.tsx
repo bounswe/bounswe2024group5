@@ -15,7 +15,7 @@ export const useFetchFollowing = () => {
     return useQuery({
         queryKey: ['following'],
         queryFn: async () => {
-            if (!username) return;
+            if (!username) return [];
 
             const response = await fetch(`${hostUrl}/api/profile/${username}/following`, {
                 headers: {

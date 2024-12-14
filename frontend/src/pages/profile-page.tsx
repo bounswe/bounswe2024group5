@@ -13,7 +13,7 @@ import {
 import ProfileUpdateModal from "../components/profile/update-modal";
 
 import { message, Tabs } from "antd";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useGetProfile } from "../hooks/api/profile/get";
 import { useUpdateProfile } from "../hooks/api/profile/update";
 import { useFetchQuizzes } from "../hooks/api/get-quizzes";
@@ -239,6 +239,14 @@ const ProfilePage = () => {
                                       );
                                     }}
                                   />
+                                )}
+                                {isOwnProfile && (
+                                  <Link to={`/add-quiz/${quiz.id}`}>
+                                    <button className="flex items-center gap-1 px-2 py-1 text-sm text-orange-600 transition-colors rounded-lg hover:bg-orange-50">
+                                      <IconEdit size={16} />
+                                      Edit
+                                    </button>
+                                  </Link>
                                 )}
                               </div>
                             </div>

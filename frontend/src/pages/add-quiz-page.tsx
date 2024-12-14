@@ -5,12 +5,14 @@ import {
   IconPlus,
   IconLoader2,
 } from "@tabler/icons-react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import type { Quiz, Question, QuestionType } from "../types/question";
 import { QuestionInputWithTemplate } from "../components/create-quiz/word-input-with-question-template";
 import { useCreateQuiz } from "../hooks/api/create-quiz";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUploadFile } from "../hooks/api/upload-image";
+import { useGetQuiz } from "../hooks/api/quizzes/get";
+import { useUpdateQuiz } from "../hooks/api/quizzes/update";
 
 export const AddQuizPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +27,18 @@ export const AddQuizPage: React.FC = () => {
     image: "none",
     questions: [],
   });
+
+  const quizIdParam = useParams().quizId;
+  const quizId = quizIdParam ? parseInt(quizIdParam) : undefined;
+  const { data: quizData } = useGetQuiz(quizId);
+
+  const { mutateAsync: updateQuiz } = useUpdateQuiz();
+
+  useEffect(() => {
+    if (quizData) {
+      setQuiz(quizData);
+    }
+  }, [quizData]);
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -95,7 +109,14 @@ export const AddQuizPage: React.FC = () => {
   };
 
   const onSubmit = async () => {
-    await createQuiz(quiz);
+    if (!quizId) {
+      console.log("Creating new quiz...");
+      await createQuiz(quiz);
+    } else {
+      // Update quiz
+      console.log("Updating quiz...");
+      await updateQuiz(quiz);
+    }
     navigate("/quizzes");
   };
 

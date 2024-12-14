@@ -7,13 +7,24 @@ type QuizResponse = {
 	quiz: Quiz;
 };
 
-export const useGetQuiz = (id: number) => {
+export const useGetQuiz = (id?: number) => {
 	const TOKEN = localStorage.getItem('token');
 	const hostUrl = useContext(HostContext);
 
 	return useQuery({
 		queryKey: ['quiz', id],
 		queryFn: async () => {
+			if (!id) {
+				return {
+					id: Math.floor(Math.random() * 1000),
+					title: "",
+					description: "",
+					difficulty: 1,
+					image: "none",
+					questions: [],
+				  };
+			};
+
 			if (!TOKEN) {
 				throw new Error('No authentication token found');
 			}
