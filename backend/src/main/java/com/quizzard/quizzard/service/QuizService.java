@@ -2,16 +2,15 @@ package com.quizzard.quizzard.service;
 
 import com.quizzard.quizzard.exception.AccessDeniedException;
 import com.quizzard.quizzard.exception.ResourceNotFoundException;
+import com.quizzard.quizzard.model.FavoriteQuestion;
 import com.quizzard.quizzard.model.Question;
 import com.quizzard.quizzard.model.Quiz;
 import com.quizzard.quizzard.model.User;
-import com.quizzard.quizzard.model.request.CreateQuizRequest;
-import com.quizzard.quizzard.model.request.QuestionRequest;
-import com.quizzard.quizzard.model.request.SolveQuizRequest;
-import com.quizzard.quizzard.model.request.UpdateQuizRequest;
+import com.quizzard.quizzard.model.request.*;
 import com.quizzard.quizzard.model.response.QuestionResponse;
 import com.quizzard.quizzard.model.response.QuizResponse;
 import com.quizzard.quizzard.model.response.SolveQuizResponse;
+import com.quizzard.quizzard.repository.FavoriteQuestionRepository;
 import com.quizzard.quizzard.repository.FavoriteQuizRepository;
 import com.quizzard.quizzard.repository.QuestionRepository;
 import com.quizzard.quizzard.repository.QuizRepository;
@@ -21,6 +20,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.print.attribute.standard.RequestingUserName;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +31,9 @@ public class QuizService {
 
     @Autowired
     private QuizRepository quizRepository;
+
+    @Autowired
+    private FavoriteQuestionRepository favoriteQuestionRepository;
 
     @Autowired
     private QuestionRepository questionRepository;
@@ -155,5 +160,41 @@ public class QuizService {
             throw new ResourceNotFoundException("Quiz not found with id " + givenQuizId);
         return mapQuizzesToQuizResponses(quizRepository.findRecommendedQuizzes(givenQuizId, username, pageable));
     }
+
+    public QuizResponse createQuizFromFavorites(String authorUsername, CreateFromFavQuestionToQuizRequest request) {
+        User author = userService.getOneUserByUsername(authorUsername);
+        List<FavoriteQuestion> favoriteQuestions = favoriteQuestionRepository.findAllByUserId(author.getId());
+        String title = request.getTitle();
+        Integer count = request.getCount();
+        Collections.shuffle(favoriteQuestions);
+        if (favoriteQuestions.size() < count)
+            throw new ResourceNotFoundException("You don't have enough favorite questions");
+
+        // 1. Create Quiz
+        Quiz quiz = new Quiz();
+        quiz.setTitle(title);
+        quiz.setAuthor(author);
+        quiz.setDescription("Created from favorite questions");
+        quizRepository.save(quiz);
+
+        // 2. Create questions from favorite questions and add them to quiz
+        for (int i = 0; i < count; i++) {
+            Question question = new Question();
+            question.setQuizId(quiz.getId());
+            question.setQuestionType(favoriteQuestions.get(i).getQuestion().getQuestionType());
+            question.setDifficulty(favoriteQuestions.get(i).getQuestion().getDifficulty());
+            question.setWord(favoriteQuestions.get(i).getQuestion().getWord());
+            question.setCorrectAnswer(favoriteQuestions.get(i).getQuestion().getCorrectAnswer());
+            question.setWrongAnswer1(favoriteQuestions.get(i).getQuestion().getWrongAnswer1());
+            question.setWrongAnswer2(favoriteQuestions.get(i).getQuestion().getWrongAnswer2());
+            question.setWrongAnswer3(favoriteQuestions.get(i).getQuestion().getWrongAnswer3());
+            question.setQuizId(quiz.getId());
+            questionRepository.save(question);
+        }
+        quiz.setDifficulty(calculateQuizDifficulty(quiz));
+        return mapQuizToQuizResponse(quiz);
+    }
+
+
 
 }

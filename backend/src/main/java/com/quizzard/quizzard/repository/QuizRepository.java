@@ -3,12 +3,15 @@ package com.quizzard.quizzard.repository;
 
 import com.quizzard.quizzard.model.Quiz;
 import com.quizzard.quizzard.model.User;
+import com.quizzard.quizzard.model.response.LeaderboardResponse;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Pageable;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
@@ -48,4 +51,13 @@ public interface QuizRepository extends JpaRepository <Quiz, Long> {
             Pageable pageable
     );
 
+    @Query("""
+        SELECT new com.quizzard.quizzard.model.response.LeaderboardResponse$QuizCreated(u.username, COUNT(q.id))
+        FROM Quiz q
+        JOIN q.author u
+        WHERE q.createdAt >= :timestamp
+        GROUP BY u.username
+        ORDER BY COUNT(q.id) DESC
+        """)
+    List<LeaderboardResponse.QuizCreated> getLeaderboardQuizCreated(@Param("timestamp") Timestamp timestamp);
 }
