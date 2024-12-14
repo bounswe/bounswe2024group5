@@ -1,7 +1,6 @@
 package com.quizzard.quizzard.service;
 
 import com.quizzard.quizzard.model.QuestionType;
-import com.quizzard.quizzard.model.response.AnswerSuggestionResponse;
 import com.quizzard.quizzard.repository.EnglishRepository;
 import com.quizzard.quizzard.repository.TranslateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +14,8 @@ public class AnswerSuggestionService {
     @Autowired
     private TranslateRepository translateRepository;
 
-    public AnswerSuggestionResponse getAnswerSuggestion(String word, String questionType) {
+    public List<String> getCorrectAnswers(String word, String questionType) {
         QuestionType questionTypeEnum = QuestionType.valueOf(questionType.toLowerCase());
-        AnswerSuggestionResponse answerSuggestionResponse = new AnswerSuggestionResponse();
         List<String> correctAnswerSuggestions = List.of();
         switch (questionTypeEnum) {
             case english_to_sense:
@@ -30,8 +28,23 @@ public class AnswerSuggestionService {
                 correctAnswerSuggestions = translateRepository.findEnglishByTurkishWord(word);
                 break;
         }
-        answerSuggestionResponse.setCorrectAnswerSuggestions(correctAnswerSuggestions);
-        answerSuggestionResponse.setWrongAnswerSuggestions(List.of());
-        return answerSuggestionResponse;
+        return correctAnswerSuggestions;
+    }
+
+    public List<String> getWrongAnswers(String word, String correctAnswer, String questionType) {
+        QuestionType questionTypeEnum = QuestionType.valueOf(questionType.toLowerCase());
+        List<String> wrongAnswerSuggestions = List.of();
+        switch (questionTypeEnum) {
+            case english_to_sense:
+                wrongAnswerSuggestions = translateRepository.findSenseByEnglishWord(word);
+                break;
+            case english_to_turkish:
+                wrongAnswerSuggestions = translateRepository.findTurkishByEnglishWord(word);
+                break;
+            case turkish_to_english:
+                wrongAnswerSuggestions = translateRepository.findEnglishByTurkishWord(word);
+                break;
+        }
+        return wrongAnswerSuggestions;
     }
 }
