@@ -24,6 +24,9 @@ import { DifficultyBadge } from "../components/badges/level";
 import { useFetchPosts } from "../hooks/api/get-forum-post";
 import { ForumPostCard } from "../components/profile/forum-post-card";
 import { ProfilePhotoUpload } from "../components/profile/profile-photo";
+import { useFetchFollowing } from "../hooks/api/profile/follow-button/get-following";
+import { usePostFollowing } from "../hooks/api/profile/follow-button/post-following";
+import { useDeleteFollowing } from "../hooks/api/profile/follow-button/delete-following";
 
 const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,6 +41,21 @@ const ProfilePage = () => {
   const { data: userQuizzes } = useFetchQuizzes({
     username: profile?.username ?? "",
   });
+
+  const { data: following } = useFetchFollowing();
+  const isFollowing = following?.some((f) => f.username === username);
+
+  const { mutateAsync: followUser } = usePostFollowing();
+  const { mutateAsync: unfollowUser } = useDeleteFollowing();
+
+  const handleFollow = () => {
+    if (isFollowing) {
+      unfollowUser(username);
+    } else {
+      followUser(username);
+    }
+  }
+
   const user = {
     badges: [
       { id: 1, name: "Quiz Master", description: "Created 2 quizzes" },
@@ -103,6 +121,12 @@ const ProfilePage = () => {
                     >
                       <IconEdit size={20} />
                       {isUpdating ? "Updating..." : "Edit"}
+                    </button>
+                  )}
+
+                  {!isOwnProfile && (
+                    <button onClick={handleFollow} className="flex items-center justify-center px-4 py-2 text-white transition-colors rounded-full bg-violet-500 hover:bg-violet-600">
+                      { isFollowing ? "Unfollow" : "Follow" }
                     </button>
                   )}
                 </div>
