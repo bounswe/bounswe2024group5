@@ -71,7 +71,7 @@ const App = () => {
             <Route path="forum" element={<ForumPage />} />
             <Route path="post/:postId" element={<PostDetailsPage />} />
             <Route
-              path="add-quiz"
+              path="add-quiz/:quizId?"
               element={
                 <ProtectedRoute>
                   <AddQuizPage />
