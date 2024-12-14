@@ -27,7 +27,7 @@ function FeedPage() {
     const hostURL = useContext(HostContext);
 
     useEffect(() => {
-        const token = sessionStorage.getItem("token");
+        const token = localStorage.getItem("token");
         //console.log("Getting posts with token: ", token);
 
         fetch(`${hostURL}/api/posts`, {
@@ -51,7 +51,7 @@ function FeedPage() {
     }
 
     const handleSearch = () => {
-        const token = sessionStorage.getItem("token");
+        const token = localStorage.getItem("token");
         const params = new URLSearchParams();
         params.append("query", searchInput);
         fetch(`${hostURL}/api/search?` + params.toString(), {

@@ -9,23 +9,23 @@ export const useCreateUpvote = (postId: number) => {
 
     return useMutation({
         mutationFn: async () => {
-            const TOKEN = sessionStorage.getItem('token');
+            const TOKEN = localStorage.getItem('token');
             const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${TOKEN}`,
-				}
-			});
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${TOKEN}`,
+                }
+            });
 
-			if (!response.ok) {
-				throw new Error('Failed to upvote post.');
-			}
+            if (!response.ok) {
+                throw new Error('Failed to upvote post.');
+            }
 
-			return response.json();
+            return response.json();
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['posts']});
-            queryClient.setQueryData<ForumPost[]>(['posts'], (old) => old?.map(post => post.id === postId ? {...post, noUpvote: post.noUpvote+1} : post))
+            queryClient.invalidateQueries({ queryKey: ['posts'] });
+            queryClient.setQueryData<ForumPost[]>(['posts'], (old) => old?.map(post => post.id === postId ? { ...post, noUpvote: post.noUpvote + 1 } : post))
         }
     })
 }

@@ -36,7 +36,7 @@ function LoginPage() {
       .then((response) => {
         console.log(response);
         if (response.message === "Login successful") {
-          sessionStorage.setItem("token", response.token);
+          localStorage.setItem("token", response.token);
           navigate("/feed");
         } else {
           setErrorMessage(response.message);

@@ -12,7 +12,7 @@ import {
 
 import ProfileUpdateModal from "../components/profile/update-modal";
 
-import { Tabs } from "antd";
+import { message, Tabs } from "antd";
 import { useParams } from "react-router-dom";
 import { useGetProfile } from "../hooks/api/profile/get";
 import { useUpdateProfile } from "../hooks/api/profile/update";
@@ -24,9 +24,12 @@ import { DifficultyBadge } from "../components/badges/level";
 import { useFetchPosts } from "../hooks/api/get-forum-post";
 import { ForumPostCard } from "../components/profile/forum-post-card";
 import { ProfilePhotoUpload } from "../components/profile/profile-photo";
+
 import { useFetchFollowing } from "../hooks/api/profile/follow-button/get-following";
 import { usePostFollowing } from "../hooks/api/profile/follow-button/post-following";
 import { useDeleteFollowing } from "../hooks/api/profile/follow-button/delete-following";
+
+import { DeleteQuizButton } from "../components/profile/delete-quiz-button";
 
 const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -226,6 +229,17 @@ const ProfilePage = () => {
                                   <IconHeart className="w-5 h-5 text-red-500" />
                                   {/* <span>{quiz.likes}</span> */}4
                                 </div>
+                                {isOwnProfile && (
+                                  <DeleteQuizButton
+                                    quizId={quiz.id as number}
+                                    quizTitle={quiz.title}
+                                    onDeleteSuccess={() => {
+                                      message.success(
+                                        "Quiz deleted successfully"
+                                      );
+                                    }}
+                                  />
+                                )}
                               </div>
                             </div>
                           </motion.div>

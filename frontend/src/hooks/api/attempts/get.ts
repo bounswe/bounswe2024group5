@@ -9,7 +9,7 @@ export const useGetQuizAttempt = (id: number) => {
 	return useQuery({
 		queryKey: ['quiz-attempt', id],
 		queryFn: async () => {
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 
 			const response = await fetch(
 				`${hostUrl}/api/quiz-attempts/${id}`,
