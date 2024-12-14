@@ -8,13 +8,13 @@ import {
 import { FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 
-const calculateQuizDifficultyFromElo = (elo: number) => {
-    if (elo < 400) return "A1";
+export const calculateQuizDifficultyFromElo = (elo: number) => {
+    if (elo < 500) return "A1";
     else if (elo < 1000) return "A2";
-    else if (elo < 1800) return "B1";
-    else if (elo < 2600) return "B2";
-    else if (elo < 3300) return "C1";
-    else return "C2";
+    else if (elo < 1500) return "B1";
+    else if (elo < 2000) return "B2";
+    else if (elo < 2500) return "C1";
+    else if (elo < 5000) return "C2";
 };
 
 export const EloCefrInfoTable = () => {
@@ -37,7 +37,7 @@ export const EloCefrInfoTable = () => {
                 <Text style={styles.bulletText}>
                     <Text style={styles.levelText}>A1 </Text>
                     <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
-                    <Text style={styles.rangeText}> [000, 400]</Text>
+                    <Text style={styles.rangeText}> [000, 500)</Text>
                 </Text>
             </View>
             
@@ -46,7 +46,7 @@ export const EloCefrInfoTable = () => {
                 <Text style={styles.bulletText}>
                     <Text style={styles.levelText}>A2 </Text>
                     <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
-                    <Text style={styles.rangeText}> [400, 1800]</Text>
+                    <Text style={styles.rangeText}> [500, 1000)</Text>
                 </Text>
             </View>
 
@@ -55,7 +55,7 @@ export const EloCefrInfoTable = () => {
                 <Text style={styles.bulletText}>
                     <Text style={styles.levelText}>B1 </Text>
                     <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
-                    <Text style={styles.rangeText}> [1000, 1800]</Text>
+                    <Text style={styles.rangeText}> [1000, 1500)</Text>
                 </Text>
             </View>
             
@@ -64,7 +64,7 @@ export const EloCefrInfoTable = () => {
                 <Text style={styles.bulletText}>
                     <Text style={styles.levelText}>B2 </Text>
                     <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
-                    <Text style={styles.rangeText}> [1800, 2600]</Text>
+                    <Text style={styles.rangeText}> [1500, 2000)</Text>
                 </Text>
             </View>
             
@@ -73,7 +73,7 @@ export const EloCefrInfoTable = () => {
                 <Text style={styles.bulletText}>
                     <Text style={styles.levelText}>C1 </Text>
                     <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
-                    <Text style={styles.rangeText}> [2600, 3300]</Text>
+                    <Text style={styles.rangeText}> [2000, 2500)</Text>
                 </Text>
             </View>
             
@@ -82,7 +82,7 @@ export const EloCefrInfoTable = () => {
                 <Text style={styles.bulletText}>
                     <Text style={styles.levelText}>C2 </Text>
                     <FontAwesome name="long-arrow-right" size={16} color="#6a0dad" />
-                    <Text style={styles.rangeText}> [3300, 10000]</Text>
+                    <Text style={styles.rangeText}> [2500, 5000]</Text>
                 </Text>
             </View>
         </View>
