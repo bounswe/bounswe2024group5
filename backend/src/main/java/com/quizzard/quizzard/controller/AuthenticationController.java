@@ -51,17 +51,17 @@ public class AuthenticationController {
         }
         int score;
         if(proficiency.equals("A1"))
-            score = 200;
+            score = 250;
         else if(proficiency.equals("A2"))
-            score = 600;
+            score = 750;
         else if(proficiency.equals("B1"))
-            score = 1400;
+            score = 1250;
         else if(proficiency.equals("B2"))
-            score = 2200;
+            score = 1750;
         else if(proficiency.equals("C1"))
-            score = 2900;
+            score = 2250;
         else
-            score = 3400;
+            score = 3000;
 
         User user = new User(request.getUsername(), 
                              encoder.encode(request.getPassword()), 
