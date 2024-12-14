@@ -71,4 +71,11 @@ public class QuizController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}/recommended")
+    public ResponseEntity<List<QuizResponse>> getRecommendedQuizzes(@RequestHeader("Authorization") String jwt, @PathVariable Long id) {
+        String username = jwtUtils.getUserNameFromJwtToken(jwt.substring(7));
+        List<QuizResponse> recommendedQuizzes = quizService.getRecommendedQuizzes(username, id);
+        return ResponseEntity.ok(recommendedQuizzes);
+    }
+
 }

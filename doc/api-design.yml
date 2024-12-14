@@ -1008,6 +1008,30 @@ paths:
       responses:
         '204':
           description: Quiz deleted
+  /quizzes/{id}/recommended:
+    get:
+      summary: Get recommended quizzes by quiz ID
+      description: Retrieves up to 5 quizzes which has similar difficulty level with the given quiz and has not been attempted yet.
+      tags:
+        - Quizzes
+      parameters:
+        - name: id
+          in: path
+          description: ID of the quiz
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Quiz details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuizResponse'
+        '404':
+          description: Quiz not found
   /quiz-attempts:
     post:
       summary: Attempt a quiz
