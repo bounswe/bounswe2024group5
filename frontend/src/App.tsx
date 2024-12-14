@@ -22,6 +22,7 @@ import HostContext from "./HostContext";
 import { PostDetailsPage } from "./pages/post-details-page";
 
 import ProfilePage from "./pages/profile-page";
+import LeaderboardPage from "./pages/leaderboard";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = sessionStorage.getItem("token");
@@ -63,6 +64,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+            <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="forum" element={<ForumPage />} />
             <Route path="post/:postId" element={<PostDetailsPage />} />
             <Route
