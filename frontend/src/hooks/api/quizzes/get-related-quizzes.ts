@@ -5,7 +5,7 @@ import HostContext from '../../../HostContext';
 
 
 export const useGetRecommendedQuizzes = (id: number) => {
-	const TOKEN = sessionStorage.getItem('token');
+	const TOKEN = localStorage.getItem('token');
 	const hostUrl = useContext(HostContext);
 
 	return useQuery({
