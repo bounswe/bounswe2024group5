@@ -217,29 +217,20 @@ const QuizCreationPage = ({ navigation }) => {
         const newQuestions = [...questions];
         question.answerSuggestions = data.correctAnswerSuggestions;
         question.showAnswerSuggestions = data.correctAnswerSuggestions.length > 0;
+        if (data.wrongAnswerSuggestions.length >= 3) {
+          question.options["B"] = data.wrongAnswerSuggestions[0]
+          question.options["C"] = data.wrongAnswerSuggestions[1]
+          question.options["D"] = data.wrongAnswerSuggestions[2]
+        }
         question.isLoadingAnswerSuggestions = false;
         newQuestions[index] = question
 
         setQuestions(newQuestions);
       } else {
         console.error("Failed to fetch answer suggestions");
-
-        const newQuestions = [...questions];
-        newQuestions[index].answerSuggestions = [];
-        newQuestions[index].showAnswerSuggestions = false;
-        newQuestions[index].isLoadingAnswerSuggestions = false;
-
-        setQuestions(newQuestions);
       }
     } catch (error) {
       console.error("Error fetching answer suggestions:", error);
-
-      const newQuestions = [...questions];
-      newQuestions[index].answerSuggestions = [];
-      newQuestions[index].showAnswerSuggestions = false;
-      newQuestions[index].isLoadingAnswerSuggestions = false;
-
-      setQuestions(newQuestions);
     }
   };
 
@@ -389,7 +380,10 @@ const QuizCreationPage = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       {/* Header Section */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate("Home")}>
@@ -499,13 +493,13 @@ const QuizCreationPage = ({ navigation }) => {
               <TextInput
                 style={styles.choiceInput}
                 placeholder={`Choice ${option}`}
-                value={option === 'A' ? question.options[option] : ''}
+                value={question.options[option]}
                 editable={option === 'A'}
                 onChangeText={(text) => {
                   if (option === 'A') {
                     updateQuestion(index, option, text);
                     // Trigger answer suggestions only for option A
-
+                    fetchAnswerSuggestions(index, questions[index])
                   }
                 }}
               />
@@ -578,6 +572,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingBottom: 100, // Keep extra padding at the bottom
     backgroundColor: "#fff",
   },
   header: {
@@ -686,10 +681,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+  
+  contentContainer: {
+    paddingBottom: 100, // Add extra padding to the bottom of the scrollable content
+  },
   bottomButtons: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    zIndex: 10, // Ensure buttons are above other content
   },
   cancelButton: {
     backgroundColor: "#ccc",
