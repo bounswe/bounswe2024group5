@@ -134,7 +134,9 @@ const ForumModal = React.memo<{
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Posts about '{word}'</Text>
+            <Text style={styles.modalTitle}>
+              Posts about <Text style={styles.boldText}>'{word}'</Text>
+            </Text>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <Ionicons name="close" size={24} color="#1a1a1a" />
             </TouchableOpacity>
@@ -293,30 +295,35 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     initializeQuiz();
   }, [quiz.id, hostUrl, token]);
 
+  const fetchHintImages = useCallback(
+    async (word: string) => {
+      setIsLoadingHintImages(true);
+      try {
+        const response = await fetch(
+          `${hostUrl}/api/hint?word=${encodeURIComponent(word)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-  const fetchHintImages = useCallback(async (word: string) => {
-    setIsLoadingHintImages(true);
-    try {
-      const response = await fetch(`${hostUrl}/api/hint?word=${encodeURIComponent(word)}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
-      if (response.ok) {
-        const images = await response.json();
-        setHintImages(images);
-      } else {
-        Alert.alert("Error", "Failed to fetch hint images");
+        if (response.ok) {
+          const images = await response.json();
+          setHintImages(images);
+        } else {
+          Alert.alert("Error", "Failed to fetch hint images");
+        }
+      } catch (error) {
+        console.error("Error fetching hint images:", error);
+        Alert.alert("Error", "Failed to load hint images");
+      } finally {
+        setIsLoadingHintImages(false);
+        setIsHintModalVisible(true);
       }
-    } catch (error) {
-      console.error("Error fetching hint images:", error);
-      Alert.alert("Error", "Failed to load hint images");
-    } finally {
-      setIsLoadingHintImages(false);
-      setIsHintModalVisible(true);
-    }
-  }, [hostUrl, token]);
+    },
+    [hostUrl, token]
+  );
 
   const handleAnswer = async (answer) => {
     if (alreadyFinished) return;
@@ -485,46 +492,43 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     }
   };
 
-    return (
-      <View style={styles.container}>
-        <QuizHeader
-          quizName={quiz.title}
-          questionIndex={questionIndex}
-          totalQuestions={questions.length}
-        />
-        <View style={styles.roundQuestionContainer}>
-          <Text style={styles.questionText}>
-            {generateQuestionSentence(question)}
-          </Text>
-          {shuffledAnswers.map((answer, index) => {
-            let backgroundColor;
-            if (!isQuestionAnswered[questionIndex]) {
-              backgroundColor = "#ddd6fe";
+  return (
+    <View style={styles.container}>
+      <QuizHeader
+        quizName={quiz.title}
+        questionIndex={questionIndex}
+        totalQuestions={questions.length}
+      />
+      <View style={styles.roundQuestionContainer}>
+        <Text style={styles.questionText}>
+          {generateQuestionSentence(question)}
+        </Text>
+        {shuffledAnswers.map((answer, index) => {
+          let backgroundColor;
+          if (!isQuestionAnswered[questionIndex]) {
+            backgroundColor = "#ddd6fe";
+          } else {
+            if (answer === question.correctAnswer) {
+              backgroundColor = "green";
+            } else if (answer === selectedAnswers[questionIndex]) {
+              backgroundColor = "red";
             } else {
-              if (answer === question.correctAnswer) {
-                backgroundColor = "green";
-              } else if (answer === selectedAnswers[questionIndex]) {
-                backgroundColor = "red";
-              } else {
-                backgroundColor = "#ddd6fe";
-              }
+              backgroundColor = "#ddd6fe";
             }
-  
-            return (
-              <TouchableOpacity
-                key={index}
-                style={[styles.button, { backgroundColor }]}
-                onPress={() => handleAnswer(answer)}
-              >
-                <Text style={styles.buttonText}>{answer}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-  
-        
-    
-        
+          }
+
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[styles.button, { backgroundColor }]}
+              onPress={() => handleAnswer(answer)}
+            >
+              <Text style={styles.buttonText}>{answer}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
       {/* Container for Next Button */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.nextButton} onPress={handlePrevious}>
@@ -552,14 +556,14 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       </View>
       {/* Container for Hint and Related Posts Buttons */}
       <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.hintButton}
-            onPress={() => fetchHintImages(question.word)}
-          >
-            <Ionicons name="help-circle-outline" size={20} color="#6a0dad" />
-            <Text style={styles.hintButtonText}>Hint</Text>
-          </TouchableOpacity>
-          {/* Hint Images Modal */}
+        <TouchableOpacity
+          style={styles.hintButton}
+          onPress={() => fetchHintImages(question.word)}
+        >
+          <Ionicons name="help-circle-outline" size={20} color="#6a0dad" />
+          <Text style={styles.hintButtonText}>Hint</Text>
+        </TouchableOpacity>
+        {/* Hint Images Modal */}
         <Modal
           visible={isHintModalVisible}
           transparent={true}
@@ -569,20 +573,22 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           <View style={styles.hintModalContainer}>
             <View style={styles.hintModalContent}>
               <View style={styles.hintModalHeader}>
-                <Text style={styles.hintModalTitle}>Hints for '{question.word}'</Text>
-                <TouchableOpacity 
-                  style={styles.closeButton} 
+                <Text style={styles.hintModalTitle}>
+                  Hints for '{question.word}'
+                </Text>
+                <TouchableOpacity
+                  style={styles.closeButton}
                   onPress={() => setIsHintModalVisible(false)}
                 >
                   <Ionicons name="close" size={24} color="#1a1a1a" />
                 </TouchableOpacity>
               </View>
-    
+
               {isLoadingHintImages ? (
                 <ActivityIndicator size="large" color="#6a0dad" />
               ) : (
-                <ScrollView 
-                  horizontal 
+                <ScrollView
+                  horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.hintImagesContainer}
                 >
@@ -599,18 +605,18 @@ const QuizSolvingScreen = ({ route, navigation }) => {
             </View>
           </View>
         </Modal>
-    
-          <TouchableOpacity
-            style={styles.forumButton}
-            onPress={() => {
-              fetchRelatedPosts(question.word);
-              setForumModalVisible(true);
-            }}
-          >
-            <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
-            <Text style={styles.forumButtonText}>See Related Posts</Text>
-          </TouchableOpacity>
-        </View>
+
+        <TouchableOpacity
+          style={styles.forumButton}
+          onPress={() => {
+            fetchRelatedPosts(question.word);
+            setForumModalVisible(true);
+          }}
+        >
+          <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
+          <Text style={styles.forumButtonText}>See Related Posts</Text>
+        </TouchableOpacity>
+      </View>
       <ForumModal
         visible={forumModalVisible}
         onClose={() => {
@@ -754,8 +760,10 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: "bold",
     color: "#1a1a1a",
+  },
+  boldText: {
+    fontWeight: "bold",
   },
   modalBody: {
     flex: 1,
@@ -926,9 +934,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 10,
   },
 });
