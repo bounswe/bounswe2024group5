@@ -10,7 +10,7 @@ import {
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const MyQuizzesView = ({ createdQuizzes, onDelete, navigation, deleteFunctionality = true  }) => {
+const MyQuizzesView = ({ createdQuizzes, onDelete, navigation, deleteFunctionality = true }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [quizToDelete, setQuizToDelete] = useState(null);
 
@@ -49,32 +49,65 @@ const MyQuizzesView = ({ createdQuizzes, onDelete, navigation, deleteFunctionali
               {/* TODO: Convert the following ELO to CEFR */}
               <Text style={styles.itemDetail}>ELO: {quiz.difficulty}</Text>
 
-                            {/* Favorites and Delete Container */}
-                            <View style={styles.cardFooter}>
-                                <Text style={styles.itemDetail}>
-                                    <AntDesignIcon name="like2" size={12} color="#e13528" /> {quiz.noFavorites}
-                                </Text>
-                                {deleteFunctionality && (
-                                    <TouchableOpacity
-                                        style={styles.deleteButton}
-                                        onPress={() => onDelete && onDelete(quiz.id)}
-                                    >
-                                        <AntDesignIcon
-                                            name="delete"
-                                            size={16}
-                                            color="#e13528"
-                                        />
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
-            ) : (
-                <Text style={styles.noDataText}>
-                    You haven't created any quizzes yet.
+              {/* Favorites and Delete Container */}
+              <View style={styles.cardFooter}>
+                <Text style={styles.itemDetail}>
+                  <AntDesignIcon name="like2" size={12} color="#e13528" />{" "} {quiz.noFavorites}
                 </Text>
-            )}
+                {deleteFunctionality && (
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDelete(quiz.id)}
+                  >
+                    <Text style={styles.deletebuttonText}>
+                      <AntDesignIcon name="delete" size={12} />
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      ) : (
+        <Text style={styles.noDataText}>
+          You haven't created any quizzes yet.
+        </Text>
+      )}
+
+      {/* Alert Modal */}
+      <Modal
+        visible={showAlert}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowAlert(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Ionicons name="information-circle" size={50} color="#e13528" />
+            <Text style={styles.modalTitle}>Delete Quiz</Text>
+            <Text style={styles.modalText}>
+              Are you sure you want to delete this quiz? This action cannot be
+              undone.
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setShowAlert(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.continueButton]}
+                onPress={confirmDelete}
+              >
+                <Text
+                  style={[styles.modalButtonText, styles.continueButtonText]}
+                >
+                  Delete
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </Modal>
     </View>
