@@ -37,8 +37,7 @@ const ForumScreen = ({ navigation }) => {
   const authContext = useAuth(); // Get the authentication context
   console.log('Auth context in ForumScreen:', authContext);
   const { token, username } = authContext;  // Now you can destructure both token and username
-  console.log('Token and username in ForumScreen:', token, username);
-  const [upVoted, setUpVoted] = useState(false);
+  const [isUpvoted, setIsUpvoted] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -111,7 +110,7 @@ const ForumScreen = ({ navigation }) => {
       };
 
       fetchPosts();
-    }, [hostUrl, token, username, upVoted])
+    }, [hostUrl, token, isUpvoted])
   );
 
   // Function to handle upvoting a question
@@ -121,7 +120,7 @@ const ForumScreen = ({ navigation }) => {
     if (questionIndex === -1) return;
 
     const question = questions[questionIndex];
-    setUpVoted(!upVoted);
+    setIsUpvoted(!isUpvoted);
     try {
       if (question.hasUpvoted) {
         // If already upvoted, remove upvote
