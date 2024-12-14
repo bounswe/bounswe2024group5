@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import HostContext from '../../../HostContext';
 
 export const useDeleteQuiz = () => {
-	const TOKEN = sessionStorage.getItem('token');
+	const TOKEN = localStorage.getItem('token');
 	const hostUrl = useContext(HostContext);
 	const queryClient = useQueryClient();
 
