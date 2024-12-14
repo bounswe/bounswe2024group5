@@ -124,7 +124,7 @@ export const AddQuizPage: React.FC = () => {
     <div className="min-h-screen p-8 bg-purple-50 rounded-3xl">
       <div className="max-w-4xl mx-auto">
         <h1 className="mb-8 text-3xl font-bold text-purple-800">
-          Create a Quiz
+          {!quizId ? "Create a Quiz" : "Edit Quiz" }
         </h1>
 
         <div className="p-6 mb-8 bg-white rounded-lg shadow-md">
@@ -265,19 +265,21 @@ export const AddQuizPage: React.FC = () => {
           </div>
         ))}
 
-        <button
+        { !quizId &&
+          <button
           onClick={addQuestion}
           className="flex items-center justify-center w-full p-4 mb-8 text-purple-800 transition-colors bg-purple-100 rounded-lg hover:bg-purple-200"
-        >
+          >
           <IconCirclePlus className="mr-2" />
           Add Question
         </button>
+        }
 
         <button
           onClick={onSubmit}
           className="w-full p-4 font-semibold text-white transition-colors bg-purple-600 rounded-lg hover:bg-purple-700"
         >
-          Submit Quiz
+          {!quizId ? "Submit Quiz" : "Update Quiz"}
         </button>
       </div>
     </div>
