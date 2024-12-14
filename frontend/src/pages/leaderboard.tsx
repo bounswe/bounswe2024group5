@@ -6,7 +6,6 @@ import { Tabs, Skeleton } from "antd";
 import { IconTrophy, IconBrain, IconPencil } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
 
-// Separate LeaderboardCard into its own component for better organization
 const LeaderboardCard = ({
   title,
   data,
