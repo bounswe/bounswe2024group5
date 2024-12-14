@@ -32,8 +32,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
+
+  const hostUrl = (import.meta.env.VITE_HOST_URL) || "34.55.188.177";
+  console.log(hostUrl);
+
   return (
-    <HostContext.Provider value="http://localhost:80">
+    <HostContext.Provider value={`http://${hostUrl}:80`}>
       <Router>
         <Routes>
           <Route path="signup" element={<SignUpPage />} />
