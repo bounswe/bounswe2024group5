@@ -7,7 +7,6 @@ import { DifficultyBadge } from "../badges/level";
 import {
   IconBooks,
   IconHeart,
-  IconShare,
   IconUser,
   IconPhotoOff,
 } from "@tabler/icons-react";
@@ -15,9 +14,10 @@ import { cx } from "class-variance-authority";
 import { useFetchQuizFavorites } from "../../hooks/api/quiz-favorite/get-quiz-favorite";
 import { usePostQuizFavorite } from "../../hooks/api/quiz-favorite/post-quiz-favorite";
 import { useDeleteQuizFavorite } from "../../hooks/api/quiz-favorite/delete-quiz-favorite";
+import { CopyLinkButton } from "../copy-quiz-link-button";
 
 export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
-
+  const quizUrl = `${window.location.origin}/quiz/${quiz.id}`;
   const { data: favoriteQuizzes } = useFetchQuizFavorites();
   const { mutateAsync: postQuizFavorite } = usePostQuizFavorite();
   const { mutateAsync: deleteQuizFavorite } = useDeleteQuizFavorite();
@@ -89,10 +89,7 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
               <DifficultyBadge difficulty={quiz.difficulty} />
 
               <div className="flex items-center gap-1">
-                <IconShare
-                  className="text-zinc-500 hover:text-zinc-700"
-                  size={20}
-                />
+              <CopyLinkButton url={quizUrl} />
                 <div className="flex items-center gap-1 text-zinc-500">
                   <IconHeart
                     className={cx(

@@ -12,7 +12,7 @@ export const useCreateQuiz = () => {
 	return useMutation({
 		mutationFn: async (quizData: CreateQuizPayload): Promise<Quiz> => {
 
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 			const response = await fetch(`${hostUrl}/api/quizzes`, {
 				method: 'POST',
 				headers: {

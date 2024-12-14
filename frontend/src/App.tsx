@@ -24,7 +24,7 @@ import { PostDetailsPage } from "./pages/post-details-page";
 import ProfilePage from "./pages/profile-page";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
   if (!token) {
     return <Navigate to="/login" replace />;
   }
