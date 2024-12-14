@@ -4,19 +4,35 @@ import {
   IconUpload,
   IconPlus,
   IconLoader2,
+  IconSparkles,
+  IconWand,
 } from "@tabler/icons-react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import type { Quiz, Question, QuestionType } from "../types/question";
 import { QuestionInputWithTemplate } from "../components/create-quiz/word-input-with-question-template";
 import { useCreateQuiz } from "../hooks/api/create-quiz";
 import { useNavigate } from "react-router-dom";
 import { useUploadFile } from "../hooks/api/upload-image";
+import { useAnswerSuggestions } from "../hooks/api/questions-answers/get-suggestions";
 
 export const AddQuizPage: React.FC = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { mutateAsync: createQuiz } = useCreateQuiz();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
+  const [showMagicEffect, setShowMagicEffect] = useState<number | null>(null);
+  const [pendingQuestion, setPendingQuestion] = useState<{
+    id: number;
+    word: string;
+    questionType: QuestionType;
+  } | null>(null);
+
+  const { data: suggestions, isFetched } = useAnswerSuggestions({
+    word: pendingQuestion?.word ?? "",
+    questionType: pendingQuestion?.questionType ?? "english_to_turkish",
+    enabled: !!pendingQuestion,
+  });
+
   const [quiz, setQuiz] = useState<Quiz>({
     id: Math.floor(Math.random() * 1000),
     title: "",
@@ -25,6 +41,28 @@ export const AddQuizPage: React.FC = () => {
     image: "none",
     questions: [],
   });
+
+  useEffect(() => {
+    if (isFetched && suggestions && pendingQuestion) {
+      setQuiz((prevQuiz) => ({
+        ...prevQuiz,
+        questions: prevQuiz.questions.map((q) =>
+          q.id === pendingQuestion.id
+            ? {
+                ...q,
+                correctAnswer: suggestions.correctAnswerSuggestions[0] || "",
+                wrongAnswers: [
+                  suggestions.wrongAnswerSuggestions[0] || "",
+                  suggestions.wrongAnswerSuggestions[1] || "",
+                  suggestions.wrongAnswerSuggestions[2] || "",
+                ],
+              }
+            : q
+        ),
+      }));
+      setPendingQuestion(null);
+    }
+  }, [suggestions, isFetched, pendingQuestion]);
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -59,6 +97,20 @@ export const AddQuizPage: React.FC = () => {
       ...prevQuiz,
       questions: [...prevQuiz.questions, newQuestion],
     }));
+  };
+
+  const handleAutoFill = (questionId: number) => {
+    const question = quiz.questions.find((q) => q.id === questionId);
+    if (!question?.word) return;
+
+    setShowMagicEffect(questionId);
+    setTimeout(() => setShowMagicEffect(null), 1500);
+
+    setPendingQuestion({
+      id: questionId,
+      word: question.word,
+      questionType: question.questionType,
+    });
   };
 
   const updateQuestion = (
@@ -180,21 +232,36 @@ export const AddQuizPage: React.FC = () => {
               <h3 className="text-xl font-semibold text-purple-800">
                 Question {index + 1}
               </h3>
-              <select
-                className="px-3 py-1 text-purple-800 bg-purple-100 rounded-md outline-none"
-                value={question.questionType}
-                onChange={(e) =>
-                  updateQuestion(
-                    question.id ?? 0,
-                    "questionType",
-                    e.target.value as QuestionType
-                  )
-                }
-              >
-                <option value="english_to_turkish">Eng -&gt; Tr</option>
-                <option value="turkish_to_english">Tr -&gt; Eng</option>
-                <option value="english_to_sense">Meaning</option>
-              </select>
+              <div className="flex items-center gap-2">
+                {question.word && (
+                  <button
+                    onClick={() => handleAutoFill(question.id as number)}
+                    className="flex items-center gap-2 px-3 py-1 transition-all rounded-md text-emerald-800 bg-emerald-100 hover:bg-emerald-200"
+                  >
+                    {showMagicEffect === question.id ? (
+                      <IconSparkles className="animate-spin" size={20} />
+                    ) : (
+                      <IconWand size={20} />
+                    )}
+                    Auto-fill Answers
+                  </button>
+                )}
+                <select
+                  className="px-3 py-1.5 text-purple-800 bg-purple-100 rounded-md outline-none cursor-pointer hover:bg-purple-200 transition-all"
+                  value={question.questionType}
+                  onChange={(e) =>
+                    updateQuestion(
+                      question.id as number,
+                      "questionType",
+                      e.target.value as QuestionType
+                    )
+                  }
+                >
+                  <option value="english_to_turkish">Eng -&gt; Tr</option>
+                  <option value="turkish_to_english">Tr -&gt; Eng</option>
+                  <option value="english_to_sense">Meaning</option>
+                </select>
+              </div>
             </div>
 
             <QuestionInputWithTemplate
