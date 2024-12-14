@@ -188,11 +188,13 @@ export const AddQuizPage: React.FC = () => {
           </div>
         </div>
 
+        { !quizId && 
         <h2 className="mb-4 text-2xl font-semibold text-purple-800">
           Questions
         </h2>
+        }
 
-        {quiz.questions.map((question, index) => (
+        {!quizId && quiz.questions.map((question, index) => (
           <div
             key={question.id}
             className="p-6 mb-6 bg-white rounded-lg shadow-md"
