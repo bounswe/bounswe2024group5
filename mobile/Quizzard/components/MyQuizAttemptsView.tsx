@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import FontAwesomeIcon from "react-native-vector-icons/FontAwesome";
 import { Ionicons } from "@expo/vector-icons";
 
-const MyQuizAttemptsView = ({ quizHistory, navigation }) => {
+const MyQuizAttemptsView = ({ quizHistory, navigation, hideCompleted }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
 
@@ -21,6 +21,13 @@ const MyQuizAttemptsView = ({ quizHistory, navigation }) => {
     if (selectedQuiz) {
       navigation.navigate("QuizWelcome", { quiz: selectedQuiz });
     }
+  };
+
+  const filterQuizzes = (quizzes) => {
+    if (hideCompleted) {
+      return quizzes.filter((quiz) => quiz.status !== "Completed");
+    }
+    return quizzes;
   };
 
   return (
@@ -64,7 +71,7 @@ const MyQuizAttemptsView = ({ quizHistory, navigation }) => {
 
       {/* Quiz List */}
       {quizHistory && quizHistory.length > 0 ? (
-        quizHistory.map((quiz) => (
+        filterQuizzes(quizHistory).map((quiz) => (
           <TouchableOpacity
             key={quiz.attemptId}
             style={styles.card}
@@ -225,6 +232,25 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     color: "white",
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: 10,
+  },
+  hideCompletedButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: "#059669",
+  },
+  hideCompletedText: {
+    fontSize: 12,
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 
