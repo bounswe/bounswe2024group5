@@ -1,4 +1,3 @@
-// QuizSolvingScreen.tsx
 import React, {
   useState,
   useContext,
@@ -16,13 +15,14 @@ import {
   ScrollView,
   ActivityIndicator,
   FlatList,
+  Image,
 } from "react-native";
 import QuizHeader from "../components/QuizSolveQuizHeader";
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from "../app/HostContext";
 import { Post, Reply } from "../types/forum";
-import { Ionicons } from "@expo/vector-icons"; // Add missing import
-import { Question } from "../database/types"; // Add proper type import
+import { Ionicons } from "@expo/vector-icons";
+import { Question } from "../database/types";
 
 // Add missing type for route params
 interface RouteParams {
@@ -206,6 +206,9 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [postReplies, setPostReplies] = useState<Reply[]>([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [hintImages, setHintImages] = useState<string[]>([]);
+  const [isHintModalVisible, setIsHintModalVisible] = useState(false);
+  const [isLoadingHintImages, setIsLoadingHintImages] = useState(false);
 
   const initializeQuiz = async () => {
     console.log("### Initializing quiz:", quiz.id);
@@ -289,6 +292,31 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     console.log(`### QuizSolvingScreen: quiz ID: ${quiz.id}`);
     initializeQuiz();
   }, [quiz.id, hostUrl, token]);
+
+
+  const fetchHintImages = useCallback(async (word: string) => {
+    setIsLoadingHintImages(true);
+    try {
+      const response = await fetch(`${hostUrl}/api/hint?word=${encodeURIComponent(word)}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        const images = await response.json();
+        setHintImages(images);
+      } else {
+        Alert.alert("Error", "Failed to fetch hint images");
+      }
+    } catch (error) {
+      console.error("Error fetching hint images:", error);
+      Alert.alert("Error", "Failed to load hint images");
+    } finally {
+      setIsLoadingHintImages(false);
+      setIsHintModalVisible(true);
+    }
+  }, [hostUrl, token]);
 
   const handleAnswer = async (answer) => {
     if (alreadyFinished) return;
@@ -457,42 +485,46 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <QuizHeader
-        quizName={quiz.title}
-        questionIndex={questionIndex}
-        totalQuestions={questions.length}
-      />
-      <View style={styles.roundQuestionContainer}>
-        <Text style={styles.questionText}>
-          {generateQuestionSentence(question)}
-        </Text>
-        {shuffledAnswers.map((answer, index) => {
-          let backgroundColor;
-          if (!isQuestionAnswered[questionIndex]) {
-            backgroundColor = "#ddd6fe"; // Match the background color
-          } else {
-            if (answer === question.correctAnswer) {
-              backgroundColor = "green"; // Correct answer
-            } else if (answer === selectedAnswers[questionIndex]) {
-              backgroundColor = "red"; // Selected answer
+    return (
+      <View style={styles.container}>
+        <QuizHeader
+          quizName={quiz.title}
+          questionIndex={questionIndex}
+          totalQuestions={questions.length}
+        />
+        <View style={styles.roundQuestionContainer}>
+          <Text style={styles.questionText}>
+            {generateQuestionSentence(question)}
+          </Text>
+          {shuffledAnswers.map((answer, index) => {
+            let backgroundColor;
+            if (!isQuestionAnswered[questionIndex]) {
+              backgroundColor = "#ddd6fe";
             } else {
-              backgroundColor = "#ddd6fe"; // Match the background color
+              if (answer === question.correctAnswer) {
+                backgroundColor = "green";
+              } else if (answer === selectedAnswers[questionIndex]) {
+                backgroundColor = "red";
+              } else {
+                backgroundColor = "#ddd6fe";
+              }
             }
-          }
-
-          return (
-            <TouchableOpacity
-              key={index}
-              style={[styles.button, { backgroundColor }]}
-              onPress={() => handleAnswer(answer)}
-            >
-              <Text style={styles.buttonText}>{answer}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+  
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[styles.button, { backgroundColor }]}
+                onPress={() => handleAnswer(answer)}
+              >
+                <Text style={styles.buttonText}>{answer}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+  
+        
+    
+        
       {/* Container for Next Button */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.nextButton} onPress={handlePrevious}>
@@ -518,16 +550,67 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         )}
       </View>
-      <TouchableOpacity
-        style={styles.forumButton}
-        onPress={() => {
-          fetchRelatedPosts(question.word);
-          setForumModalVisible(true);
-        }}
-      >
-        <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
-        <Text style={styles.forumButtonText}>See Related Posts</Text>
-      </TouchableOpacity>
+      {/* Container for Hint and Related Posts Buttons */}
+      <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={styles.hintButton}
+            onPress={() => fetchHintImages(question.word)}
+          >
+            <Ionicons name="help-circle-outline" size={20} color="#6a0dad" />
+            <Text style={styles.hintButtonText}>Hint</Text>
+          </TouchableOpacity>
+          {/* Hint Images Modal */}
+        <Modal
+          visible={isHintModalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setIsHintModalVisible(false)}
+        >
+          <View style={styles.hintModalContainer}>
+            <View style={styles.hintModalContent}>
+              <View style={styles.hintModalHeader}>
+                <Text style={styles.hintModalTitle}>Hints for '{question.word}'</Text>
+                <TouchableOpacity 
+                  style={styles.closeButton} 
+                  onPress={() => setIsHintModalVisible(false)}
+                >
+                  <Ionicons name="close" size={24} color="#1a1a1a" />
+                </TouchableOpacity>
+              </View>
+    
+              {isLoadingHintImages ? (
+                <ActivityIndicator size="large" color="#6a0dad" />
+              ) : (
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.hintImagesContainer}
+                >
+                  {hintImages.map((imageUrl, index) => (
+                    <Image
+                      key={index}
+                      source={{ uri: imageUrl }}
+                      style={styles.hintImage}
+                      resizeMode="cover"
+                    />
+                  ))}
+                </ScrollView>
+              )}
+            </View>
+          </View>
+        </Modal>
+    
+          <TouchableOpacity
+            style={styles.forumButton}
+            onPress={() => {
+              fetchRelatedPosts(question.word);
+              setForumModalVisible(true);
+            }}
+          >
+            <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
+            <Text style={styles.forumButtonText}>See Related Posts</Text>
+          </TouchableOpacity>
+        </View>
       <ForumModal
         visible={forumModalVisible}
         onClose={() => {
@@ -781,6 +864,72 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 8,
+  },
+  hintButton: {
+    backgroundColor: "#f8f9fa",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#6a0dad",
+  },
+  hintButtonText: {
+    color: "#6a0dad",
+    fontWeight: "600",
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  hintModalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  hintModalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 20,
+    width: "90%",
+    maxHeight: "70%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  hintModalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  hintModalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+  },
+  hintImagesContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  hintImage: {
+    width: 250,
+    height: 250,
+    borderRadius: 10,
+    marginHorizontal: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
   },
 });
 
