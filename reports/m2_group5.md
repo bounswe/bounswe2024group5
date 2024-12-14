@@ -550,7 +550,7 @@ As per the feedback we've received in the milestone 1, we've decided to add imag
   - **POST `/api/file/upload`**: Uploads the file to the Google Cloud Bucket
   ```typescript
   mutationFn: async (file: File) => {
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 			const formData = new FormData();
 			formData.append('file', file);
 
@@ -846,7 +846,7 @@ I integrated forum related API endpoints to the forum page. Two important one ar
 - **GET `/api/posts/{postId}/relatedPosts`**:
 ```typescript
 export const useFetchRelatedPosts = (postId: number | null) => {
-    const TOKEN = sessionStorage.getItem('token');
+    const TOKEN = localStorage.getItem('token');
     const hostUrl = useContext(HostContext);
 
     return useQuery({
@@ -906,7 +906,7 @@ export const useFetchRelatedPosts = (postId: number | null) => {
 ```typescript
 
 export const useFetchPosts = (params?: { username?: string; tag?: string }) => {
-    const TOKEN = sessionStorage.getItem('token');
+    const TOKEN = localStorage.getItem('token');
     const hostUrl = useContext(HostContext);
 
     return useQuery({

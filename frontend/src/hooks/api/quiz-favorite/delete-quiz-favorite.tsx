@@ -12,7 +12,7 @@ export const useDeleteQuizFavorite = () => {
                 return -1;
             }
 
-            const TOKEN = sessionStorage.getItem('token');
+            const TOKEN = localStorage.getItem('token');
             const response = await fetch(`${hostUrl}/api/favorite-quiz/${quizId}`, {
                 method: 'DELETE',
                 headers: {

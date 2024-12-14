@@ -24,7 +24,7 @@ import { PostDetailsPage } from "./pages/post-details-page";
 import ProfilePage from "./pages/profile-page";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -32,8 +32,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
+
+  const hostUrl = (import.meta.env.VITE_HOST_URL) || "34.55.188.177";
+  console.log(hostUrl);
+
   return (
-    <HostContext.Provider value="http://34.55.188.177">
+
+    <HostContext.Provider value={`http://${hostUrl}:80`}>
       <Router>
         <Routes>
           <Route path="signup" element={<SignUpPage />} />

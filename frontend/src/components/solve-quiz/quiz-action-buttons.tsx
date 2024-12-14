@@ -26,7 +26,9 @@ export const QuizActionButtons = ({
   const isThisQuestionAnswered = answers[currentQuestion] !== undefined;
 
   const currentWord = questions[currentQuestion].word;
-  const { data: hintImages, isLoading: isLoadingHints } = useHint(currentWord);
+
+  const hintWord = questions[currentQuestion].questionType === "turkish_to_english"? questions[currentQuestion].correctAnswer : questions[currentQuestion].word; 
+  const { data: hintImages, isLoading: isLoadingHints } = useHint(hintWord);
 
   const isLastQuestion = currentQuestion === questions.length - 1;
   const isFirstQuestion = currentQuestion === 0;

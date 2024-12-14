@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ForumReply } from "../../types/forum-post";
 
 export const useFetchReplies = (postId: number | null) => {
-    const TOKEN = sessionStorage.getItem('token');
+    const TOKEN = localStorage.getItem('token');
     const hostUrl = useContext(HostContext);
 
     return useQuery({
@@ -13,9 +13,9 @@ export const useFetchReplies = (postId: number | null) => {
             if (postId === null) return null;
             const response = await fetch(`${hostUrl}/api/posts/${postId}/replies`, {
                 headers: {
-					'Authorization': `Bearer ${TOKEN}`,
-					'Content-Type': 'application/json'
-				}
+                    'Authorization': `Bearer ${TOKEN}`,
+                    'Content-Type': 'application/json'
+                }
             });
             if (!response.ok) {
                 throw new Error('Failed to fetch replies!');

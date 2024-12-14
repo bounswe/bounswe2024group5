@@ -32,8 +32,8 @@ export const LoginPage = () => {
         return response.json();
       })
       .then((response) => {
-        sessionStorage.setItem("token", response.token);
-        sessionStorage.setItem('username', username);
+        localStorage.setItem("token", response.token);
+        localStorage.setItem('username', username);
         navigate("/quizzes");
       })
       .catch((error) => {

@@ -8,7 +8,7 @@ type QuizResponse = {
 };
 
 export const useGetQuiz = (id: number) => {
-	const TOKEN = sessionStorage.getItem('token');
+	const TOKEN = localStorage.getItem('token');
 	const hostUrl = useContext(HostContext);
 
 	return useQuery({

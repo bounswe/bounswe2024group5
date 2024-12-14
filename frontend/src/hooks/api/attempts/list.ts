@@ -22,7 +22,7 @@ export const useQuizAttempts = (filters?: { isCompleted?: boolean; quizId?: numb
 	return useQuery({
 		queryKey: ['quiz-attempts', filters],
 		queryFn: async () => {
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 			const params = new URLSearchParams();
 
 			if (filters?.isCompleted !== undefined) {

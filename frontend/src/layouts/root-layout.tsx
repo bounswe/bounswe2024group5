@@ -54,7 +54,7 @@ const NavBar = () => {
         <Link
           to="/login"
           onClick={() => {
-            sessionStorage.removeItem("token");
+            localStorage.removeItem("token");
           }}
         >
           <IconLogout size={32} className="cursor-pointer text-violet-700" />

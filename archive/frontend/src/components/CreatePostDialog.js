@@ -56,7 +56,7 @@ function CreatePostDialog({ isOpen, setIsOpen, addPost }) {
             tags: tags,
         }
 
-        const token = sessionStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
         console.log("Posting with, ", token);
 

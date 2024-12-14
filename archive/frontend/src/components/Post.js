@@ -46,7 +46,7 @@ function Post({postData}) {
     }
 
     const handleDelete = () => {
-        const token = sessionStorage.getItem("token");
+        const token = localStorage.getItem("token");
         fetch(`${hostURL}/api/posts/${postData.id}`, {
             method: "DELETE",
             headers: {
