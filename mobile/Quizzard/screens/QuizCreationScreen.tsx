@@ -137,7 +137,6 @@ const QuizCreationPage = ({ navigation }) => {
     }
 
     const formattedQuestions = questions.map((question) => ({
-      id: Math.floor(Math.random() * 1000),
       questionType: question.questionType,
       word: question.word,
       correctAnswer: question.options.A,
@@ -149,7 +148,6 @@ const QuizCreationPage = ({ navigation }) => {
     }));
 
     const quizData = {
-      id: Math.floor(Math.random() * 1000),
       title: quizTitle,
       description: quizDescription,
       // difficulty: 1,
