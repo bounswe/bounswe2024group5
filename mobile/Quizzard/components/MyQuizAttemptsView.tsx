@@ -80,7 +80,11 @@ const MyQuizAttemptsView = ({ quizHistory, navigation, hideCompleted }) => {
             <View style={styles.cardHeader}>
               <Text style={styles.itemTitle}>{quiz.title}</Text>
               <Text style={styles.scoreText}>
-                {quiz.score !== null ? `+${quiz.score} pts` : ""}
+                {quiz.score !== null
+                  ? quiz.score > 0
+                    ? `+${quiz.score} pts`
+                    : `${quiz.score} pts`
+                  : ""}
               </Text>
             </View>
             <View style={styles.cardDetails}>
