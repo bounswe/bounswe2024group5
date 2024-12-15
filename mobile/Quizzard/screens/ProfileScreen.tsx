@@ -37,7 +37,7 @@ interface Post {
 const ProfileScreen = ({ route, navigation }) => {
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, ""); // Remove trailing slash
   const authContext = useAuth(); // Get the authentication context
-  const {token, username} = authContext; // Destructure token and username
+  const { token, username } = authContext; // Destructure token and username
   const usernameToDisplay = route.params?.username;
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -60,15 +60,20 @@ const ProfileScreen = ({ route, navigation }) => {
   const fetchUserProfile = async () => {
     setLoading(true); // Ensure loading indicator shows during fetch
     try {
-      console.log(`Fetching profile from: ${hostUrl}/api/profile/${usernameToDisplay}`);
+      console.log(
+        `Fetching profile from: ${hostUrl}/api/profile/${usernameToDisplay}`
+      );
 
-      const response = await fetch(`${hostUrl}/api/profile/${usernameToDisplay}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${hostUrl}/api/profile/${usernameToDisplay}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const contentType = response.headers.get("Content-Type");
       const status = response.status;
@@ -308,44 +313,28 @@ const ProfileScreen = ({ route, navigation }) => {
 
   // Handler to delete a quiz
   const handleDeleteQuiz = async (quizId) => {
-    Alert.alert("Delete Quiz", "Are you sure you want to delete this quiz?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            const response = await fetch(
-              `${hostUrl}/api/quizzes/${quizId}`, // Ensure correct path
-              {
-                method: "DELETE",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-            if (response.status === 204) {
-              Alert.alert("Success", "Quiz deleted successfully!");
-              // Refresh the profile to reflect the deleted quiz
-              if (showMyQuizzes) {
-                if (!usernameToDisplay) {
-                  await fetchUserProfile();
-                }
-                fetchMyQuizzes();
-              }
-            } else {
-              const error = await response.json();
-              Alert.alert("Error", error.message || "Failed to delete quiz.");
-              console.error("Delete Quiz Error:", error);
-            }
-          } catch (error) {
-            Alert.alert("Error", "Could not delete quiz.");
-            console.error(`Error deleting quiz with ID ${quizId}:`, error);
-          }
+    try {
+      const response = await fetch(`${hostUrl}/api/quizzes/${quizId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-      },
-    ]);
+      });
+      if (response.status === 204) {
+        if (showMyQuizzes) {
+          if (!usernameToDisplay) {
+            await fetchUserProfile();
+          }
+          fetchMyQuizzes();
+        }
+      } else {
+        const error = await response.json();
+        console.error("Delete Quiz Error:", error);
+      }
+    } catch (error) {
+      console.error(`Error deleting quiz with ID ${quizId}:`, error);
+    }
   };
 
   // Handlers to toggle visibility of sections
@@ -397,7 +386,9 @@ const ProfileScreen = ({ route, navigation }) => {
 
         // Fetch followers and following
         const followersResponse = await fetch(
-          `${hostUrl}/api/profile/${usernameToDisplay || usernameToDisplay}/followers`,
+          `${hostUrl}/api/profile/${
+            usernameToDisplay || usernameToDisplay
+          }/followers`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -405,7 +396,9 @@ const ProfileScreen = ({ route, navigation }) => {
           }
         );
         const followingResponse = await fetch(
-          `${hostUrl}/api/profile/${usernameToDisplay || usernameToDisplay}/following`,
+          `${hostUrl}/api/profile/${
+            usernameToDisplay || usernameToDisplay
+          }/following`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -421,7 +414,9 @@ const ProfileScreen = ({ route, navigation }) => {
 
           // Check if current user is following this profile
           if (!isOwn) {
-            setIsFollowing(followersData.some((f) => f.username === usernameToDisplay));
+            setIsFollowing(
+              followersData.some((f) => f.username === usernameToDisplay)
+            );
           }
         }
       } catch (error) {
@@ -521,7 +516,8 @@ const ProfileScreen = ({ route, navigation }) => {
           <View style={styles.headerInfo}>
             <Text style={styles.name}>{name}</Text>
             <Text style={styles.subheading}>
-              <AntDesignIcon name="user" size={16} color="gray" /> @{usernameToDisplay}
+              <AntDesignIcon name="user" size={16} color="gray" /> @
+              {usernameToDisplay}
             </Text>
 
             <View style={styles.statistics}>
@@ -551,7 +547,9 @@ const ProfileScreen = ({ route, navigation }) => {
             <TouchableOpacity
               style={styles.settingsButton}
               onPress={() =>
-                navigation.navigate("ProfileSettings", { username: usernameToDisplay })
+                navigation.navigate("ProfileSettings", {
+                  username: usernameToDisplay,
+                })
               }
             >
               <FontAwesomeIcon
@@ -577,11 +575,11 @@ const ProfileScreen = ({ route, navigation }) => {
         </View>
 
         {/* My Quizzes Section */}
-          <Pressable
-            style={styles.sectionButton}
-            onPress={() => handleMyQuizzes()}
-          >
-        <View style={styles.sectionHeader}>
+        <Pressable
+          style={styles.sectionButton}
+          onPress={() => handleMyQuizzes()}
+        >
+          <View style={styles.sectionHeader}>
             <Ionicons
               name={showMyQuizzes ? "chevron-up" : "chevron-down"}
               size={24}
@@ -590,16 +588,16 @@ const ProfileScreen = ({ route, navigation }) => {
             <Text style={styles.sectionTitle}>
               {isOwnProfile ? " My Quizzes" : ` ${usernameToDisplay}'s Quizzes`}
             </Text>
-        </View>
-            {showMyQuizzes ? (
-              <MyQuizzesView
-                createdQuizzes={createdQuizzes}
-                onDelete={isOwnProfile ? handleDeleteQuiz : undefined}
-                navigation={navigation}
-                deleteFunctionality={isOwnProfile ? true : false}
-              />
-            ) : null}
-          </Pressable>
+          </View>
+          {showMyQuizzes ? (
+            <MyQuizzesView
+              createdQuizzes={createdQuizzes}
+              onDelete={isOwnProfile ? handleDeleteQuiz : undefined}
+              navigation={navigation}
+              deleteFunctionality={isOwnProfile ? true : false}
+            />
+          ) : null}
+        </Pressable>
 
         {/* My Posts Section */}
         <View>
@@ -607,68 +605,68 @@ const ProfileScreen = ({ route, navigation }) => {
             style={styles.sectionButton}
             onPress={() => handleMyPosts()}
           >
-          <View style={styles.sectionHeader}>
-            <Ionicons
-              name={showMyPosts ? "chevron-up" : "chevron-down"}
-              size={24}
-              color="#4C1D95"
-            />
-             <Text style={styles.sectionTitle}>
-              {isOwnProfile ? " My Posts" : ` ${usernameToDisplay}'s Posts`}
-            </Text>
-          </View>
-            {showMyPosts ? (
-              <MyPostsView myPosts={posts} navigation={navigation} />
-            ) : null}
-          </Pressable>
-          </View>
-
-        {/* Quiz Attempts Section */}
-        {isOwnProfile ? ( 
-        <View>
-        <Pressable
-          style={styles.sectionButton}
-          onPress={() => handleMyQuizAttempts()}
-        >
-          <View style={styles.sectionTitleRow}>
             <View style={styles.sectionHeader}>
               <Ionicons
-                name={showMyQuizAttempts ? "chevron-up" : "chevron-down"}
+                name={showMyPosts ? "chevron-up" : "chevron-down"}
                 size={24}
                 color="#4C1D95"
               />
               <Text style={styles.sectionTitle}>
-                {isOwnProfile ? " My Quiz Attempts" : ` ${usernameToDisplay}'s Quiz Attempts`}
+                {isOwnProfile ? " My Posts" : ` ${usernameToDisplay}'s Posts`}
               </Text>
             </View>
-            {showMyQuizAttempts && (
-              <TouchableOpacity
-                style={styles.hideCompletedButton}
-                onPress={() => setHideCompleted(!hideCompleted)}
-              >
-                <Ionicons
-                  name={hideCompleted ? "eye-off" : "eye"}
-                  size={16}
-                  color="#fff"
-                />
-                <Text style={styles.hideCompletedText}>
-                  {hideCompleted ? "Show Completed" : "Hide Completed"}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          {showMyQuizAttempts && (
-            <MyQuizAttemptsView
-              quizHistory={quizAttempts}
-              navigation={navigation}
-              hideCompleted={hideCompleted}
-            />
-          )}
-        </Pressable>
-      </View>
-        )
-      : null}
+            {showMyPosts ? (
+              <MyPostsView myPosts={posts} navigation={navigation} />
+            ) : null}
+          </Pressable>
+        </View>
 
+        {/* Quiz Attempts Section */}
+        {isOwnProfile ? (
+          <View>
+            <Pressable
+              style={styles.sectionButton}
+              onPress={() => handleMyQuizAttempts()}
+            >
+              <View style={styles.sectionTitleRow}>
+                <View style={styles.sectionHeader}>
+                  <Ionicons
+                    name={showMyQuizAttempts ? "chevron-up" : "chevron-down"}
+                    size={24}
+                    color="#4C1D95"
+                  />
+                  <Text style={styles.sectionTitle}>
+                    {isOwnProfile
+                      ? " My Quiz Attempts"
+                      : ` ${usernameToDisplay}'s Quiz Attempts`}
+                  </Text>
+                </View>
+                {showMyQuizAttempts && (
+                  <TouchableOpacity
+                    style={styles.hideCompletedButton}
+                    onPress={() => setHideCompleted(!hideCompleted)}
+                  >
+                    <Ionicons
+                      name={hideCompleted ? "eye-off" : "eye"}
+                      size={16}
+                      color="#fff"
+                    />
+                    <Text style={styles.hideCompletedText}>
+                      {hideCompleted ? "Show" : "Hide"}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              {showMyQuizAttempts && (
+                <MyQuizAttemptsView
+                  quizHistory={quizAttempts}
+                  navigation={navigation}
+                  hideCompleted={hideCompleted}
+                />
+              )}
+            </Pressable>
+          </View>
+        ) : null}
       </ScrollView>
     </BaseLayout>
   );
