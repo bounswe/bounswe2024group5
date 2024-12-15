@@ -187,7 +187,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const { quiz, questions } = route.params as RouteParams; // Access the passed data
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<(string | null)[]>([]);
-  const [quizQuestions, setQuestions] = useState<Question[]>([]);
   const [isQuestionAnswered, setIsQuestionAnswered] = useState(
     questions.map(() => false)
   );
@@ -244,7 +243,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       const quizData = await quizResponse.json();
       const questions = quizData.quiz.questions;
 
-      setQuestions(questions);
       setIsQuestionAnswered(new Array(questions.length).fill(false));
       setSelectedAnswers(new Array(questions.length).fill(null));
 
@@ -485,6 +483,35 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     }
   };
 
+  const addToFavorites = async () => {
+    const questionId = questions[questionIndex].id;
+
+    try {
+      const response = await fetch(`${hostUrl}/api/favorite-question`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ questionId })
+      });
+
+      if (response.status === 201) {
+      } else if (response.status === 400) {
+        Alert.alert('Info', 'This question is already in your favorites.');
+      } else if (response.status === 404) {
+        Alert.alert('Error', 'Question not found.');
+      } else {
+        Alert.alert('Error', 'Failed to add question to favorites.');
+      }
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      Alert.alert('Error', 'Failed to add question to favorites.');
+    } finally {
+    }
+  };
+
+
   return (
     <View style={styles.container}>
       <QuizHeader
@@ -492,6 +519,25 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         questionIndex={questionIndex}
         totalQuestions={questions.length}
       />
+      <View style={styles.heartContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              addToFavorites();
+              console.log('Favorite clicked');
+            }}
+          >
+            <View style={styles.heartButtonContent}>
+              <Text style={styles.heartButtonText}>Add To Favorite Questions</Text>
+              <Ionicons
+                name="heart-outline"
+                size={24}
+                color="#6a0dad"
+                style={styles.heartIcon}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+
       <View style={styles.roundQuestionContainer}>
         <Text style={styles.questionText}>
           {generateQuestionSentence(question)}
@@ -531,6 +577,8 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           {/* Replace text with right-pointing arrow icon */}
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
+
+
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           {/* Replace text with right-pointing arrow icon */}
@@ -577,6 +625,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
                   <Ionicons name="close" size={24} color="#1a1a1a" />
                 </TouchableOpacity>
               </View>
+
 
               <View style={styles.disclaimerContainer}>
                 <Text style={styles.disclaimerText}>
@@ -970,13 +1019,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  heartContainer: {
+    backgroundColor: '#f5f3ff', // Light purple background
+    padding: 10,
+    borderRadius: 12,
+    marginVertical: 10,
+    marginHorizontal: 15,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  heartButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heartButtonText: {
+    color: '#6a0dad',
+    fontSize: 16,
+    marginRight: 8,
+  },
+  heartIcon: {
+    marginLeft: 4,
+  },
+
   noHintText: {
     fontSize: 16,
     color: '#6c757d',
     textAlign: 'center',
     marginTop: 10,
   }
-
 });
 
 export default QuizSolvingScreen;
