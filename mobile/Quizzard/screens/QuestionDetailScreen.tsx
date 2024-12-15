@@ -15,9 +15,8 @@ import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../app/index";
 import HostUrlContext from "../app/HostContext";
 import { useAuth } from "./AuthProvider";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ForumQuestion, ForumReply } from "../database/types";
-
+import QuestionItem from "../components/QuestionItem";
 
 type QuestionDetailScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -33,6 +32,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { questionId } = route.params;
   const [question, setQuestion] = useState<ForumQuestion | null>(null);
   const [repliesData, setRepliesData] = useState<ForumReply[]>([]);
+  const [relatedPostsData, setRelatedPostsData] = useState<ForumQuestion[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [newReply, setNewReply] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -42,7 +42,8 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   // const token = authContext ? authContext.token : null;
   const { token, username } = authContext;  // Now you can destructure both token and username
   const [isUpvoted, setIsUpvoted] = useState(false);
-  const [showReplies, setShowReplies] = useState(true);
+  const [showReplies, setShowReplies] = useState(false);
+  const [showRelatedPosts, setShowRelatedPosts] = useState(false);
 
   // Fetch question details and replies
   useEffect(() => {
@@ -113,6 +114,35 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         } else {
           throw new Error("Failed to fetch replies");
         }
+
+        // Fetch related posts
+        const relatedPostsResponse = await fetch(
+          `${hostUrl}/api/posts/${questionId}/related?page=1&size=3`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (relatedPostsResponse.ok) {
+          const relatedPosts: ForumQuestion[] = await relatedPostsResponse.json();
+          relatedPosts.forEach((reply) => {
+            reply.createdAt = new Date(reply.createdAt).toLocaleString("en-US", {
+              year: "numeric",
+              month: "numeric",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            reply.content = reply.content;
+          });
+          setRelatedPostsData(relatedPosts);
+        } else {
+          throw new Error("Failed to fetch related posts.");
+        }
+
+
       } catch (error) {
         console.error("Error fetching data:", error);
         Alert.alert("Error", "Failed to fetch data. Please try again.");
@@ -127,6 +157,10 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const handleToggleReplies = () => {
     setShowReplies(!showReplies);
   };
+
+  const handleToggleRelatedPosts = () => {
+    setShowRelatedPosts(!showRelatedPosts);
+  }
 
   const handleUpvote = async () => {
 
@@ -234,7 +268,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6d28d9" />
+        <ActivityIndicator size="large" color="#2e1065" />
       </View>
     );
   }
@@ -266,7 +300,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
         <View style={styles.metadata}>
           <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: question.username })}>
-            <Text style={styles.replyUsername}>@{question.username}:</Text>
+            <Text style={styles.replyUsername}>@{question.username}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.upvoteContainer}
@@ -323,6 +357,44 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
       )}
       </Pressable>
+
+      {/* Collapsible Related Posts Section */}
+      <Pressable
+        style={[styles.repliesSectionButton, showRelatedPosts ? styles.repliesSectionExpanded : {}]}
+        onPress={handleToggleRelatedPosts}
+      >
+        <View style={styles.repliesSectionHeader}>
+          <Ionicons
+            name={showRelatedPosts ? "chevron-up" : "chevron-down"}
+            size={20}
+            color="#2e1065"
+          />
+          <Text style={styles.repliesHeader}>Related Posts </Text>
+        </View>
+
+        {showRelatedPosts && (
+          <View>
+            {relatedPostsData.map((item) => (
+              <QuestionItem
+                key={item.id}
+                question={item}
+                onPress={() =>
+                  navigation.navigate('QuestionDetail', {
+                    questionId: item.id,
+                    title: item.title,
+                    content: item.content,
+                    username: item.username,
+                    noUpvote: item.noUpvote,
+                    createdAt: item.createdAt
+                  })
+                }
+              />
+            ))}
+          </View>
+        )}
+       
+      </Pressable>
+
 
       {/* Reply Input */}
       <View style={styles.replyInputContainer}>
@@ -394,11 +466,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
   },
-  username: {
-    fontSize: 12,
-    color: "#6d28d9",
-    fontWeight: "bold",
-  },
   upvoteContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -406,7 +473,7 @@ const styles = StyleSheet.create({
   upvoteText: {
     marginLeft: 4,
     fontSize: 14,
-    color: "#6d28d9",
+    color: "#2e1065",
   },
   tagsContainer: {
     flexDirection: "row",
@@ -423,7 +490,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    color: "#6d28d9",
+    color: "#2e1065",
   },
   footer: {
     flexDirection: "row",
@@ -452,7 +519,7 @@ const styles = StyleSheet.create({
   },
   replyUsername: {
     fontWeight: "bold",
-    color: "#6d28d9",
+    color: "#2e1065",
     marginBottom: 4,
   },
   replyText: {
@@ -490,7 +557,7 @@ const styles = StyleSheet.create({
   repliesSectionButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#f3e8ff',
+    backgroundColor: '#faf5ff',
     marginBottom: 4,
     borderRadius: 8,
     padding: 16,
@@ -504,6 +571,9 @@ const styles = StyleSheet.create({
   },
   repliesSectionExpanded: {
     marginBottom: 0,
+  },
+  questionList: {
+    flex: 1,
   },
 });
 
