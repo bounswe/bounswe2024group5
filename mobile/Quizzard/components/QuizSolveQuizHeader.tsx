@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
     },
     headerBox: {
-        backgroundColor: '#d3d3d3', // Light grey background color
+        backgroundColor: '#ede9fe', // Light pruple background color
         paddingVertical: 10,
         paddingHorizontal: 15,
         borderRadius: 10, // Rounded corners
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     quizName: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#6a0dad', // Purple text
+        color: '#4c1d95', // Purple text
     },
     questionCountText: {
         fontSize: 18,

@@ -21,7 +21,7 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
-  const { login, token } = useAuth();
+  const { login, saveUsername, token} = useAuth();
 
   const fetchUserProfile = async (token) => {
     try {
@@ -93,6 +93,7 @@ const LoginScreen = ({ navigation }) => {
           email: registeredUser.email,
           profile: userProfile,
         };
+        saveUsername(user.username);
         console.log("Logged in user:", user);
         navigation.navigate("Home", { registeredUser: user });
       } else {
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#6a0dad",
+    color: "#6d28d9",
     textAlign: "center",
     marginBottom: 24,
   },
@@ -175,15 +176,15 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#6a0dad",
+    borderColor: "#6d28d9",
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
     backgroundColor: "#fff",
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   loginButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,

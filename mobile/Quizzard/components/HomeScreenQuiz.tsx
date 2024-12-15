@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     paddingHorizontal: 5,
     paddingVertical: 2,
-    borderRadius: 5,
+    borderRadius: 12,
     fontSize: 16,
     fontWeight: "bold",
   },
