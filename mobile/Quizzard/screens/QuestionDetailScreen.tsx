@@ -372,7 +372,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
               <View key={reply.id} style={styles.replyContainer}>
                 <TouchableOpacity
                   onPress={() =>
-                    navigation.navigate("OtherUserProfileScreen", {
+                    navigation.navigate("Profile", {
                       username: reply.username,
                     })
                   }
