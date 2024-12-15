@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useContext } from "react";
 import HostContext from "../../../HostContext";
+import { QuestionFavoriteResponse } from "./post-question-favorite";
 
 export const useDeleteQuestionFavorite = () => {
     const queryClient = useQueryClient();
@@ -28,7 +29,7 @@ export const useDeleteQuestionFavorite = () => {
         },
         onSuccess: (questionId: number) => {
             queryClient.invalidateQueries({ queryKey: ['question-favorites'] });
-            queryClient.setQueryData<number[]>(['question-favorites'], (old) => old?.filter(id => id !== questionId));
+            queryClient.setQueryData<QuestionFavoriteResponse[]>(['question-favorites'], (old) => old?.filter(questionFavorite => questionFavorite.questionId !== questionId));
         }
     });
 }
