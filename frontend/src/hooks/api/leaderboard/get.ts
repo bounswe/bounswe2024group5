@@ -24,7 +24,7 @@ export type LeaderboardData = {
 	};
 }
 export const useLeaderboard = () => {
-	const TOKEN = sessionStorage.getItem('token');
+	const TOKEN = localStorage.getItem('token');
 	const hostUrl = useContext(HostContext);
 
 	return useQuery({
