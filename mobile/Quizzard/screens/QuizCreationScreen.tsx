@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import * as FileSystem from "expo-file-system"; // Import FileSystem for base64 
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from "../app/HostContext";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const QuizCreationPage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
@@ -28,9 +29,94 @@ const QuizCreationPage = ({ navigation }) => {
   const [uploading, setUploading] = useState(false);
   const [image, setMedia] = useState<string | null>(null);
   const authContext = useAuth();
+  const [favoritedQuestions, setFavoritedQuestions] = useState([]);
+  const [favoritedQuestionsIndex, setFavoritedQuestionsIndex] = useState(0);
   const token = authContext ? authContext.token : null;
 
   // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready
+  
+  // Add shuffle utility function 
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const shuffled = [...array]; // Create copy
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // Swap
+  }
+  return shuffled;
+};
+
+  useEffect(() => {
+    // This code runs when component mounts
+    const getFavoritedQuestions = async () => {
+      try {
+        if (!token) return; // Exit if no auth token
+  
+        const response = await fetch(`${hostUrl}/api/favorite-question`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to fetch favorited questions');
+        }
+  
+        // we shuffle to make the list random at the beginning
+        const data = shuffleArray(await response.json());
+        console.log(data);
+        setFavoritedQuestions(data);
+        
+      } catch (error) {
+        console.error('Error fetching favorited questions:', error);
+      }
+    };
+  
+    getFavoritedQuestions();
+  }, [token, hostUrl]); // Re-run if token or hostUrl changes
+
+  // Add favorited question from the favorited queestion index
+  const addRandomQuestion = async () => {
+    try {
+      if (!token) {
+        console.log("No token available");
+        return;
+      }
+  
+      const questionId = 3;
+      console.log("Fetching question ID:", questionId);
+  
+      try {
+        const response = await fetch(`${hostUrl}/api/questions/${questionId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+  
+        console.log("Response status:", response.status);
+        
+        if (!response.ok) {
+          console.error("Response not OK:", response.status, response.statusText);
+          const errorText = await response.text();
+          console.error("Error details:", errorText);
+          throw new Error(`API call failed: ${response.status} ${response.statusText}`);
+        }
+  
+        const questionData = await response.json();
+        console.log("Question data received:", questionData);
+  
+        // Rest of the code...
+      } catch (fetchError) {
+        console.error("Network or parsing error:", fetchError);
+        Alert.alert("Error", "Failed to fetch question data");
+      }
+  
+    } catch (error) {
+      console.error("General error:", error);
+      Alert.alert("Error", "An unexpected error occurred");
+    }
+  };
 
   const uploadFile = async (fileUri: string) => {
     try {
@@ -330,6 +416,7 @@ const QuizCreationPage = ({ navigation }) => {
         </View>
       </View>
 
+
       {/* Title Input */}
       <TextInput
         style={styles.input}
@@ -401,12 +488,23 @@ const QuizCreationPage = ({ navigation }) => {
       ))}
 
       {/* + Question Button */}
-      <TouchableOpacity
-        style={styles.addQuestionButton}
-        onPress={handleAddQuestion}
-      >
-        <Text style={styles.addQuestionButtonText}>+ Question</Text>
-      </TouchableOpacity>
+      {/* Question Buttons Container */}
+<View style={styles.addQuestionButtonsContainer}>
+  <TouchableOpacity
+    style={styles.addQuestionButton}
+    onPress={handleAddQuestion}
+  >
+    <Text style={styles.addQuestionButtonText}>+ Question</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.addQuestionButton}
+    onPress={addRandomQuestion}
+  >
+    <Text style={styles.addQuestionButtonText}>+ Random Favorite Question</Text>
+  </TouchableOpacity>
+</View>
+
 
       {/* Bottom Cancel and Submit Buttons */}
       <View style={styles.bottomButtons}>
@@ -566,6 +664,34 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+  quizFromFavoritesContainer: {
+    backgroundColor: '#f5f3ff', // Light purple background
+    padding: 10,
+    borderRadius: 12,
+    marginVertical: 10,
+    marginHorizontal: 15,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  quizFromFavoritesText: {
+    color: '#6a0dad',
+    fontSize: 16,
+    marginRight: 8,
+  },
+  addQuestionButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    marginVertical: 10,
+  }
 });
 
 export default QuizCreationPage;
