@@ -76,7 +76,7 @@ const SelectedPostView = React.memo<SelectedPostViewProps>(
   ({ post, replies, onBack }) => (
     <ScrollView style={styles.postsList} showsVerticalScrollIndicator={false}>
       <TouchableOpacity onPress={onBack} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={20} color="#6a0dad" />
+        <Ionicons name="arrow-back" size={20} color="#6d28d9" />
         <Text style={styles.backButtonText}>Back to posts</Text>
       </TouchableOpacity>
       <View style={styles.postContainer}>
@@ -144,7 +144,7 @@ const ForumModal = React.memo<{
 
           <View style={styles.modalBody}>
             {isLoadingPosts ? (
-              <ActivityIndicator size="large" color="#6a0dad" />
+              <ActivityIndicator size="large" color="#6d28d9" />
             ) : selectedPost ? (
               <SelectedPostView
                 post={selectedPost}
@@ -308,18 +308,20 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           }
         );
 
-        if (response.ok) {
-          const images = await response.json();
-          setHintImages(images);
-        } else {
-          Alert.alert("Error", "Failed to fetch hint images");
-        }
-      } catch (error) {
-        console.error("Error fetching hint images:", error);
-        Alert.alert("Error", "Failed to load hint images");
-      } finally {
-        setIsLoadingHintImages(false);
-        setIsHintModalVisible(true);
+  const fetchHintImages = useCallback(async (word: string) => {
+    setIsLoadingHintImages(true);
+    try {
+      const response = await fetch(`${hostUrl}/api/hint?word=${encodeURIComponent(word)}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const images = await response.json();
+        setHintImages(images);
+      } else {
+        Alert.alert("Error", "Failed to fetch hint images");
       }
     },
     [hostUrl, token]
@@ -573,9 +575,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           <View style={styles.hintModalContainer}>
             <View style={styles.hintModalContent}>
               <View style={styles.hintModalHeader}>
-                <Text style={styles.hintModalTitle}>
-                  Hints for '{question.word}'
-                </Text>
+                <Text style={styles.hintModalTitle}>Hints for '{question.word}'</Text>
                 <TouchableOpacity
                   style={styles.closeButton}
                   onPress={() => setIsHintModalVisible(false)}
@@ -583,25 +583,40 @@ const QuizSolvingScreen = ({ route, navigation }) => {
                   <Ionicons name="close" size={24} color="#1a1a1a" />
                 </TouchableOpacity>
               </View>
+              <View style={styles.disclaimerContainer}>
+                <Text style={styles.disclaimerText}>
+                  These images are here to help, not to solve the quiz for you. Sometimes they nail it, and other times... well, they might just confuse you. Don't blame us if the hint feels more like a plot twist—trust your brain and keep going! You've got this!
+                </Text>
+              </View>
 
-              {isLoadingHintImages ? (
-                <ActivityIndicator size="large" color="#6a0dad" />
-              ) : (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.hintImagesContainer}
-                >
-                  {hintImages.map((imageUrl, index) => (
-                    <Image
-                      key={index}
-                      source={{ uri: imageUrl }}
-                      style={styles.hintImage}
-                      resizeMode="cover"
-                    />
-                  ))}
-                </ScrollView>
-              )}
+              <View style={styles.hintModalBody}>
+                {isLoadingHintImages ? (
+                  <View style={styles.centerContent}>
+                    <ActivityIndicator size="large" color="#6a0dad" />
+                    <Text style={styles.loadingText}>Loading hints...</Text>
+                  </View>
+                ) : hintImages.length === 0 ? (
+                  <View style={styles.centerContent}>
+                    <Ionicons name="images-outline" size={40} color="#6c757d" />
+                    <Text style={styles.noHintText}>No hint images found for '{question.word}'</Text>
+                  </View>
+                ) : (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.hintImagesContainer}
+                  >
+                    {hintImages.map((imageUrl, index) => (
+                      <Image
+                        key={index}
+                        source={{ uri: imageUrl }}
+                        style={styles.hintImage}
+                        resizeMode="contain"
+                      />
+                    ))}
+                  </ScrollView>
+                )}
+              </View>
             </View>
           </View>
         </Modal>
@@ -700,7 +715,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -720,10 +735,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#6a0dad",
+    borderColor: "#6d28d9",
   },
   forumButtonText: {
-    color: "#6a0dad",
+    color: "#6d28d9",
     fontWeight: "600",
     fontSize: 16,
     marginLeft: 8,
@@ -813,7 +828,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    color: "#6a0dad",
+    color: "#6d28d9",
     marginLeft: 8,
   },
   postContainer: {
@@ -873,6 +888,49 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 8,
   },
+
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  hintModalBody: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#6a0dad',
+  },
+  hintModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 20,
+  },
+  hintModalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    width: '100%',
+    height: '70%', // Fixed height
+  },
+  hintImagesContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+  },
+  hintImage: {
+    width: 280,
+    height: 280,
+    borderRadius: 10,
+    marginHorizontal: 10,
+    backgroundColor: '#f0f0f0', // Debug background
+  },
   hintButton: {
     backgroundColor: "#f8f9fa",
     paddingVertical: 12,
@@ -891,27 +949,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 8,
   },
-  hintModalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  hintModalContent: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 20,
-    width: "90%",
-    maxHeight: "70%",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
   hintModalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -923,22 +960,30 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1a1a1a",
   },
-  hintImagesContainer: {
-    alignItems: "center",
-    justifyContent: "center",
+  disclaimerContainer: {
+    backgroundColor: '#fff3cd',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
   },
-  hintImage: {
-    width: 250,
-    height: 250,
-    borderRadius: 10,
-    marginHorizontal: 10,
+  disclaimerText: {
+    fontSize: 14,
+    color: '#856404',
+    textAlign: 'center',
+    lineHeight: 20,
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  centerContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noHintText: {
+    fontSize: 16,
+    color: '#6c757d',
+    textAlign: 'center',
     marginTop: 10,
-  },
+  }
+
 });
 
 export default QuizSolvingScreen;

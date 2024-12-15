@@ -1,21 +1,25 @@
 // BaseLayout.tsx
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  Modal,
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView,
+  Modal, 
+  TouchableWithoutFeedback 
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRoute } from "@react-navigation/native"; // Import useRoute hook to get the current route
+import { useRoute } from "@react-navigation/native";
+import { useAuth } from "./AuthProvider";
+import { EloCefrInfoTable } from "../components/EloCefrInfoTable";
 
 const BaseLayout = ({ children, navigation }) => {
-  const route = useRoute(); // Get the current route
-
-  // Add state for modal visibility
+  const route = useRoute();
+  const authContext = useAuth(); // Get the authentication context
+  const {token, username} = authContext; 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
 
   const handleLogout = () => {
     setShowLogoutModal(true);
@@ -26,7 +30,11 @@ const BaseLayout = ({ children, navigation }) => {
   };
 
   const navigateToProfile = () => {
-    navigation.navigate("Profile");
+    navigation.navigate("Profile", { username: username });
+  };
+
+  const toggleInfoModal = () => {
+    setIsInfoModalVisible(!isInfoModalVisible);
   };
 
   // Determine which icon should be filled based on the current route
@@ -42,6 +50,12 @@ const BaseLayout = ({ children, navigation }) => {
           <Text style={styles.appName}>Quizzard</Text>
         </TouchableOpacity>
         <View style={styles.icons}>
+          <TouchableOpacity 
+            style={styles.iconButton}
+            onPress={toggleInfoModal}
+          >
+            <Ionicons name="help-circle-outline" size={28} color="black" />
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={navigateToProfile}
@@ -54,7 +68,36 @@ const BaseLayout = ({ children, navigation }) => {
         </View>
       </View>
 
-      {/* Dynamic Content Section - Modified styles */}
+      {/* Information Modal */}
+      <Modal
+        transparent={true}
+        visible={isInfoModalVisible}
+        animationType="fade"
+        onRequestClose={toggleInfoModal}
+      >
+        <TouchableWithoutFeedback onPress={toggleInfoModal}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.infoModalContent}>
+                <TouchableOpacity 
+                  style={styles.closeButton} 
+                  onPress={toggleInfoModal}
+                >
+                  <Ionicons name="close" size={24} color="black" />
+                </TouchableOpacity>
+                <ScrollView 
+                  contentContainerStyle={styles.scrollViewContent}
+                  showsVerticalScrollIndicator={false}
+                >
+                  {EloCefrInfoTable()}
+                </ScrollView>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Dynamic Content Section */}
       <View style={styles.body}>{children}</View>
 
       {/* Bottom Navigation Bar */}
@@ -64,9 +107,9 @@ const BaseLayout = ({ children, navigation }) => {
           onPress={() => navigation.navigate("Home")}
         >
           <Ionicons
-            name={isHome ? "home" : "home-outline"} // Fill the icon if on Home page
+            name={isHome ? "home" : "home-outline"}
             size={24}
-            color="#6a0dad"
+            color="#6d28d9"
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -74,9 +117,9 @@ const BaseLayout = ({ children, navigation }) => {
           onPress={() => navigation.navigate("Forum")}
         >
           <Ionicons
-            name={isForum ? "chatbox" : "chatbox-outline"} // Fill the icon if on Forum page
+            name={isForum ? "chatbox" : "chatbox-outline"}
             size={24}
-            color="#6a0dad"
+            color="#6d28d9"
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -86,7 +129,7 @@ const BaseLayout = ({ children, navigation }) => {
           <Ionicons
             name={isLeaderboard ? "trophy" : "trophy-outline"}
             size={24}
-            color="#6a0dad"
+            color="#6d28d9"
           />
         </TouchableOpacity>
       </View>
@@ -99,7 +142,7 @@ const BaseLayout = ({ children, navigation }) => {
         onRequestClose={() => setShowLogoutModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={styles.logoutModalContent}>
             <Ionicons name="warning" size={50} color="#d97706" />
             <Text style={styles.modalTitle}>Confirm Logout</Text>
             <Text style={styles.modalText}>Are you sure you want to quit?</Text>
@@ -145,7 +188,7 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6a0dad", // Dark purple color for the app name
+    color: "#5b21b6", // Dark purple color for the app name
   },
   icons: {
     flexDirection: "row",
@@ -171,11 +214,26 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  modalContent: {
+  infoModalContent: {
+    width: '80%',
+    backgroundColor: '#ede9fe',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  logoutModalContent: {
     backgroundColor: "white",
     borderRadius: 20,
     padding: 25,
@@ -189,6 +247,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
   modalTitle: {
     fontSize: 20,

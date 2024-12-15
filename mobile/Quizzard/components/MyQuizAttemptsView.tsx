@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#6a0dad",
+    color: "#4c1d95",
     marginLeft: 10,
   },
   cardDetails: {

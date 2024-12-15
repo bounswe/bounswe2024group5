@@ -54,17 +54,20 @@ const QuizWelcomePage = ({ route, navigation }) => {
             <View style={styles.separator} />
             <View style={styles.detailRow}>
               <Text style={styles.detailsLabel}>Created by:</Text>
-              <Text style={styles.detailsValue}>{quiz.username}</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Profile', { username: quiz.username })}>
+                <Text style={styles.detailsValue}>@{quiz.username}</Text>
+              </TouchableOpacity>
             </View>
             <View style={styles.separator} />
             <View style={styles.detailRow}>
               <Text style={styles.detailsLabel}>Created at:</Text>
-              <Text style={styles.detailsValue}>{quiz.createdAt}</Text>
-            </View>
-            <View style={styles.separator} />
-            <View style={styles.detailRow}>
-              <Text style={styles.detailsLabel}>Updated at:</Text>
-              <Text style={styles.detailsValue}>{quiz.updatedAt}</Text>
+              <Text style={styles.detailsValue}>{new Date(quiz.createdAt).toLocaleString("en-US", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}</Text>
             </View>
           </View>
 
@@ -109,7 +112,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   detailsContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f3ff",
     borderRadius: 12,
     padding: 15,
     marginBottom: 30,
@@ -132,6 +135,7 @@ const styles = StyleSheet.create({
   detailsValue: {
     fontSize: 14,
     color: "#777",
+    fontWeight: "bold",
   },
   separator: {
     height: 1,

@@ -10,7 +10,7 @@ import {
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const MyQuizzesView = ({ createdQuizzes, onDelete, navigation }) => {
+const MyQuizzesView = ({ createdQuizzes, onDelete, navigation, deleteFunctionality = true }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [quizToDelete, setQuizToDelete] = useState(null);
 
@@ -52,17 +52,18 @@ const MyQuizzesView = ({ createdQuizzes, onDelete, navigation }) => {
               {/* Favorites and Delete Container */}
               <View style={styles.cardFooter}>
                 <Text style={styles.itemDetail}>
-                  <AntDesignIcon name="like2" size={12} color="#e13528" />{" "}
-                  {quiz.noFavorites}
+                  <AntDesignIcon name="like2" size={12} color="#e13528" />{" "} {quiz.noFavorites}
                 </Text>
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={() => handleDelete(quiz.id)}
-                >
-                  <Text style={styles.deletebuttonText}>
-                    <AntDesignIcon name="delete" size={12} />
-                  </Text>
-                </TouchableOpacity>
+                {deleteFunctionality && (
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDelete(quiz.id)}
+                  >
+                    <Text style={styles.deletebuttonText}>
+                      <AntDesignIcon name="delete" size={12} />
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </TouchableOpacity>
           ))}

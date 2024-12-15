@@ -22,7 +22,7 @@ export const FeaturedQuizCard = ({ quiz }: { quiz: Quiz }) => {
   const { mutateAsync: postQuizFavorite } = usePostQuizFavorite();
   const { mutateAsync: deleteQuizFavorite } = useDeleteQuizFavorite();
 
-  const isCurrentQuizFavorite = favoriteQuizzes?.filter(favoriteQuizzes => favoriteQuizzes?.quiz?.id === quiz.id).length == 1;
+  const isCurrentQuizFavorite = favoriteQuizzes?.filter(favoriteQuizzes => favoriteQuizzes?.quizId === quiz.id).length == 1;
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.preventDefault();

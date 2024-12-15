@@ -51,6 +51,7 @@ const QuizCreationPage = ({ navigation }) => {
   const [showAnswerSuggestions, setShowAnswerSuggestions] = useState(false);
   const [isLoadingAnswerSuggestions, setIsLoadingAnswerSuggestions] = useState(false);
   const [activeWordSuggestionIndex, setActiveWordSuggestionIndex] = useState<number | null>(null);
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState<number | null>(null);
 
   // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready
 
@@ -137,7 +138,6 @@ const QuizCreationPage = ({ navigation }) => {
     }
 
     const formattedQuestions = questions.map((question) => ({
-      id: Math.floor(Math.random() * 1000),
       questionType: question.questionType,
       word: question.word,
       correctAnswer: question.options.A,
@@ -149,7 +149,6 @@ const QuizCreationPage = ({ navigation }) => {
     }));
 
     const quizData = {
-      id: Math.floor(Math.random() * 1000),
       title: quizTitle,
       description: quizDescription,
       // difficulty: 1,
@@ -255,6 +254,7 @@ const QuizCreationPage = ({ navigation }) => {
   };
 
   const handleInputChange = (index: number, word: string) => {
+    setActiveQuestionIndex(index); // Add this line
     if (!questions[index].questionType) {
       Alert.alert("Select Type", "Please select a type first.");
       return;
@@ -380,176 +380,182 @@ const QuizCreationPage = ({ navigation }) => {
   };
 
   return (
-    <ScrollView 
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-    >
-      {/* Header Section */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Text style={styles.appName}>Quizzard</Text>
-        </TouchableOpacity>
-        <View style={styles.icons}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="person-outline" size={24} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <Ionicons name="log-out-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Title Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Untitled Quiz"
-        value={quizTitle}
-        onChangeText={setQuizTitle}
-      />
-
-      {/* Image Upload Box */}
-      <TouchableOpacity
-        style={styles.imageUploadBox}
-        onPress={pickImageAndUpload}
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
       >
-        {imageUrl ? (
-          <Image
-            source={{ uri: imageUrl }}
-            style={{
-              width: '100%',
-              height: '100%',
-              borderRadius: 10
-            }}
-            resizeMode="cover"
-          />
-        ) : (
-          <Text style={styles.imageUploadText}>
-            + Upload Image
-          </Text>
-        )}
-      </TouchableOpacity>
-
-      {/* Description Input */}
-      <TextInput
-        style={styles.descriptionInput}
-        placeholder="Enter quiz description..."
-        value={quizDescription}
-        onChangeText={setQuizDescription}
-        multiline
-      />
-
-      {/* Render all question boxes */}
-      {questions.map((question, index) => (
-        <View key={index} style={styles.questionBox}>
-          {/* Existing header container */}
-          <View style={styles.headerContainer}>
-            <TextInput
-              style={styles.questionTitle}
-              placeholder="Enter a word"
-              value={question.word}
-              onChangeText={(word) => handleInputChange(index, word)}
-            />
-            {/* Loading indicator for suggestions */}
-            {isLoadingWordSuggestions && (
-              <ActivityIndicator
-                size="small"
-                color="#6a0dad"
-                style={styles.suggestionLoadingIndicator}
-              />
-            )}
-            <View style={styles.dropdownContainer}>
-              <DropdownComponent
-                testID="question-type-dropdown"
-                selectedValue={questions[index].questionType}
-                onValueChange={(type) => updateQuestionType(index, type)}
-              />
-            </View>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+            <Text style={styles.appName}>Quizzard</Text>
+          </TouchableOpacity>
+          <View style={styles.icons}>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="person-outline" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => navigation.navigate("Login")}
+            >
+              <Ionicons name="log-out-outline" size={24} color="black" />
+            </TouchableOpacity>
           </View>
-
-          {/* Word Suggestions Dropdown */}
-          {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
-            <View style={styles.wordSuggestionsContainer}>
-              <FlatList
-                data={question.wordSuggestions}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.wordSuggestionItem}
-                    onPress={() => handleWordSuggestionSelect(index, item)}
-                  >
-                    <Text>{item}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          )}
-
-          {/* Answer Choices */}
-          {["A", "B", "C", "D"].map((option) => (
-            <View key={option}>
-              <TextInput
-                style={styles.choiceInput}
-                placeholder={`Choice ${option}`}
-                value={question.options[option]}
-                editable={option === 'A'}
-                onChangeText={(text) => {
-                  if (option === 'A') {
-                    updateQuestion(index, option, text);
-                    // Trigger answer suggestions only for option A
-                    fetchAnswerSuggestions(index, questions[index])
-                  }
-                }}
-              />
-
-              {/* Answer Suggestions Dropdown - Only for Option A */}
-              {option === 'A' &&
-                question.showAnswerSuggestions &&
-                question.answerSuggestions.length > 0 && (
-                  <View style={styles.answerSuggestionsContainer}>
-                    <FlatList
-                      data={question.answerSuggestions}
-                      keyExtractor={(item) => item}
-                      renderItem={({ item }) => (
-                        <TouchableOpacity
-                          style={styles.answerSuggestionItem}
-                          onPress={() => handleAnswerSuggestionSelect(index, item)}
-                        >
-                          <Text>{item}</Text>
-                        </TouchableOpacity>
-                      )}
-                    />
-                  </View>
-                )}
-            </View>
-          ))}
         </View>
-      ))}
 
+        {/* Title Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Untitled Quiz"
+          value={quizTitle}
+          onChangeText={setQuizTitle}
+        />
 
-      {/* + Question Button */}
-      <TouchableOpacity
-        style={styles.addQuestionButton}
-        onPress={handleAddQuestion}
-      >
-        <Text style={styles.addQuestionButtonText}>+ Question</Text>
-      </TouchableOpacity>
-
-      {/* Bottom Cancel and Submit Buttons */}
-      <View style={styles.bottomButtons}>
+        {/* Image Upload Box */}
         <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
+          style={styles.imageUploadBox}
+          onPress={pickImageAndUpload}
         >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+          {imageUrl ? (
+            <Image
+              source={{ uri: imageUrl }}
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: 10
+              }}
+              resizeMode="cover"
+            />
+          ) : (
+            <Text style={styles.imageUploadText}>
+              + Upload Image
+            </Text>
+          )}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.submitButton} onPress={submitQuiz}>
-          <Text style={styles.submitButtonText}>Submit</Text>
+
+        {/* Description Input */}
+        <TextInput
+          style={styles.descriptionInput}
+          placeholder="Enter quiz description..."
+          value={quizDescription}
+          onChangeText={setQuizDescription}
+          multiline
+        />
+
+        {/* Render all question boxes */}
+        {questions.map((question, index) => (
+          <View
+            key={index}
+            style={[
+              styles.questionBox,
+              { zIndex: questions.length - index } // Higher index = lower in the stack
+            ]}
+          >
+            {/* Existing header container */}
+            <View style={styles.headerContainer}>
+              <TextInput
+                style={styles.questionTitle}
+                placeholder="Enter a word"
+                value={question.word}
+                onChangeText={(word) => handleInputChange(index, word)}
+              />
+              {/* Loading indicator for suggestions */}
+              {isLoadingWordSuggestions && (
+                <ActivityIndicator
+                  size="small"
+                  color="#6a0dad"
+                  style={styles.suggestionLoadingIndicator}
+                />
+              )}
+              <View style={styles.dropdownContainer}>
+                <DropdownComponent
+                  testID="question-type-dropdown"
+                  selectedValue={questions[index].questionType}
+                  onValueChange={(type) => updateQuestionType(index, type)}
+                />
+              </View>
+            </View>
+
+            {/* Word Suggestions Dropdown */}
+            {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
+              <View style={[styles.suggestionsOverlay, { top: 60 }]}>
+                <ScrollView>
+                  {question.wordSuggestions.map((item, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={styles.suggestionItem}
+                      onPress={() => handleWordSuggestionSelect(index, item)}
+                    >
+                      <Text style={styles.suggestionText}>{item}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+
+            {/* Answer Choices */}
+            {["A", "B", "C", "D"].map((option) => (
+              <View key={option}>
+                <TextInput
+                  style={styles.choiceInput}
+                  placeholder={`Choice ${option}`}
+                  value={question.options[option]}
+                  editable={option === 'A'}
+                  onChangeText={(text) => {
+                    if (option === 'A') {
+                      updateQuestion(index, option, text);
+                      // Trigger answer suggestions only for option A
+                      fetchAnswerSuggestions(index, questions[index])
+                    }
+                  }}
+                />
+
+                {/* Answer Suggestions Dropdown */}
+                {option === 'A' &&
+                  question.showAnswerSuggestions &&
+                  question.answerSuggestions.length > 0 && (
+                    <View style={[styles.suggestionsOverlay, { top: 40 }]}>
+                      <ScrollView>
+                        {question.answerSuggestions.map((item, i) => (
+                          <TouchableOpacity
+                            key={i}
+                            style={styles.suggestionItem}
+                            onPress={() => handleAnswerSuggestionSelect(index, item)}
+                          >
+                            <Text style={styles.suggestionText}>{item}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+              </View>
+            ))}
+          </View>
+        ))}
+
+
+        {/* + Question Button */}
+        <TouchableOpacity
+          style={styles.addQuestionButton}
+          onPress={handleAddQuestion}
+        >
+          <Text style={styles.addQuestionButtonText}>+ Question</Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+
+        {/* Bottom Cancel and Submit Buttons */}
+        <View style={styles.bottomButtons}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.submitButton} onPress={submitQuiz}>
+            <Text style={styles.submitButtonText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -585,7 +591,7 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6a0dad", // Dark purple color for the app name
+    color: "#6d28d9", // Dark purple color for the app name
   },
   icons: {
     flexDirection: "row",
@@ -638,7 +644,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 3,
   },
   headerContainer: {
     flexDirection: "row",
@@ -669,19 +674,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   addQuestionButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     alignItems: "center",
     marginBottom: 20,
+    zIndex: 0, // Changed from 1 to 0
+    elevation: 0, // Changed from 1 to 0
   },
-  addQuestionButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  
+
   contentContainer: {
     paddingBottom: 100, // Add extra padding to the bottom of the scrollable content
   },
@@ -696,7 +698,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    zIndex: 10, // Ensure buttons are above other content
+    zIndex: 999999, // Lower than suggestions
+    elevation: 999999,
   },
   cancelButton: {
     backgroundColor: "#ccc",
@@ -711,7 +714,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -734,6 +737,33 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+  },
+  suggestionsOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    maxHeight: 200,
+    zIndex: 9999999, // Increased to be higher than everything
+    elevation: 9999999, // Match zIndex for Android
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+
+  suggestionItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+
+  suggestionText: {
+    fontSize: 14,
+    color: '#333',
   },
 });
 

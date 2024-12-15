@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     width: 50,
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   username: {
     flex: 1,
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   score: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   categoryContainer: {
     flexDirection: "row",

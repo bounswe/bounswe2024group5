@@ -16,17 +16,9 @@ import QuizViewComponent from "../components/QuizViewComponent";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
-import HostUrlContext from "../app/HostContext";
+import HostUrlContext from '../app/HostContext';
 import Ionicons from "react-native-vector-icons/Ionicons";
-
-const calculateQuizDifficultyFromElo = (elo: number) => {
-  if (elo < 400) return "A1";
-  else if (elo < 1000) return "A2";
-  else if (elo < 1800) return "B1";
-  else if (elo < 2600) return "B2";
-  else if (elo < 3300) return "C1";
-  else return "C2";
-};
+import { calculateQuizDifficultyFromElo } from "../components/EloCefrInfoTable";
 
 const HomePage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
@@ -275,7 +267,7 @@ const HomePage = ({ navigation }) => {
     return (
       <BaseLayout navigation={navigation}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6a0dad" />
+          <ActivityIndicator size="large" color="#6d28d9" />
           <Text style={styles.loadingText}>Loading quizzes...</Text>
         </View>
       </BaseLayout>
@@ -427,10 +419,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#8b5cf6",
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 5,
+    borderRadius: 12,
     flexShrink: 0,
     width: "30%",
   },
@@ -489,7 +481,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   noQuizzesText: {
     textAlign: "center",
@@ -567,7 +559,7 @@ const styles = StyleSheet.create({
   modalButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 12,
     minWidth: 100,
     alignItems: "center",
   },
