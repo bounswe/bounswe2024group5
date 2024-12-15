@@ -38,7 +38,9 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
   const authContext = useAuth();
-  const token = authContext ? authContext.token : null;
+  // const token = authContext ? authContext.token : null;
+  const { token, username } = authContext;  // Now you can destructure both token and username
+  const [isUpvoted, setIsUpvoted] = useState(false);
 
   // Fetch question details and replies
   useEffect(() => {
@@ -67,6 +69,22 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         } else {
           throw new Error("Failed to fetch question");
         }
+
+        // Fetch upvote status:
+        const upvoteResponse = await fetch(`${hostUrl}/api/posts/${questionId}/upvotes?username=${username}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!upvoteResponse.ok) {
+          console.error(`Failed to fetch upvotes: ${upvoteResponse.status} - ${upvoteResponse.statusText}`);
+          throw new Error('Failed to fetch upvotes');
+        }
+
+        const upvoteData = await upvoteResponse.json();
+        setIsUpvoted(upvoteData.length > 0);
 
         // Fetch replies
         const repliesResponse = await fetch(
@@ -102,67 +120,64 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     };
 
     fetchData();
-  }, [hostUrl, token, questionId]);
+  }, [hostUrl, token, questionId, isUpvoted]);
 
   const handleUpvote = async () => {
 
-    if(!question) {
+    if (!question) {
       console.log(`Question not set..`);
       return;
     }
-    return;
+    try {
+      if (isUpvoted) {
+        // If already upvoted, remove upvote
+          const response = await fetch(`${hostUrl}/api/posts/${questionId}/upvote`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the headers
+            },
+          });
 
-    // TODO: Implement next!!
-    if (question.hasUpvoted) {
-      // If already upvoted, remove upvote
-      try {
-        const response = await fetch(`${hostUrl}/api/posts/${questionId}/upvote`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the headers
-          },
-        });
-
-        if (response.status === 204) {
-          // Successfully removed upvote
-        } else if (response.status === 401) {
-          Alert.alert("Unauthorized", "Please log in to remove upvote.");
-        } else {
-          const errorData = await response.json();
-          Alert.alert("Error", errorData.message || "Failed to remove upvote.");
-        }
-      } catch (error) {
-        console.error("Error removing upvote:", error);
-        Alert.alert("Error", "Failed to remove upvote.");
-      }
-    } else {
-      // If not upvoted, add upvote
-      try {
-        const response = await fetch(`${hostUrl}/api/posts/${questionId}/upvote`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the headers
-          },
-        });
-        console.log(response);
-        if (response.status === 200) {
-          const data = await response.json();
-          console.log("Upvote response data:", data);
-          // Assuming the response contains the updated upvote count
-          const updatedUpvotes = data.noUpvote || question.noUpvote + 1;
-
-          //TODO: Add to upvotedPostIds
-          // setUpvotedPostIds((prev) => new Set(prev).add(postId));
-        } else if (response.status === 401) {
-          Alert.alert("Unauthorized", "Please log in to upvote.");
-        } else {
-          const errorData = await response.json();
-          Alert.alert("Error", errorData.message || "Failed to upvote.");
-        }
-      } catch (error) {
-        console.error("Error upvoting post:", error);
-        Alert.alert("Error", "Failed to upvote the post.");
-      }
+          if (response.status === 204) {
+            // Successfully removed upvote
+            // setQuestion(prev => ({
+            //   ...prev!,
+            //   noUpvote: prev!.noUpvote - 1,
+            // }));
+            setIsUpvoted(!isUpvoted);
+          } else if (response.status === 401) {
+            Alert.alert("Unauthorized", "Please log in to remove upvote.");
+          } else {
+            const errorData = await response.json();
+            Alert.alert("Error", errorData.message || "Failed to remove upvote.");
+          }
+      } else {
+        // If not upvoted, add upvote
+          const response = await fetch(`${hostUrl}/api/posts/${questionId}/upvote`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the headers
+            },
+          });
+          // console.log(response);
+          if (response.ok) {
+            const data = await response.json();
+            // setQuestion(prev => ({
+            //   ...prev!,
+            //   noUpvote: data.upvotes || prev!.noUpvote + 1,
+            // }));
+            console.log("Upvote response data:", data);
+            setIsUpvoted(!isUpvoted);
+          } else if (response.status === 401) {
+            Alert.alert("Unauthorized", "Please log in to upvote.");
+          } else {
+            const errorData = await response.json();
+            Alert.alert("Error", errorData.message || "Failed to upvote.");
+          }
+    } 
+    } catch (error) {
+      console.error("Error handling upvote:", error);
+      Alert.alert("Error", "Failed to update upvote. Please try again.");
     }
   };
 
@@ -191,12 +206,12 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       if (response.ok) {
         const newReplyData: ForumReply = await response.json();
         newReplyData.createdAt = new Date(newReplyData.createdAt).toLocaleString("en-US", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          });
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
         setRepliesData((prev) => [...prev, newReplyData]);
         setNewReply("");
       } else {
@@ -213,7 +228,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6a0dad" />
+        <ActivityIndicator size="large" color="#6d28d9" />
       </View>
     );
   }
@@ -244,16 +259,18 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         </Text>
 
         <View style={styles.metadata}>
-          <Text style={styles.username}>@{question.username}</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: question.username })}>
+            <Text style={styles.replyUsername}>@{question.username}:</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.upvoteContainer}
             onPress={handleUpvote}
             activeOpacity={0.7}
           >
             <Ionicons
-              name={question.hasUpvoted ? "heart" : "heart-outline"}
+              name={isUpvoted ? "heart" : "heart-outline"}
               size={20}
-              color={question.hasUpvoted ? "#e0245e" : "#6a0dad"}
+              color={isUpvoted ? "#e0245e" : "#6a0dad"}
             />
             <Text style={styles.upvoteText}>{question.noUpvote}</Text>
           </TouchableOpacity>
@@ -279,7 +296,9 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       <Text style={styles.repliesHeader}>Replies</Text>
       {repliesData.map((reply) => (
         <View key={reply.id} style={styles.replyContainer}>
-          <Text style={styles.replyUsername}>@{reply.username}:</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: reply.username })}>
+            <Text style={styles.replyUsername}>@{reply.username}:</Text>
+          </TouchableOpacity>
           <Text style={styles.replyText}>{reply.content}</Text>
           <Text style={styles.replyDate}>{reply.createdAt}</Text>
         </View>
@@ -357,7 +376,7 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 12,
-    color: "#6a0dad",
+    color: "#6d28d9",
     fontWeight: "bold",
   },
   upvoteContainer: {
@@ -367,7 +386,7 @@ const styles = StyleSheet.create({
   upvoteText: {
     marginLeft: 4,
     fontSize: 14,
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   tagsContainer: {
     flexDirection: "row",
@@ -384,7 +403,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   footer: {
     flexDirection: "row",
@@ -412,7 +431,7 @@ const styles = StyleSheet.create({
   },
   replyUsername: {
     fontWeight: "bold",
-    color: "#6a0dad",
+    color: "#6d28d9",
     marginBottom: 4,
   },
   replyText: {
@@ -435,7 +454,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     borderRadius: 8,
     padding: 12,
     alignItems: "center",

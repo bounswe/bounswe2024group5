@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { QuizAttempt } from "../hooks/api/attempts/list";
-import {Modal} from "antd";
+import { Modal } from "antd";
 import { motion } from "framer-motion";
 import { OptionButton } from "../components/solve-quiz/option";
 import Confetti from "react-confetti";
@@ -18,7 +18,7 @@ import { useQuestionAnswers } from "../hooks/api/questions-answers/list";
 import { QuizResult } from "../components/solve-quiz/quiz-result";
 import { useUpdateQuizAttempt } from "../hooks/api/attempts/update";
 import { ForumForQuizSolvePage } from "../components/solve-quiz/forum-integration";
-import { IconHeart,  IconInfoCircleFilled } from "@tabler/icons-react";
+import { IconHeart, IconInfoCircleFilled } from "@tabler/icons-react";
 import { usePostQuestionFavorite } from "../hooks/api/question-favorite/post-question-favorite";
 import { useFetchQuestionFavorites } from "../hooks/api/question-favorite/get-question-favorite";
 import { useDeleteQuestionFavorite } from "../hooks/api/question-favorite/delete-question-favorite";
@@ -58,9 +58,9 @@ export const SolveQuizPage = () => {
       isCompleted: false,
     });
 
-    const { data: attempts } = useQuizAttempts({
-      quizId: quizIdAsNumber,
-    });
+  const { data: attempts } = useQuizAttempts({
+    quizId: quizIdAsNumber,
+  });
 
   const { mutateAsync: updateQuizAttempt } = useUpdateQuizAttempt(
     quizAttempt?.id ?? -1
@@ -73,19 +73,41 @@ export const SolveQuizPage = () => {
   const { mutateAsync: deleteQuestionFavorite } = useDeleteQuestionFavorite();
   const { data: favoriteQuestions } = useFetchQuestionFavorites();
 
+  const resetQuizState = () => {
+    setShowCompletedWarning(false);
+    setIsNewCompletion(false);
+    setCurrentQuestion(0);
+    setLastSolvedQuestion(-1);
+    setSelectedAnswer(undefined);
+    setIsQuizFinished(false);
+    setConfettiEnabled(false);
+    setShowResult(false);
+    setScore(0);
+    setAnswers([]);
+    setQuizAttempt(null);
+  };
+
+  useEffect(() => {
+    resetQuizState();
+  }, [quizId]);
   const quiz = quizzes?.find((q) => q.id?.toString() === quizId);
 
-  const isCurrentQuestionFavorite = favoriteQuestions?.filter(favoriteQuestion => favoriteQuestion?.question?.id === quiz?.questions[currentQuestion].id).length === 1;
+  const isCurrentQuestionFavorite =
+    favoriteQuestions?.filter(
+      (favoriteQuestion) =>
+        favoriteQuestion?.question?.id === quiz?.questions[currentQuestion].id
+    ).length === 1;
 
   useEffect(() => {
     const initializeQuizAttempt = async () => {
       // Don't do anything if we already have a quiz attempt
       if (quizAttempt) return;
 
+      resetQuizState();
+
       // Check for existing incomplete attempts first
       if (!isLoadingAttempts && existingAttempts?.length) {
         setQuizAttempt(existingAttempts[0]);
-        console.log(quizAttempt);
         return;
       }
 
@@ -114,7 +136,9 @@ export const SolveQuizPage = () => {
   useEffect(() => {
     const checkQuizCompletion = () => {
       if (attempts?.length && !isNewCompletion) {
-        const hasCompletedAttempt = attempts.some((attempt) => attempt.completed);
+        const hasCompletedAttempt = attempts.some(
+          (attempt) => attempt.completed
+        );
         if (hasCompletedAttempt) {
           setShowCompletedWarning(true);
         }
@@ -220,7 +244,7 @@ export const SolveQuizPage = () => {
   };
 
   const handleCancel = () => {
-    navigate('/'); // Navigate to main page
+    navigate("/"); // Navigate to main page
   };
 
   const handleNavigateToQuestion = (questionIndex: number) => {
@@ -272,11 +296,11 @@ export const SolveQuizPage = () => {
     } else {
       deleteQuestionFavorite(quiz.questions[currentQuestion].id);
     }
-  }
+  };
 
   return (
     <>
-    <Modal
+      <Modal
         open={showCompletedWarning}
         closable={false}
         footer={null}
@@ -287,15 +311,20 @@ export const SolveQuizPage = () => {
       >
         <div className="flex flex-col items-center py-4">
           <div className="flex items-center justify-center w-12 h-12 mb-4 rounded-full bg-emerald-600">
-            <IconInfoCircleFilled size={60} stroke={1} className="text-emerald-100" />
+            <IconInfoCircleFilled
+              size={60}
+              stroke={1}
+              className="text-emerald-100"
+            />
           </div>
-          
+
           <h3 className="mb-2 text-xl font-semibold">Already Completed</h3>
-          
+
           <p className="mb-6 text-center text-gray-600">
-            You've already completed this quiz. You won't receive additional points, but you can practice again!
+            You've already completed this quiz. You won't receive additional
+            points, but you can practice again!
           </p>
-          
+
           <div className="flex justify-center w-full gap-3">
             <button
               onClick={handleCancel}
@@ -330,9 +359,16 @@ export const SolveQuizPage = () => {
               transition={{ duration: 0.5 }}
               className="relative flex-grow p-6 mr-4 rounded-xl bg-violet-50"
             >
-
-              <div onClick={handleQuestionLike} className="absolute flex items-center justify-center w-12 h-12 bg-red-200 rounded-full shadow-md cursor-pointer right-2 -top-8">
-                 <IconHeart size={32} stroke={1} color="red" fill={isCurrentQuestionFavorite ? "red" : "none"}/>
+              <div
+                onClick={handleQuestionLike}
+                className="absolute flex items-center justify-center w-12 h-12 bg-red-200 rounded-full shadow-md cursor-pointer right-2 -top-8"
+              >
+                <IconHeart
+                  size={32}
+                  stroke={1}
+                  color="red"
+                  fill={isCurrentQuestionFavorite ? "red" : "none"}
+                />
               </div>
 
               <ProgressBar

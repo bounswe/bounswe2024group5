@@ -18,7 +18,6 @@ const RegisterScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
-  const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,7 +25,7 @@ const RegisterScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const { login, token } = useAuth();
+  const { login, saveUsername, token} = useAuth();
 
   const showError = (message) => {
     setErrorMessage(message);
@@ -151,7 +150,7 @@ const RegisterScreen = ({ navigation }) => {
           email: registeredUser.email,
           profile: userProfile,
         };
-        setUser(user);
+        saveUsername(user.username);
         console.log("Logged in user:", user);
         navigation.navigate("Home", { registeredUser: user });
 
@@ -277,7 +276,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
     fontSize: 28,
     fontWeight: "bold",
-    color: "#6a0dad",
+    color: "#6d28d9",
     textAlign: "center",
     marginBottom: 24,
   },
@@ -294,28 +293,28 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     borderWidth: 1,
-    borderColor: "#6a0dad",
+    borderColor: "#6d28d9",
     borderRadius: 8,
     marginBottom: 16,
     overflow: "hidden",
   },
   picker: {
     height: 50,
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   input: {
     width: "100%",
     borderWidth: 1,
-    borderColor: "#6a0dad",
+    borderColor: "#6d28d9",
     borderRadius: 8,
     padding: 12,
     margin: 4,
     marginBottom: 16,
     backgroundColor: "#fff",
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   registerButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,

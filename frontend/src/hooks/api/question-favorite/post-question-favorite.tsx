@@ -17,7 +17,7 @@ export const usePostQuestionFavorite = () => {
     return useMutation({
         mutationFn: async ( questionId: number | undefined ) => {
             if (!questionId) return;
-            const TOKEN = sessionStorage.getItem('token');
+            const TOKEN = localStorage.getItem('token');
             const response = await fetch(`${hostUrl}/api/favorite-question`, {
                 method: 'POST',
                 headers: {

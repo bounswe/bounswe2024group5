@@ -8,7 +8,7 @@ export const useUploadFile = () => {
 
 	return useMutation({
 		mutationFn: async (file: File) => {
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 			const formData = new FormData();
 			formData.append('file', file);
 

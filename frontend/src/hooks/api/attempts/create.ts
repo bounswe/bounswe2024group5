@@ -25,7 +25,7 @@ export const useCreateQuizAttempt = () => {
 
 	return useMutation({
 		mutationFn: async (payload: CreateQuizAttemptPayload) => {
-			const TOKEN = sessionStorage.getItem('token');
+			const TOKEN = localStorage.getItem('token');
 			const response = await fetch(`${hostUrl}/api/quiz-attempts`, {
 				method: 'POST',
 				headers: {

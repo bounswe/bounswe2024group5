@@ -10,7 +10,7 @@ interface QuizParams {
 }
 
 export const useFetchQuizzes = (params: QuizParams = {}) => {
-	const TOKEN = sessionStorage.getItem('token');
+	const TOKEN = localStorage.getItem('token');
 	const hostUrl = useContext(HostContext);
 	const { username, minDifficulty, maxDifficulty } = params;
 

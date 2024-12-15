@@ -105,7 +105,7 @@ class FavoriteQuizServiceTest {
         when(userService.getOneUserByUsername("testUser")).thenReturn(mockUser);
         when(favoriteQuizRepository.findAllByUser(mockUser)).thenReturn(List.of(mockFavoriteQuiz));
 
-        List<FavoriteQuiz> favoriteQuizzes = favoriteQuizService.getAllFavoriteQuizzes(jwtToken);
+        List<FavoriteQuizResponse> favoriteQuizzes = favoriteQuizService.getAllFavoriteQuizzes(jwtToken);
 
         assertNotNull(favoriteQuizzes);
         assertEquals(1, favoriteQuizzes.size());

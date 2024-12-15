@@ -5,7 +5,7 @@ import HostContext from '../../HostContext';
 export type HintResponse = string[];
 
 export const useHint = (word: string) => {
-	const TOKEN = sessionStorage.getItem('token');
+	const TOKEN = localStorage.getItem('token');
 	const hostUrl = useContext(HostContext);
 
 	return useQuery({

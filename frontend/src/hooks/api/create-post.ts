@@ -14,25 +14,25 @@ export const useCreatePost = () => {
     const hostUrl = useContext(HostContext)
 
     return useMutation({
-        mutationFn: async ( postPayload: PostPayload ) => {
-            const TOKEN = sessionStorage.getItem('token');
+        mutationFn: async (postPayload: PostPayload) => {
+            const TOKEN = localStorage.getItem('token');
             const response = await fetch(`${hostUrl}/api/posts`, {
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${TOKEN}`,
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(postPayload),
-			});
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${TOKEN}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(postPayload),
+            });
 
-			if (!response.ok) {
-				throw new Error('Failed to create post');
-			}
+            if (!response.ok) {
+                throw new Error('Failed to create post');
+            }
 
-			return response.json();
+            return response.json();
         },
         onSuccess: (newQuiz) => {
-            queryClient.invalidateQueries({ queryKey: ['posts']});
+            queryClient.invalidateQueries({ queryKey: ['posts'] });
             queryClient.setQueryData<ForumPost[]>(['posts'], (old) => [...(old || []), newQuiz])
         }
     })

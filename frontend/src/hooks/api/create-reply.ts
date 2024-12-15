@@ -12,25 +12,25 @@ export const useCreateReply = (postId: number) => {
     const hostUrl = useContext(HostContext)
 
     return useMutation({
-        mutationFn: async ( postPayload: ReplyPayload ) => {
-            const TOKEN = sessionStorage.getItem('token');
+        mutationFn: async (postPayload: ReplyPayload) => {
+            const TOKEN = localStorage.getItem('token');
             const response = await fetch(`${hostUrl}/api/posts/${postId}/replies`, {
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${TOKEN}`,
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(postPayload),
-			});
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${TOKEN}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(postPayload),
+            });
 
-			if (!response.ok) {
-				throw new Error('Failed to send reply.');
-			}
+            if (!response.ok) {
+                throw new Error('Failed to send reply.');
+            }
 
-			return response.json();
+            return response.json();
         },
         onSuccess: (newReply) => {
-            queryClient.invalidateQueries({ queryKey: ['replies']});
+            queryClient.invalidateQueries({ queryKey: ['replies'] });
             queryClient.setQueryData<ForumPost[]>(['replies'], (old) => [...(old || []), newReply])
         }
     })

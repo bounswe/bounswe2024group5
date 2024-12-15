@@ -6,9 +6,9 @@ import {
   IconClock,
   IconHeart,
   IconPhotoOff,
-  IconShare,
   IconUser,
 } from "@tabler/icons-react";
+import { CopyLinkButton } from "../copy-quiz-link-button";
 import { cx } from "class-variance-authority";
 import { IconCircleDashedCheck } from "@tabler/icons-react";
 import { useQuizAttempts } from "../../hooks/api/attempts/list";
@@ -20,7 +20,7 @@ import { useDeleteQuizFavorite } from "../../hooks/api/quiz-favorite/delete-quiz
 
 export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
   
-  
+  const quizUrl = `${window.location.origin}/quiz/${quiz.id}`;
   const { data: favoriteQuizzes } = useFetchQuizFavorites();
   const { mutateAsync: postQuizFavorite } = usePostQuizFavorite();
   const { mutateAsync: deleteQuizFavorite } = useDeleteQuizFavorite();
@@ -137,10 +137,7 @@ export const RegularQuizCard = ({ quiz }: { quiz: Quiz }) => {
             <DifficultyBadge difficulty={quiz.difficulty} />
 
             <div className="flex items-center gap-1">
-              <IconShare
-                className="text-zinc-500 hover:text-zinc-700"
-                size={20}
-              />
+            <CopyLinkButton url={quizUrl} />
               <div className="flex items-center gap-1 text-zinc-500">
                 <IconHeart
                   className={cx("stroke-red-500", {
