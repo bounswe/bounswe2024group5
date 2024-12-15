@@ -22,7 +22,7 @@ export const useGetQuiz = (id?: number) => {
 					difficulty: 1,
 					image: "none",
 					questions: [],
-				  };
+				};
 			};
 
 			if (!TOKEN) {
@@ -46,15 +46,9 @@ export const useGetQuiz = (id?: number) => {
 				throw new Error('Failed to fetch quiz details');
 			}
 
-			// const data = await response.json() as ;
 			const data = (await response.json()) as QuizResponse;
 
-			// Randomize options for each question
-			data.quiz.questions.forEach((question) => {
-				question.options = question.wrongAnswers
-					.concat(question.correctAnswer)
-					.sort(() => Math.random() - 0.5);
-			});
+
 
 			return data.quiz;
 		},
