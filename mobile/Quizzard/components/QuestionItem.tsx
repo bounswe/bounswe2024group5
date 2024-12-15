@@ -10,12 +10,12 @@ type QuestionItemProps = {
   question: {
     id: number;
     title: string;
-    description: string;
+    content: string;
     createdAt: string;
-    commentCount: number;
+    noReplies: number;
     tags: string[];
     username: string;
-    upvotes: number;
+    noUpvote: number;
     hasUpvoted: boolean; // Add hasUpvoted field
   };
   onPress: () => void;
@@ -33,8 +33,8 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Text style={styles.title}>{question.title}</Text>
-      <Text style={styles.description}>
-        {question.description.slice(0, 100)}...
+      <Text style={styles.content}>
+        {question.content.slice(0, 100)}...
       </Text>
 
       <View style={styles.metadata}>
@@ -51,7 +51,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
             size={20}
             color={question.hasUpvoted ? "#e0245e" : "#4c1d95"}
           />
-          <Text style={styles.upvoteText}>{question.upvotes}</Text>
+          <Text style={styles.upvoteText}>{question.noUpvote}</Text>
         </TouchableOpacity>
       </View>
 
@@ -66,7 +66,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
       <View style={styles.footer}>
         <Text style={styles.metadataText}>{question.createdAt}</Text>
         <Text style={styles.metadataText}>
-          {question.commentCount} comments
+          {question.noReplies} comments
         </Text>
       </View>
     </TouchableOpacity>
@@ -80,6 +80,8 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     elevation: 2,
+    borderColor: "#e0e0e0",
+    borderWidth: 1,
   },
   title: {
     fontSize: 18,
@@ -87,7 +89,7 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
   },
-  description: {
+  content: {
     fontSize: 14,
     color: "#666",
     marginBottom: 8,

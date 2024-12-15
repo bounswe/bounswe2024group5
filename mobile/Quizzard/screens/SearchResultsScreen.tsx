@@ -31,12 +31,12 @@ type Props = {
 interface Question {
   id: number;
   title: string;
-  description: string;
+  content: string;
   createdAt: string;
-  commentCount: number;
+  noReplies: number;
   tags: string[];
   username: string;
-  upvotes: number;
+  noUpvote: number;
   hasUpvoted: boolean;
 }
 
@@ -91,7 +91,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
         const formattedData = data.map((item) => ({
           id: item.id,
           title: item.title,
-          description: item.content, // Map 'content' to 'description'
+          content: item.content,
           createdAt: new Date(item.createdAt).toLocaleString("en-US", {
             year: "numeric",
             month: "numeric",
@@ -99,10 +99,10 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
             hour: "2-digit",
             minute: "2-digit",
           }),
-          commentCount: item.noReplies || 0,
+          noReplies: item.noReplies || 0,
           tags: item.tags || [],
           username: item.username || item.user?.username || "Anonymous",
-          upvotes: item.noUpvote || 0,
+          noUpvote: item.noUpvote || 0,
           hasUpvoted: upvotedPostIds.has(item.id),
         }));
 
@@ -164,7 +164,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
             const updatedQuestions = [...questions];
             updatedQuestions[questionIndex] = {
               ...question,
-              upvotes: question.upvotes - 1,
+              noUpvote: question.noUpvote - 1,
               hasUpvoted: false,
             };
     
@@ -195,7 +195,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
             const updatedQuestions = [...questions];
             updatedQuestions[questionIndex] = {
               ...question,
-              upvotes: data.upvotes || question.upvotes + 1,
+              noUpvote: data.noUpvote || question.noUpvote + 1,
               hasUpvoted: true,
             };
             setQuestions(updatedQuestions);
@@ -218,7 +218,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   const navigateToQuestionDetail = (
     questionId: number,
     title: string,
-    description: string,
+    content: string,
     username: string,
     noUpvote: number,
     createdAt: string
@@ -226,7 +226,7 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
     navigation.navigate("QuestionDetail", {
       questionId,
       title,
-      description,
+      content,
       username,
       noUpvote,
       createdAt,
@@ -260,9 +260,9 @@ const SearchResultsScreen: React.FC<Props> = ({ route, navigation }) => {
               navigateToQuestionDetail(
                 item.id,
                 item.title,
-                item.description,
+                item.content,
                 item.username,
-                item.upvotes,
+                item.noUpvote,
                 item.createdAt
               )
             }
