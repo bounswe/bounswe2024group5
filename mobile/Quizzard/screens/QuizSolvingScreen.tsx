@@ -302,7 +302,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (response.ok) {
         const images = await response.json();
         setHintImages(images);
@@ -485,46 +485,46 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     }
   };
 
-    return (
-      <View style={styles.container}>
-        <QuizHeader
-          quizName={quiz.title}
-          questionIndex={questionIndex}
-          totalQuestions={questions.length}
-        />
-        <View style={styles.roundQuestionContainer}>
-          <Text style={styles.questionText}>
-            {generateQuestionSentence(question)}
-          </Text>
-          {shuffledAnswers.map((answer, index) => {
-            let backgroundColor;
-            if (!isQuestionAnswered[questionIndex]) {
-              backgroundColor = "#ddd6fe";
+  return (
+    <View style={styles.container}>
+      <QuizHeader
+        quizName={quiz.title}
+        questionIndex={questionIndex}
+        totalQuestions={questions.length}
+      />
+      <View style={styles.roundQuestionContainer}>
+        <Text style={styles.questionText}>
+          {generateQuestionSentence(question)}
+        </Text>
+        {shuffledAnswers.map((answer, index) => {
+          let backgroundColor;
+          if (!isQuestionAnswered[questionIndex]) {
+            backgroundColor = "#ddd6fe";
+          } else {
+            if (answer === question.correctAnswer) {
+              backgroundColor = "green";
+            } else if (answer === selectedAnswers[questionIndex]) {
+              backgroundColor = "red";
             } else {
-              if (answer === question.correctAnswer) {
-                backgroundColor = "green";
-              } else if (answer === selectedAnswers[questionIndex]) {
-                backgroundColor = "red";
-              } else {
-                backgroundColor = "#ddd6fe";
-              }
+              backgroundColor = "#ddd6fe";
             }
-  
-            return (
-              <TouchableOpacity
-                key={index}
-                style={[styles.button, { backgroundColor }]}
-                onPress={() => handleAnswer(answer)}
-              >
-                <Text style={styles.buttonText}>{answer}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-  
-        
-    
-        
+          }
+
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[styles.button, { backgroundColor }]}
+              onPress={() => handleAnswer(answer)}
+            >
+              <Text style={styles.buttonText}>{answer}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+
+
+
       {/* Container for Next Button */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.nextButton} onPress={handlePrevious}>
@@ -552,14 +552,14 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       </View>
       {/* Container for Hint and Related Posts Buttons */}
       <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.hintButton}
-            onPress={() => fetchHintImages(question.word)}
-          >
-            <Ionicons name="help-circle-outline" size={20} color="#6a0dad" />
-            <Text style={styles.hintButtonText}>Hint</Text>
-          </TouchableOpacity>
-          {/* Hint Images Modal */}
+        <TouchableOpacity
+          style={styles.hintButton}
+          onPress={() => fetchHintImages(question.word)}
+        >
+          <Ionicons name="help-circle-outline" size={20} color="#6a0dad" />
+          <Text style={styles.hintButtonText}>Hint</Text>
+        </TouchableOpacity>
+        {/* Hint Images Modal */}
         <Modal
           visible={isHintModalVisible}
           transparent={true}
@@ -570,47 +570,63 @@ const QuizSolvingScreen = ({ route, navigation }) => {
             <View style={styles.hintModalContent}>
               <View style={styles.hintModalHeader}>
                 <Text style={styles.hintModalTitle}>Hints for '{question.word}'</Text>
-                <TouchableOpacity 
-                  style={styles.closeButton} 
+                <TouchableOpacity
+                  style={styles.closeButton}
                   onPress={() => setIsHintModalVisible(false)}
                 >
                   <Ionicons name="close" size={24} color="#1a1a1a" />
                 </TouchableOpacity>
               </View>
-    
-              {isLoadingHintImages ? (
-                <ActivityIndicator size="large" color="#6a0dad" />
-              ) : (
-                <ScrollView 
-                  horizontal 
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.hintImagesContainer}
-                >
-                  {hintImages.map((imageUrl, index) => (
-                    <Image
-                      key={index}
-                      source={{ uri: imageUrl }}
-                      style={styles.hintImage}
-                      resizeMode="cover"
-                    />
-                  ))}
-                </ScrollView>
-              )}
+
+              <View style={styles.disclaimerContainer}>
+                <Text style={styles.disclaimerText}>
+                  These images are here to help, not to solve the quiz for you. Sometimes they nail it, and other times... well, they might just confuse you. Don't blame us if the hint feels more like a plot twist—trust your brain and keep going! You've got this!
+                </Text>
+              </View>
+
+              <View style={styles.hintModalBody}>
+                {isLoadingHintImages ? (
+                  <View style={styles.centerContent}>
+                    <ActivityIndicator size="large" color="#6a0dad" />
+                    <Text style={styles.loadingText}>Loading hints...</Text>
+                  </View>
+                ) : hintImages.length === 0 ? (
+                  <View style={styles.centerContent}>
+                    <Ionicons name="images-outline" size={40} color="#6c757d" />
+                    <Text style={styles.noHintText}>No hint images found for '{question.word}'</Text>
+                  </View>
+                ) : (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.hintImagesContainer}
+                  >
+                    {hintImages.map((imageUrl, index) => (
+                      <Image
+                        key={index}
+                        source={{ uri: imageUrl }}
+                        style={styles.hintImage}
+                        resizeMode="contain"
+                      />
+                    ))}
+                  </ScrollView>
+                )}
+              </View>
             </View>
           </View>
         </Modal>
-    
-          <TouchableOpacity
-            style={styles.forumButton}
-            onPress={() => {
-              fetchRelatedPosts(question.word);
-              setForumModalVisible(true);
-            }}
-          >
-            <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
-            <Text style={styles.forumButtonText}>See Related Posts</Text>
-          </TouchableOpacity>
-        </View>
+
+        <TouchableOpacity
+          style={styles.forumButton}
+          onPress={() => {
+            fetchRelatedPosts(question.word);
+            setForumModalVisible(true);
+          }}
+        >
+          <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
+          <Text style={styles.forumButtonText}>See Related Posts</Text>
+        </TouchableOpacity>
+      </View>
       <ForumModal
         visible={forumModalVisible}
         onClose={() => {
@@ -865,6 +881,49 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 8,
   },
+
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  hintModalBody: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#6a0dad',
+  },
+  hintModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 20,
+  },
+  hintModalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    width: '100%',
+    height: '70%', // Fixed height
+  },
+  hintImagesContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+  },
+  hintImage: {
+    width: 280,
+    height: 280,
+    borderRadius: 10,
+    marginHorizontal: 10,
+    backgroundColor: '#f0f0f0', // Debug background
+  },
   hintButton: {
     backgroundColor: "#f8f9fa",
     paddingVertical: 12,
@@ -883,27 +942,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 8,
   },
-  hintModalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  hintModalContent: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 20,
-    width: "90%",
-    maxHeight: "70%",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
   hintModalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -915,22 +953,30 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1a1a1a",
   },
-  hintImagesContainer: {
-    alignItems: "center",
-    justifyContent: "center",
+  disclaimerContainer: {
+    backgroundColor: '#fff3cd',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
   },
-  hintImage: {
-    width: 250,
-    height: 250,
-    borderRadius: 10,
-    marginHorizontal: 10,
+  disclaimerText: {
+    fontSize: 14,
+    color: '#856404',
+    textAlign: 'center',
+    lineHeight: 20,
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  centerContent: {
+    flex: 1,
     alignItems: 'center',
-    marginTop: 10,
+    justifyContent: 'center',
   },
+  noHintText: {
+    fontSize: 16,
+    color: '#6c757d',
+    textAlign: 'center',
+    marginTop: 10,
+  }
+
 });
 
 export default QuizSolvingScreen;
