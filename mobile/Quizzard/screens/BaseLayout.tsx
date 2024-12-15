@@ -11,10 +11,13 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
+import { useAuth } from "./AuthProvider";
 import { EloCefrInfoTable } from "../components/EloCefrInfoTable";
 
 const BaseLayout = ({ children, navigation }) => {
   const route = useRoute();
+  const authContext = useAuth(); // Get the authentication context
+  const {token, username} = authContext; 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
 
@@ -27,7 +30,7 @@ const BaseLayout = ({ children, navigation }) => {
   };
 
   const navigateToProfile = () => {
-    navigation.navigate("Profile");
+    navigation.navigate("Profile", { username: username });
   };
 
   const toggleInfoModal = () => {
