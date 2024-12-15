@@ -103,7 +103,7 @@ const LoginScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Network or other error:", error);
-      setErrorMessage("Network error. Please try again.");
+      setErrorMessage("Error trying to login. Please try again.");
       setModalVisible(true);
     }
   };
