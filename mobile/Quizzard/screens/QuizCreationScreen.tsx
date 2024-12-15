@@ -9,8 +9,11 @@ import {
   FlatList,
   Alert,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal,
+  Platform,
 } from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import DropdownComponent from "../components/QuestionTypeDropdown";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system"; // Import FileSystem for base64 conversion
@@ -35,25 +38,46 @@ const QuizCreationPage = ({ navigation }) => {
       isLoadingAnswerSuggestions: false
     }
   ]);
-  const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
   const [selectedType, setSelectedType] = useState(""); // Default type
-  const [typedQuestionWord, setTypedQuestionWord] = useState("");
-  const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [image, setMedia] = useState<string | null>(null);
   const authContext = useAuth();
   const token = authContext ? authContext.token : null;
-  const [wordSuggestions, setWordSuggestions] = useState<string[]>([]);
-  const [showWordSuggestions, setShowWordSuggestions] = useState(false);
   const [isLoadingWordSuggestions, setIsLoadingWordSuggestions] = useState(false);
-  const [answerSuggestions, setAnswerSuggestions] = useState<string[]>([]);
-  const [showAnswerSuggestions, setShowAnswerSuggestions] = useState(false);
-  const [isLoadingAnswerSuggestions, setIsLoadingAnswerSuggestions] = useState(false);
-  const [activeWordSuggestionIndex, setActiveWordSuggestionIndex] = useState<number | null>(null);
-  const [activeQuestionIndex, setActiveQuestionIndex] = useState<number | null>(null);
+  const [selectedNumber, setSelectedNumber] = useState(1);
+  const [favoriteCount, setFavoriteCount] = useState(0);
 
   // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready
+
+  const getFavoriteQuestionsCount = async () => {
+    try {
+      const response = await fetch(`${hostUrl}/api/favorite-question`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFavoriteCount(data.length);
+      } else {
+        console.error('Failed to fetch favorite questions');
+      }
+    } catch (error) {
+      console.error('Error fetching favorite questions:', error);
+    }
+  };
+
+  // Add useEffect to fetch count when component mounts
+  useEffect(() => {
+    if (token) {
+      getFavoriteQuestionsCount();
+    }
+  }, [token]);
+
 
   const uploadFile = async (fileUri: string) => {
     try {
@@ -254,7 +278,6 @@ const QuizCreationPage = ({ navigation }) => {
   };
 
   const handleInputChange = (index: number, word: string) => {
-    setActiveQuestionIndex(index); // Add this line
     if (!questions[index].questionType) {
       Alert.alert("Select Type", "Please select a type first.");
       return;
@@ -379,6 +402,52 @@ const QuizCreationPage = ({ navigation }) => {
     );
   };
 
+  const createQuizFromFavorites = async () => {
+    if (!quizTitle) {
+      Alert.alert("Error", "Please enter a quiz title first");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${hostUrl}/api/quizzes/from-favorites`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          count: selectedNumber,
+          title: quizTitle
+        })
+      });
+
+      if (response.ok) {
+        const quiz = await response.json();
+        Alert.alert("Success", "Quiz created from favorites successfully!");
+        navigation.navigate("Home");
+      } else {
+        const error = await response.text();
+        Alert.alert("Error", `Failed to create quiz: ${error}`);
+      }
+    } catch (error) {
+      console.error("Error creating quiz from favorites:", error);
+      Alert.alert("Error", "Failed to create quiz from favorites");
+    }
+  };
+
+
+  const incrementNumber = () => {
+    if (selectedNumber < favoriteCount) {
+      setSelectedNumber(prev => prev + 1);
+    }
+  };
+
+  const decrementNumber = () => {
+    if (selectedNumber > 1) {
+      setSelectedNumber(prev => prev - 1);
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
@@ -410,6 +479,33 @@ const QuizCreationPage = ({ navigation }) => {
           value={quizTitle}
           onChangeText={setQuizTitle}
         />
+
+        <View style={styles.favoritesContainer}>
+          <TouchableOpacity style={styles.favoritesButton} onPress={createQuizFromFavorites}>
+            <Text style={styles.favoritesButtonText}>Quiz from Favorites</Text>
+          </TouchableOpacity>
+
+          <View style={styles.numberInputContainer}>
+            <TouchableOpacity
+              style={styles.numberButton}
+              onPress={decrementNumber}
+            >
+              <Text style={styles.numberButtonText}>-</Text>
+            </TouchableOpacity>
+
+            <View style={styles.numberDisplay}>
+              <Text style={styles.numberText}>{selectedNumber}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.numberButton}
+              onPress={incrementNumber}
+            >
+              <Text style={styles.numberButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
+
+        </View>
 
         {/* Image Upload Box */}
         <TouchableOpacity
@@ -763,6 +859,101 @@ const styles = StyleSheet.create({
 
   suggestionText: {
     fontSize: 14,
+    color: '#333',
+  },
+
+  favoritesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 10,
+  },
+
+  favoritesButton: {
+    backgroundColor: "#6d28d9",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  favoritesButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  numberInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 8,
+    width: 80,
+    textAlign: 'center',
+  },
+  modalView: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  pickerContainer: {
+    backgroundColor: 'white',
+    paddingBottom: 20,
+  },
+
+  picker: {
+    height: 200,
+  },
+
+  doneButton: {
+    alignItems: 'flex-end',
+    padding: 10,
+    backgroundColor: '#f8f8f8',
+  },
+
+  doneButtonText: {
+    color: '#6d28d9',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  numberInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 5,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+
+  numberButton: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    width: 40,
+    alignItems: 'center',
+  },
+
+  numberButtonText: {
+    fontSize: 20,
+    color: '#6d28d9',
+    fontWeight: 'bold',
+  },
+
+  numberDisplay: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    minWidth: 40,
+    alignItems: 'center',
+  },
+
+  numberText: {
+    fontSize: 16,
     color: '#333',
   },
 });
