@@ -206,31 +206,12 @@ const ProfileScreen = ({ route, navigation }) => {
                 quizDetails.quiz.difficulty
               ),
               username: quizDetails.quiz.username,
-              createdAt: new Date(quizDetails.quiz.createdAt).toLocaleString(
-                "en-US",
-                {
-                  year: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                }
-              ),
+              createdAt: quizDetails.quiz.createdAt,
               noFavorites: quizDetails.quiz.noFavorites,
               questions: quizDetails.quiz.questions,
               completedAt: attempt.completed
-                ? new Date(attempt.completedAt).toLocaleString("en-US", {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : new Date(attempt.updatedAt).toLocaleString("en-US", {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }),
+                ? attempt.completedAt
+                : attempt.updatedAt,
               score: attempt.completed ? attempt.score : null,
               status: attempt.completed ? "Completed" : "In Progress",
               rawCompleted: attempt.completed,
@@ -503,7 +484,7 @@ const ProfileScreen = ({ route, navigation }) => {
     return (
       <BaseLayout navigation={navigation}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6a0dad" />
+          <ActivityIndicator size="large" color="#6d28d9" />
           <Text>Loading...</Text>
         </View>
       </BaseLayout>
@@ -771,7 +752,7 @@ const styles = StyleSheet.create({
   },
   sectionButton: {
     backgroundColor: "#f5f3ff",
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 12,
     padding: 10,
   },
@@ -800,10 +781,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   retryButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   retryButtonText: {
     color: "#fff",

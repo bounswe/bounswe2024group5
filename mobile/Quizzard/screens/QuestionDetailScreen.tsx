@@ -124,7 +124,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const handleUpvote = async () => {
 
-    if(!question) {
+    if (!question) {
       console.log(`Question not set..`);
       return;
     }
@@ -206,12 +206,12 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       if (response.ok) {
         const newReplyData: ForumReply = await response.json();
         newReplyData.createdAt = new Date(newReplyData.createdAt).toLocaleString("en-US", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          });
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
         setRepliesData((prev) => [...prev, newReplyData]);
         setNewReply("");
       } else {
@@ -228,7 +228,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6a0dad" />
+        <ActivityIndicator size="large" color="#6d28d9" />
       </View>
     );
   }
@@ -259,7 +259,9 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         </Text>
 
         <View style={styles.metadata}>
-          <Text style={styles.username}>@{question.username}</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: question.username })}>
+            <Text style={styles.replyUsername}>@{question.username}:</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.upvoteContainer}
             onPress={handleUpvote}
@@ -294,7 +296,9 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       <Text style={styles.repliesHeader}>Replies</Text>
       {repliesData.map((reply) => (
         <View key={reply.id} style={styles.replyContainer}>
-          <Text style={styles.replyUsername}>@{reply.username}:</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: reply.username })}>
+            <Text style={styles.replyUsername}>@{reply.username}:</Text>
+          </TouchableOpacity>
           <Text style={styles.replyText}>{reply.content}</Text>
           <Text style={styles.replyDate}>{reply.createdAt}</Text>
         </View>
@@ -372,7 +376,7 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 12,
-    color: "#6a0dad",
+    color: "#6d28d9",
     fontWeight: "bold",
   },
   upvoteContainer: {
@@ -382,7 +386,7 @@ const styles = StyleSheet.create({
   upvoteText: {
     marginLeft: 4,
     fontSize: 14,
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   tagsContainer: {
     flexDirection: "row",
@@ -399,7 +403,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   footer: {
     flexDirection: "row",
@@ -427,7 +431,7 @@ const styles = StyleSheet.create({
   },
   replyUsername: {
     fontWeight: "bold",
-    color: "#6a0dad",
+    color: "#6d28d9",
     marginBottom: 4,
   },
   replyText: {
@@ -450,7 +454,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     borderRadius: 8,
     padding: 12,
     alignItems: "center",

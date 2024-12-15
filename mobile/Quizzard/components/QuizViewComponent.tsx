@@ -56,7 +56,7 @@ const QuizViewComponent: React.FC<QuizViewComponentProps> = ({
               ELO: {Math.round(quiz.elo)}
             </Text>
             <View style={styles.likesContainer}>
-              <Ionicons name="heart-outline" size={16} color="#6a0dad" />
+              <Ionicons name="heart-outline" size={16} color="#6d28d9" />
               <Text style={styles.likeCount}>{quiz.likes}</Text>
             </View>
           </View>
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   quizTitle: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#6b21a8",
+    color: "#6d28d9",
     marginBottom: 5,
   },
   quizQuestions: {
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   difficultyLevel: {
     fontSize: 14,
-    color: "#6a0dad",
+    color: "#6d28d9",
     fontWeight: "bold",
   },
   likesContainer: {
