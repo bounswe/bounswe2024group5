@@ -40,6 +40,10 @@ const ForumScreen = ({ navigation }) => {
 
   const [upvotedPostIds, setUpvotedPostIds] = useState(new Set<number>());
 
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const PAGE_SIZE = 5;
+
   // Load upvoted post IDs from AsyncStorage when the component mounts
   useEffect(() => {
     const loadUpvotedPosts = async () => {
@@ -76,49 +80,81 @@ const ForumScreen = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchPosts = async () => {
-        setIsLoading(true); // Set loading to true when fetching
-        try {
-          const response = await fetch(`${hostUrl}/api/posts`, {
-            headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
-            },
-          });
+      const checkNextPage = async (currentPageData: any[]) => {
+        if (currentPageData.length === PAGE_SIZE) {
+          // If current page is full, check next page
+          try {
+            const nextPageResponse = await fetch(
+              `${hostUrl}/api/feed?page=${currentPage + 1}&size=${PAGE_SIZE}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
 
-          console.log("Response status:", response.status);
+            if (nextPageResponse.ok) {
+              const nextPageData = await nextPageResponse.json();
+              const nextPosts = Array.isArray(nextPageData)
+                ? nextPageData
+                : nextPageData.content;
+              // If next page has content, there are more pages
+              return nextPosts && nextPosts.length > 0;
+            }
+          } catch (error) {
+            console.error("Error checking next page:", error);
+          }
+        }
+        return false;
+      };
+
+      const fetchPosts = async () => {
+        setIsLoading(true);
+        try {
+          const response = await fetch(
+            `${hostUrl}/api/feed?page=${currentPage}&size=${PAGE_SIZE}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
           if (response.ok) {
             const data = await response.json();
-            console.log("Data fetched:", data);
+            console.log("API Response:", data);
 
-            // Check if data is an array
-            if (Array.isArray(data)) {
-              // Map the API data to match the structure expected by QuestionItem
-              const formattedData = data.map((item) => ({
-                id: item.id,
-                title: item.title,
-                description: item.content,
-                createdAt: new Date(item.createdAt).toLocaleString("en-US", {
-                  year: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }),
-                commentCount: item.noReplies || 0,
-                tags: item.tags || [],
-                username: item.username || item.user?.username || "Anonymous",
-                upvotes: item.noUpvote || 0,
-                hasUpvoted: upvotedPostIds.has(item.id),
-              }));
-              setQuestions(formattedData);
-            } else {
-              console.error("Data is not an array:", data);
-              Alert.alert(
-                "Error",
-                "Unexpected data format received from server."
-              );
-            }
+            const posts = Array.isArray(data) ? data : data.content;
+
+            // Check if there's a next page
+            const hasNextPage = await checkNextPage(posts);
+            const calculatedTotalPages = hasNextPage
+              ? currentPage + 2
+              : currentPage + 1;
+
+            console.log("Has next page:", hasNextPage);
+            console.log("Calculated total pages:", calculatedTotalPages);
+
+            setTotalPages(calculatedTotalPages);
+
+            const formattedData = posts.map((item) => ({
+              id: item.id,
+              title: item.title,
+              description: item.content,
+              createdAt: new Date(item.createdAt).toLocaleString("en-US", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+              commentCount: item.noReplies || 0,
+              tags: item.tags || [],
+              username: item.username || item.user?.username || "Anonymous",
+              upvotes: item.noUpvote || 0,
+              hasUpvoted: upvotedPostIds.has(item.id),
+            }));
+            setQuestions(formattedData);
           } else {
             const errorData = await response.json();
             console.error("Error response data:", errorData);
@@ -133,7 +169,7 @@ const ForumScreen = ({ navigation }) => {
       };
 
       fetchPosts();
-    }, [hostUrl, token, upvotedPostIds]) // Depend on upvotedPostIds to refresh hasUpvoted
+    }, [hostUrl, token, upvotedPostIds, currentPage])
   );
 
   // Function to handle upvoting a question
@@ -241,6 +277,64 @@ const ForumScreen = ({ navigation }) => {
     });
   };
 
+  const PaginationControls = () => (
+    <View style={styles.paginationContainer}>
+      <TouchableOpacity
+        style={[
+          styles.pageButton,
+          currentPage === 0 && styles.pageButtonDisabled,
+        ]}
+        onPress={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+        disabled={currentPage === 0}
+      >
+        <Ionicons
+          name="chevron-back"
+          size={20}
+          color={currentPage === 0 ? "#999" : "white"}
+        />
+        <Text
+          style={[
+            styles.pageButtonText,
+            currentPage === 0 && styles.pageButtonTextDisabled,
+          ]}
+        >
+          Previous
+        </Text>
+      </TouchableOpacity>
+
+      <View style={styles.pageIndicator}>
+        <Text style={styles.pageText}>
+          {currentPage + 1} / {totalPages}
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        style={[
+          styles.pageButton,
+          currentPage >= totalPages - 1 && styles.pageButtonDisabled,
+        ]}
+        onPress={() =>
+          setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))
+        }
+        disabled={currentPage >= totalPages - 1}
+      >
+        <Text
+          style={[
+            styles.pageButtonText,
+            currentPage >= totalPages - 1 && styles.pageButtonTextDisabled,
+          ]}
+        >
+          Next
+        </Text>
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={currentPage >= totalPages - 1 ? "#999" : "white"}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+
   if (isLoading) {
     return (
       <BaseLayout navigation={navigation}>
@@ -292,6 +386,8 @@ const ForumScreen = ({ navigation }) => {
           keyExtractor={(item) => item.id.toString()}
           style={styles.questionList}
         />
+
+        <PaginationControls />
       </View>
     </BaseLayout>
   );
@@ -335,6 +431,52 @@ const styles = StyleSheet.create({
   },
   questionList: {
     flex: 1,
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    backgroundColor: "#fff",
+  },
+  pageButton: {
+    backgroundColor: "#6a0dad",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    minWidth: 100,
+    justifyContent: "center",
+    elevation: 2,
+  },
+  pageButtonDisabled: {
+    backgroundColor: "#f0f0f0",
+    elevation: 0,
+  },
+  pageButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+    marginHorizontal: 4,
+  },
+  pageButtonTextDisabled: {
+    color: "#999",
+  },
+  pageIndicator: {
+    backgroundColor: "#f8f8f8",
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  pageText: {
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "600",
   },
 });
 
