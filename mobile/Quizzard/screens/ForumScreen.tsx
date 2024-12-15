@@ -207,7 +207,7 @@ const ForumScreen = ({ navigation }) => {
     return (
       <BaseLayout navigation={navigation}>
         <View style={styles.container}>
-          <ActivityIndicator size="large" color="#6a0dad" />
+          <ActivityIndicator size="large" color="#6d28d9" />
         </View>
       </BaseLayout>
     );
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   addButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     borderRadius: 30,
     width: 50,
     height: 50,

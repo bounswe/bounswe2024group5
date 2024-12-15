@@ -106,7 +106,7 @@ const BaseLayout = ({ children, navigation }) => {
           <Ionicons
             name={isHome ? "home" : "home-outline"}
             size={24}
-            color="#6a0dad"
+            color="#6d28d9"
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -116,7 +116,7 @@ const BaseLayout = ({ children, navigation }) => {
           <Ionicons
             name={isForum ? "chatbox" : "chatbox-outline"}
             size={24}
-            color="#6a0dad"
+            color="#6d28d9"
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -126,7 +126,7 @@ const BaseLayout = ({ children, navigation }) => {
           <Ionicons
             name={isLeaderboard ? "trophy" : "trophy-outline"}
             size={24}
-            color="#6a0dad"
+            color="#6d28d9"
           />
         </TouchableOpacity>
       </View>
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6a0dad", // Dark purple color for the app name
+    color: "#5b21b6", // Dark purple color for the app name
   },
   icons: {
     flexDirection: "row",

@@ -140,7 +140,7 @@ const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
         const response = await fetch(
           `${hostUrl}/api/autocomplete?prefix=${encodeURIComponent(
             currentTag
-          )}`,
+          )}&language=english`,
           {
             method: "GET",
             headers: {
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#faf5ff',
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 5,

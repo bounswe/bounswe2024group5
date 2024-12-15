@@ -2,6 +2,9 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the upvote icon
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from "../app/index";
 
 type QuestionItemProps = {
   question: {
@@ -24,6 +27,9 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
   onPress,
   onUpvote,
 }) => {
+
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Text style={styles.title}>{question.title}</Text>
@@ -32,7 +38,9 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
       </Text>
 
       <View style={styles.metadata}>
-        <Text style={styles.username}>@{question.username}</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: question.username })}>
+          <Text style={styles.username}>@{question.username}</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.upvoteContainer}
           onPress={onUpvote}
@@ -41,7 +49,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
           <Ionicons
             name={question.hasUpvoted ? "heart" : "heart-outline"}
             size={20}
-            color={question.hasUpvoted ? "#e0245e" : "#6a0dad"}
+            color={question.hasUpvoted ? "#e0245e" : "#4c1d95"}
           />
           <Text style={styles.upvoteText}>{question.upvotes}</Text>
         </TouchableOpacity>
@@ -101,7 +109,7 @@ const styles = StyleSheet.create({
   upvoteText: {
     marginLeft: 4,
     fontSize: 14,
-    color: "#6a0dad",
+    color: "#4c1d95",
   },
   tagsContainer: {
     flexDirection: "row",
@@ -118,7 +126,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    color: "#6a0dad",
+    color: "#4c1d95",
   },
   footer: {
     flexDirection: "row",

@@ -23,12 +23,12 @@ const DifficultyLevelDropdown: React.FC<DifficultyLevelDropdownProps> = ({
 }) => {
   const customStyles = {
     dropdown: {
-      color: "#6a0dad",
+      color: "#6d28d9",
       height: 40,
       width: "100%",
       margin: 4,
       borderWidth: 1,
-      borderColor: "#6a0dad",
+      borderColor: "#6d28d9",
       borderRadius: 8,
       paddingHorizontal: 10,
       justifyContent: "center",
