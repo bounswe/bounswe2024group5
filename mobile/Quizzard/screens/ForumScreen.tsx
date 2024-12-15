@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import BaseLayout from "./BaseLayout";
 import QuestionItem from "../components/QuestionItem";
@@ -35,70 +36,121 @@ const ForumScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
 
   const authContext = useAuth(); // Get the authentication context
-  const { token, username } = authContext;  // Now you can destructure both token and username
+
+  const [upvotedPostIds, setUpvotedPostIds] = useState(new Set<number>());
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const PAGE_SIZE = 5;
+
+  // Load upvoted post IDs from AsyncStorage when the component mounts
+  useEffect(() => {
+    const loadUpvotedPosts = async () => {
+      try {
+        const storedUpvoted = await AsyncStorage.getItem("upvotedPostIds");
+        if (storedUpvoted) {
+          const parsedUpvoted = JSON.parse(storedUpvoted);
+          setUpvotedPostIds(new Set(parsedUpvoted));
+        }
+      } catch (error) {
+        console.error("Error loading upvoted posts from storage:", error);
+      }
+    };
+
+    loadUpvotedPosts();
+  }, []);
+
+  // Save upvoted post IDs to AsyncStorage whenever it changes
+  useEffect(() => {
+    const saveUpvotedPosts = async () => {
+      try {
+        const upvotedArray = Array.from(upvotedPostIds);
+        await AsyncStorage.setItem(
+          "upvotedPostIds",
+          JSON.stringify(upvotedArray)
+        );
+      } catch (error) {
+        console.error("Error saving upvoted posts to storage:", error);
+      }
+    };
+
+    saveUpvotedPosts();
+  }, [upvotedPostIds]);
+  const { token, username } = authContext; // Now you can destructure both token and username
   const [isUpvoted, setIsUpvoted] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
       const fetchPosts = async () => {
-        setIsLoading(true); // Set loading to true when fetching
+        setIsLoading(true);
         try {
-          const postsResponse = await fetch(`${hostUrl}/api/posts`, {
+          // First fetch all posts to get total count
+          const allPostsResponse = await fetch(`${hostUrl}/api/posts`, {
             headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
+              Authorization: `Bearer ${token}`,
             },
           });
-          // console.log("Response status:", postsResponse.status);
-          if (!postsResponse.ok) {
-            throw new Error('Failed to fetch posts');
+
+          if (!allPostsResponse.ok) {
+            throw new Error("Failed to fetch posts");
           }
 
-          const postsData = await postsResponse.json();
-          console.log("Data fetched:", postsData);
+          const allPosts = await allPostsResponse.json();
 
-          // Check if data is an array
-          if (Array.isArray(postsData)) {
-            if(!username) {
-              throw new Error('Username is not set');
-            }
-            // Get upvote status for all posts
-            const upvotesResponse = await fetch(`${hostUrl}/api/posts/upvotes?username=${username}`, {
+          // Calculate total pages
+          const total = Array.isArray(allPosts) ? allPosts.length : 0;
+          const calculatedTotalPages = Math.ceil(total / PAGE_SIZE);
+          setTotalPages(calculatedTotalPages);
+
+          // Get paginated slice of posts
+          const start = currentPage * PAGE_SIZE;
+          const end = start + PAGE_SIZE;
+          const paginatedPosts = allPosts.slice(start, end);
+
+          if (!username) {
+            throw new Error("Username is not set");
+          }
+
+          // Get upvote status for paginated posts
+          const upvotesResponse = await fetch(
+            `${hostUrl}/api/posts/upvotes?username=${username}`,
+            {
               method: "GET",
               headers: {
                 Authorization: `Bearer ${token}`,
               },
-            });
-
-            if (!upvotesResponse.ok) {
-              console.error(`Failed to fetch upvotes: ${upvotesResponse.status} - ${upvotesResponse.statusText}`);
-              throw new Error('Failed to fetch upvotes');
             }
+          );
 
-            const upvotesData = await upvotesResponse.json();
-            // Create a Set of upvoted post IDs for efficient lookup
-            const userUpvotedPosts = new Set(upvotesData.map(upvote => upvote.postId));
-
-            // Map the API data to match the structure expected by QuestionItem with correct upvote status
-            const formattedData = postsData.map((item) => ({
-              id: item.id,
-              title: item.title,
-              content: item.content,
-              createdAt: new Date(item.createdAt).toLocaleString("en-US", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-              noReplies: item.noReplies || 0,
-              tags: item.tags || [],
-              username: item.username || item.user?.username || "Anonymous",
-              noUpvote: item.noUpvote || 0,
-              hasUpvoted: userUpvotedPosts.has(item.id),
-            }));
-
-            setQuestions(formattedData);
+          if (!upvotesResponse.ok) {
+            throw new Error("Failed to fetch upvotes");
           }
+
+          const upvotesData = await upvotesResponse.json();
+          const userUpvotedPosts = new Set(
+            upvotesData.map((upvote) => upvote.postId)
+          );
+
+          // Format the paginated posts with upvote status
+          const formattedPosts = paginatedPosts.map((item) => ({
+            id: item.id,
+            title: item.title,
+            content: item.content,
+            createdAt: new Date(item.createdAt).toLocaleString("en-US", {
+              year: "numeric",
+              month: "numeric",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            noReplies: item.noReplies || 0,
+            tags: item.tags || [],
+            username: item.username || item.user?.username || "Anonymous",
+            noUpvote: item.noUpvote || 0,
+            hasUpvoted: userUpvotedPosts.has(item.id),
+          }));
+
+          setQuestions(formattedPosts);
         } catch (error) {
           console.error("Error fetching posts:", error);
           Alert.alert("Error", "Failed to fetch posts. Please try again.");
@@ -108,7 +160,7 @@ const ForumScreen = ({ navigation }) => {
       };
 
       fetchPosts();
-    }, [hostUrl, token, isUpvoted])
+    }, [hostUrl, token, currentPage, isUpvoted]) // Add currentPage to dependencies
   );
 
   // Function to handle upvoting a question
@@ -122,52 +174,52 @@ const ForumScreen = ({ navigation }) => {
     try {
       if (question.hasUpvoted) {
         // If already upvoted, remove upvote
-          const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
-            },
-          });
+        const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        });
 
-          if (response.status === 204) {
-            const updatedQuestions = [...questions];
-            updatedQuestions[questionIndex] = {
-              ...question,
-              noUpvote: question.noUpvote - 1,
-              hasUpvoted: false,
-            };
-            setQuestions(updatedQuestions);
-          } else if (response.status === 401) {
-            Alert.alert("Unauthorized", "Please log in to remove upvote.");
-          } else {
-            throw new Error('Failed to remove upvote');
-          }
+        if (response.status === 204) {
+          const updatedQuestions = [...questions];
+          updatedQuestions[questionIndex] = {
+            ...question,
+            noUpvote: question.noUpvote - 1,
+            hasUpvoted: false,
+          };
+          setQuestions(updatedQuestions);
+        } else if (response.status === 401) {
+          Alert.alert("Unauthorized", "Please log in to remove upvote.");
+        } else {
+          throw new Error("Failed to remove upvote");
+        }
       } else {
         // If not upvoted, add upvote
-          const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
-            },
-          });
-          console.log(response);
-          if (response.ok) {
-      // if (response.status === 200) {
-            const data = await response.json();
-            console.log("Upvote response data:", data);
-            const updatedQuestions = [...questions];
-            updatedQuestions[questionIndex] = {
-              ...question,
-              noUpvote: data.noUpvote || question.noUpvote + 1,
-              hasUpvoted: true,
-            };
-            setQuestions(updatedQuestions);
-          } else if (response.status === 401) {
-            Alert.alert("Unauthorized", "Please log in to upvote.");
-          } else {
-            const errorData = await response.json();
-            Alert.alert("Error", errorData.message || "Failed to upvote.");
-          }
+        const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        });
+        console.log(response);
+        if (response.ok) {
+          // if (response.status === 200) {
+          const data = await response.json();
+          console.log("Upvote response data:", data);
+          const updatedQuestions = [...questions];
+          updatedQuestions[questionIndex] = {
+            ...question,
+            noUpvote: data.noUpvote || question.noUpvote + 1,
+            hasUpvoted: true,
+          };
+          setQuestions(updatedQuestions);
+        } else if (response.status === 401) {
+          Alert.alert("Unauthorized", "Please log in to upvote.");
+        } else {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.message || "Failed to upvote.");
+        }
       }
     } catch (error) {
       console.error("Error handling upvote:", error);
@@ -200,6 +252,64 @@ const ForumScreen = ({ navigation }) => {
       createdAt,
     });
   };
+
+  const PaginationControls = () => (
+    <View style={styles.paginationContainer}>
+      <TouchableOpacity
+        style={[
+          styles.pageButton,
+          currentPage === 0 && styles.pageButtonDisabled,
+        ]}
+        onPress={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+        disabled={currentPage === 0}
+      >
+        <Ionicons
+          name="chevron-back"
+          size={20}
+          color={currentPage === 0 ? "#999" : "white"}
+        />
+        <Text
+          style={[
+            styles.pageButtonText,
+            currentPage === 0 && styles.pageButtonTextDisabled,
+          ]}
+        >
+          Previous
+        </Text>
+      </TouchableOpacity>
+
+      <View style={styles.pageIndicator}>
+        <Text style={styles.pageText}>
+          {currentPage + 1} / {totalPages}
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        style={[
+          styles.pageButton,
+          currentPage >= totalPages - 1 && styles.pageButtonDisabled,
+        ]}
+        onPress={() =>
+          setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))
+        }
+        disabled={currentPage >= totalPages - 1}
+      >
+        <Text
+          style={[
+            styles.pageButtonText,
+            currentPage >= totalPages - 1 && styles.pageButtonTextDisabled,
+          ]}
+        >
+          Next
+        </Text>
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={currentPage >= totalPages - 1 ? "#999" : "white"}
+        />
+      </TouchableOpacity>
+    </View>
+  );
 
   if (isLoading) {
     return (
@@ -252,6 +362,8 @@ const ForumScreen = ({ navigation }) => {
           keyExtractor={(item) => item.id.toString()}
           style={styles.questionList}
         />
+
+        <PaginationControls />
       </View>
     </BaseLayout>
   );
@@ -295,6 +407,52 @@ const styles = StyleSheet.create({
   },
   questionList: {
     flex: 1,
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    backgroundColor: "#fff",
+  },
+  pageButton: {
+    backgroundColor: "#6a0dad",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    minWidth: 100,
+    justifyContent: "center",
+    elevation: 2,
+  },
+  pageButtonDisabled: {
+    backgroundColor: "#f0f0f0",
+    elevation: 0,
+  },
+  pageButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+    marginHorizontal: 4,
+  },
+  pageButtonTextDisabled: {
+    color: "#999",
+  },
+  pageIndicator: {
+    backgroundColor: "#f8f8f8",
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  pageText: {
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "600",
   },
 });
 

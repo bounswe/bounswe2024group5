@@ -39,7 +39,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
   const authContext = useAuth();
-  const { token, username } = authContext;  // Now you can destructure both token and username
+  const { token, username } = authContext; // Now you can destructure both token and username
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [showRelatedPosts, setShowRelatedPosts] = useState(false);
@@ -60,29 +60,36 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
         if (questionResponse.ok) {
           const questionData: ForumQuestion = await questionResponse.json();
-          questionData.createdAt = new Date(questionData.createdAt).toLocaleString("en-US", {
+          questionData.createdAt = new Date(
+            questionData.createdAt
+          ).toLocaleString("en-US", {
             year: "numeric",
             month: "numeric",
             day: "numeric",
             hour: "2-digit",
             minute: "2-digit",
-          })
+          });
           setQuestion(questionData);
         } else {
           throw new Error("Failed to fetch question");
         }
 
         // Fetch upvote status:
-        const upvoteResponse = await fetch(`${hostUrl}/api/posts/${questionId}/upvotes?username=${username}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const upvoteResponse = await fetch(
+          `${hostUrl}/api/posts/${questionId}/upvotes?username=${username}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!upvoteResponse.ok) {
-          console.error(`Failed to fetch upvotes: ${upvoteResponse.status} - ${upvoteResponse.statusText}`);
-          throw new Error('Failed to fetch upvotes');
+          console.error(
+            `Failed to fetch upvotes: ${upvoteResponse.status} - ${upvoteResponse.statusText}`
+          );
+          throw new Error("Failed to fetch upvotes");
         }
 
         const upvoteData = await upvoteResponse.json();
@@ -101,13 +108,16 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         if (repliesResponse.ok) {
           const repliesData: ForumReply[] = await repliesResponse.json();
           repliesData.forEach((reply) => {
-            reply.createdAt = new Date(reply.createdAt).toLocaleString("en-US", {
-              year: "numeric",
-              month: "numeric",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
+            reply.createdAt = new Date(reply.createdAt).toLocaleString(
+              "en-US",
+              {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }
+            );
           });
           setRepliesData(repliesData);
         } else {
@@ -125,23 +135,25 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         );
 
         if (relatedPostsResponse.ok) {
-          const relatedPosts: ForumQuestion[] = await relatedPostsResponse.json();
+          const relatedPosts: ForumQuestion[] =
+            await relatedPostsResponse.json();
           relatedPosts.forEach((reply) => {
-            reply.createdAt = new Date(reply.createdAt).toLocaleString("en-US", {
-              year: "numeric",
-              month: "numeric",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
+            reply.createdAt = new Date(reply.createdAt).toLocaleString(
+              "en-US",
+              {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }
+            );
             reply.content = reply.content;
           });
           setRelatedPostsData(relatedPosts);
         } else {
           throw new Error("Failed to fetch related posts.");
         }
-
-
       } catch (error) {
         console.error("Error fetching data:", error);
         Alert.alert("Error", "Failed to fetch data. Please try again.");
@@ -159,10 +171,9 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const handleToggleRelatedPosts = () => {
     setShowRelatedPosts(!showRelatedPosts);
-  }
+  };
 
   const handleUpvote = async () => {
-
     if (!question) {
       console.log(`Question not set..`);
       return;
@@ -170,49 +181,55 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     try {
       if (isUpvoted) {
         // If already upvoted, remove upvote
-          const response = await fetch(`${hostUrl}/api/posts/${questionId}/upvote`, {
+        const response = await fetch(
+          `${hostUrl}/api/posts/${questionId}/upvote`,
+          {
             method: "DELETE",
             headers: {
               Authorization: `Bearer ${token}`, // Include the token in the headers
             },
-          });
-
-          if (response.status === 204) {
-            // Successfully removed upvote
-            // setQuestion(prev => ({
-            //   ...prev!,
-            //   noUpvote: prev!.noUpvote - 1,
-            // }));
-            setIsUpvoted(!isUpvoted);
-          } else if (response.status === 401) {
-            Alert.alert("Unauthorized", "Please log in to remove upvote.");
-          } else {
-            const errorData = await response.json();
-            Alert.alert("Error", errorData.message || "Failed to remove upvote.");
           }
+        );
+
+        if (response.status === 204) {
+          // Successfully removed upvote
+          // setQuestion(prev => ({
+          //   ...prev!,
+          //   noUpvote: prev!.noUpvote - 1,
+          // }));
+          setIsUpvoted(!isUpvoted);
+        } else if (response.status === 401) {
+          Alert.alert("Unauthorized", "Please log in to remove upvote.");
+        } else {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.message || "Failed to remove upvote.");
+        }
       } else {
         // If not upvoted, add upvote
-          const response = await fetch(`${hostUrl}/api/posts/${questionId}/upvote`, {
+        const response = await fetch(
+          `${hostUrl}/api/posts/${questionId}/upvote`,
+          {
             method: "POST",
             headers: {
               Authorization: `Bearer ${token}`, // Include the token in the headers
             },
-          });
-          if (response.ok) {
-            const data = await response.json();
-            // setQuestion(prev => ({
-            //   ...prev!,
-            //   noUpvote: data.upvotes || prev!.noUpvote + 1,
-            // }));
-            console.log("Upvote response data:", data);
-            setIsUpvoted(!isUpvoted);
-          } else if (response.status === 401) {
-            Alert.alert("Unauthorized", "Please log in to upvote.");
-          } else {
-            const errorData = await response.json();
-            Alert.alert("Error", errorData.message || "Failed to upvote.");
           }
-    } 
+        );
+        if (response.ok) {
+          const data = await response.json();
+          // setQuestion(prev => ({
+          //   ...prev!,
+          //   noUpvote: data.upvotes || prev!.noUpvote + 1,
+          // }));
+          console.log("Upvote response data:", data);
+          setIsUpvoted(!isUpvoted);
+        } else if (response.status === 401) {
+          Alert.alert("Unauthorized", "Please log in to upvote.");
+        } else {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.message || "Failed to upvote.");
+        }
+      }
     } catch (error) {
       console.error("Error handling upvote:", error);
       Alert.alert("Error", "Failed to update upvote. Please try again.");
@@ -243,7 +260,9 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
       if (response.ok) {
         const newReplyData: ForumReply = await response.json();
-        newReplyData.createdAt = new Date(newReplyData.createdAt).toLocaleString("en-US", {
+        newReplyData.createdAt = new Date(
+          newReplyData.createdAt
+        ).toLocaleString("en-US", {
           year: "numeric",
           month: "numeric",
           day: "numeric",
@@ -292,12 +311,14 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       {/* Question Container (Similar to QuestionItem) */}
       <View style={styles.questionContainer}>
         <Text style={styles.title}>{question.title}</Text>
-        <Text style={styles.content}>
-          {question.content}
-        </Text>
+        <Text style={styles.content}>{question.content}</Text>
 
         <View style={styles.metadata}>
-          <TouchableOpacity onPress={() => navigation.navigate('Profile', { username: question.username })}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Profile", { username: question.username })
+            }
+          >
             <Text style={styles.replyUsername}>@{question.username}:</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -329,7 +350,10 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
       {/* Collapsible Replies Section */}
       <Pressable
-        style={[styles.repliesSectionButton, showReplies ? styles.repliesSectionExpanded : {}]}
+        style={[
+          styles.repliesSectionButton,
+          showReplies ? styles.repliesSectionExpanded : {},
+        ]}
         onPress={handleToggleReplies}
       >
         <View style={styles.repliesSectionHeader}>
@@ -338,22 +362,29 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             size={20}
             color="#2e1065"
           />
-          <Text style={styles.repliesHeader}>Replies ({repliesData.length})
+          <Text style={styles.repliesHeader}>
+            Replies ({repliesData.length})
           </Text>
         </View>
         {showReplies && (
-        <View>
-          {repliesData.map((reply) => (
-            <View key={reply.id} style={styles.replyContainer}>
-              <TouchableOpacity onPress={() => navigation.navigate('Profile', { username: reply.username })}>
-                <Text style={styles.replyUsername}>@{reply.username}:</Text>
-              </TouchableOpacity>
-              <Text style={styles.replyText}>{reply.content}</Text>
-              <Text style={styles.replyDate}>{reply.createdAt}</Text>
-            </View>
-          ))}
-        </View>
-      )}
+          <View>
+            {repliesData.map((reply) => (
+              <View key={reply.id} style={styles.replyContainer}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("Profile", {
+                      username: reply.username,
+                    })
+                  }
+                >
+                  <Text style={styles.replyUsername}>@{reply.username}:</Text>
+                </TouchableOpacity>
+                <Text style={styles.replyText}>{reply.content}</Text>
+                <Text style={styles.replyDate}>{reply.createdAt}</Text>
+              </View>
+            ))}
+          </View>
+        )}
       </Pressable>
 
       {/* Reply Input */}
@@ -363,7 +394,10 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           value={newReply}
           onChangeText={setNewReply}
           placeholder="Write a reply..."
-          multiline
+          placeholderTextColor="#666" // Add placeholder color
+          multiline={true}
+          numberOfLines={4}
+          autoCapitalize="sentences"
         />
         <TouchableOpacity
           style={[
@@ -383,7 +417,10 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
       {/* Collapsible Related Posts Section */}
       <Pressable
-        style={[styles.repliesSectionButton, showRelatedPosts ? styles.repliesSectionExpanded : {}]}
+        style={[
+          styles.repliesSectionButton,
+          showRelatedPosts ? styles.repliesSectionExpanded : {},
+        ]}
         onPress={handleToggleRelatedPosts}
       >
         <View style={styles.repliesSectionHeader}>
@@ -402,22 +439,20 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
                 key={item.id}
                 question={item}
                 onPress={() =>
-                  navigation.navigate('QuestionDetail', {
+                  navigation.navigate("QuestionDetail", {
                     questionId: item.id,
                     title: item.title,
                     content: item.content,
                     username: item.username,
                     noUpvote: item.noUpvote,
-                    createdAt: item.createdAt
+                    createdAt: item.createdAt,
                   })
                 }
               />
             ))}
           </View>
         )}
-       
       </Pressable>
-      
     </ScrollView>
   );
 };
@@ -540,6 +575,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: "#e0e0e0",
+    color: "#333", // Add explicit text color
+    fontSize: 14,
+    textAlignVertical: "top", // For Android multiline alignment
   },
   submitButton: {
     backgroundColor: "#6d28d9",
@@ -557,7 +595,7 @@ const styles = StyleSheet.create({
   repliesSectionButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#faf5ff',
+    backgroundColor: "#faf5ff",
     marginBottom: 4,
     borderRadius: 8,
     padding: 16,
@@ -565,8 +603,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   repliesSectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 4,
   },
   repliesSectionExpanded: {
