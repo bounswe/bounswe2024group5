@@ -38,7 +38,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
       </Text>
 
       <View style={styles.metadata}>
-        <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: question.username })}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profile', { username: question.username })}>
           <Text style={styles.username}>@{question.username}</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 12,
     color: "#888",
+    fontWeight: "bold",
   },
   upvoteContainer: {
     flexDirection: "row",

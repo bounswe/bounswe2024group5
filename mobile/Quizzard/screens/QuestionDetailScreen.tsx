@@ -259,7 +259,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         </Text>
 
         <View style={styles.metadata}>
-          <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: question.username })}>
+          <TouchableOpacity onPress={() => navigation.navigate('Profile', { username: question.username })}>
             <Text style={styles.replyUsername}>@{question.username}:</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -296,7 +296,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       <Text style={styles.repliesHeader}>Replies</Text>
       {repliesData.map((reply) => (
         <View key={reply.id} style={styles.replyContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: reply.username })}>
+          <TouchableOpacity onPress={() => navigation.navigate('Profile', { username: reply.username })}>
             <Text style={styles.replyUsername}>@{reply.username}:</Text>
           </TouchableOpacity>
           <Text style={styles.replyText}>{reply.content}</Text>

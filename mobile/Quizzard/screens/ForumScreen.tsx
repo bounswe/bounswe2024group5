@@ -35,7 +35,6 @@ const ForumScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
 
   const authContext = useAuth(); // Get the authentication context
-  console.log('Auth context in ForumScreen:', authContext);
   const { token, username } = authContext;  // Now you can destructure both token and username
   const [isUpvoted, setIsUpvoted] = useState(false);
 
@@ -62,7 +61,6 @@ const ForumScreen = ({ navigation }) => {
             if(!username) {
               throw new Error('Username is not set');
             }
-            console.log(`hostUrl is ${hostUrl} and username is |${username}|`);
             // Get upvote status for all posts
             const upvotesResponse = await fetch(`${hostUrl}/api/posts/upvotes?username=${username}`, {
               method: "GET",
