@@ -51,6 +51,7 @@ const QuizCreationPage = ({ navigation }) => {
   const [showAnswerSuggestions, setShowAnswerSuggestions] = useState(false);
   const [isLoadingAnswerSuggestions, setIsLoadingAnswerSuggestions] = useState(false);
   const [activeWordSuggestionIndex, setActiveWordSuggestionIndex] = useState<number | null>(null);
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState<number | null>(null);
 
   // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready
 
@@ -253,6 +254,7 @@ const QuizCreationPage = ({ navigation }) => {
   };
 
   const handleInputChange = (index: number, word: string) => {
+    setActiveQuestionIndex(index); // Add this line
     if (!questions[index].questionType) {
       Alert.alert("Select Type", "Please select a type first.");
       return;
@@ -442,7 +444,13 @@ const QuizCreationPage = ({ navigation }) => {
 
       {/* Render all question boxes */}
       {questions.map((question, index) => (
-        <View key={index} style={styles.questionBox}>
+        <View 
+          key={index} 
+          style={[
+            styles.questionBox,
+            { zIndex: questions.length - index } // Higher index = lower in the stack
+          ]}
+        >
           {/* Existing header container */}
           <View style={styles.headerContainer}>
             <TextInput
@@ -470,7 +478,7 @@ const QuizCreationPage = ({ navigation }) => {
 
           {/* Word Suggestions Dropdown */}
 {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
-  <View style={[styles.suggestionsOverlay, { top: 45 }]}>
+  <View style={[styles.suggestionsOverlay, { top: 60 }]}>
     <ScrollView>
       {question.wordSuggestions.map((item, i) => (
         <TouchableOpacity
@@ -636,8 +644,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    zIndex: 1000, // Add this
-    elevation: 1000, // Add this for Android
   },
   headerContainer: {
     flexDirection: "row",
@@ -674,13 +680,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     marginBottom: 20,
-    zIndex: 1, // Add this
-    elevation: 1, // Add this for Android
-  },
-  addQuestionButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
+    zIndex: 0, // Changed from 1 to 0
+    elevation: 0, // Changed from 1 to 0
   },
   
   contentContainer: {
@@ -697,8 +698,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    zIndex: 1, // Update this
-    elevation: 1, // Update this for Android
+    zIndex: 999999, // Lower than suggestions
+    elevation: 999999,
   },
   cancelButton: {
     backgroundColor: "#ccc",
@@ -746,8 +747,8 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     maxHeight: 200,
-    zIndex: 9999, // Increase this value
-    elevation: 9999, // Match zIndex for Android
+    zIndex: 9999999, // Increased to be higher than everything
+    elevation: 9999999, // Match zIndex for Android
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
