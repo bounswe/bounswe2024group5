@@ -394,10 +394,9 @@ const ProfileScreen = ({ route, navigation }) => {
         // Check if viewing own profile or another user's
         const isOwn = !usernameToDisplay || usernameToDisplay === username;
         setIsOwnProfile(isOwn);
-
         // Fetch followers and following
         const followersResponse = await fetch(
-          `${hostUrl}/api/profile/${usernameToDisplay || usernameToDisplay}/followers`,
+          `${hostUrl}/api/profile/${usernameToDisplay}/followers`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -405,7 +404,7 @@ const ProfileScreen = ({ route, navigation }) => {
           }
         );
         const followingResponse = await fetch(
-          `${hostUrl}/api/profile/${usernameToDisplay || usernameToDisplay}/following`,
+          `${hostUrl}/api/profile/${usernameToDisplay}/following`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -419,9 +418,9 @@ const ProfileScreen = ({ route, navigation }) => {
           setFollowers(followersData);
           setFollowing(followingData);
 
-          // Check if current user is following this profile
           if (!isOwn) {
-            setIsFollowing(followersData.some((f) => f.username === usernameToDisplay));
+            // Check if current user is in the followers list
+            setIsFollowing(followersData.some(f => f.username === username));
           }
         }
       } catch (error) {
@@ -432,10 +431,18 @@ const ProfileScreen = ({ route, navigation }) => {
     };
 
     fetchData();
-  }, [usernameToDisplay, route.params?.username]);
+  }, [usernameToDisplay, username]);
 
   // Add follow/unfollow handler
   const handleFollowToggle = async () => {
+    // Optimistically update UI
+    setIsFollowing(prevState => !prevState);
+    setFollowers(prev => 
+      isFollowing 
+        ? prev.filter(f => f.username !== username)
+        : [...prev, { username, name: userProfile.name }]
+    );
+  
     try {
       const response = await fetch(
         `${hostUrl}/api/profile/follow/${usernameToDisplay}`,
@@ -446,23 +453,27 @@ const ProfileScreen = ({ route, navigation }) => {
           },
         }
       );
-
-      if (response.ok) {
-        setIsFollowing(!isFollowing);
-        console.log("## Follow status updated:", isFollowing);
-        // Update followers count
-        const newFollowers = await fetch(
-          `${hostUrl}/api/profile/${usernameToDisplay}/followers`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        ).then((res) => res.json());
-        setFollowers(newFollowers);
+  
+      if (!response.ok) {
+        // Revert changes if request failed
+        setIsFollowing(prevState => !prevState);
+        setFollowers(prev => 
+          !isFollowing 
+            ? prev.filter(f => f.username !== username)
+            : [...prev, { username, name: userProfile.name }]
+        );
+        Alert.alert("Error", "Failed to update follow status");
       }
     } catch (error) {
+      // Revert changes if request failed
+      setIsFollowing(prevState => !prevState);
+      setFollowers(prev => 
+        !isFollowing 
+          ? prev.filter(f => f.username !== username)
+          : [...prev, { username, name: userProfile.name }]
+      );
       console.error("Error toggling follow:", error);
+      Alert.alert("Error", "Failed to update follow status");
     }
   };
 
@@ -537,13 +548,29 @@ const ProfileScreen = ({ route, navigation }) => {
             </View>
 
             <View style={styles.followStats}>
-              <Text style={styles.followText}>
-                {followers.length} followers
-              </Text>
-              <Text style={styles.followText}>
-                {following.length} following
-              </Text>
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('FollowList', { 
+                  username: usernameToDisplay, 
+                  type: 'followers' 
+                })}
+              >
+                <Text style={styles.followText}>
+                  {followers.length} followers
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('FollowList', { 
+                  username: usernameToDisplay, 
+                  type: 'following' 
+                })}
+              >
+                <Text style={styles.followText}>
+                  {following.length} following
+                </Text>
+              </TouchableOpacity>
             </View>
+
           </View>
 
           {/* Show Edit or Follow button based on profile type */}
@@ -568,6 +595,7 @@ const ProfileScreen = ({ route, navigation }) => {
                 isFollowing && styles.followingButton,
               ]}
               onPress={handleFollowToggle}
+              activeOpacity={0.7}
             >
               <Text style={styles.followButtonText}>
                 {isFollowing ? "Following" : "Follow"}
