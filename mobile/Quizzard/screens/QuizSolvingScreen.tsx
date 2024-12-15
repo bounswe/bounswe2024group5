@@ -134,7 +134,9 @@ const ForumModal = React.memo<{
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Posts about '{word}'</Text>
+            <Text style={styles.modalTitle}>
+              Posts about <Text style={styles.boldText}>'{word}'</Text>
+            </Text>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <Ionicons name="close" size={24} color="#1a1a1a" />
             </TouchableOpacity>
@@ -291,30 +293,35 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     initializeQuiz();
   }, [quiz.id, hostUrl, token]);
 
+  const fetchHintImages = useCallback(
+    async (word: string) => {
+      setIsLoadingHintImages(true);
+      try {
+        const response = await fetch(
+          `${hostUrl}/api/hint?word=${encodeURIComponent(word)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-  const fetchHintImages = useCallback(async (word: string) => {
-    setIsLoadingHintImages(true);
-    try {
-      const response = await fetch(`${hostUrl}/api/hint?word=${encodeURIComponent(word)}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const images = await response.json();
-        setHintImages(images);
-      } else {
-        Alert.alert("Error", "Failed to fetch hint images");
+        if (response.ok) {
+          const images = await response.json();
+          setHintImages(images);
+        } else {
+          Alert.alert("Error", "Failed to fetch hint images");
+        }
+      } catch (error) {
+        console.error("Error fetching hint images:", error);
+        Alert.alert("Error", "Failed to load hint images");
+      } finally {
+        setIsLoadingHintImages(false);
+        setIsHintModalVisible(true);
       }
-    } catch (error) {
-      console.error("Error fetching hint images:", error);
-      Alert.alert("Error", "Failed to load hint images");
-    } finally {
-      setIsLoadingHintImages(false);
-      setIsHintModalVisible(true);
-    }
-  }, [hostUrl, token]);
+    },
+    [hostUrl, token]
+  );
 
   const handleAnswer = async (answer) => {
     if (alreadyFinished) return;
@@ -488,29 +495,28 @@ const QuizSolvingScreen = ({ route, navigation }) => {
 
     try {
       const response = await fetch(`${hostUrl}/api/favorite-question`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ questionId })
+        body: JSON.stringify({ questionId }),
       });
 
       if (response.status === 201) {
       } else if (response.status === 400) {
-        Alert.alert('Info', 'This question is already in your favorites.');
+        Alert.alert("Info", "This question is already in your favorites.");
       } else if (response.status === 404) {
-        Alert.alert('Error', 'Question not found.');
+        Alert.alert("Error", "Question not found.");
       } else {
-        Alert.alert('Error', 'Failed to add question to favorites.');
+        Alert.alert("Error", "Failed to add question to favorites.");
       }
     } catch (error) {
-      console.error('Error adding to favorites:', error);
-      Alert.alert('Error', 'Failed to add question to favorites.');
+      console.error("Error adding to favorites:", error);
+      Alert.alert("Error", "Failed to add question to favorites.");
     } finally {
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -520,23 +526,25 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         totalQuestions={questions.length}
       />
       <View style={styles.heartContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              addToFavorites();
-              console.log('Favorite clicked');
-            }}
-          >
-            <View style={styles.heartButtonContent}>
-              <Text style={styles.heartButtonText}>Add To Favorite Questions</Text>
-              <Ionicons
-                name="heart-outline"
-                size={24}
-                color="#6a0dad"
-                style={styles.heartIcon}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          onPress={() => {
+            addToFavorites();
+            console.log("Favorite clicked");
+          }}
+        >
+          <View style={styles.heartButtonContent}>
+            <Text style={styles.heartButtonText}>
+              Add To Favorite Questions
+            </Text>
+            <Ionicons
+              name="heart-outline"
+              size={24}
+              color="#6a0dad"
+              style={styles.heartIcon}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.roundQuestionContainer}>
         <Text style={styles.questionText}>
@@ -568,17 +576,12 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         })}
       </View>
 
-
-
-
       {/* Container for Next Button */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.nextButton} onPress={handlePrevious}>
           {/* Replace text with right-pointing arrow icon */}
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
-
-
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           {/* Replace text with right-pointing arrow icon */}
@@ -617,7 +620,9 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           <View style={styles.hintModalContainer}>
             <View style={styles.hintModalContent}>
               <View style={styles.hintModalHeader}>
-                <Text style={styles.hintModalTitle}>Hints for '{question.word}'</Text>
+                <Text style={styles.hintModalTitle}>
+                  Hints for '{question.word}'
+                </Text>
                 <TouchableOpacity
                   style={styles.closeButton}
                   onPress={() => setIsHintModalVisible(false)}
@@ -625,11 +630,12 @@ const QuizSolvingScreen = ({ route, navigation }) => {
                   <Ionicons name="close" size={24} color="#1a1a1a" />
                 </TouchableOpacity>
               </View>
-
-
               <View style={styles.disclaimerContainer}>
                 <Text style={styles.disclaimerText}>
-                  These images are here to help, not to solve the quiz for you. Sometimes they nail it, and other times... well, they might just confuse you. Don't blame us if the hint feels more like a plot twist—trust your brain and keep going! You've got this!
+                  These images are here to help, not to solve the quiz for you.
+                  Sometimes they nail it, and other times... well, they might
+                  just confuse you. Don't blame us if the hint feels more like a
+                  plot twist—trust your brain and keep going! You've got this!
                 </Text>
               </View>
 
@@ -642,7 +648,9 @@ const QuizSolvingScreen = ({ route, navigation }) => {
                 ) : hintImages.length === 0 ? (
                   <View style={styles.centerContent}>
                     <Ionicons name="images-outline" size={40} color="#6c757d" />
-                    <Text style={styles.noHintText}>No hint images found for '{question.word}'</Text>
+                    <Text style={styles.noHintText}>
+                      No hint images found for '{question.word}'
+                    </Text>
                   </View>
                 ) : (
                   <ScrollView
@@ -819,8 +827,10 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: "bold",
     color: "#1a1a1a",
+  },
+  boldText: {
+    fontWeight: "bold",
   },
   modalBody: {
     flex: 1,
@@ -932,38 +942,38 @@ const styles = StyleSheet.create({
   },
 
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 10,
   },
   hintModalBody: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#6a0dad',
+    color: "#6a0dad",
   },
   hintModalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     padding: 20,
   },
   hintModalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 20,
     padding: 20,
-    width: '100%',
-    height: '70%', // Fixed height
+    width: "100%",
+    height: "70%", // Fixed height
   },
   hintImagesContainer: {
     flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 10,
   },
   hintImage: {
@@ -971,7 +981,7 @@ const styles = StyleSheet.create({
     height: 280,
     borderRadius: 10,
     marginHorizontal: 10,
-    backgroundColor: '#f0f0f0', // Debug background
+    backgroundColor: "#f0f0f0", // Debug background
   },
   hintButton: {
     backgroundColor: "#f8f9fa",
@@ -1003,31 +1013,31 @@ const styles = StyleSheet.create({
     color: "#1a1a1a",
   },
   disclaimerContainer: {
-    backgroundColor: '#fff3cd',
+    backgroundColor: "#fff3cd",
     borderRadius: 8,
     padding: 12,
     marginBottom: 15,
   },
   disclaimerText: {
     fontSize: 14,
-    color: '#856404',
-    textAlign: 'center',
+    color: "#856404",
+    textAlign: "center",
     lineHeight: 20,
   },
   centerContent: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   heartContainer: {
-    backgroundColor: '#f5f3ff', // Light purple background
+    backgroundColor: "#f5f3ff", // Light purple background
     padding: 10,
     borderRadius: 12,
     marginVertical: 10,
     marginHorizontal: 15,
     borderWidth: 1,
-    borderColor: '#e9ecef',
-    shadowColor: '#000',
+    borderColor: "#e9ecef",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -1037,12 +1047,12 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   heartButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   heartButtonText: {
-    color: '#6a0dad',
+    color: "#6a0dad",
     fontSize: 16,
     marginRight: 8,
   },
@@ -1052,10 +1062,10 @@ const styles = StyleSheet.create({
 
   noHintText: {
     fontSize: 16,
-    color: '#6c757d',
-    textAlign: 'center',
+    color: "#6c757d",
+    textAlign: "center",
     marginTop: 10,
-  }
+  },
 });
 
 export default QuizSolvingScreen;
