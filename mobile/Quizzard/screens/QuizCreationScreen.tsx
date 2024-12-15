@@ -423,7 +423,7 @@ const QuizCreationPage = ({ navigation }) => {
 
       if (response.ok) {
         const quiz = await response.json();
-        Alert.alert("Success", "Quiz created from favorites successfully!");
+        Alert.alert("Success", "Quiz created from favorites successfully! You can see it in your profile page under My Quizzes.");
         navigation.navigate("Home");
       } else {
         const error = await response.text();
