@@ -381,180 +381,180 @@ const QuizCreationPage = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1 }}>
-    <ScrollView 
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-    >
-      {/* Header Section */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Text style={styles.appName}>Quizzard</Text>
-        </TouchableOpacity>
-        <View style={styles.icons}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="person-outline" size={24} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <Ionicons name="log-out-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Title Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Untitled Quiz"
-        value={quizTitle}
-        onChangeText={setQuizTitle}
-      />
-
-      {/* Image Upload Box */}
-      <TouchableOpacity
-        style={styles.imageUploadBox}
-        onPress={pickImageAndUpload}
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
       >
-        {imageUrl ? (
-          <Image
-            source={{ uri: imageUrl }}
-            style={{
-              width: '100%',
-              height: '100%',
-              borderRadius: 10
-            }}
-            resizeMode="cover"
-          />
-        ) : (
-          <Text style={styles.imageUploadText}>
-            + Upload Image
-          </Text>
-        )}
-      </TouchableOpacity>
-
-      {/* Description Input */}
-      <TextInput
-        style={styles.descriptionInput}
-        placeholder="Enter quiz description..."
-        value={quizDescription}
-        onChangeText={setQuizDescription}
-        multiline
-      />
-
-      {/* Render all question boxes */}
-      {questions.map((question, index) => (
-        <View 
-          key={index} 
-          style={[
-            styles.questionBox,
-            { zIndex: questions.length - index } // Higher index = lower in the stack
-          ]}
-        >
-          {/* Existing header container */}
-          <View style={styles.headerContainer}>
-            <TextInput
-              style={styles.questionTitle}
-              placeholder="Enter a word"
-              value={question.word}
-              onChangeText={(word) => handleInputChange(index, word)}
-            />
-            {/* Loading indicator for suggestions */}
-            {isLoadingWordSuggestions && (
-              <ActivityIndicator
-                size="small"
-                color="#6a0dad"
-                style={styles.suggestionLoadingIndicator}
-              />
-            )}
-            <View style={styles.dropdownContainer}>
-              <DropdownComponent
-                testID="question-type-dropdown"
-                selectedValue={questions[index].questionType}
-                onValueChange={(type) => updateQuestionType(index, type)}
-              />
-            </View>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+            <Text style={styles.appName}>Quizzard</Text>
+          </TouchableOpacity>
+          <View style={styles.icons}>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="person-outline" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => navigation.navigate("Login")}
+            >
+              <Ionicons name="log-out-outline" size={24} color="black" />
+            </TouchableOpacity>
           </View>
-
-          {/* Word Suggestions Dropdown */}
-{question.showWordSuggestions && question.wordSuggestions.length > 0 && (
-  <View style={[styles.suggestionsOverlay, { top: 60 }]}>
-    <ScrollView>
-      {question.wordSuggestions.map((item, i) => (
-        <TouchableOpacity
-          key={i}
-          style={styles.suggestionItem}
-          onPress={() => handleWordSuggestionSelect(index, item)}
-        >
-          <Text style={styles.suggestionText}>{item}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  </View>
-)}
-
-          {/* Answer Choices */}
-          {["A", "B", "C", "D"].map((option) => (
-            <View key={option}>
-              <TextInput
-                style={styles.choiceInput}
-                placeholder={`Choice ${option}`}
-                value={question.options[option]}
-                editable={option === 'A'}
-                onChangeText={(text) => {
-                  if (option === 'A') {
-                    updateQuestion(index, option, text);
-                    // Trigger answer suggestions only for option A
-                    fetchAnswerSuggestions(index, questions[index])
-                  }
-                }}
-              />
-
-              {/* Answer Suggestions Dropdown */}
-{option === 'A' && 
-  question.showAnswerSuggestions && 
-  question.answerSuggestions.length > 0 && (
-  <View style={[styles.suggestionsOverlay, { top: 40 }]}>
-    <ScrollView>
-      {question.answerSuggestions.map((item, i) => (
-        <TouchableOpacity
-          key={i}
-          style={styles.suggestionItem}
-          onPress={() => handleAnswerSuggestionSelect(index, item)}
-        >
-          <Text style={styles.suggestionText}>{item}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  </View>
-)}
-            </View>
-          ))}
         </View>
-      ))}
 
+        {/* Title Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Untitled Quiz"
+          value={quizTitle}
+          onChangeText={setQuizTitle}
+        />
 
-      {/* + Question Button */}
-      <TouchableOpacity
-        style={styles.addQuestionButton}
-        onPress={handleAddQuestion}
-      >
-        <Text style={styles.addQuestionButtonText}>+ Question</Text>
-      </TouchableOpacity>
-
-      {/* Bottom Cancel and Submit Buttons */}
-      <View style={styles.bottomButtons}>
+        {/* Image Upload Box */}
         <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
+          style={styles.imageUploadBox}
+          onPress={pickImageAndUpload}
         >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+          {imageUrl ? (
+            <Image
+              source={{ uri: imageUrl }}
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: 10
+              }}
+              resizeMode="cover"
+            />
+          ) : (
+            <Text style={styles.imageUploadText}>
+              + Upload Image
+            </Text>
+          )}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.submitButton} onPress={submitQuiz}>
-          <Text style={styles.submitButtonText}>Submit</Text>
+
+        {/* Description Input */}
+        <TextInput
+          style={styles.descriptionInput}
+          placeholder="Enter quiz description..."
+          value={quizDescription}
+          onChangeText={setQuizDescription}
+          multiline
+        />
+
+        {/* Render all question boxes */}
+        {questions.map((question, index) => (
+          <View
+            key={index}
+            style={[
+              styles.questionBox,
+              { zIndex: questions.length - index } // Higher index = lower in the stack
+            ]}
+          >
+            {/* Existing header container */}
+            <View style={styles.headerContainer}>
+              <TextInput
+                style={styles.questionTitle}
+                placeholder="Enter a word"
+                value={question.word}
+                onChangeText={(word) => handleInputChange(index, word)}
+              />
+              {/* Loading indicator for suggestions */}
+              {isLoadingWordSuggestions && (
+                <ActivityIndicator
+                  size="small"
+                  color="#6a0dad"
+                  style={styles.suggestionLoadingIndicator}
+                />
+              )}
+              <View style={styles.dropdownContainer}>
+                <DropdownComponent
+                  testID="question-type-dropdown"
+                  selectedValue={questions[index].questionType}
+                  onValueChange={(type) => updateQuestionType(index, type)}
+                />
+              </View>
+            </View>
+
+            {/* Word Suggestions Dropdown */}
+            {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
+              <View style={[styles.suggestionsOverlay, { top: 60 }]}>
+                <ScrollView>
+                  {question.wordSuggestions.map((item, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={styles.suggestionItem}
+                      onPress={() => handleWordSuggestionSelect(index, item)}
+                    >
+                      <Text style={styles.suggestionText}>{item}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+
+            {/* Answer Choices */}
+            {["A", "B", "C", "D"].map((option) => (
+              <View key={option}>
+                <TextInput
+                  style={styles.choiceInput}
+                  placeholder={`Choice ${option}`}
+                  value={question.options[option]}
+                  editable={option === 'A'}
+                  onChangeText={(text) => {
+                    if (option === 'A') {
+                      updateQuestion(index, option, text);
+                      // Trigger answer suggestions only for option A
+                      fetchAnswerSuggestions(index, questions[index])
+                    }
+                  }}
+                />
+
+                {/* Answer Suggestions Dropdown */}
+                {option === 'A' &&
+                  question.showAnswerSuggestions &&
+                  question.answerSuggestions.length > 0 && (
+                    <View style={[styles.suggestionsOverlay, { top: 40 }]}>
+                      <ScrollView>
+                        {question.answerSuggestions.map((item, i) => (
+                          <TouchableOpacity
+                            key={i}
+                            style={styles.suggestionItem}
+                            onPress={() => handleAnswerSuggestionSelect(index, item)}
+                          >
+                            <Text style={styles.suggestionText}>{item}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+              </View>
+            ))}
+          </View>
+        ))}
+
+
+        {/* + Question Button */}
+        <TouchableOpacity
+          style={styles.addQuestionButton}
+          onPress={handleAddQuestion}
+        >
+          <Text style={styles.addQuestionButtonText}>+ Question</Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+
+        {/* Bottom Cancel and Submit Buttons */}
+        <View style={styles.bottomButtons}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.submitButton} onPress={submitQuiz}>
+            <Text style={styles.submitButtonText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -683,7 +683,7 @@ const styles = StyleSheet.create({
     zIndex: 0, // Changed from 1 to 0
     elevation: 0, // Changed from 1 to 0
   },
-  
+
   contentContainer: {
     paddingBottom: 100, // Add extra padding to the bottom of the scrollable content
   },
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
-  
+
   suggestionItem: {
     padding: 12,
     borderBottomWidth: 1,
