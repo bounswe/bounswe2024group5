@@ -20,7 +20,7 @@ public class FavoriteQuestionResponse {
     public FavoriteQuestionResponse(FavoriteQuestion favoriteQuestion) {
         this.id = favoriteQuestion.getId();
         this.userId = favoriteQuestion.getUser().getId();
-        this.questionId = favoriteQuestion.getId();
+        this.questionId = favoriteQuestion.getQuestion().getId();
         this.createdAt = favoriteQuestion.getCreatedAt();
         this.updatedAt = favoriteQuestion.getUpdatedAt();
     }
