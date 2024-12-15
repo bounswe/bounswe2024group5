@@ -537,13 +537,6 @@ const ProfileScreen = ({ route, navigation }) => {
               <AntDesignIcon name="user" size={16} color="gray" /> @{username}
             </Text>
 
-            {/* Disable emails in the profile page as it is too long */}
-            {/* <Text style={styles.subheading}>
-              <Icon name="envelope" size={16} color="gray" /> {email}
-            </Text> */}
-            {/* <Text style={styles.subheading}>{noFollowers} followers</Text> */}
-            {/* <Text style={styles.subheading}>{noFollowing} followings</Text> */}
-
             <View style={styles.statistics}>
               <Text style={styles.score}>
                 <Ionicons name="trophy-outline" size={16} color="#fbbf24" />{" "}

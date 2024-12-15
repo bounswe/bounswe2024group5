@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
+  Pressable,
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -41,6 +42,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   // const token = authContext ? authContext.token : null;
   const { token, username } = authContext;  // Now you can destructure both token and username
   const [isUpvoted, setIsUpvoted] = useState(false);
+  const [showReplies, setShowReplies] = useState(true);
 
   // Fetch question details and replies
   useEffect(() => {
@@ -121,6 +123,10 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
     fetchData();
   }, [hostUrl, token, questionId, isUpvoted]);
+
+  const handleToggleReplies = () => {
+    setShowReplies(!showReplies);
+  };
 
   const handleUpvote = async () => {
 
@@ -286,23 +292,37 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
         <View style={styles.footer}>
           <Text style={styles.metadataText}>{question.createdAt}</Text>
-          <Text style={styles.metadataText}>
-            {question.noReplies} comments
-          </Text>
         </View>
       </View>
 
-      {/* Replies Section */}
-      <Text style={styles.repliesHeader}>Replies</Text>
-      {repliesData.map((reply) => (
-        <View key={reply.id} style={styles.replyContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: reply.username })}>
-            <Text style={styles.replyUsername}>@{reply.username}:</Text>
-          </TouchableOpacity>
-          <Text style={styles.replyText}>{reply.content}</Text>
-          <Text style={styles.replyDate}>{reply.createdAt}</Text>
+      {/* Collapsible Replies Section */}
+      <Pressable
+        style={[styles.repliesSectionButton, showReplies ? styles.repliesSectionExpanded : {}]}
+        onPress={handleToggleReplies}
+      >
+        <View style={styles.repliesSectionHeader}>
+          <Ionicons
+            name={showReplies ? "chevron-up" : "chevron-down"}
+            size={20}
+            color="#2e1065"
+          />
+          <Text style={styles.repliesHeader}>Replies ({repliesData.length})
+          </Text>
         </View>
-      ))}
+        {showReplies && (
+        <View>
+          {repliesData.map((reply) => (
+            <View key={reply.id} style={styles.replyContainer}>
+              <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: reply.username })}>
+                <Text style={styles.replyUsername}>@{reply.username}:</Text>
+              </TouchableOpacity>
+              <Text style={styles.replyText}>{reply.content}</Text>
+              <Text style={styles.replyDate}>{reply.createdAt}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+      </Pressable>
 
       {/* Reply Input */}
       <View style={styles.replyInputContainer}>
@@ -416,9 +436,10 @@ const styles = StyleSheet.create({
   repliesHeader: {
     fontSize: 16,
     fontWeight: "bold",
-    marginHorizontal: 16,
-    marginTop: 16,
+    marginTop: 8,
     marginBottom: 8,
+    color: "#2e1065",
+    textAlign: "left",
   },
   replyContainer: {
     backgroundColor: "#fef3c7",
@@ -465,6 +486,24 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  repliesSectionButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#f3e8ff',
+    marginBottom: 4,
+    borderRadius: 8,
+    padding: 16,
+    margin: 12,
+    elevation: 2,
+  },
+  repliesSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  repliesSectionExpanded: {
+    marginBottom: 0,
   },
 });
 
