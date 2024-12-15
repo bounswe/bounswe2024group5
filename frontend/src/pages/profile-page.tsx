@@ -12,7 +12,7 @@ import {
 
 import ProfileUpdateModal from "../components/profile/update-modal";
 
-import { message, Tabs } from "antd";
+import { message, Spin, Tabs } from "antd";
 import { Link, useParams } from "react-router-dom";
 import { useGetProfile } from "../hooks/api/profile/get";
 import { useUpdateProfile } from "../hooks/api/profile/update";
@@ -34,7 +34,7 @@ import { DeleteQuizButton } from "../components/profile/delete-quiz-button";
 const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { username } = useParams<{ username?: string }>();
-  const { data: profile, error } = useGetProfile(username);
+  const { data: profile, error, isLoading } = useGetProfile(username);
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     useUpdateProfile();
   const { data: posts } = useFetchPosts({ username: profile?.username ?? "" });
@@ -57,7 +57,7 @@ const ProfilePage = () => {
     } else {
       followUser(username);
     }
-  }
+  };
 
   const user = {
     badges: [
@@ -66,7 +66,7 @@ const ProfilePage = () => {
     ],
   };
 
-  if (error || !profile) {
+  if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-red-500">
@@ -75,6 +75,15 @@ const ProfilePage = () => {
       </div>
     );
   }
+
+  if (isLoading || !profile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spin />
+      </div>
+    );
+  }
+
   const handleProfileUpdate = async (updates: {
     name?: string;
     email?: string;
@@ -128,8 +137,11 @@ const ProfilePage = () => {
                   )}
 
                   {!isOwnProfile && (
-                    <button onClick={handleFollow} className="flex items-center justify-center px-4 py-2 text-white transition-colors rounded-full bg-violet-500 hover:bg-violet-600">
-                      { isFollowing ? "Unfollow" : "Follow" }
+                    <button
+                      onClick={handleFollow}
+                      className="flex items-center justify-center px-4 py-2 text-white transition-colors rounded-full bg-violet-500 hover:bg-violet-600"
+                    >
+                      {isFollowing ? "Unfollow" : "Follow"}
                     </button>
                   )}
                 </div>
@@ -142,13 +154,17 @@ const ProfilePage = () => {
                     </p>
                   </div>
 
-                  { isOwnProfile && (  
+                  {isOwnProfile && (
                     <div className="flex items-center gap-1 mt-2">
-                    <IconMail className="text-zinc-700" size={20} stroke={3} />
-                    <p className="text-gray-600 place-self-start">
-                      {profile.email}
-                    </p>
-                  </div>
+                      <IconMail
+                        className="text-zinc-700"
+                        size={20}
+                        stroke={3}
+                      />
+                      <p className="text-gray-600 place-self-start">
+                        {profile.email}
+                      </p>
+                    </div>
                   )}
                 </div>
 
@@ -260,17 +276,24 @@ const ProfilePage = () => {
                     </div>
                   ),
                 },
-                ...(isOwnProfile ? [{
-                  key: "history",
-                  label: "Quiz History",
-                  children: (
-                    <div className="grid gap-4">
-                      {userQuizAttempts?.map((attempt) => (
-                        <QuizAttemptCard key={attempt.id} attempt={attempt} />
-                      ))}
-                    </div>
-                  ),
-                }] : []),
+                ...(isOwnProfile
+                  ? [
+                      {
+                        key: "history",
+                        label: "Quiz History",
+                        children: (
+                          <div className="grid gap-4">
+                            {userQuizAttempts?.map((attempt) => (
+                              <QuizAttemptCard
+                                key={attempt.id}
+                                attempt={attempt}
+                              />
+                            ))}
+                          </div>
+                        ),
+                      },
+                    ]
+                  : []),
                 {
                   key: "forum",
                   label: "Forum Posts",
