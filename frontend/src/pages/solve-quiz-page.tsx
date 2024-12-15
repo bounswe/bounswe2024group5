@@ -350,6 +350,7 @@ export const SolveQuizPage = () => {
             questionCount={quiz.questions.length}
             completedAt={quizAttempt?.completedAt ?? new Date().toISOString()}
             quizId={quizIdAsNumber}
+            resetQuizState={resetQuizState}
           />
         ) : (
           <>
