@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   quizSection: {
-    height: 240,
+    height: 220,
   },
   quizScroll: {
     paddingLeft: 15,

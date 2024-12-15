@@ -1,7 +1,9 @@
 // QuizViewComponent.js
-import React from "react";
+import React, { useState, useEffect, useContext }  from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import HostUrlContext from "../app/HostContext";
+import { useAuth } from "../screens/AuthProvider";
 
 interface QuizViewComponentProps {
   quiz: any;
@@ -18,6 +20,63 @@ const QuizViewComponent: React.FC<QuizViewComponentProps> = ({
   showActions = false,
   status,
 }) => {
+  const [isFavorited, setIsFavorited] = useState(false);
+  const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
+  const { token } = useAuth();
+
+  useEffect(() => {
+    checkFavoriteStatus();
+  }, []);
+
+  const checkFavoriteStatus = async () => {
+    try {
+      const response = await fetch(`${hostUrl}/api/favorite-quiz/${quiz.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setIsFavorited(response.ok);
+    } catch (error) {
+      console.error("Error checking favorite status:", error);
+    }
+  };
+
+  const handleFavoritePress = async () => {
+    try {
+      if (isFavorited) {
+        // Remove from favorites
+        const response = await fetch(`${hostUrl}/api/favorite-quiz/${quiz.id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 204) {
+          setIsFavorited(false);
+          quiz.noFavorites = Math.max(0, quiz.noFavorites - 1);
+        }
+      } else {
+        // Add to favorites
+        const response = await fetch(`${hostUrl}/api/favorite-quiz`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ quizId: quiz.id }),
+        });
+
+        if (response.status === 201) {
+          setIsFavorited(true);
+          quiz.noFavorites += 1;
+        }
+      }
+    } catch (error) {
+      console.error("Error updating favorite status:", error);
+    }
+  };
+
   return (
     <View style={styles.quizContainer}>
       <TouchableOpacity
@@ -52,13 +111,19 @@ const QuizViewComponent: React.FC<QuizViewComponentProps> = ({
           <View style={styles.quizInfo}>
             <Text style={styles.difficultyLevel}>{quiz.difficulty}</Text>
             <Text style={styles.difficultyLevel}> | </Text>
-            <Text style={styles.difficultyLevel}>
-              ELO: {Math.round(quiz.elo)}
-            </Text>
-            <View style={styles.likesContainer}>
-              <Ionicons name="heart-outline" size={16} color="#6d28d9" />
-              <Text style={styles.likeCount}>{quiz.likes}</Text>
-            </View>
+            <Text style={styles.difficultyLevel}>{Math.round(quiz.elo)}       </Text>
+            <TouchableOpacity 
+              style={styles.likesContainer} 
+              onPress={handleFavoritePress}
+              activeOpacity={0.7}
+            >
+              <Ionicons 
+                name={isFavorited ? "heart" : "heart-outline"} 
+                size={14} 
+                color={isFavorited ? "#e0245e" : "#6d28d9"} 
+              />
+              <Text style={styles.likeCount}>{quiz.noFavorites}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>
@@ -76,8 +141,8 @@ const QuizViewComponent: React.FC<QuizViewComponentProps> = ({
 
 const styles = StyleSheet.create({
   quizContainer: {
-    width: 140,
-    height: 220,
+    width: 130,
+    height: 200,
     marginRight: 16,
     backgroundColor: "#ede9fe",
     borderRadius: 8,
@@ -92,13 +157,13 @@ const styles = StyleSheet.create({
   },
   quizImage: {
     width: "100%",
-    height: 110,
+    height: 100,
   },
   quizDetails: {
     padding: 10,
     flexDirection: "column",
     justifyContent: "space-between",
-    height: 110,
+    height: 100,
   },
   quizInfoHeader: {
     flexDirection: "column",
@@ -120,7 +185,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   difficultyLevel: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#6d28d9",
     fontWeight: "bold",
   },
