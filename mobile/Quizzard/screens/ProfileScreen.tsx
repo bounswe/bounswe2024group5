@@ -20,6 +20,7 @@ import MyQuizzesView from "../components/MyQuizzesView";
 import MyPostsView from "../components/MyPostsView";
 import MyQuizAttemptsView from "../components/MyQuizAttemptsView";
 import { useFocusEffect } from "@react-navigation/native";
+import { calculateQuizDifficultyFromElo } from "../components/EloCefrInfoTable";
 
 interface QuizAttempt {
   id: number;
@@ -54,15 +55,6 @@ const ProfileScreen = ({ route, navigation }) => {
   const [following, setFollowing] = useState([]);
 
   const [hideCompleted, setHideCompleted] = useState(false);
-
-  const calculateQuizDifficultyFromElo = (elo: number) => {
-    if (elo < 400) return "A1";
-    else if (elo < 1000) return "A2";
-    else if (elo < 1800) return "B1";
-    else if (elo < 2600) return "B2";
-    else if (elo < 3300) return "C1";
-    else return "C2";
-  };
 
   // Function to fetch user profile
   const fetchUserProfile = async () => {
