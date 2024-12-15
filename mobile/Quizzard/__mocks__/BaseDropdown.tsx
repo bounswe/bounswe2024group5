@@ -2,15 +2,15 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
 const BaseDropdown = ({ data, selectedValue, onValueChange, placeholder }) => {
+  // Auto-select multiple choice type on mount
   React.useEffect(() => {
-    // Automatically select multiple choice type
     onValueChange("multipleChoice");
-  }, [onValueChange]);
+  }, []);
 
   return (
     <View testID="base-dropdown">
       <TouchableOpacity testID="question-type-dropdown" onPress={() => null}>
-        <Text>{selectedValue || placeholder}</Text>
+        <Text>Multiple Choice</Text>
       </TouchableOpacity>
     </View>
   );
