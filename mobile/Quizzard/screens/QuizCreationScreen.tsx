@@ -378,6 +378,7 @@ const QuizCreationPage = ({ navigation }) => {
   };
 
   return (
+    <View style={{ flex: 1 }}>
     <ScrollView 
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
@@ -468,22 +469,21 @@ const QuizCreationPage = ({ navigation }) => {
           </View>
 
           {/* Word Suggestions Dropdown */}
-          {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
-            <View style={styles.wordSuggestionsContainer}>
-              <FlatList
-                data={question.wordSuggestions}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.wordSuggestionItem}
-                    onPress={() => handleWordSuggestionSelect(index, item)}
-                  >
-                    <Text>{item}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          )}
+{question.showWordSuggestions && question.wordSuggestions.length > 0 && (
+  <View style={[styles.suggestionsOverlay, { top: 45 }]}>
+    <ScrollView>
+      {question.wordSuggestions.map((item, i) => (
+        <TouchableOpacity
+          key={i}
+          style={styles.suggestionItem}
+          onPress={() => handleWordSuggestionSelect(index, item)}
+        >
+          <Text style={styles.suggestionText}>{item}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  </View>
+)}
 
           {/* Answer Choices */}
           {["A", "B", "C", "D"].map((option) => (
@@ -502,25 +502,24 @@ const QuizCreationPage = ({ navigation }) => {
                 }}
               />
 
-              {/* Answer Suggestions Dropdown - Only for Option A */}
-              {option === 'A' &&
-                question.showAnswerSuggestions &&
-                question.answerSuggestions.length > 0 && (
-                  <View style={styles.answerSuggestionsContainer}>
-                    <FlatList
-                      data={question.answerSuggestions}
-                      keyExtractor={(item) => item}
-                      renderItem={({ item }) => (
-                        <TouchableOpacity
-                          style={styles.answerSuggestionItem}
-                          onPress={() => handleAnswerSuggestionSelect(index, item)}
-                        >
-                          <Text>{item}</Text>
-                        </TouchableOpacity>
-                      )}
-                    />
-                  </View>
-                )}
+              {/* Answer Suggestions Dropdown */}
+{option === 'A' && 
+  question.showAnswerSuggestions && 
+  question.answerSuggestions.length > 0 && (
+  <View style={[styles.suggestionsOverlay, { top: 40 }]}>
+    <ScrollView>
+      {question.answerSuggestions.map((item, i) => (
+        <TouchableOpacity
+          key={i}
+          style={styles.suggestionItem}
+          onPress={() => handleAnswerSuggestionSelect(index, item)}
+        >
+          <Text style={styles.suggestionText}>{item}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  </View>
+)}
             </View>
           ))}
         </View>
@@ -548,6 +547,7 @@ const QuizCreationPage = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </View>
   );
 };
 
@@ -636,7 +636,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 3,
+    zIndex: 1000, // Add this
+    elevation: 1000, // Add this for Android
   },
   headerContainer: {
     flexDirection: "row",
@@ -673,6 +674,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     marginBottom: 20,
+    zIndex: 1, // Add this
+    elevation: 1, // Add this for Android
   },
   addQuestionButtonText: {
     color: "#fff",
@@ -694,7 +697,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    zIndex: 10, // Ensure buttons are above other content
+    zIndex: 1, // Update this
+    elevation: 1, // Update this for Android
   },
   cancelButton: {
     backgroundColor: "#ccc",
@@ -732,6 +736,33 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+  },
+  suggestionsOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    maxHeight: 200,
+    zIndex: 9999, // Increase this value
+    elevation: 9999, // Match zIndex for Android
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  
+  suggestionItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+
+  suggestionText: {
+    fontSize: 14,
+    color: '#333',
   },
 });
 
