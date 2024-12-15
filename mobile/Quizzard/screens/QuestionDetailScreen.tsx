@@ -39,7 +39,6 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
   const authContext = useAuth();
-  // const token = authContext ? authContext.token : null;
   const { token, username } = authContext;  // Now you can destructure both token and username
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
@@ -199,7 +198,6 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
               Authorization: `Bearer ${token}`, // Include the token in the headers
             },
           });
-          // console.log(response);
           if (response.ok) {
             const data = await response.json();
             // setQuestion(prev => ({
@@ -358,6 +356,31 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       )}
       </Pressable>
 
+      {/* Reply Input */}
+      <View style={styles.replyInputContainer}>
+        <TextInput
+          style={styles.replyInput}
+          value={newReply}
+          onChangeText={setNewReply}
+          placeholder="Write a reply..."
+          multiline
+        />
+        <TouchableOpacity
+          style={[
+            styles.submitButton,
+            isSubmitting && styles.submitButtonDisabled,
+          ]}
+          onPress={handleAddReply}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.submitButtonText}>Submit Reply</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+
       {/* Collapsible Related Posts Section */}
       <Pressable
         style={[styles.repliesSectionButton, showRelatedPosts ? styles.repliesSectionExpanded : {}]}
@@ -394,32 +417,7 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         )}
        
       </Pressable>
-
-
-      {/* Reply Input */}
-      <View style={styles.replyInputContainer}>
-        <TextInput
-          style={styles.replyInput}
-          value={newReply}
-          onChangeText={setNewReply}
-          placeholder="Write a reply..."
-          multiline
-        />
-        <TouchableOpacity
-          style={[
-            styles.submitButton,
-            isSubmitting && styles.submitButtonDisabled,
-          ]}
-          onPress={handleAddReply}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitButtonText}>Submit Reply</Text>
-          )}
-        </TouchableOpacity>
-      </View>
+      
     </ScrollView>
   );
 };
@@ -448,6 +446,8 @@ const styles = StyleSheet.create({
     padding: 16,
     margin: 12,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
   },
   title: {
     fontSize: 18,
@@ -512,7 +512,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fef3c7",
     borderRadius: 8,
     padding: 12,
-    marginHorizontal: 16,
     marginBottom: 8,
     borderWidth: 1,
     borderColor: "#e0e0e0",
@@ -529,7 +528,6 @@ const styles = StyleSheet.create({
   replyDate: {
     fontSize: 12,
     color: "#888",
-    // alignSelf: "flex-left",
   },
   replyInputContainer: {
     margin: 16,
@@ -540,6 +538,8 @@ const styles = StyleSheet.create({
     padding: 12,
     minHeight: 100,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
   },
   submitButton: {
     backgroundColor: "#6d28d9",
