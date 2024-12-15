@@ -54,7 +54,7 @@ const QuizWelcomePage = ({ route, navigation }) => {
             <View style={styles.separator} />
             <View style={styles.detailRow}>
               <Text style={styles.detailsLabel}>Created by:</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: quiz.username })}>
+              <TouchableOpacity onPress={() => navigation.navigate('Profile', { username: quiz.username })}>
                 <Text style={styles.detailsValue}>@{quiz.username}</Text>
               </TouchableOpacity>
             </View>
@@ -68,11 +68,6 @@ const QuizWelcomePage = ({ route, navigation }) => {
                 hour: "2-digit",
                 minute: "2-digit",
               })}</Text>
-            </View>
-            <View style={styles.separator} />
-            <View style={styles.detailRow}>
-              <Text style={styles.detailsLabel}>Updated at:</Text>
-              <Text style={styles.detailsValue}>{quiz.updatedAt}</Text>
             </View>
           </View>
 
@@ -140,6 +135,7 @@ const styles = StyleSheet.create({
   detailsValue: {
     fontSize: 14,
     color: "#777",
+    fontWeight: "bold",
   },
   separator: {
     height: 1,

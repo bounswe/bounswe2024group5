@@ -297,8 +297,8 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         </Text>
 
         <View style={styles.metadata}>
-          <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfileScreen', { username: question.username })}>
-            <Text style={styles.replyUsername}>@{question.username}</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Profile', { username: question.username })}>
+            <Text style={styles.replyUsername}>@{question.username}:</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.upvoteContainer}

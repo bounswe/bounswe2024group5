@@ -36,10 +36,9 @@ interface Post {
 const ProfileScreen = ({ route, navigation }) => {
   const hostUrl = useContext(HostUrlContext).replace(/\/+$/, ""); // Remove trailing slash
   const authContext = useAuth(); // Get the authentication context
-  const token = authContext ? authContext.token : null;
-
+  const {token, username} = authContext; // Destructure token and username
+  const usernameToDisplay = route.params?.username;
   const [userProfile, setUserProfile] = useState(null);
-  const [username, setUsername] = useState(null);
   const [loading, setLoading] = useState(true);
   const [createdQuizzes, setCreatedQuizzes] = useState<any[]>([]);
   const [quizAttempts, setQuizAttempts] = useState<QuizAttempt[]>([]);
@@ -69,9 +68,9 @@ const ProfileScreen = ({ route, navigation }) => {
   const fetchUserProfile = async () => {
     setLoading(true); // Ensure loading indicator shows during fetch
     try {
-      console.log(`Fetching profile from: ${hostUrl}/api/profile/me`);
+      console.log(`Fetching profile from: ${hostUrl}/api/profile/${usernameToDisplay}`);
 
-      const response = await fetch(`${hostUrl}/api/profile/me`, {
+      const response = await fetch(`${hostUrl}/api/profile/${usernameToDisplay}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -91,10 +90,7 @@ const ProfileScreen = ({ route, navigation }) => {
         if (response.ok) {
           setUserProfile(data);
           console.log("User Profile:", data);
-          setUsername(data.username);
-          // handleMyQuizzes();
-          // handleMyPosts();
-          // handleMyQuizAttempts();
+          // setUsername(data.username);
         } else {
           // Handle specific error messages from API
           Alert.alert("Error", data.message || "Failed to fetch profile data.");
@@ -125,12 +121,12 @@ const ProfileScreen = ({ route, navigation }) => {
     if (!userProfile) {
       await fetchUserProfile();
     }
-    if (!username) {
+    if (!usernameToDisplay) {
       return;
     }
     try {
       const response = await fetch(
-        `${hostUrl}/api/quizzes?username=${username}`,
+        `${hostUrl}/api/quizzes?username=${usernameToDisplay}`,
         {
           method: "GET",
           headers: {
@@ -276,12 +272,12 @@ const ProfileScreen = ({ route, navigation }) => {
     if (!userProfile) {
       await fetchUserProfile();
     }
-    if (!username) {
+    if (!usernameToDisplay) {
       return;
     }
     try {
       const response = await fetch(
-        `${hostUrl}/api/posts?username=${username}`,
+        `${hostUrl}/api/posts?username=${usernameToDisplay}`,
         {
           method: "GET",
           headers: {
@@ -341,7 +337,7 @@ const ProfileScreen = ({ route, navigation }) => {
               Alert.alert("Success", "Quiz deleted successfully!");
               // Refresh the profile to reflect the deleted quiz
               if (showMyQuizzes) {
-                if (!username) {
+                if (!usernameToDisplay) {
                   await fetchUserProfile();
                 }
                 fetchMyQuizzes();
@@ -380,7 +376,7 @@ const ProfileScreen = ({ route, navigation }) => {
         setLoading(true);
         try {
           await fetchUserProfile();
-          if (username) {
+          if (usernameToDisplay) {
             await Promise.all([
               fetchMyQuizAttempts(),
               fetchMyQuizzes(),
@@ -395,7 +391,7 @@ const ProfileScreen = ({ route, navigation }) => {
       };
 
       fetchData();
-    }, [username]) // Only depend on username
+    }, [usernameToDisplay]) // Only depend on username
   );
 
   // Update useEffect to check if it's own profile and fetch follow data
@@ -404,13 +400,12 @@ const ProfileScreen = ({ route, navigation }) => {
       setLoading(true);
       try {
         // Check if viewing own profile or another user's
-        const viewingUsername = route.params?.username;
-        const isOwn = !viewingUsername || viewingUsername === username;
+        const isOwn = !usernameToDisplay || usernameToDisplay === username;
         setIsOwnProfile(isOwn);
 
         // Fetch followers and following
         const followersResponse = await fetch(
-          `${hostUrl}/api/profile/${viewingUsername || username}/followers`,
+          `${hostUrl}/api/profile/${usernameToDisplay || usernameToDisplay}/followers`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -418,7 +413,7 @@ const ProfileScreen = ({ route, navigation }) => {
           }
         );
         const followingResponse = await fetch(
-          `${hostUrl}/api/profile/${viewingUsername || username}/following`,
+          `${hostUrl}/api/profile/${usernameToDisplay || usernameToDisplay}/following`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -434,7 +429,7 @@ const ProfileScreen = ({ route, navigation }) => {
 
           // Check if current user is following this profile
           if (!isOwn) {
-            setIsFollowing(followersData.some((f) => f.username === username));
+            setIsFollowing(followersData.some((f) => f.username === usernameToDisplay));
           }
         }
       } catch (error) {
@@ -445,14 +440,13 @@ const ProfileScreen = ({ route, navigation }) => {
     };
 
     fetchData();
-  }, [username, route.params?.username]);
+  }, [usernameToDisplay, route.params?.username]);
 
   // Add follow/unfollow handler
   const handleFollowToggle = async () => {
-    const targetUsername = route.params?.username;
     try {
       const response = await fetch(
-        `${hostUrl}/api/profile/follow/${targetUsername}`,
+        `${hostUrl}/api/profile/follow/${usernameToDisplay}`,
         {
           method: isFollowing ? "DELETE" : "POST",
           headers: {
@@ -463,9 +457,10 @@ const ProfileScreen = ({ route, navigation }) => {
 
       if (response.ok) {
         setIsFollowing(!isFollowing);
+        console.log("## Follow status updated:", isFollowing);
         // Update followers count
         const newFollowers = await fetch(
-          `${hostUrl}/api/profile/${targetUsername}/followers`,
+          `${hostUrl}/api/profile/${usernameToDisplay}/followers`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -534,7 +529,7 @@ const ProfileScreen = ({ route, navigation }) => {
           <View style={styles.headerInfo}>
             <Text style={styles.name}>{name}</Text>
             <Text style={styles.subheading}>
-              <AntDesignIcon name="user" size={16} color="gray" /> @{username}
+              <AntDesignIcon name="user" size={16} color="gray" /> @{usernameToDisplay}
             </Text>
 
             <View style={styles.statistics}>
@@ -564,7 +559,7 @@ const ProfileScreen = ({ route, navigation }) => {
             <TouchableOpacity
               style={styles.settingsButton}
               onPress={() =>
-                navigation.navigate("ProfileSettings", { username })
+                navigation.navigate("ProfileSettings", { username: usernameToDisplay })
               }
             >
               <FontAwesomeIcon
@@ -590,21 +585,29 @@ const ProfileScreen = ({ route, navigation }) => {
         </View>
 
         {/* My Quizzes Section */}
-        <Pressable
-          style={styles.sectionButton}
-          onPress={() => handleMyQuizzes()}
-        >
-          <Text style={styles.sectionTitle}>
-            {isOwnProfile ? "My Quizzes" : `${username}'s Quizzes`}
-          </Text>
-          {showMyQuizzes ? (
-            <MyQuizzesView
-              createdQuizzes={createdQuizzes}
-              onDelete={isOwnProfile ? handleDeleteQuiz : undefined}
-              navigation={navigation}
+          <Pressable
+            style={styles.sectionButton}
+            onPress={() => handleMyQuizzes()}
+          >
+        <View style={styles.sectionHeader}>
+            <Ionicons
+              name={showMyQuizzes ? "chevron-up" : "chevron-down"}
+              size={24}
+              color="#4C1D95"
             />
-          ) : null}
-        </Pressable>
+            <Text style={styles.sectionTitle}>
+              {isOwnProfile ? " My Quizzes" : ` ${usernameToDisplay}'s Quizzes`}
+            </Text>
+        </View>
+            {showMyQuizzes ? (
+              <MyQuizzesView
+                createdQuizzes={createdQuizzes}
+                onDelete={isOwnProfile ? handleDeleteQuiz : undefined}
+                navigation={navigation}
+                deleteFunctionality={isOwnProfile ? true : false}
+              />
+            ) : null}
+          </Pressable>
 
         {/* My Posts Section */}
         <View>
@@ -612,50 +615,68 @@ const ProfileScreen = ({ route, navigation }) => {
             style={styles.sectionButton}
             onPress={() => handleMyPosts()}
           >
-            <Text style={styles.sectionTitle}>
-              {isOwnProfile ? "My Posts" : `${username}'s Posts`}
+          <View style={styles.sectionHeader}>
+            <Ionicons
+              name={showMyPosts ? "chevron-up" : "chevron-down"}
+              size={24}
+              color="#4C1D95"
+            />
+             <Text style={styles.sectionTitle}>
+              {isOwnProfile ? " My Posts" : ` ${usernameToDisplay}'s Posts`}
             </Text>
+          </View>
             {showMyPosts ? (
               <MyPostsView myPosts={posts} navigation={navigation} />
             ) : null}
           </Pressable>
-        </View>
+          </View>
 
         {/* Quiz Attempts Section */}
+        {isOwnProfile ? ( 
         <View>
-          <Pressable
-            style={styles.sectionButton}
-            onPress={() => handleMyQuizAttempts()}
-          >
-            <View style={styles.sectionTitleRow}>
+        <Pressable
+          style={styles.sectionButton}
+          onPress={() => handleMyQuizAttempts()}
+        >
+          <View style={styles.sectionTitleRow}>
+            <View style={styles.sectionHeader}>
+              <Ionicons
+                name={showMyQuizAttempts ? "chevron-up" : "chevron-down"}
+                size={24}
+                color="#4C1D95"
+              />
               <Text style={styles.sectionTitle}>
-                {isOwnProfile ? "Quiz Attempts" : `${username}'s Quiz Attempts`}
+                {isOwnProfile ? " My Quiz Attempts" : ` ${usernameToDisplay}'s Quiz Attempts`}
               </Text>
-              {showMyQuizAttempts && (
-                <TouchableOpacity
-                  style={styles.hideCompletedButton}
-                  onPress={() => setHideCompleted(!hideCompleted)}
-                >
-                  <Ionicons
-                    name={hideCompleted ? "eye-off" : "eye"}
-                    size={20}
-                    color="#fff"
-                  />
-                  <Text style={styles.hideCompletedText}>
-                    {hideCompleted ? "Show Completed" : "Hide Completed"}
-                  </Text>
-                </TouchableOpacity>
-              )}
             </View>
             {showMyQuizAttempts && (
-              <MyQuizAttemptsView
-                quizHistory={quizAttempts}
-                navigation={navigation}
-                hideCompleted={hideCompleted}
-              />
+              <TouchableOpacity
+                style={styles.hideCompletedButton}
+                onPress={() => setHideCompleted(!hideCompleted)}
+              >
+                <Ionicons
+                  name={hideCompleted ? "eye-off" : "eye"}
+                  size={16}
+                  color="#fff"
+                />
+                <Text style={styles.hideCompletedText}>
+                  {hideCompleted ? "Show Completed" : "Hide Completed"}
+                </Text>
+              </TouchableOpacity>
             )}
-          </Pressable>
-        </View>
+          </View>
+          {showMyQuizAttempts && (
+            <MyQuizAttemptsView
+              quizHistory={quizAttempts}
+              navigation={navigation}
+              hideCompleted={hideCompleted}
+            />
+          )}
+        </Pressable>
+      </View>
+        )
+      : null}
+
       </ScrollView>
     </BaseLayout>
   );
@@ -696,6 +717,7 @@ const styles = StyleSheet.create({
     color: "#666",
     marginTop: 4,
     textAlign: "left",
+    fontWeight: "bold",
   },
   settingsButton: {
     flexDirection: "row",
@@ -749,6 +771,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     padding: 10,
   },
+  sectionHeader: {
+    flexDirection: "row",
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "600",
@@ -795,14 +820,15 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   followButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#8b5cf6",
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    marginTop: 25,
+    marginBottom: 40,
+    padding: 10,
   },
   followingButton: {
-    backgroundColor: "#e5e7eb",
+    backgroundColor: "#4c1d95",
   },
   followButtonText: {
     color: "#fff",
@@ -813,7 +839,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 5,
   },
   hideCompletedButton: {
     flexDirection: "row",
@@ -825,7 +851,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#059669",
   },
   hideCompletedText: {
-    fontSize: 12,
+    fontSize: 10,
     color: "#fff",
     fontWeight: "bold",
   },
