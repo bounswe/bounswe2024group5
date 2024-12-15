@@ -20,12 +20,12 @@ import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEff
 interface Question {
   id: number;
   title: string;
-  description: string;
+  content: string;
   createdAt: string;
-  commentCount: number;
+  noReplies: number;
   tags: string[];
   username: string;
-  upvotes: number;
+  noUpvote: number;
   hasUpvoted: boolean;
 }
 
@@ -82,7 +82,7 @@ const ForumScreen = ({ navigation }) => {
             const formattedData = postsData.map((item) => ({
               id: item.id,
               title: item.title,
-              description: item.content,
+              content: item.content,
               createdAt: new Date(item.createdAt).toLocaleString("en-US", {
                 year: "numeric",
                 month: "numeric",
@@ -90,10 +90,10 @@ const ForumScreen = ({ navigation }) => {
                 hour: "2-digit",
                 minute: "2-digit",
               }),
-              commentCount: item.noReplies || 0,
+              noReplies: item.noReplies || 0,
               tags: item.tags || [],
               username: item.username || item.user?.username || "Anonymous",
-              upvotes: item.noUpvote || 0,
+              noUpvote: item.noUpvote || 0,
               hasUpvoted: userUpvotedPosts.has(item.id),
             }));
 
@@ -133,7 +133,7 @@ const ForumScreen = ({ navigation }) => {
             const updatedQuestions = [...questions];
             updatedQuestions[questionIndex] = {
               ...question,
-              upvotes: question.upvotes - 1,
+              noUpvote: question.noUpvote - 1,
               hasUpvoted: false,
             };
             setQuestions(updatedQuestions);
@@ -158,7 +158,7 @@ const ForumScreen = ({ navigation }) => {
             const updatedQuestions = [...questions];
             updatedQuestions[questionIndex] = {
               ...question,
-              upvotes: data.upvotes || question.upvotes + 1,
+              noUpvote: data.noUpvote || question.noUpvote + 1,
               hasUpvoted: true,
             };
             setQuestions(updatedQuestions);
@@ -186,7 +186,7 @@ const ForumScreen = ({ navigation }) => {
   const navigateToQuestionDetail = (
     questionId: number,
     title: string,
-    description: string,
+    content: string,
     username: string,
     noUpvote: number,
     createdAt: string
@@ -194,7 +194,7 @@ const ForumScreen = ({ navigation }) => {
     navigation.navigate("QuestionDetail", {
       questionId,
       title,
-      description,
+      content,
       username,
       noUpvote,
       createdAt,
@@ -240,9 +240,9 @@ const ForumScreen = ({ navigation }) => {
                 navigateToQuestionDetail(
                   item.id,
                   item.title,
-                  item.description,
+                  item.content,
                   item.username,
-                  item.upvotes,
+                  item.noUpvote,
                   item.createdAt
                 )
               }

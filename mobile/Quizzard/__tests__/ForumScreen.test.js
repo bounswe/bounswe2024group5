@@ -90,7 +90,7 @@ describe('ForumScreen', () => {
       if (url.includes('/upvote')) {
         return Promise.resolve({
           status: 200,
-          json: () => Promise.resolve({ upvotes: 11 }),
+          json: () => Promise.resolve({ noUpvote: 11 }),
         });
       }
       return Promise.resolve({
