@@ -519,13 +519,11 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         totalQuestions={questions.length}
       />
       <View style={styles.heartContainer}>
-        <View style={styles.heartContainer}>
           <TouchableOpacity
             onPress={() => {
               addToFavorites();
               console.log('Favorite clicked');
             }}
-            style={styles.heartButton}
           >
             <View style={styles.heartButtonContent}>
               <Text style={styles.heartButtonText}>Add To Favorite Questions</Text>
@@ -538,7 +536,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
             </View>
           </TouchableOpacity>
         </View>
-      </View>
       <View style={styles.roundQuestionContainer}>
         <Text style={styles.questionText}>
           {generateQuestionSentence(question)}
@@ -982,11 +979,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   heartContainer: {
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  heartButton: {
+    backgroundColor: '#f5f3ff', // Light purple background
     padding: 10,
+    borderRadius: 12,
+    marginVertical: 10,
+    marginHorizontal: 15,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   heartButtonContent: {
     flexDirection: 'row',
@@ -994,13 +1001,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   heartButtonText: {
-    marginRight: 8,
     color: '#6a0dad',
     fontSize: 16,
+    marginRight: 8,
   },
   heartIcon: {
     marginLeft: 4,
-  }
+  },
 });
 
 export default QuizSolvingScreen;
