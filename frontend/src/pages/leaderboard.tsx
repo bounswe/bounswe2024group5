@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLeaderboard } from "../hooks/api/leaderboard/get";
 import { motion } from "framer-motion";
 import { LeaderboardUser } from "../hooks/api/leaderboard/get";
 import { Tabs, Skeleton } from "antd";
 import { IconTrophy, IconBrain, IconPencil } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
-
 const LeaderboardCard = ({
   title,
   data,
@@ -16,61 +15,91 @@ const LeaderboardCard = ({
   data: LeaderboardUser[];
   icon: React.ReactNode;
   valueKey: "solved" | "created" | "points";
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="h-full p-6 bg-white rounded-3xl"
-  >
-    <h3 className="flex items-center gap-2 mb-4 text-xl font-semibold text-purple-800">
-      {icon}
-      {title}
-    </h3>
-    <div className="space-y-3">
-      {data.length === 0 ? (
-        <p className="text-gray-500">No data available</p>
-      ) : (
-        data.map((user, index) => (
-          <motion.div
-            key={user.username}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.05 }}
-            className="flex items-center justify-between p-3 transition-colors bg-purple-50 rounded-xl hover:bg-purple-100"
-          >
-            <div className="flex items-center gap-3">
-              <span
+}) => {
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+
+  useEffect(() => {
+    const username = localStorage.getItem("username");
+    setCurrentUser(username);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="h-full p-6 bg-white rounded-3xl"
+    >
+      <h3 className="flex items-center gap-2 mb-4 text-xl font-semibold text-purple-800">
+        {icon}
+        {title}
+      </h3>
+      <div className="space-y-3">
+        {data.length === 0 ? (
+          <p className="text-gray-500">No data available</p>
+        ) : (
+          data.map((user, index) => {
+            const isCurrentUser = user.username === currentUser;
+            const borderColor =
+              index === 0
+                ? "border-yellow-500"
+                : index === 1
+                ? "border-gray-400"
+                : index === 2
+                ? "border-amber-600"
+                : "border-emerald-400";
+
+            return (
+              <motion.div
+                key={user.username}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
                 className={`
-                  ${
-                    index === 0
-                      ? "bg-yellow-500"
-                      : index === 1
-                      ? "bg-gray-400"
-                      : index === 2
-                      ? "bg-amber-600"
-                      : "bg-emerald-400"
-                  } 
-                  w-7 h-7 flex items-center justify-center rounded-full text-white font-bold text-sm
+                  flex items-center justify-between p-3 transition-colors bg-purple-50 rounded-xl hover:bg-purple-100
+                  ${isCurrentUser ? `border-2 ${borderColor}` : ""}
+                  relative
                 `}
               >
-                {index + 1}
-              </span>
-              <Link
-                to={`/profile/${user.username}`}
-                className="text-base font-medium text-purple-800 hover:text-purple-600"
-              >
-                @{user.username}
-              </Link>
-            </div>
-            <span className="text-base font-semibold text-purple-600">
-              {user[valueKey]} {valueKey === "points" ? "pts" : ""}
-            </span>
-          </motion.div>
-        ))
-      )}
-    </div>
-  </motion.div>
-);
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`
+                      ${
+                        index === 0
+                          ? "bg-yellow-500"
+                          : index === 1
+                          ? "bg-gray-400"
+                          : index === 2
+                          ? "bg-amber-600"
+                          : "bg-emerald-400"
+                      } 
+                      w-7 h-7 flex items-center justify-center rounded-full text-white font-bold text-sm
+                    `}
+                  >
+                    {index + 1}
+                  </span>
+                  <Link
+                    to={`/profile/${user.username}`}
+                    className="text-base font-medium text-purple-800 hover:text-purple-600"
+                  >
+                    @{user.username}
+                  </Link>
+                  {isCurrentUser && (
+                    <span className="px-2 py-1 text-xs font-semibold text-purple-800 bg-purple-200 rounded-full">
+                      You
+                    </span>
+                  )}
+                </div>
+                <span className="text-base font-semibold text-purple-600">
+                  {user[valueKey]} {valueKey === "points" ? "pts" : ""}
+                </span>
+              </motion.div>
+            );
+          })
+        )}
+      </div>
+    </motion.div>
+  );
+};
 
 const LoadingSkeleton = () => (
   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
