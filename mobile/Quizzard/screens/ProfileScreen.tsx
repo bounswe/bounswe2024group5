@@ -617,7 +617,7 @@ const ProfileScreen = ({ route, navigation }) => {
           >
           <View style={styles.sectionHeader}>
             <Ionicons
-              name={showMyQuizzes ? "chevron-up" : "chevron-down"}
+              name={showMyPosts ? "chevron-up" : "chevron-down"}
               size={24}
               color="#4C1D95"
             />
@@ -641,7 +641,7 @@ const ProfileScreen = ({ route, navigation }) => {
           <View style={styles.sectionTitleRow}>
             <View style={styles.sectionHeader}>
               <Ionicons
-                name={showMyQuizzes ? "chevron-up" : "chevron-down"}
+                name={showMyQuizAttempts ? "chevron-up" : "chevron-down"}
                 size={24}
                 color="#4C1D95"
               />
