@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useContext } from "react";
 import HostContext from "../../../HostContext";
-import { Question } from "../../../types/question";
 
 export type QuestionFavoriteResponse = {
     id: number,
-    question: Question,
+    questionId: number,
     createdAt: string,
     updatedAt: string,
 }
@@ -34,6 +33,7 @@ export const usePostQuestionFavorite = () => {
             return response.json();
         },
         onSuccess: (newFavorite) => {
+            console.log("New favorite question: ", newFavorite);
             queryClient.invalidateQueries({ queryKey: ['question-favorites']});
             queryClient.setQueryData<QuestionFavoriteResponse[]>(['question-favorites'], (old) => [...(old || []), newFavorite])
         }

@@ -697,8 +697,8 @@ paths:
                 properties:
                   token:
                     type: string
-                  user:
-                    $ref: '#/components/schemas/User'
+                  message:
+                    type: string
         '401':
           description: Unauthorized
           content:

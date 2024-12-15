@@ -92,10 +92,13 @@ export const SolveQuizPage = () => {
   }, [quizId]);
   const quiz = quizzes?.find((q) => q.id?.toString() === quizId);
 
+  console.log("Current question id: ", quiz?.questions[currentQuestion].id);
+  console.log("Favorite questions: ", favoriteQuestions);
+
   const isCurrentQuestionFavorite =
     favoriteQuestions?.filter(
       (favoriteQuestion) =>
-        favoriteQuestion?.question?.id === quiz?.questions[currentQuestion].id
+        favoriteQuestion?.questionId === quiz?.questions[currentQuestion].id
     ).length === 1;
 
   useEffect(() => {
@@ -350,6 +353,7 @@ export const SolveQuizPage = () => {
             questionCount={quiz.questions.length}
             completedAt={quizAttempt?.completedAt ?? new Date().toISOString()}
             quizId={quizIdAsNumber}
+            resetQuizState={resetQuizState}
           />
         ) : (
           <>

@@ -1,11 +1,10 @@
 import { useContext } from "react";
 import HostContext from "../../../HostContext";
 import { useQuery } from "@tanstack/react-query";
-import { Quiz } from "../../../types/question";
 
 export type QuizFavoriteResponse = {
     id: number,
-    quiz: Quiz,
+    quizId: number,
     createdAt: string,
     updatedAt: string,
 }

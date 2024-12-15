@@ -16,6 +16,7 @@ import { RootStackParamList } from "../app/index";
 import { Ionicons } from "@expo/vector-icons";
 import HostUrlContext from "../app/HostContext";
 import { useAuth } from "./AuthProvider";
+import BaseLayout from "./BaseLayout";
 
 type CreateQuestionScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -139,7 +140,7 @@ const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
         const response = await fetch(
           `${hostUrl}/api/autocomplete?prefix=${encodeURIComponent(
             currentTag
-          )}`,
+          )}&language=english`,
           {
             method: "GET",
             headers: {
@@ -219,6 +220,7 @@ const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
+    <BaseLayout navigation={navigation}>
     <View style={styles.container}>
       <View style={styles.contentContainer}>
         {/* Back Button */}
@@ -230,11 +232,12 @@ const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Question Title Input */}
+        <Text style={styles.title}>Tell us what your post is about.{"\n"}Do not forget to add some tags!</Text>
         <TextInput
           style={styles.input}
           value={title}
           onChangeText={setTitle}
-          placeholder="Question Title"
+          placeholder="Question Title*"
         />
 
         {/* Question Content Input */}
@@ -242,7 +245,7 @@ const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
           style={styles.descriptionInput}
           value={content}
           onChangeText={setContent}
-          placeholder="Question Content"
+          placeholder="Question Content*"
           multiline
         />
 
@@ -252,7 +255,7 @@ const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
             style={styles.input}
             value={tagsInput}
             onChangeText={handleTagsInputChange}
-            placeholder="Tags (comma-separated)"
+            placeholder="Tags (comma-separated)*"
           />
           {isFetchingSuggestions && (
             <View style={styles.loadingIndicator}>
@@ -292,6 +295,7 @@ const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </View>
+    </BaseLayout>
   );
 };
 
@@ -318,25 +322,32 @@ const styles = StyleSheet.create({
   backButton: {
     marginBottom: 20,
   },
+  title: {
+    fontSize: 18,
+    color: "#2e1065",
+    marginBottom: 8,
+  },
   input: {
     height: 40,
-    borderColor: "gray",
+    borderColor: "#2e1065",
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
     borderRadius: 5,
+    backgroundColor: '#faf5ff',
   },
   descriptionInput: {
     height: 100,
-    borderColor: "gray",
+    borderColor: "#2e1065",
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
     textAlignVertical: "top",
     borderRadius: 5,
+    backgroundColor: '#faf5ff',
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -353,7 +364,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: "#fff",
-    borderColor: "gray",
+    borderColor: "#2e1065",
     borderWidth: 1,
     maxHeight: 150,
     zIndex: 999,
