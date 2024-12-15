@@ -82,7 +82,12 @@ const LeaderboardScreen = ({ navigation }) => {
   };
 
   const renderItem = ({ item, index }) => (
-    <View style={styles.leaderboardItem}>
+    <TouchableOpacity
+      style={styles.leaderboardItem}
+      onPress={() =>
+        navigation.navigate("Profile", { username: item.username })
+      }
+    >
       <Text style={styles.rank}>#{index + 1}</Text>
       <Text style={styles.username}>{item.username}</Text>
       <Text style={styles.score}>
@@ -92,7 +97,7 @@ const LeaderboardScreen = ({ navigation }) => {
           ? item.solved
           : item.created || 0}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderToggleButtons = () => (
