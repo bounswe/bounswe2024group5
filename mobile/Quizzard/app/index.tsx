@@ -17,7 +17,7 @@ import QuizFinishScreen from "../screens/QuizFinishScreen"; // Import the finish
 import { AuthProvider } from "../screens/AuthProvider";
 import SearchResultsScreen from "../screens/SearchResultsScreen";
 import LeaderboardScreen from "../screens/LeaderboardScreen";
-import OtherUserProfileScreen from "../screens/OtherUserProfileScreen";
+// import OtherUserProfileScreen from "../screens/OtherUserProfileScreen";
 
 export type RootStackParamList = {
   Login: undefined;
@@ -56,7 +56,7 @@ export type RootStackParamList = {
   };
   Profile: undefined;
   ProfileSettings: undefined;
-  OtherUserProfileScreen: undefined;
+  // OtherUserProfileScreen: undefined;
   QuizWelcome: {
     quiz: {
       title: string;
@@ -152,11 +152,11 @@ function MyStack() {
         component={ProfileSettingsScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="OtherUserProfileScreen"
         component={OtherUserProfileScreen}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Stack.Screen
         name="Leaderboard"
         component={LeaderboardScreen}
