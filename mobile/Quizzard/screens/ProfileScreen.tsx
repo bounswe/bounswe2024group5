@@ -537,13 +537,29 @@ const ProfileScreen = ({ route, navigation }) => {
             </View>
 
             <View style={styles.followStats}>
-              <Text style={styles.followText}>
-                {followers.length} followers
-              </Text>
-              <Text style={styles.followText}>
-                {following.length} following
-              </Text>
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('FollowList', { 
+                  username: usernameToDisplay, 
+                  type: 'followers' 
+                })}
+              >
+                <Text style={styles.followText}>
+                  {followers.length} followers
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('FollowList', { 
+                  username: usernameToDisplay, 
+                  type: 'following' 
+                })}
+              >
+                <Text style={styles.followText}>
+                  {following.length} following
+                </Text>
+              </TouchableOpacity>
             </View>
+
           </View>
 
           {/* Show Edit or Follow button based on profile type */}
