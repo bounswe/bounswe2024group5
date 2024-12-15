@@ -25,8 +25,7 @@ const HomePage = ({ navigation }) => {
   const [quizzesForYou, setQuizzesForYou] = useState<Quiz[]>([]);
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
-  const [otherQuizzesFilterDifficulty, setOtherQuizzesFilterDifficulty] =
-    useState("a1"); // Default difficulty
+  const [otherQuizzesFilterDifficulty, setOtherQuizzesFilterDifficulty] = useState("a1");
   const authContext = useAuth(); // Get the authentication context
   const [userProfile, setUserProfile] = useState(null);
   const token = authContext ? authContext.token : null; // Get the token if authContext is not null
@@ -433,7 +432,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   quizSection: {
-    height: 240,
+    height: 220,
   },
   quizScroll: {
     paddingLeft: 15,

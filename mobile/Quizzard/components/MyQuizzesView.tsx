@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,88 @@ import {
 } from "react-native";
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import HostUrlContext from "../app/HostContext";
+import { useAuth } from "../screens/AuthProvider";
+
 
 const MyQuizzesView = ({ createdQuizzes, onDelete, navigation, deleteFunctionality = true }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [quizToDelete, setQuizToDelete] = useState(null);
+  const [favoritedQuizzes, setFavoritedQuizzes] = useState({});
+  const hostUrl = useContext(HostUrlContext).replace(/\/+$/, "");
+  const { token } = useAuth();
+
+  // Check favorite status for all quizzes on component mount
+  useEffect(() => {
+    checkFavoriteStatus();
+  }, []);
+
+  // Fetch all favorite quizzes at once
+  const checkFavoriteStatus = async () => {
+    try {
+      const response = await fetch(`${hostUrl}/api/favorite-quiz`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const favoriteData = await response.json();
+        // Create an object with quizId as key and favorite status as value
+        const favoriteStatus = favoriteData.reduce((acc, favorite) => ({
+          ...acc,
+          [favorite.quizId]: true
+        }), {});
+        setFavoritedQuizzes(favoriteStatus);
+      }
+    } catch (error) {
+      console.error("Error checking favorite status:", error);
+    }
+  };
+
+  const handleFavorite = async (quiz) => {
+    try {
+      if (favoritedQuizzes[quiz.id]) {
+        // Remove from favorites
+        const response = await fetch(`${hostUrl}/api/favorite-quiz/${quiz.id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 204) {
+          setFavoritedQuizzes(prev => ({
+            ...prev,
+            [quiz.id]: false
+          }));
+          quiz.noFavorites = Math.max(0, quiz.noFavorites - 1);
+        }
+      } else {
+        // Add to favorites
+        const response = await fetch(`${hostUrl}/api/favorite-quiz`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ quizId: quiz.id }),
+        });
+
+        if (response.status === 201) {
+          setFavoritedQuizzes(prev => ({
+            ...prev,
+            [quiz.id]: true
+          }));
+          quiz.noFavorites += 1;
+        }
+      }
+    } catch (error) {
+      console.error("Error updating favorite status:", error);
+    }
+  };
+
 
   const handleDelete = (id) => {
     setQuizToDelete(id);
@@ -51,9 +129,19 @@ const MyQuizzesView = ({ createdQuizzes, onDelete, navigation, deleteFunctionali
 
               {/* Favorites and Delete Container */}
               <View style={styles.cardFooter}>
-                <Text style={styles.itemDetail}>
-                  <AntDesignIcon name="like2" size={12} color="#e13528" />{" "} {quiz.noFavorites}
-                </Text>
+                <TouchableOpacity
+                  onPress={() => handleFavorite(quiz)}
+                  style={styles.favoriteButton}
+                >
+                  <Ionicons
+                    name={favoritedQuizzes[quiz.id] ? "heart" : "heart-outline"}
+                    size={14}
+                    color={favoritedQuizzes[quiz.id] ? "#e0245e" : "#6a0dad"}
+                  />
+                  <Text style={styles.favoriteCount}>{quiz.noFavorites}</Text>
+                </TouchableOpacity>
+
+
                 {deleteFunctionality && (
                   <TouchableOpacity
                     style={styles.deleteButton}
@@ -230,6 +318,15 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     color: "white",
+  },
+  favoriteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  favoriteCount: {
+    marginLeft: 4,
+    fontSize: 12,
+    color: "#666",
   },
 });
 

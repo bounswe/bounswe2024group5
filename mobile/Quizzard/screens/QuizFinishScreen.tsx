@@ -12,15 +12,7 @@ import HostUrlContext from "../app/HostContext";
 import QuizViewComponent from "../components/QuizViewComponent";
 import { Quiz } from "../database/types";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
-const calculateQuizDifficultyFromElo = (elo: number) => {
-  if (elo < 400) return "A1";
-  else if (elo < 1000) return "A2";
-  else if (elo < 1800) return "B1";
-  else if (elo < 2600) return "B2";
-  else if (elo < 3300) return "C1";
-  else return "C2";
-};
+import { calculateQuizDifficultyFromElo } from "../components/EloCefrInfoTable";
 
 const QuizFinishScreen = ({ route, navigation }) => {
   const { quiz, questions, selectedAnswers, alreadyFinished } = route.params;
