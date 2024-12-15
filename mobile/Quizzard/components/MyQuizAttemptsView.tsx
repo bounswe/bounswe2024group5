@@ -89,7 +89,15 @@ const MyQuizAttemptsView = ({ quizHistory, navigation, hideCompleted }) => {
             </View>
             <View style={styles.cardDetails}>
               <Text style={styles.itemDetail}>
-                Last activity: {quiz.completedAt}
+                Last activity:{" "}
+                {new Date(quiz.completedAt).toLocaleString("en-US", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                  hour12: true,
+                })}
               </Text>
               <Text
                 style={[
