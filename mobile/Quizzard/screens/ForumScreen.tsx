@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import BaseLayout from "./BaseLayout";
 import QuestionItem from "../components/QuestionItem";
@@ -75,98 +76,81 @@ const ForumScreen = ({ navigation }) => {
 
     saveUpvotedPosts();
   }, [upvotedPostIds]);
-  const { token, username } = authContext;  // Now you can destructure both token and username
+  const { token, username } = authContext; // Now you can destructure both token and username
   const [isUpvoted, setIsUpvoted] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
-      const checkNextPage = async (currentPageData: any[]) => {
-        if (currentPageData.length === PAGE_SIZE) {
-          // If current page is full, check next page
-          try {
-            const nextPageResponse = await fetch(
-              `${hostUrl}/api/feed?page=${currentPage + 1}&size=${PAGE_SIZE}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-
-            if (nextPageResponse.ok) {
-              const nextPageData = await nextPageResponse.json();
-              const nextPosts = Array.isArray(nextPageData)
-                ? nextPageData
-                : nextPageData.content;
-              // If next page has content, there are more pages
-              return nextPosts && nextPosts.length > 0;
-            }
-          } catch (error) {
-            console.error("Error checking next page:", error);
-          }
-        }
-        return false;
-      };
-
       const fetchPosts = async () => {
         setIsLoading(true);
         try {
-          const postsResponse = await fetch(`${hostUrl}/api/posts`, {
+          // First fetch all posts to get total count
+          const allPostsResponse = await fetch(`${hostUrl}/api/posts`, {
             headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
+              Authorization: `Bearer ${token}`,
             },
           });
-          // console.log("Response status:", postsResponse.status);
-          if (!postsResponse.ok) {
-            throw new Error('Failed to fetch posts');
+
+          if (!allPostsResponse.ok) {
+            throw new Error("Failed to fetch posts");
           }
 
-          const postsData = await postsResponse.json();
-          console.log("Data fetched:", postsData);
+          const allPosts = await allPostsResponse.json();
 
-          // Check if data is an array
-          if (Array.isArray(postsData)) {
-            if(!username) {
-              throw new Error('Username is not set');
-            }
-            // Get upvote status for all posts
-            const upvotesResponse = await fetch(`${hostUrl}/api/posts/upvotes?username=${username}`, {
+          // Calculate total pages
+          const total = Array.isArray(allPosts) ? allPosts.length : 0;
+          const calculatedTotalPages = Math.ceil(total / PAGE_SIZE);
+          setTotalPages(calculatedTotalPages);
+
+          // Get paginated slice of posts
+          const start = currentPage * PAGE_SIZE;
+          const end = start + PAGE_SIZE;
+          const paginatedPosts = allPosts.slice(start, end);
+
+          if (!username) {
+            throw new Error("Username is not set");
+          }
+
+          // Get upvote status for paginated posts
+          const upvotesResponse = await fetch(
+            `${hostUrl}/api/posts/upvotes?username=${username}`,
+            {
               method: "GET",
               headers: {
                 Authorization: `Bearer ${token}`,
               },
-            });
-
-            if (!upvotesResponse.ok) {
-              console.error(`Failed to fetch upvotes: ${upvotesResponse.status} - ${upvotesResponse.statusText}`);
-              throw new Error('Failed to fetch upvotes');
             }
+          );
 
-            const upvotesData = await upvotesResponse.json();
-            // Create a Set of upvoted post IDs for efficient lookup
-            const userUpvotedPosts = new Set(upvotesData.map(upvote => upvote.postId));
-
-            // Map the API data to match the structure expected by QuestionItem with correct upvote status
-            const formattedData = postsData.map((item) => ({
-              id: item.id,
-              title: item.title,
-              content: item.content,
-              createdAt: new Date(item.createdAt).toLocaleString("en-US", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-              noReplies: item.noReplies || 0,
-              tags: item.tags || [],
-              username: item.username || item.user?.username || "Anonymous",
-              noUpvote: item.noUpvote || 0,
-              hasUpvoted: userUpvotedPosts.has(item.id),
-            }));
-
-            setQuestions(formattedData);
+          if (!upvotesResponse.ok) {
+            throw new Error("Failed to fetch upvotes");
           }
+
+          const upvotesData = await upvotesResponse.json();
+          const userUpvotedPosts = new Set(
+            upvotesData.map((upvote) => upvote.postId)
+          );
+
+          // Format the paginated posts with upvote status
+          const formattedPosts = paginatedPosts.map((item) => ({
+            id: item.id,
+            title: item.title,
+            content: item.content,
+            createdAt: new Date(item.createdAt).toLocaleString("en-US", {
+              year: "numeric",
+              month: "numeric",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            noReplies: item.noReplies || 0,
+            tags: item.tags || [],
+            username: item.username || item.user?.username || "Anonymous",
+            noUpvote: item.noUpvote || 0,
+            hasUpvoted: userUpvotedPosts.has(item.id),
+          }));
+
+          setQuestions(formattedPosts);
         } catch (error) {
           console.error("Error fetching posts:", error);
           Alert.alert("Error", "Failed to fetch posts. Please try again.");
@@ -176,7 +160,7 @@ const ForumScreen = ({ navigation }) => {
       };
 
       fetchPosts();
-    }, [hostUrl, token, isUpvoted])
+    }, [hostUrl, token, currentPage, isUpvoted]) // Add currentPage to dependencies
   );
 
   // Function to handle upvoting a question
@@ -190,52 +174,52 @@ const ForumScreen = ({ navigation }) => {
     try {
       if (question.hasUpvoted) {
         // If already upvoted, remove upvote
-          const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
-            },
-          });
+        const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        });
 
-          if (response.status === 204) {
-            const updatedQuestions = [...questions];
-            updatedQuestions[questionIndex] = {
-              ...question,
-              noUpvote: question.noUpvote - 1,
-              hasUpvoted: false,
-            };
-            setQuestions(updatedQuestions);
-          } else if (response.status === 401) {
-            Alert.alert("Unauthorized", "Please log in to remove upvote.");
-          } else {
-            throw new Error('Failed to remove upvote');
-          }
+        if (response.status === 204) {
+          const updatedQuestions = [...questions];
+          updatedQuestions[questionIndex] = {
+            ...question,
+            noUpvote: question.noUpvote - 1,
+            hasUpvoted: false,
+          };
+          setQuestions(updatedQuestions);
+        } else if (response.status === 401) {
+          Alert.alert("Unauthorized", "Please log in to remove upvote.");
+        } else {
+          throw new Error("Failed to remove upvote");
+        }
       } else {
         // If not upvoted, add upvote
-          const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the headers
-            },
-          });
-          console.log(response);
-          if (response.ok) {
-      // if (response.status === 200) {
-            const data = await response.json();
-            console.log("Upvote response data:", data);
-            const updatedQuestions = [...questions];
-            updatedQuestions[questionIndex] = {
-              ...question,
-              noUpvote: data.noUpvote || question.noUpvote + 1,
-              hasUpvoted: true,
-            };
-            setQuestions(updatedQuestions);
-          } else if (response.status === 401) {
-            Alert.alert("Unauthorized", "Please log in to upvote.");
-          } else {
-            const errorData = await response.json();
-            Alert.alert("Error", errorData.message || "Failed to upvote.");
-          }
+        const response = await fetch(`${hostUrl}/api/posts/${postId}/upvote`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        });
+        console.log(response);
+        if (response.ok) {
+          // if (response.status === 200) {
+          const data = await response.json();
+          console.log("Upvote response data:", data);
+          const updatedQuestions = [...questions];
+          updatedQuestions[questionIndex] = {
+            ...question,
+            noUpvote: data.noUpvote || question.noUpvote + 1,
+            hasUpvoted: true,
+          };
+          setQuestions(updatedQuestions);
+        } else if (response.status === 401) {
+          Alert.alert("Unauthorized", "Please log in to upvote.");
+        } else {
+          const errorData = await response.json();
+          Alert.alert("Error", errorData.message || "Failed to upvote.");
+        }
       }
     } catch (error) {
       console.error("Error handling upvote:", error);
