@@ -26,7 +26,7 @@ export type RootStackParamList = {
   QuestionDetail: {
     questionId: number;
     title: string;
-    description: string;
+    content: string;
     username?: string;
     noUpvote?: number;
     createdAt?: string;
