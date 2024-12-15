@@ -214,8 +214,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    height: 65,
-    backgroundColor: "rgba(255, 255, 255, 0.9)", // Frosted glass effect
+    height: 55,
+    backgroundColor: "#ede9fe",
     paddingBottom: 8,
     borderTopColor: "rgba(0,0,0,0.05)",
     borderTopWidth: 1,
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
-    paddingVertical: 8,
+    marginTop: 14,
   },
 
   navLabel: {

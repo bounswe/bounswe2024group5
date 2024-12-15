@@ -66,102 +66,141 @@ const FollowListScreen = ({ route, navigation }) => {
     </TouchableOpacity>
   );
 
-  if (loading) {
-    return (
-      <BaseLayout navigation={navigation}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6d28d9" />
-        </View>
-      </BaseLayout>
+  
+    const renderEmptyList = () => (
+      <View style={styles.emptyContainer}>
+        <Ionicons 
+          name={type === 'followers' ? "people-outline" : "person-add-outline"} 
+          size={50} 
+          color="#6d28d9"
+        />
+        <Text style={styles.emptyText}>
+          {type === 'followers' 
+            ? `${username} has no followers yet`
+            : `${username} isn't following anyone yet`
+          }
+        </Text>
+      </View>
     );
-  }
-
-  return (
+  
+    if (loading) {
+    return (
     <BaseLayout navigation={navigation}>
-      <View style={styles.container}>
+        <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#6d28d9" />
+        </View>
+    </BaseLayout>
+    );
+    }
+  
+return (
+    <BaseLayout navigation={navigation}>
+    <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity
+        <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}
-          >
+        >
             <Ionicons name="arrow-back" size={24} color="#333" />
-          </TouchableOpacity>
-          <Text style={styles.title}>
+        </TouchableOpacity>
+        <Text style={styles.title}>
             {type.charAt(0).toUpperCase() + type.slice(1)} ({users.length})
-          </Text>
+        </Text>
         </View>
-
+  
         <FlatList
-          data={users}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.username}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
+        data={users}
+        renderItem={renderItem}
+        ListEmptyComponent={renderEmptyList}
+        keyExtractor={(item) => item.username}
+        contentContainerStyle={[
+            styles.listContainer,
+            users.length === 0 && styles.emptyListContainer
+        ]}
+        showsVerticalScrollIndicator={false}
         />
-      </View>
-    </BaseLayout>
-  );
-};
+    </View>
+      </BaseLayout>
+    );
+  };
+  
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3e8ff',
-  },
-  backButton: {
-    marginRight: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2e1065',
-  },
-  listContainer: {
-    padding: 16,
-  },
-  userCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#f3e8ff',
-    borderRadius: 12,
-    marginBottom: 8,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  userInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  username: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#4c1d95',
-  },
-  name: {
-    fontSize: 14,
-    color: '#666',
-  },
-});
-
-export default FollowListScreen;
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: '#f3e8ff',
+    },
+    backButton: {
+      marginRight: 16,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: '#2e1065',
+    },
+    listContainer: {
+      padding: 16,
+    },
+    userCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 12,
+      backgroundColor: '#f3e8ff',
+      borderRadius: 12,
+      marginBottom: 8,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
+    profileImage: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+    },
+    userInfo: {
+      flex: 1,
+      marginLeft: 12,
+    },
+    username: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#4c1d95',
+    },
+    name: {
+      fontSize: 14,
+      color: '#666',
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+      minHeight: 300, // Ensures content is centered nicely
+    },
+    emptyText: {
+      marginTop: 16,
+      fontSize: 16,
+      color: '#6d28d9',
+      textAlign: 'center',
+      fontWeight: '500',
+    },
+    emptyListContainer: {
+      flexGrow: 1, // Ensures the empty container can take full height
+    }
+  });
+  
+  export default FollowListScreen;
