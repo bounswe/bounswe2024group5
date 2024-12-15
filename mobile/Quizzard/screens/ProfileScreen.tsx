@@ -604,6 +604,7 @@ const ProfileScreen = ({ route, navigation }) => {
                 createdQuizzes={createdQuizzes}
                 onDelete={isOwnProfile ? handleDeleteQuiz : undefined}
                 navigation={navigation}
+                deleteFunctionality={isOwnProfile ? true : false}
               />
             ) : null}
           </Pressable>
