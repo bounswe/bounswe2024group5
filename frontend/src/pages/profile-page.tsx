@@ -138,6 +138,7 @@ const ProfilePage = () => {
 
                   {!isOwnProfile && (
                     <button
+                      data-testid="follow-button"
                       onClick={handleFollow}
                       className="flex items-center justify-center px-4 py-2 text-white transition-colors rounded-full bg-violet-500 hover:bg-violet-600"
                     >
