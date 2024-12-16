@@ -58,6 +58,7 @@ public interface QuizRepository extends JpaRepository <Quiz, Long> {
         WHERE q.createdAt >= :timestamp
         GROUP BY u.username
         ORDER BY COUNT(q.id) DESC
+        LIMIT 10
         """)
     List<LeaderboardResponse.QuizCreated> getLeaderboardQuizCreated(@Param("timestamp") Timestamp timestamp);
 }
