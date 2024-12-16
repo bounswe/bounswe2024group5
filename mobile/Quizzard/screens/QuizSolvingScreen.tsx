@@ -33,23 +33,6 @@ interface RouteParams {
   questions: Question[];
 }
 
-// types from the database/types.ts file:
-// type Question = {
-//   id: number;
-//   quizId: number;
-//   word: string;
-//   questionType: QuestionType;
-//   options: string[];
-//   correctAnswer: string;      // 'A', 'B', 'C' or 'D'
-//   wrongAnswers: string[];
-//   difficulty: number;         // elo
-// }
-
-// type QuestionType =
-//   | "english_to_turkish"
-//   | "turkish_to_english"
-//   | "english_to_sense";
-
 interface PostPreviewProps {
   post: Post;
   onPress: () => void;
@@ -132,10 +115,10 @@ const ForumModal = React.memo<{
       onRequestClose={onClose}
     >
       <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
+        <View style={styles.relatedPostModalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>
-              Posts about <Text style={styles.boldText}>'{word}'</Text>
+            <Text style={styles.relatedPostModalTitle}>
+              Posts about '{word}'
             </Text>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <Ionicons name="close" size={24} color="#1a1a1a" />
@@ -154,9 +137,9 @@ const ForumModal = React.memo<{
             ) : (
               <FlatList
                 data={relatedPosts}
-                horizontal
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.flatListContent}
                 ListEmptyComponent={
                   <View style={styles.noPostsContainer}>
@@ -445,6 +428,8 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       return `How do you say '${question.word}' in Turkish?`;
     } else if (question.questionType === "turkish_to_english") {
       return `How do you say '${question.word}' in English?`;
+    } else if (question.questionType === "english_to_sense") {
+      return `What is the meaning of '${question.word}'?`;
     } else {
       return "Invalid question type";
     }
@@ -627,6 +612,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           <Ionicons name="help-circle-outline" size={20} color="#6a0dad" />
           <Text style={styles.hintButtonText}>Hint</Text>
         </TouchableOpacity>
+        
         {/* Hint Images Modal */}
         <Modal
           visible={isHintModalVisible}
@@ -903,16 +889,33 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "flex-end", // Makes modal slide from bottom
+    justifyContent: "flex-end",
+    alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: 4,
   },
   modalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    height: "80%", // Takes up 80% of screen height
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
+    width: "80%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  relatedPostModalContent: {
+    backgroundColor: "#f0eff7",   //#f0eff7
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
     width: "100%",
+    height: "70%",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -931,29 +934,34 @@ const styles = StyleSheet.create({
     borderBottomColor: "#e9ecef",
     marginBottom: 15,
   },
+  relatedPostModalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+    textAlign: "left",
+  },
   modalTitle: {
     fontSize: 20,
-    color: "#1a1a1a",
-  },
-  boldText: {
     fontWeight: "bold",
+    color: "#1a1a1a",
+    marginVertical: 10,
+    textAlign: "center",
   },
   modalBody: {
     flex: 1,
     width: "100%",
   },
   flatListContent: {
-    paddingHorizontal: 10,
-    paddingBottom: 20, // Add padding at the bottom
+    paddingVertical: 10,
+    paddingBottom: 20, 
   },
   postsList: {
     flex: 1,
   },
   postPreview: {
-    width: 300,
-    height: "25%",
-    minHeight: 150,
+    minHeight: "25%",
     marginHorizontal: 10,
+    marginBottom: 10,
     padding: 15,
     backgroundColor: "#f8f9fa",
     borderRadius: 12,
@@ -1029,13 +1037,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   noPostsContainer: {
-    width: 300,
-    height: 200,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-    marginHorizontal: 10,
+    paddingVertical: 40,
   },
   noPostsText: {
     fontSize: 16,
@@ -1254,28 +1259,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 25,
-    alignItems: "center",
-    width: "85%",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#1a1a1a",
-    marginVertical: 10,
-    textAlign: "center",
   },
   modalText: {
     fontSize: 16,
