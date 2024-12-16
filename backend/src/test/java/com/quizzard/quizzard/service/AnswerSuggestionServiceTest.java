@@ -33,7 +33,7 @@ public class AnswerSuggestionServiceTest {
     public void testGetAnswerSuggestion_EnglishToSense() {
         // Arrange
         String word = "happy";
-        String questionType = "english_to_turkish";
+        String questionType = "english_to_sense";
         List<String> expectedSuggestions = Arrays.asList("an expression of greeting");
 
         when(senseRepository.findSenseByEnglishWord(word)).thenReturn(expectedSuggestions);
@@ -80,6 +80,6 @@ public class AnswerSuggestionServiceTest {
         // Assert
         assertNotNull(response);
         assertEquals(expectedSuggestions, response);
-        verify(translateRepository).findTurkishByEnglishWord(word);
+        verify(translateRepository).findEnglishByTurkishWord(word);
     }
 }
