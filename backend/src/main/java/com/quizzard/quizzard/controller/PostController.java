@@ -45,9 +45,10 @@ public class PostController {
     }
 
     @GetMapping
-    ResponseEntity<List<PostResponse>> getAllPosts(@RequestParam(required = false) Optional<String> tag,
+    ResponseEntity<List<PostResponse>> getAllPosts(@RequestHeader("Authorization") String jwtToken,
+                                                    @RequestParam(required = false) Optional<String> tag,
                                                    @RequestParam(required = false) Optional<String> username){
-        return ResponseEntity.ok(postService.getAllPosts(tag, username));
+        return ResponseEntity.ok(postService.getAllPosts(jwtToken, tag, username));
     }
 
     @GetMapping("/{postId}")
