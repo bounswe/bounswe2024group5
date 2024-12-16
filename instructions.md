@@ -53,3 +53,18 @@
    ```bash
     npm start
    ```
+
+### Local Deployment for Web
+
+1. Install dependencies
+
+   ```bash
+   pnpm i
+   ```
+
+2. Start the app
+
+   ```bash
+    pnpm run dev
+   ```
+
