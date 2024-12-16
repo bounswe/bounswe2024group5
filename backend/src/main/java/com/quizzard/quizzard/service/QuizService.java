@@ -165,6 +165,7 @@ public class QuizService {
         return mapQuizzesToQuizResponses(quizRepository.findRecommendedQuizzes(givenQuizId, username, pageable));
     }
 
+    @Transactional
     public QuizResponse createQuizFromFavorites(String authorUsername, CreateFromFavQuestionToQuizRequest request) {
         User author = userService.getOneUserByUsername(authorUsername);
         List<FavoriteQuestion> favoriteQuestions = favoriteQuestionRepository.findAllByUserId(author.getId());
