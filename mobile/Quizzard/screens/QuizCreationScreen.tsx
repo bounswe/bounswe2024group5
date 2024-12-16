@@ -307,8 +307,15 @@ const QuizCreationPage = ({ navigation }) => {
   // New method to fetch word suggestions
   const fetchWordSuggestions = async (index, question) => {
     const updatedQuestions = [...questions];
-    const language = question.questionType.includes('english') ? 'english' : 'turkish';
-
+    let language = "english";
+    console.log(question.questionType);
+    if (question.questionType === "turkish_to_english") {
+      language = "turkish";
+    }
+    
+    
+    console.log(language);
+    
     try {
       question.isLoadingWordSuggestions = true;
       updatedQuestions[index] = question;
@@ -327,6 +334,7 @@ const QuizCreationPage = ({ navigation }) => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
 
         // Ensure we're updating the specific question's state
         const newQuestions = [...questions];
@@ -395,11 +403,6 @@ const QuizCreationPage = ({ navigation }) => {
     updatedQuestion.options = { ...updatedQuestion.options, [option]: text };
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
-    // console.log(`Question is: ${questions[index].options}`);
-    console.log(
-      `3- Question ${index + 1} options:`,
-      updatedQuestions[index].options
-    );
   };
 
   const createQuizFromFavorites = async () => {
@@ -539,97 +542,94 @@ const QuizCreationPage = ({ navigation }) => {
         />
 
         {/* Render all question boxes */}
-        {questions.map((question, index) => (
-          <View
-            key={index}
-            style={[
-              styles.questionBox,
-              { zIndex: questions.length - index } // Higher index = lower in the stack
-            ]}
-          >
-            {/* Existing header container */}
-            <View style={styles.headerContainer}>
-              <TextInput
-                style={styles.questionTitle}
-                placeholder="Enter a word"
-                value={question.word}
-                onChangeText={(word) => handleInputChange(index, word)}
-              />
-              {/* Loading indicator for suggestions */}
-              {isLoadingWordSuggestions && (
-                <ActivityIndicator
-                  size="small"
-                  color="#6a0dad"
-                  style={styles.suggestionLoadingIndicator}
-                />
-              )}
-              <View style={styles.dropdownContainer}>
-                <DropdownComponent
-                  testID="question-type-dropdown"
-                  selectedValue={questions[index].questionType}
-                  onValueChange={(type) => updateQuestionType(index, type)}
-                />
-              </View>
-            </View>
+{questions.map((question, index) => (
+  <View
+    key={index}
+    style={[
+      styles.questionBox,
+      { zIndex: questions.length - index }
+    ]}
+  >
+    {/* Existing header container */}
+    <View style={styles.headerContainer}>
+      <TextInput
+        style={styles.questionTitle}
+        placeholder="Enter a word"
+        value={question.word}
+        onChangeText={(word) => handleInputChange(index, word)}
+      />
+      {/* Loading indicator for suggestions */}
+      {isLoadingWordSuggestions && (
+        <ActivityIndicator
+          size="small"
+          color="#6a0dad"
+          style={styles.suggestionLoadingIndicator}
+        />
+      )}
+      <View style={styles.dropdownContainer}>
+        <DropdownComponent
+          testID="question-type-dropdown"
+          selectedValue={questions[index].questionType}
+          onValueChange={(type) => updateQuestionType(index, type)}
+        />
+      </View>
+    </View>
 
-            {/* Word Suggestions Dropdown */}
-            {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
-              <View style={[styles.suggestionsOverlay, { top: 60 }]}>
-                <ScrollView>
-                  {question.wordSuggestions.map((item, i) => (
-                    <TouchableOpacity
-                      key={i}
-                      style={styles.suggestionItem}
-                      onPress={() => handleWordSuggestionSelect(index, item)}
-                    >
-                      <Text style={styles.suggestionText}>{item}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
+    {/* Word Suggestions Dropdown */}
+    {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
+      <View style={[styles.suggestionsOverlay, { top: 60 }]}>
+        <ScrollView>
+          {question.wordSuggestions.map((item, i) => (
+            <TouchableOpacity
+              key={i}
+              style={styles.suggestionItem}
+              onPress={() => handleWordSuggestionSelect(index, item)}
+            >
+              <Text style={styles.suggestionText}>{item}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    )}
 
-            {/* Answer Choices */}
-            {["A", "B", "C", "D"].map((option) => (
-              <View key={option}>
-                <TextInput
-                  style={styles.choiceInput}
-                  placeholder={`Choice ${option}`}
-                  value={question.options[option]}
-                  editable={option === 'A'}
-                  onChangeText={(text) => {
-                    if (option === 'A') {
-                      updateQuestion(index, option, text);
-                      // Trigger answer suggestions only for option A
-                      fetchAnswerSuggestions(index, questions[index])
-                    }
-                  }}
-                />
+    {/* Answer Choices */}
+    {["A", "B", "C", "D"].map((option) => (
+      <View key={option}>
+        <TextInput
+          style={styles.choiceInput}
+          placeholder={`Choice ${option}`}
+          value={question.options[option]}
+          editable={true}
+          onChangeText={(text) => {
+            updateQuestion(index, option, text);
+            if (option === 'A') {
+              fetchAnswerSuggestions(index, questions[index]);
+            }
+          }}
+        />
 
-                {/* Answer Suggestions Dropdown */}
-                {option === 'A' &&
-                  question.showAnswerSuggestions &&
-                  question.answerSuggestions.length > 0 && (
-                    <View style={[styles.suggestionsOverlay, { top: 40 }]}>
-                      <ScrollView>
-                        {question.answerSuggestions.map((item, i) => (
-                          <TouchableOpacity
-                            key={i}
-                            style={styles.suggestionItem}
-                            onPress={() => handleAnswerSuggestionSelect(index, item)}
-                          >
-                            <Text style={styles.suggestionText}>{item}</Text>
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
-                    </View>
-                  )}
-              </View>
-            ))}
+        {/* Answer Suggestions Dropdown - only for option A */}
+        {option === 'A' && 
+         question.showAnswerSuggestions && 
+         question.answerSuggestions.length > 0 && (
+          <View style={[styles.suggestionsOverlay, { top: 40 }]}>
+            <ScrollView>
+              {question.answerSuggestions.map((item, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={styles.suggestionItem}
+                  onPress={() => handleAnswerSuggestionSelect(index, item)}
+                >
+                  <Text style={styles.suggestionText}>{item}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
-        ))}
-
-
+        )}
+      </View>
+    ))}
+  </View>
+))}
         {/* + Question Button */}
         <TouchableOpacity
           style={styles.addQuestionButton}
