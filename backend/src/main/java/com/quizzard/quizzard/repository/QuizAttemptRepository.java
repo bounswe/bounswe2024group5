@@ -33,6 +33,7 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> 
               AND qa.updatedAt >= :timestamp
             GROUP BY u.username
             ORDER BY solved DESC
+            LIMIT 10
             """)
     List<LeaderboardResponse.QuizSolved> getLeaderboardQuizSolved(@Param("timestamp") Timestamp timestamp);
 
@@ -44,6 +45,7 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> 
               AND qa.updatedAt >= :timestamp
             GROUP BY u.username
             ORDER BY points DESC
+            LIMIT 10
             """)
     List<LeaderboardResponse.PointsEarned> getLeaderboardPointsEarned(@Param("timestamp") Timestamp timestamp);
 }
