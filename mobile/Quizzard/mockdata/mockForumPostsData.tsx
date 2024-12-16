@@ -1,4 +1,4 @@
-const mockForumPosts = [
+export const mockForumPosts = [
     {
         id: 1,
         title: 'How to improve my English grammar?',
