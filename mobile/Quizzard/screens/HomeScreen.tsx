@@ -18,15 +18,8 @@ import { useAuth } from "./AuthProvider";
 import { Quiz, Question } from "../database/types";
 import HostUrlContext from "../app/HostContext";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
-const calculateQuizDifficultyFromElo = (elo: number) => {
-  if (elo < 400) return "A1";
-  else if (elo < 1000) return "A2";
-  else if (elo < 1800) return "B1";
-  else if (elo < 2600) return "B2";
-  else if (elo < 3300) return "C1";
-  else return "C2";
-};
+import { calculateQuizDifficultyFromElo } from "../components/EloCefrInfoTable";
+import { useFocusEffect } from "@react-navigation/native";
 
 const HomePage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
@@ -34,7 +27,7 @@ const HomePage = ({ navigation }) => {
   const [otherQuizzes, setOtherQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
   const [otherQuizzesFilterDifficulty, setOtherQuizzesFilterDifficulty] =
-    useState("a1"); // Default difficulty
+    useState("a1");
   const authContext = useAuth(); // Get the authentication context
   const [userProfile, setUserProfile] = useState(null);
   const token = authContext ? authContext.token : null; // Get the token if authContext is not null
@@ -207,30 +200,32 @@ const HomePage = ({ navigation }) => {
   );
 
   // Main data fetching function
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const attemptsMap = await fetchQuizAttempts(); // Fetch quiz attempts first
-        await Promise.all([
-          fetchQuizzesForYou(attemptsMap),
-          fetchOtherQuizzes(attemptsMap),
-          fetchUserProfile(),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const attemptsMap = await fetchQuizAttempts();
+          await Promise.all([
+            fetchQuizzesForYou(attemptsMap),
+            fetchOtherQuizzes(attemptsMap),
+            fetchUserProfile(),
+          ]);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchData();
-  }, [
-    fetchQuizAttempts,
-    fetchQuizzesForYou,
-    fetchOtherQuizzes,
-    otherQuizzesFilterDifficulty,
-  ]);
+      fetchData();
+    }, [
+      fetchQuizAttempts,
+      fetchQuizzesForYou,
+      fetchOtherQuizzes,
+      otherQuizzesFilterDifficulty,
+    ])
+  );
 
   const navigateToQuizCreation = () => {
     navigation.navigate("QuizCreation");
@@ -275,7 +270,7 @@ const HomePage = ({ navigation }) => {
     return (
       <BaseLayout navigation={navigation}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6a0dad" />
+          <ActivityIndicator size="large" color="#6d28d9" />
           <Text style={styles.loadingText}>Loading quizzes...</Text>
         </View>
       </BaseLayout>
@@ -427,10 +422,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#8b5cf6",
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 5,
+    borderRadius: 12,
     flexShrink: 0,
     width: "30%",
   },
@@ -441,7 +436,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   quizSection: {
-    height: 240,
+    height: 220,
   },
   quizScroll: {
     paddingLeft: 15,
@@ -489,7 +484,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: "#6a0dad",
+    color: "#6d28d9",
   },
   noQuizzesText: {
     textAlign: "center",
@@ -567,7 +562,7 @@ const styles = StyleSheet.create({
   modalButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 12,
     minWidth: 100,
     alignItems: "center",
   },

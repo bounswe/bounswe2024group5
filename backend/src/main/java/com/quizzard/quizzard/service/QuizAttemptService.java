@@ -163,7 +163,7 @@ public class QuizAttemptService {
             double scoreDifference = wordScore - userScore;
             double absDifference = Math.abs(scoreDifference);
 
-            int steps = (int) Math.floor(absDifference / 100.0);
+            int steps = (int) Math.floor(absDifference / 125.0);
 
             double multiplier;
             if (scoreDifference < 0) { // If user's level is higher than the word's level
@@ -192,8 +192,8 @@ public class QuizAttemptService {
         if (finalScore < 0) {
             finalScore = 0;
         } // here should be updated if score range changes
-        else if (finalScore > 4000) {
-            finalScore = 4000;
+        else if (finalScore > 5000) {
+            finalScore = 5000;
         }
         userService.updateUserPoint(user, finalScore);
 

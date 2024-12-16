@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,12 @@ import {
   ScrollView,
   FlatList,
   Alert,
+  Image,
+  ActivityIndicator,
+  Modal,
+  Platform,
 } from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import DropdownComponent from "../components/QuestionTypeDropdown";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system"; // Import FileSystem for base64 conversion
@@ -20,17 +25,59 @@ const QuizCreationPage = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
+  const [questions, setQuestions] = useState<Question[]>([
+    {
+      word: "",
+      options: { A: "", B: "", C: "", D: "" },
+      questionType: "",
+      wordSuggestions: [], // Add per-question suggestions
+      showWordSuggestions: false,
+      isLoadingWordSuggestions: false,
+      answerSuggestions: [],
+      showAnswerSuggestions: false,
+      isLoadingAnswerSuggestions: false
+    }
+  ]);
   const [selectedType, setSelectedType] = useState(""); // Default type
-  const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [image, setMedia] = useState<string | null>(null);
   const authContext = useAuth();
   const token = authContext ? authContext.token : null;
+  const [isLoadingWordSuggestions, setIsLoadingWordSuggestions] = useState(false);
+  const [selectedNumber, setSelectedNumber] = useState(1);
+  const [favoriteCount, setFavoriteCount] = useState(0);
 
   // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready
+
+  const getFavoriteQuestionsCount = async () => {
+    try {
+      const response = await fetch(`${hostUrl}/api/favorite-question`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFavoriteCount(data.length);
+      } else {
+        console.error('Failed to fetch favorite questions');
+      }
+    } catch (error) {
+      console.error('Error fetching favorite questions:', error);
+    }
+  };
+
+  // Add useEffect to fetch count when component mounts
+  useEffect(() => {
+    if (token) {
+      getFavoriteQuestionsCount();
+    }
+  }, [token]);
+
 
   const uploadFile = async (fileUri: string) => {
     try {
@@ -115,7 +162,6 @@ const QuizCreationPage = ({ navigation }) => {
     }
 
     const formattedQuestions = questions.map((question) => ({
-      id: Math.floor(Math.random() * 1000),
       questionType: question.questionType,
       word: question.word,
       correctAnswer: question.options.A,
@@ -127,7 +173,6 @@ const QuizCreationPage = ({ navigation }) => {
     }));
 
     const quizData = {
-      id: Math.floor(Math.random() * 1000),
       title: quizTitle,
       description: quizDescription,
       // difficulty: 1,
@@ -170,39 +215,16 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-  // Fetch question word suggestions
-  const fetchQuestionWord = async (word, type) => {
-    const apiUrl = `${hostUrl}/api/question_word?word=${word}&type=${type}`;
-    try {
-      const response = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setSuggestions(data); // Store the suggestions
-        console.log("Suggestions:", data);
-      } else {
-        console.error("Failed to fetch suggestions", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
-    }
-  };
 
-  // Fetch question answers
-  const fetchQuestionAnswers = async (
-    word: string,
-    type: "english_to_turkish" | "turkish_to_english" | "english_to_sense",
-    token: string
-  ): Promise<void> => {
+  const fetchAnswerSuggestions = async (index, question) => {
+    const updatedQuestions = [...questions];
+
     try {
-      const apiUrl = `${hostUrl}/api/question_answers?word=${encodeURIComponent(
-        word
-      )}&type=${type}`;
+      // Set loading state for the specific question
+      updatedQuestions[index].isLoadingAnswerSuggestions = true;
+      setQuestions(updatedQuestions);
+
+      const apiUrl = `${hostUrl}/api/answer-suggestion?word=${encodeURIComponent(question.word)}&questionType=${question.questionType}`;
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -213,32 +235,89 @@ const QuizCreationPage = ({ navigation }) => {
 
       if (response.ok) {
         const data = await response.json();
-        if (data) {
-          const updatedQuestions = [...questions];
-          const newChoices = {
-            A: data.correct_answer,
-            B: data.wrong_answer1,
-            C: data.wrong_answer2,
-            D: data.wrong_answer3,
-          };
-          updatedQuestions[questions.length - 1].options = newChoices; // Update options for the latest question
-          setQuestions(updatedQuestions);
+
+        // Ensure we're updating the specific question's state
+        const newQuestions = [...questions];
+        question.answerSuggestions = data.correctAnswerSuggestions;
+        question.showAnswerSuggestions = data.correctAnswerSuggestions.length > 0;
+        if (data.wrongAnswerSuggestions.length >= 3) {
+          question.options["B"] = data.wrongAnswerSuggestions[0]
+          question.options["C"] = data.wrongAnswerSuggestions[1]
+          question.options["D"] = data.wrongAnswerSuggestions[2]
         }
+        question.isLoadingAnswerSuggestions = false;
+        newQuestions[index] = question
+
+        setQuestions(newQuestions);
       } else {
-        console.error("Failed to fetch question answers:", response.statusText);
+        console.error("Failed to fetch answer suggestions");
       }
     } catch (error) {
-      console.error("Error fetching question answers:", error);
+      console.error("Error fetching answer suggestions:", error);
     }
   };
 
-  const checkInputWord = async () => {
-    let word = typedQuestionWord;
+
+  const handleAnswerSuggestionSelect = (index: number, suggestion: string) => {
+    const updatedQuestions = [...questions];
+    const updatedQuestion = { ...updatedQuestions[index] };
+
+    // Set the first option (A) with the selected suggestion
+    updatedQuestion.options = {
+      ...updatedQuestion.options,
+      A: suggestion
+    };
+
+    // Reset suggestion-related states for this specific question
+    updatedQuestion.answerSuggestions = [];
+    updatedQuestion.showAnswerSuggestions = false;
+
+    // Update the questions state
+    updatedQuestions[index] = updatedQuestion;
+    setQuestions(updatedQuestions);
+  };
+
+  const handleInputChange = (index: number, word: string) => {
+    if (!questions[index].questionType) {
+      Alert.alert("Select Type", "Please select a type first.");
+      return;
+    }
+    console.log(word)
+
+    // Update the word in state
+    const updatedQuestions = [...questions];
+    const updatedQuestion = { ...updatedQuestions[index] };
+    updatedQuestion.word = word;
+    updatedQuestions[index] = updatedQuestion;
+    setQuestions(updatedQuestions);
+
+    // Only fetch suggestions if word is longer than 1 character
+    if (word.length > 1) {
+      fetchWordSuggestions(index, updatedQuestion);
+    } else {
+      // Reset suggestions for short inputs
+      updatedQuestion.wordSuggestions = [];
+      updatedQuestion.showWordSuggestions = false;
+      updatedQuestions[index] = updatedQuestion;
+      setQuestions(updatedQuestions);
+    }
+  };
+
+
+  // New method to fetch word suggestions
+  const fetchWordSuggestions = async (index, question) => {
+    const updatedQuestions = [...questions];
+    const language = question.questionType.includes('english') ? 'english' : 'turkish';
+
     try {
+      question.isLoadingWordSuggestions = true;
+      updatedQuestions[index] = question;
+      setQuestions(updatedQuestions);
+
       const response = await fetch(
-        `${hostUrl}/api/word-checker?word=${word}&type=${selectedType}`,
+        `${hostUrl}/api/autocomplete?prefix=${encodeURIComponent(question.word)}&language=${language}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -246,43 +325,56 @@ const QuizCreationPage = ({ navigation }) => {
         }
       );
 
-      const data = await response.json();
+      if (response.ok) {
+        const data = await response.json();
 
-      if (!data.isValid) {
-        Alert.alert("Invalid Word", "Please enter a valid word!");
+        // Ensure we're updating the specific question's state
+        const newQuestions = [...questions];
+        question.wordSuggestions = data;
+        question.showWordSuggestions = data.length > 0;
+        question.isLoadingWordSuggestions = false;
+        newQuestions[index] = question
+
+        setQuestions(newQuestions);
       } else {
-        // setSelectedWord(word);
-        fetchQuestionWord(word, selectedType);
-        fetchQuestionAnswers(word, selectedType, token);
+        console.error("Failed to fetch word suggestions");
+
+        const newQuestions = [...questions];
+        newQuestions[index].wordSuggestions = [];
+        newQuestions[index].showWordSuggestions = false;
+        newQuestions[index].isLoadingWordSuggestions = false;
+
+        setQuestions(newQuestions);
       }
     } catch (error) {
-      console.error("Error validating word:", error);
-      Alert.alert("Error", "Failed to validate the word. Please try again.");
+      console.error("Error fetching word suggestions:", error);
+
+      const newQuestions = [...questions];
+      newQuestions[index].wordSuggestions = [];
+      newQuestions[index].showWordSuggestions = false;
+      newQuestions[index].isLoadingWordSuggestions = false;
+
+      setQuestions(newQuestions);
     }
   };
 
-  const handleInputChange = (index: number, word: string) => {
-    if (!selectedType) {
-      Alert.alert("Select Type", "Please select a type first.");
-      return;
-    }
-
-    // if (checkInputTimeoutId != -1) {
-    //   clearTimeout(checkInputTimeoutId);
-    // }
-    // console.log('====================================');
-    // console.log();
-    // console.log('====================================');
-    // let timeOutId = setTimeout(checkInputWord, 2000)
-    // setCheckInputTimeoutId(timeOutId);
-
+  const handleWordSuggestionSelect = (index: number, suggestion: string) => {
     const updatedQuestions = [...questions];
     const updatedQuestion = { ...updatedQuestions[index] };
-    updatedQuestion.word = word;
+
+    console.log(index)
+    console.log(suggestion)
+    // Set the word
+    updatedQuestion.word = suggestion;
+    updatedQuestion.wordSuggestions = [];
+    updatedQuestion.showWordSuggestions = false;
+
+    // Update the question in the state
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
-    console.log(`1- Question ${index + 1} word:`, updatedQuestions[index].word);
+    fetchAnswerSuggestions(index, updatedQuestion);
   };
+
 
   const updateQuestionType = (index: number, type: string) => {
     const updatedQuestions = [...questions];
@@ -310,124 +402,279 @@ const QuizCreationPage = ({ navigation }) => {
     );
   };
 
+  const createQuizFromFavorites = async () => {
+    if (!quizTitle) {
+      Alert.alert("Error", "Please enter a quiz title first");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${hostUrl}/api/quizzes/from-favorites`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          count: selectedNumber,
+          title: quizTitle
+        })
+      });
+
+      if (response.ok) {
+        const quiz = await response.json();
+        Alert.alert("Success", "Quiz created from favorites successfully! You can see it in your profile page under My Quizzes.");
+        navigation.navigate("Home");
+      } else {
+        const error = await response.text();
+        Alert.alert("Error", `Failed to create quiz: ${error}`);
+      }
+    } catch (error) {
+      console.error("Error creating quiz from favorites:", error);
+      Alert.alert("Error", "Failed to create quiz from favorites");
+    }
+  };
+
+
+  const incrementNumber = () => {
+    if (selectedNumber < favoriteCount) {
+      setSelectedNumber(prev => prev + 1);
+    }
+  };
+
+  const decrementNumber = () => {
+    if (selectedNumber > 1) {
+      setSelectedNumber(prev => prev - 1);
+    }
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Text style={styles.appName}>Quizzard</Text>
-        </TouchableOpacity>
-        <View style={styles.icons}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="person-outline" size={24} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <Ionicons name="log-out-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Title Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Untitled Quiz"
-        value={quizTitle}
-        onChangeText={setQuizTitle}
-      />
-
-      {/* Image Upload Box */}
-      <TouchableOpacity
-        style={styles.imageUploadBox}
-        onPress={pickImageAndUpload}
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
       >
-        <Text style={styles.imageUploadText}>
-          {image ? "Image Uploaded" : "+ Upload Image"}
-        </Text>
-      </TouchableOpacity>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+            <Text style={styles.appName}>Quizzard</Text>
+          </TouchableOpacity>
+          <View style={styles.icons}>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="person-outline" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => navigation.navigate("Login")}
+            >
+              <Ionicons name="log-out-outline" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      {/* Description Input */}
-      <TextInput
-        style={styles.descriptionInput}
-        placeholder="Enter quiz description..."
-        value={quizDescription}
-        onChangeText={setQuizDescription}
-        multiline
-      />
+        {/* Title Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Untitled Quiz"
+          value={quizTitle}
+          onChangeText={setQuizTitle}
+        />
 
-      {/* Render all question boxes */}
-      {questions.map((question, index) => (
-        <View key={index} style={styles.questionBox}>
-          {/* Header with Title and Dropdown */}
-          <View style={styles.headerContainer}>
-            <TextInput
-              style={styles.questionTitle}
-              placeholder="Enter a word"
-              onChangeText={(word) => handleInputChange(index, word)}
-            />
-            <View style={styles.dropdownContainer}>
-              <DropdownComponent
-                testID="question-type-dropdown"
-                selectedValue={questions[index].questionType}
-                onValueChange={(type) => updateQuestionType(index, type)}
-              />
+        <View style={styles.favoritesContainer}>
+          <TouchableOpacity style={styles.favoritesButton} onPress={createQuizFromFavorites}>
+            <Text style={styles.favoritesButtonText}>Quiz from Favorites</Text>
+          </TouchableOpacity>
+
+          <View style={styles.numberInputContainer}>
+            <TouchableOpacity
+              style={styles.numberButton}
+              onPress={decrementNumber}
+            >
+              <Text style={styles.numberButtonText}>-</Text>
+            </TouchableOpacity>
+
+            <View style={styles.numberDisplay}>
+              <Text style={styles.numberText}>{selectedNumber}</Text>
             </View>
+
+            <TouchableOpacity
+              style={styles.numberButton}
+              onPress={incrementNumber}
+            >
+              <Text style={styles.numberButtonText}>+</Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Display suggestions */}
-          {suggestions.length > 0 && (
-            <FlatList
-              data={suggestions}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <Text style={styles.suggestionText}>{item}</Text>
-              )}
-            />
-          )}
-
-          {/* Answer Choices */}
-          {["A", "B", "C", "D"].map((option) => (
-            <TextInput
-              key={option}
-              style={styles.choiceInput}
-              placeholder={`Choice ${option}`}
-              value={question.options[option]} // Now options will be populated from the API response
-              onChangeText={(text) => updateQuestion(index, option, text)}
-            />
-          ))}
         </View>
-      ))}
 
-      {/* + Question Button */}
-      <TouchableOpacity
-        style={styles.addQuestionButton}
-        onPress={handleAddQuestion}
-      >
-        <Text style={styles.addQuestionButtonText}>+ Question</Text>
-      </TouchableOpacity>
-
-      {/* Bottom Cancel and Submit Buttons */}
-      <View style={styles.bottomButtons}>
+        {/* Image Upload Box */}
         <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
+          style={styles.imageUploadBox}
+          onPress={pickImageAndUpload}
         >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+          {imageUrl ? (
+            <Image
+              source={{ uri: imageUrl }}
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: 10
+              }}
+              resizeMode="cover"
+            />
+          ) : (
+            <Text style={styles.imageUploadText}>
+              + Upload Image
+            </Text>
+          )}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.submitButton} onPress={submitQuiz}>
-          <Text style={styles.submitButtonText}>Submit</Text>
+
+        {/* Description Input */}
+        <TextInput
+          style={styles.descriptionInput}
+          placeholder="Enter quiz description..."
+          value={quizDescription}
+          onChangeText={setQuizDescription}
+          multiline
+        />
+
+        {/* Render all question boxes */}
+        {questions.map((question, index) => (
+          <View
+            key={index}
+            style={[
+              styles.questionBox,
+              { zIndex: questions.length - index } // Higher index = lower in the stack
+            ]}
+          >
+            {/* Existing header container */}
+            <View style={styles.headerContainer}>
+              <TextInput
+                style={styles.questionTitle}
+                placeholder="Enter a word"
+                value={question.word}
+                onChangeText={(word) => handleInputChange(index, word)}
+              />
+              {/* Loading indicator for suggestions */}
+              {isLoadingWordSuggestions && (
+                <ActivityIndicator
+                  size="small"
+                  color="#6a0dad"
+                  style={styles.suggestionLoadingIndicator}
+                />
+              )}
+              <View style={styles.dropdownContainer}>
+                <DropdownComponent
+                  testID="question-type-dropdown"
+                  selectedValue={questions[index].questionType}
+                  onValueChange={(type) => updateQuestionType(index, type)}
+                />
+              </View>
+            </View>
+
+            {/* Word Suggestions Dropdown */}
+            {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
+              <View style={[styles.suggestionsOverlay, { top: 60 }]}>
+                <ScrollView>
+                  {question.wordSuggestions.map((item, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={styles.suggestionItem}
+                      onPress={() => handleWordSuggestionSelect(index, item)}
+                    >
+                      <Text style={styles.suggestionText}>{item}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+
+            {/* Answer Choices */}
+            {["A", "B", "C", "D"].map((option) => (
+              <View key={option}>
+                <TextInput
+                  style={styles.choiceInput}
+                  placeholder={`Choice ${option}`}
+                  value={question.options[option]}
+                  editable={option === 'A'}
+                  onChangeText={(text) => {
+                    if (option === 'A') {
+                      updateQuestion(index, option, text);
+                      // Trigger answer suggestions only for option A
+                      fetchAnswerSuggestions(index, questions[index])
+                    }
+                  }}
+                />
+
+                {/* Answer Suggestions Dropdown */}
+                {option === 'A' &&
+                  question.showAnswerSuggestions &&
+                  question.answerSuggestions.length > 0 && (
+                    <View style={[styles.suggestionsOverlay, { top: 40 }]}>
+                      <ScrollView>
+                        {question.answerSuggestions.map((item, i) => (
+                          <TouchableOpacity
+                            key={i}
+                            style={styles.suggestionItem}
+                            onPress={() => handleAnswerSuggestionSelect(index, item)}
+                          >
+                            <Text style={styles.suggestionText}>{item}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+              </View>
+            ))}
+          </View>
+        ))}
+
+
+        {/* + Question Button */}
+        <TouchableOpacity
+          style={styles.addQuestionButton}
+          onPress={handleAddQuestion}
+        >
+          <Text style={styles.addQuestionButtonText}>+ Question</Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+
+        {/* Bottom Cancel and Submit Buttons */}
+        <View style={styles.bottomButtons}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.submitButton} onPress={submitQuiz}>
+            <Text style={styles.submitButtonText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  wordSuggestionsContainer: {
+    maxHeight: 150,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  wordSuggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  suggestionLoadingIndicator: {
+    marginLeft: 10,
+  },
   container: {
     flex: 1,
     padding: 20,
+    paddingBottom: 100, // Keep extra padding at the bottom
     backgroundColor: "#fff",
   },
   header: {
@@ -440,7 +687,7 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6a0dad", // Dark purple color for the app name
+    color: "#6d28d9", // Dark purple color for the app name
   },
   icons: {
     flexDirection: "row",
@@ -493,7 +740,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 3,
   },
   headerContainer: {
     flexDirection: "row",
@@ -506,65 +752,209 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     marginRight: 10,
   },
   dropdownContainer: {
-    width: "42%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    fontSize: 14,
-  },
-  dropdown: {
-    height: 40,
+    flex: 1,
   },
   choiceInput: {
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     marginBottom: 10,
     fontSize: 14,
+    backgroundColor: "#fff",
+    borderRadius: 5,
   },
   addQuestionButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: "flex-end",
-    marginBottom: 40,
+    borderRadius: 5,
+    alignItems: "center",
+    marginBottom: 20,
+    zIndex: 0, // Changed from 1 to 0
+    elevation: 0, // Changed from 1 to 0
   },
-  addQuestionButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
+
+  contentContainer: {
+    paddingBottom: 100, // Add extra padding to the bottom of the scrollable content
   },
   bottomButtons: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    zIndex: 999999, // Lower than suggestions
+    elevation: 999999,
   },
   cancelButton: {
-    backgroundColor: "#555",
+    backgroundColor: "#ccc",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 5,
+    alignItems: "center",
   },
   cancelButtonText: {
-    color: "#fff",
+    color: "#333",
     fontWeight: "bold",
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 5,
+    alignItems: "center",
   },
   submitButtonText: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  answerSuggestionsContainer: {
+    maxHeight: 150,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginTop: 5,
+    zIndex: 10, // Ensure it appears above other elements
+  },
+  answerSuggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  suggestionsOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    maxHeight: 200,
+    zIndex: 9999999, // Increased to be higher than everything
+    elevation: 9999999, // Match zIndex for Android
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+
+  suggestionItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+
+  suggestionText: {
+    fontSize: 14,
+    color: '#333',
+  },
+
+  favoritesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 10,
+  },
+
+  favoritesButton: {
+    backgroundColor: "#6d28d9",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  favoritesButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  numberInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 8,
+    width: 80,
+    textAlign: 'center',
+  },
+  modalView: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  pickerContainer: {
+    backgroundColor: 'white',
+    paddingBottom: 20,
+  },
+
+  picker: {
+    height: 200,
+  },
+
+  doneButton: {
+    alignItems: 'flex-end',
+    padding: 10,
+    backgroundColor: '#f8f8f8',
+  },
+
+  doneButtonText: {
+    color: '#6d28d9',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  numberInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 5,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+
+  numberButton: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    width: 40,
+    alignItems: 'center',
+  },
+
+  numberButtonText: {
+    fontSize: 20,
+    color: '#6d28d9',
+    fontWeight: 'bold',
+  },
+
+  numberDisplay: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    minWidth: 40,
+    alignItems: 'center',
+  },
+
+  numberText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
 

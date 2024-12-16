@@ -1,4 +1,3 @@
-// QuizSolvingScreen.tsx
 import React, {
   useState,
   useContext,
@@ -16,13 +15,14 @@ import {
   ScrollView,
   ActivityIndicator,
   FlatList,
+  Image,
 } from "react-native";
 import QuizHeader from "../components/QuizSolveQuizHeader";
 import { useAuth } from "./AuthProvider";
 import HostUrlContext from "../app/HostContext";
 import { Post, Reply } from "../types/forum";
-import { Ionicons } from "@expo/vector-icons"; // Add missing import
-import { Question } from "../database/types"; // Add proper type import
+import { Ionicons } from "@expo/vector-icons";
+import { Question } from "../database/types";
 
 // Add missing type for route params
 interface RouteParams {
@@ -32,23 +32,6 @@ interface RouteParams {
   };
   questions: Question[];
 }
-
-// types from the database/types.ts file:
-// type Question = {
-//   id: number;
-//   quizId: number;
-//   word: string;
-//   questionType: QuestionType;
-//   options: string[];
-//   correctAnswer: string;      // 'A', 'B', 'C' or 'D'
-//   wrongAnswers: string[];
-//   difficulty: number;         // elo
-// }
-
-// type QuestionType =
-//   | "english_to_turkish"
-//   | "turkish_to_english"
-//   | "english_to_sense";
 
 interface PostPreviewProps {
   post: Post;
@@ -76,7 +59,7 @@ const SelectedPostView = React.memo<SelectedPostViewProps>(
   ({ post, replies, onBack }) => (
     <ScrollView style={styles.postsList} showsVerticalScrollIndicator={false}>
       <TouchableOpacity onPress={onBack} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={20} color="#6a0dad" />
+        <Ionicons name="arrow-back" size={20} color="#6d28d9" />
         <Text style={styles.backButtonText}>Back to posts</Text>
       </TouchableOpacity>
       <View style={styles.postContainer}>
@@ -132,9 +115,11 @@ const ForumModal = React.memo<{
       onRequestClose={onClose}
     >
       <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
+        <View style={styles.relatedPostModalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Posts about '{word}'</Text>
+            <Text style={styles.relatedPostModalTitle}>
+              Posts about '{word}'
+            </Text>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <Ionicons name="close" size={24} color="#1a1a1a" />
             </TouchableOpacity>
@@ -142,7 +127,7 @@ const ForumModal = React.memo<{
 
           <View style={styles.modalBody}>
             {isLoadingPosts ? (
-              <ActivityIndicator size="large" color="#6a0dad" />
+              <ActivityIndicator size="large" color="#6d28d9" />
             ) : selectedPost ? (
               <SelectedPostView
                 post={selectedPost}
@@ -152,9 +137,9 @@ const ForumModal = React.memo<{
             ) : (
               <FlatList
                 data={relatedPosts}
-                horizontal
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.flatListContent}
                 ListEmptyComponent={
                   <View style={styles.noPostsContainer}>
@@ -187,7 +172,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const { quiz, questions } = route.params as RouteParams; // Access the passed data
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<(string | null)[]>([]);
-  const [quizQuestions, setQuestions] = useState<Question[]>([]);
   const [isQuestionAnswered, setIsQuestionAnswered] = useState(
     questions.map(() => false)
   );
@@ -206,6 +190,18 @@ const QuizSolvingScreen = ({ route, navigation }) => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [postReplies, setPostReplies] = useState<Reply[]>([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [hintImages, setHintImages] = useState<string[]>([]);
+  const [isHintModalVisible, setIsHintModalVisible] = useState(false);
+  const [isLoadingHintImages, setIsLoadingHintImages] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  // New state variables for modals
+  const [showStartModal, setShowStartModal] = useState(false);
+  const [showEndModal, setShowEndModal] = useState(false);
+
+  // Add new state
+  const [showFavoriteModal, setShowFavoriteModal] = useState(false);
+  const [favoriteModalMessage, setFavoriteModalMessage] = useState("");
 
   const initializeQuiz = async () => {
     console.log("### Initializing quiz:", quiz.id);
@@ -241,7 +237,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       const quizData = await quizResponse.json();
       const questions = quizData.quiz.questions;
 
-      setQuestions(questions);
       setIsQuestionAnswered(new Array(questions.length).fill(false));
       setSelectedAnswers(new Array(questions.length).fill(null));
 
@@ -290,6 +285,36 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     initializeQuiz();
   }, [quiz.id, hostUrl, token]);
 
+  const fetchHintImages = useCallback(
+    async (word: string) => {
+      setIsLoadingHintImages(true);
+      try {
+        const response = await fetch(
+          `${hostUrl}/api/hint?word=${encodeURIComponent(word)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const images = await response.json();
+          setHintImages(images);
+        } else {
+          Alert.alert("Error", "Failed to fetch hint images");
+        }
+      } catch (error) {
+        console.error("Error fetching hint images:", error);
+        Alert.alert("Error", "Failed to load hint images");
+      } finally {
+        setIsLoadingHintImages(false);
+        setIsHintModalVisible(true);
+      }
+    },
+    [hostUrl, token]
+  );
+
   const handleAnswer = async (answer) => {
     if (alreadyFinished) return;
     if (isQuestionAnswered[questionIndex]) return;
@@ -335,10 +360,8 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       setQuestionIndex(questionIndex - 1);
       console.log(`Is answered? ${isQuestionAnswered}`);
     } else {
-      Alert.alert(
-        "Start of the Quiz:",
-        "This is the first question of the quiz."
-      );
+      // Replace Alert with Modal
+      setShowStartModal(true);
     }
   };
 
@@ -348,7 +371,8 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       setQuestionIndex(questionIndex + 1);
       console.log(`Is answered? ${isQuestionAnswered}`);
     } else {
-      Alert.alert("End of the Quiz:", "This is the last question of the quiz.");
+      // Replace Alert with Modal
+      setShowEndModal(true);
     }
   };
 
@@ -404,6 +428,8 @@ const QuizSolvingScreen = ({ route, navigation }) => {
       return `How do you say '${question.word}' in Turkish?`;
     } else if (question.questionType === "turkish_to_english") {
       return `How do you say '${question.word}' in English?`;
+    } else if (question.questionType === "english_to_sense") {
+      return `What is the meaning of '${question.word}'?`;
     } else {
       return "Invalid question type";
     }
@@ -457,13 +483,95 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     }
   };
 
+  const addToFavorites = async () => {
+    const questionId = questions[questionIndex].id;
+
+    try {
+      const response = await fetch(`${hostUrl}/api/favorite-question`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ questionId }),
+      });
+
+      if (response.status === 201) {
+        setIsFavorited(true);
+        setFavoriteModalMessage("Question added to favorites.");
+      } else {
+        setFavoriteModalMessage("Failed to add question to favorites.");
+      }
+      // TODO: Consider removing the modals for favorite
+      setShowFavoriteModal(true);
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+      setFavoriteModalMessage("Failed to add question to favorites.");
+      setShowFavoriteModal(true);
+    }
+  };
+
+  const removeFromFavorites = async () => {
+    const questionId = questions[questionIndex].id;
+
+    try {
+      const response = await fetch(`${hostUrl}/api/favorite-question/${questionId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 204) {
+        setIsFavorited(false);
+        setFavoriteModalMessage("Question removed from favorites.");
+        setShowFavoriteModal(true);
+      } else {
+        setFavoriteModalMessage("Failed to remove question from favorites.");
+      }
+      // TODO: Consider removing the modals for favorite
+      setShowFavoriteModal(true);
+    } catch (error) {
+      console.error("Error removing from favorites:", error);
+      setFavoriteModalMessage("Failed to remove question from favorites.");
+      setShowFavoriteModal(true);
+    }
+  };
+
+  const checkFavoriteStatus = async (questionId: number) => {
+    try {
+      const response = await fetch(
+        `${hostUrl}/api/favorite-question/${questionId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setIsFavorited(response.status === 200);
+    } catch (error) {
+      console.error("Error checking favorite status:", error);
+      setIsFavorited(false);
+    }
+  };
+
+  // Add useEffect to check favorite status when question changes
+  useEffect(() => {
+    if (question) {
+      checkFavoriteStatus(question.id);
+    }
+  }, [questionIndex, question]);
   return (
     <View style={styles.container}>
       <QuizHeader
         quizName={quiz.title}
         questionIndex={questionIndex}
         totalQuestions={questions.length}
+        onFavorite={addToFavorites}
+        onUnfavorite={removeFromFavorites}
+        isFavorited={isFavorited}
       />
+
       <View style={styles.roundQuestionContainer}>
         <Text style={styles.questionText}>
           {generateQuestionSentence(question)}
@@ -471,14 +579,14 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         {shuffledAnswers.map((answer, index) => {
           let backgroundColor;
           if (!isQuestionAnswered[questionIndex]) {
-            backgroundColor = "#ddd6fe"; // Match the background color
+            backgroundColor = "#ddd6fe";
           } else {
             if (answer === question.correctAnswer) {
-              backgroundColor = "green"; // Correct answer
+              backgroundColor = "green";
             } else if (answer === selectedAnswers[questionIndex]) {
-              backgroundColor = "red"; // Selected answer
+              backgroundColor = "red";
             } else {
-              backgroundColor = "#ddd6fe"; // Match the background color
+              backgroundColor = "#ddd6fe";
             }
           }
 
@@ -493,10 +601,11 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           );
         })}
       </View>
-      {/* Container for Next Button */}
+
+      {/* Container for Next and Previous Buttons */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.nextButton} onPress={handlePrevious}>
-          {/* Replace text with right-pointing arrow icon */}
+          {/* Replace text with left-pointing arrow icon */}
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
 
@@ -518,16 +627,90 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         )}
       </View>
-      <TouchableOpacity
-        style={styles.forumButton}
-        onPress={() => {
-          fetchRelatedPosts(question.word);
-          setForumModalVisible(true);
-        }}
-      >
-        <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
-        <Text style={styles.forumButtonText}>See Related Posts</Text>
-      </TouchableOpacity>
+      {/* Container for Hint and Related Posts Buttons */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.hintButton}
+          onPress={() => fetchHintImages(question.word)}
+        >
+          <Ionicons name="help-circle-outline" size={20} color="#6a0dad" />
+          <Text style={styles.hintButtonText}>Hint</Text>
+        </TouchableOpacity>
+
+        {/* Hint Images Modal */}
+        <Modal
+          visible={isHintModalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setIsHintModalVisible(false)}
+        >
+          <View style={styles.hintModalContainer}>
+            <View style={styles.hintModalContent}>
+              <View style={styles.hintModalHeader}>
+                <Text style={styles.hintModalTitle}>
+                  Hints for '{question.word}'
+                </Text>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={() => setIsHintModalVisible(false)}
+                >
+                  <Ionicons name="close" size={24} color="#1a1a1a" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.disclaimerContainer}>
+                <Text style={styles.disclaimerText}>
+                  These images are here to help, not to solve the quiz for you.
+                  Sometimes they nail it, and other times... well, they might
+                  just confuse you. Don't blame us if the hint feels more like a
+                  plot twist—trust your brain and keep going! You've got this!
+                </Text>
+              </View>
+
+              <View style={styles.hintModalBody}>
+                {isLoadingHintImages ? (
+                  <View style={styles.centerContent}>
+                    <ActivityIndicator size="large" color="#6a0dad" />
+                    <Text style={styles.loadingText}>Loading hints...</Text>
+                  </View>
+                ) : hintImages.length === 0 ? (
+                  <View style={styles.centerContent}>
+                    <Ionicons name="images-outline" size={40} color="#6c757d" />
+                    <Text style={styles.noHintText}>
+                      No hint images found for '{question.word}'
+                    </Text>
+                  </View>
+                ) : (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.hintImagesContainer}
+                  >
+                    {hintImages.map((imageUrl, index) => (
+                      <Image
+                        key={index}
+                        source={{ uri: imageUrl }}
+                        style={styles.hintImage}
+                        resizeMode="contain"
+                      />
+                    ))}
+                  </ScrollView>
+                )}
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        <TouchableOpacity
+          style={styles.forumButton}
+          onPress={() => {
+            fetchRelatedPosts(question.word);
+            setForumModalVisible(true);
+          }}
+        >
+          <Ionicons name="chatbox-outline" size={20} color="#6a0dad" />
+          <Text style={styles.forumButtonText}>See Related Posts</Text>
+        </TouchableOpacity>
+      </View>
       <ForumModal
         visible={forumModalVisible}
         onClose={() => {
@@ -545,6 +728,95 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         }}
         onBackToList={() => setSelectedPost(null)}
       />
+
+      {/* Start of Quiz Modal */}
+      <Modal
+        visible={showStartModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowStartModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Ionicons name="information-circle" size={50} color="#059669" />
+            <Text style={styles.modalTitle}>First Question</Text>
+            <Text style={styles.modalText}>
+              You're at the beginning of the quiz. Can't go back any further!
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.continueButton]}
+                onPress={() => setShowStartModal(false)}
+              >
+                <Text
+                  style={[styles.modalButtonText, styles.continueButtonText]}
+                >
+                  Got it
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* End of Quiz Modal */}
+      <Modal
+        visible={showEndModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowEndModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Ionicons name="information-circle" size={50} color="#059669" />
+            <Text style={styles.modalTitle}>Last Question</Text>
+            <Text style={styles.modalText}>
+              This is the final question. Press 'Finish' when you're ready to
+              submit your answers.
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.continueButton]}
+                onPress={() => setShowEndModal(false)}
+              >
+                <Text
+                  style={[styles.modalButtonText, styles.continueButtonText]}
+                >
+                  Got it
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Add modal component in return statement */}
+      <Modal
+        visible={showFavoriteModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowFavoriteModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Ionicons name="heart" size={50} color="#059669" />
+            <Text style={styles.modalTitle}>Favorites</Text>
+            <Text style={styles.modalText}>{favoriteModalMessage}</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.continueButton]}
+                onPress={() => setShowFavoriteModal(false)}
+              >
+                <Text
+                  style={[styles.modalButtonText, styles.continueButtonText]}
+                >
+                  Got it
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -611,7 +883,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -631,26 +903,43 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#6a0dad",
+    borderColor: "#6d28d9",
   },
   forumButtonText: {
-    color: "#6a0dad",
+    color: "#6d28d9",
     fontWeight: "600",
     fontSize: 16,
     marginLeft: 8,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "flex-end", // Makes modal slide from bottom
+    justifyContent: "flex-end",
+    alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: 4,
   },
   modalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    height: "80%", // Takes up 80% of screen height
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
+    width: "80%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  relatedPostModalContent: {
+    backgroundColor: "#f0eff7",   //#f0eff7
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
     width: "100%",
+    height: "70%",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -669,27 +958,34 @@ const styles = StyleSheet.create({
     borderBottomColor: "#e9ecef",
     marginBottom: 15,
   },
+  relatedPostModalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+    textAlign: "left",
+  },
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#1a1a1a",
+    marginVertical: 10,
+    textAlign: "center",
   },
   modalBody: {
     flex: 1,
     width: "100%",
   },
   flatListContent: {
-    paddingHorizontal: 10,
-    paddingBottom: 20, // Add padding at the bottom
+    paddingVertical: 10,
+    paddingBottom: 20,
   },
   postsList: {
     flex: 1,
   },
   postPreview: {
-    width: 300,
-    height: "25%",
-    minHeight: 150,
+    minHeight: "25%",
     marginHorizontal: 10,
+    marginBottom: 10,
     padding: 15,
     backgroundColor: "#f8f9fa",
     borderRadius: 12,
@@ -722,7 +1018,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    color: "#6a0dad",
+    color: "#6d28d9",
     marginLeft: 8,
   },
   postContainer: {
@@ -765,13 +1061,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   noPostsContainer: {
-    width: 300,
-    height: 200,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-    marginHorizontal: 10,
+    paddingVertical: 40,
   },
   noPostsText: {
     fontSize: 16,
@@ -782,6 +1075,245 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 8,
   },
-});
 
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  hintModalBody: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#6a0dad",
+  },
+  hintModalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: 20,
+  },
+  hintModalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 20,
+    width: "100%",
+    height: "70%", // Fixed height
+  },
+  hintImagesContainer: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+  },
+  hintImage: {
+    width: 280,
+    height: 280,
+    borderRadius: 10,
+    marginHorizontal: 10,
+    backgroundColor: "#f0f0f0", // Debug background
+  },
+  hintButton: {
+    backgroundColor: "#f8f9fa",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#6a0dad",
+  },
+  hintButtonText: {
+    color: "#6a0dad",
+    fontWeight: "600",
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  hintModalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  hintModalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+  },
+  disclaimerContainer: {
+    backgroundColor: "#fff3cd",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+  },
+  disclaimerText: {
+    fontSize: 14,
+    color: "#856404",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  centerContent: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerContainer: {
+    marginBottom: 20,
+  },
+  quizInfoContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  quizTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+  },
+  questionCount: {
+    fontSize: 16,
+    color: "#666",
+  },
+  heartContainer: {
+    backgroundColor: "#f5f3ff",
+    padding: 10,
+    borderRadius: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  heartButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heartButtonText: {
+    color: "#6a0dad",
+    fontSize: 16,
+    marginRight: 8,
+  },
+  heartIcon: {
+    marginLeft: 4,
+  },
+
+  noHintText: {
+    fontSize: 16,
+    color: "#6c757d",
+    textAlign: "center",
+    marginTop: 10,
+  },
+
+  // New styles for Info Modals
+  infoModalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  infoModalContent: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
+    width: "85%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  infoModalIcon: {
+    marginBottom: 15,
+  },
+  infoModalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+    marginVertical: 10,
+    textAlign: "center",
+  },
+  infoModalText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  infoModalButtons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
+  },
+  infoModalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    minWidth: 100,
+    alignItems: "center",
+    backgroundColor: "#059669",
+    marginHorizontal: 10,
+  },
+  infoModalButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    minWidth: 100,
+    alignItems: "center",
+    marginHorizontal: 10,
+  },
+  continueButton: {
+    backgroundColor: "#059669",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
+  },
+  continueButtonText: {
+    color: "white",
+  },
+});
 export default QuizSolvingScreen;

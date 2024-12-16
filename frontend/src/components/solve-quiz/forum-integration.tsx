@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { useFetchPost, useFetchPosts } from "../../hooks/api/get-forum-post";
+import { useFetchPost } from "../../hooks/api/get-forum-post";
 import { ForumPostComponent } from "../forum/ForumPost";
 import { useFetchReplies } from "../../hooks/api/get-reply";
 import { ForumReplyComponent } from "../forum/ForumReply";
+import { useSearchPosts } from "../../hooks/api/search-forum";
 
 export const ForumForQuizSolvePage = ({ word } : { word: string }) => {
 
-    const { data: posts } = useFetchPosts({tag: word});
+    const { data: posts } = useSearchPosts({ keyword : word });
     const [open, setOpen] = useState<boolean>(false);
     const [postId, setPostId] = useState<number | null>(null);
     const { data: post } = useFetchPost(postId);

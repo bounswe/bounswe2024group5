@@ -22,6 +22,7 @@ import HostContext from "./HostContext";
 import { PostDetailsPage } from "./pages/post-details-page";
 
 import ProfilePage from "./pages/profile-page";
+import LeaderboardPage from "./pages/leaderboard";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("token");
@@ -32,8 +33,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
-
-  const hostUrl = (import.meta.env.VITE_HOST_URL) || "34.55.188.177";
+  const hostUrl = import.meta.env.VITE_HOST_URL || "34.55.188.177";
   console.log(hostUrl);
 
   return (
@@ -67,10 +67,11 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+            <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="forum" element={<ForumPage />} />
             <Route path="post/:postId" element={<PostDetailsPage />} />
             <Route
-              path="add-quiz"
+              path="add-quiz/:quizId?"
               element={
                 <ProtectedRoute>
                   <AddQuizPage />

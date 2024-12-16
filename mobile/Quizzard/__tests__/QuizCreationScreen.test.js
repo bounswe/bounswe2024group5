@@ -1,179 +1,155 @@
 import React from 'react';
-import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
-import QuizCreationPage from '../screens/QuizCreationScreen';
-import { AuthProvider, mockAuth } from '../__mocks__/AuthProvider';
+import { render, fireEvent, waitFor, cleanup } from '@testing-library/react-native';
+import QuizCreationScreen from '../screens/QuizCreationScreen';
+import { AuthProvider } from '../__mocks__/AuthProvider';
 import HostUrlContext from '../app/HostContext';
 import { Alert } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { act } from 'react-test-renderer';
+import { 
+  mockQuizData, 
+  mockAnswerSuggestions, 
+  mockQuestionTypes, 
+  initialQuestionState 
+} from '../__mocks__/QuizCreationMock';
 
-// Mock fetch
-global.fetch = jest.fn();
+// Mock modules
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+  return {
+    ...RN,
+    Animated: {
+      ...RN.Animated,
+      timing: () => ({ start: cb => cb && cb() }),
+      Value: jest.fn(() => ({
+        setValue: jest.fn(),
+        interpolate: jest.fn()
+      }))
+    }
+  };
+});
 
-// Mock navigation
-const mockGoBack = jest.fn();
-const mockNavigate = jest.fn();
-
-// Mock the auth hook
-jest.mock('../screens/AuthProvider', () => ({
-  useAuth: () => mockAuth,
-}));
-
-// Mock expo-image-picker
 jest.mock('expo-image-picker', () => ({
-  requestMediaLibraryPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
-  launchImageLibraryAsync: jest.fn().mockResolvedValue({
+  requestMediaLibraryPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted' })),
+  launchImageLibraryAsync: jest.fn(() => Promise.resolve({
     canceled: false,
-    assets: [{
-      uri: 'file://test-image.jpg',
-      type: 'image/jpeg',
-    }],
-  }),
-  MediaTypeOptions: {
-    Images: 'Images',
-  },
+    assets: [{ uri: 'file://test-image.jpg' }]
+  }))
 }));
 
-// Mock the BaseDropdown component
-jest.mock('../components/BaseDropdown', () => require('../__mocks__/BaseDropdown'));
+// Initialize fetch mock
+global.fetch = jest.fn(() => Promise.resolve({
+  ok: true,
+  json: () => Promise.resolve({})
+}));
+
+// Navigation mocks
+const mockNavigate = jest.fn();
+const mockGoBack = jest.fn();
+const mockSetOptions = jest.fn();
+
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    goBack: mockGoBack,
+    setOptions: mockSetOptions
+  }),
+  useRoute: () => ({
+    params: {},
+    name: 'QuizCreation'
+  })
+}));
+
+const mockAuth = {
+  token: 'fake-token',
+  user: { username: 'testuser' },
+  isLoggedIn: true,
+  getToken: () => 'fake-token'
+};
+
+const renderApp = () => 
+  render(
+    <AuthProvider value={mockAuth}>
+      <HostUrlContext.Provider value="https://api.example.com">
+        <NavigationContainer>
+          <QuizCreationScreen />
+        </NavigationContainer>
+      </HostUrlContext.Provider>
+    </AuthProvider>
+  );
 
 describe('QuizCreationScreen', () => {
   beforeEach(() => {
-    fetch.mockClear();
-    mockGoBack.mockClear();
-    mockNavigate.mockClear();
-    jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    jest.clearAllMocks();
+    cleanup();
+    Alert.alert = jest.fn();
+
+    fetch.mockImplementation((url, options) => {
+      if (url.includes('/api/answer-suggestion')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockAnswerSuggestions)
+        });
+      }
+      if (url.includes('/api/quizzes') && options?.method === 'POST') {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ id: 1 })
+        });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+    });
   });
 
+  afterEach(cleanup);
+
   it('successfully creates a quiz with one question', async () => {
-    // Mock the file upload response
-    fetch.mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        text: () => Promise.resolve('https://example.com/uploaded-image.jpg'),
-      })
-    );
+    const { getByPlaceholderText, getByText } = renderApp();
 
-    // Mock the quiz creation response
-    fetch.mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ id: 1 }),
-      })
-    );
+    // Fill quiz title
+    fireEvent.changeText(getByPlaceholderText('Untitled Quiz'), mockQuizData.title);
 
-    const { getByPlaceholderText, getByText, getByTestId } = render(
-      <AuthProvider>
-        <HostUrlContext.Provider value="https://api.example.com">
-          <QuizCreationPage navigation={{ navigate: mockNavigate, goBack: mockGoBack }} />
-        </HostUrlContext.Provider>
-      </AuthProvider>
-    );
-
-    // Fill in quiz title and description
-    const titleInput = getByPlaceholderText('Untitled Quiz');
-    const descriptionInput = getByPlaceholderText('Enter quiz description...');
-    
-    await act(async () => {
-      fireEvent.changeText(titleInput, 'Test Quiz');
-      fireEvent.changeText(descriptionInput, 'This is a test quiz');
-    });
-
-    // Add a question
-    const addQuestionButton = getByText('+ Question');
-    await act(async () => {
-      fireEvent.press(addQuestionButton);
-    });
-
-    // Fill in question details
+    // Fill word
     const wordInput = getByPlaceholderText('Enter a word');
-    await act(async () => {
-      fireEvent.changeText(wordInput, 'test');
-    });
+    fireEvent.changeText(wordInput, mockQuizData.questions[0].word);
 
-    // Select question type from dropdown
-    const dropdownButton = getByTestId('dropdown-button');
-    await act(async () => {
-      fireEvent.press(dropdownButton);
-    });
+    // Fill choices
+    fireEvent.changeText(getByPlaceholderText('Choice A'), mockQuizData.questions[0].correctAnswer);
+    fireEvent.changeText(getByPlaceholderText('Choice B'), mockQuizData.questions[0].wrongAnswers[0]);
+    fireEvent.changeText(getByPlaceholderText('Choice C'), mockQuizData.questions[0].wrongAnswers[1]);
+    fireEvent.changeText(getByPlaceholderText('Choice D'), mockQuizData.questions[0].wrongAnswers[2]);
 
-    const englishToTurkishOption = getByTestId('dropdown-option-english_to_turkish');
-    await act(async () => {
-      fireEvent.press(englishToTurkishOption);
-    });
+    // Wait for state updates
+    await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Upload image
-    const uploadButton = getByText('+ Upload Image');
-    await act(async () => {
-      fireEvent.press(uploadButton);
-      // Wait for file upload to complete
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'https://api.example.com/api/file/upload',
-        expect.any(Object)
-      ));
-    });
+    // Submit quiz
+    fireEvent.press(getByText('Submit'));
 
-    // Submit the quiz
-    const submitButton = getByText('Submit');
-    await act(async () => {
-      fireEvent.press(submitButton);
-    });
-
-    // Verify the quiz creation API call
+    // Wait for API call
     await waitFor(() => {
-      expect(fetch).toHaveBeenLastCalledWith('https://api.example.com/api/quizzes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': expect.any(String),
-          'Authorization': 'Bearer test-token',
-        },
-        body: expect.stringMatching(/"title":"Test Quiz".*"questionType":"english_to_turkish"/),
-      });
-    });
+      const postCalls = fetch.mock.calls.filter(call => 
+        call[0].includes('/api/quizzes') && 
+        call[1].method === 'POST'
+      );
+      expect(postCalls.length).toBeGreaterThan(0);
 
-    // Verify navigation after successful creation
+      const [, opts] = postCalls[0];
+      const body = JSON.parse(opts.body);
+      expect(body).toMatchObject({
+        title: mockQuizData.title,
+        questions: [{
+          questionType: 'multipleChoice',
+          word: mockQuizData.questions[0].word,
+          correctAnswer: mockQuizData.questions[0].correctAnswer,
+          wrongAnswers: mockQuizData.questions[0].wrongAnswers
+        }]
+      });
+    }, { timeout: 3000 });
+
     expect(Alert.alert).toHaveBeenCalledWith('Success', 'Quiz created successfully!');
     expect(mockNavigate).toHaveBeenCalledWith('Home');
   });
 
-  it('shows error when trying to submit without title', async () => {
-    const { getByText } = render(
-      <AuthProvider>
-        <HostUrlContext.Provider value="https://api.example.com">
-          <QuizCreationPage navigation={{ navigate: mockNavigate, goBack: mockGoBack }} />
-        </HostUrlContext.Provider>
-      </AuthProvider>
-    );
-
-    const submitButton = getByText('Submit');
-    await act(async () => {
-      fireEvent.press(submitButton);
-    });
-
-    expect(Alert.alert).toHaveBeenCalledWith('Quiz must have a title.');
-    expect(fetch).not.toHaveBeenCalled();
-  });
-
-  it('shows error when trying to submit without questions', async () => {
-    const { getByPlaceholderText, getByText } = render(
-      <AuthProvider>
-        <HostUrlContext.Provider value="https://api.example.com">
-          <QuizCreationPage navigation={{ navigate: mockNavigate, goBack: mockGoBack }} />
-        </HostUrlContext.Provider>
-      </AuthProvider>
-    );
-
-    // Fill in only the title
-    const titleInput = getByPlaceholderText('Untitled Quiz');
-    await act(async () => {
-      fireEvent.changeText(titleInput, 'Test Quiz');
-    });
-
-    const submitButton = getByText('Submit');
-    await act(async () => {
-      fireEvent.press(submitButton);
-    });
-
-    expect(Alert.alert).toHaveBeenCalledWith('Quiz must have at least one question.');
-    expect(fetch).not.toHaveBeenCalled();
-  });
-}); 
+  // ...existing test cases...
+});

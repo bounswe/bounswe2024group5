@@ -230,7 +230,7 @@ const ProfileSettingsScreen = ({ navigation }) => {
     return (
       <BaseLayout navigation={navigation}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6a0dad" />
+          <ActivityIndicator size="large" color="#6d28d9" />
           <Text>Loading...</Text>
         </View>
       </BaseLayout>
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   },
   changePhotoButton: {
     marginTop: 10,
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 8,
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   saveButton: {
-    backgroundColor: "#6a0dad",
+    backgroundColor: "#6d28d9",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 8,

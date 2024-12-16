@@ -1,3 +1,4 @@
+
 // Mock warnOnce before any other imports or mocks
 jest.mock('react-native/Libraries/Utilities/warnOnce', () => {
   return jest.fn();
@@ -7,7 +8,7 @@ import 'react-native-gesture-handler/jestSetup';
 
 // Mock the native modules before any imports
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+// jest.mock('react-native/Libraries/Animated/src/NativeAnimatedHelper');
 
 // Mock Settings
 jest.mock('react-native/Libraries/Settings/Settings', () => ({
@@ -25,64 +26,42 @@ jest.mock('react-native/Libraries/Alert/Alert', () => ({
 // Mock the entire react-native module
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
-
-  // Mock native modules that might be missing
-  RN.NativeModules = {
-    ...RN.NativeModules,
-    SettingsManager: {
-      settings: {
-        AppleLocale: 'en_US',
-        AppleLanguages: ['en'],
-      },
-      getConstants: () => ({
-        settings: {
-          AppleLocale: 'en_US',
-          AppleLanguages: ['en'],
-        }
-      })
-    },
+  RN.NativeModules.NativeAnimatedModule = {
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    removeAllListeners: jest.fn(),
+    getValue: jest.fn(),
+    setValue: jest.fn(),
+    setOffset: jest.fn(),
+    flattenOffset: jest.fn(),
+    extractOffset: jest.fn(),
+    addListener: jest.fn(),
   };
+  RN.Animated.timing = () => ({
+    start: jest.fn(),
+  });
+  return RN;
+});
 
+// Mock react-native-gesture-handler
+jest.mock('react-native-gesture-handler', () => {});
+
+// Mock react-navigation
+jest.mock('@react-navigation/native', () => {
+  const actualNav = jest.requireActual('@react-navigation/native');
   return {
-    ...RN,
-    Platform: {
-      ...RN.Platform,
-      OS: 'ios',
-      Version: 123,
-      select: (obj) => obj.ios,
-    },
-    Alert: {
-      ...RN.Alert,
-      alert: jest.fn(),
-    },
-    // Mock deprecated components to prevent warnings
-    ProgressBarAndroid: 'ProgressBarAndroid',
-    Clipboard: 'Clipboard',
-    PushNotificationIOS: 'PushNotificationIOS',
+    ...actualNav,
+    useNavigation: () => ({
+      navigate: jest.fn(),
+      goBack: jest.fn(),
+    }),
+    useFocusEffect: jest.fn(),
   };
 });
 
-// Mock expo-image-picker
-jest.mock('expo-image-picker', () => ({
-  requestMediaLibraryPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
-  requestCameraPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
-  launchImageLibraryAsync: jest.fn().mockResolvedValue({
-    cancelled: false,
-    assets: [{
-      uri: 'test-uri',
-      width: 100,
-      height: 100,
-      type: 'image'
-    }]
-  }),
-  MediaTypeOptions: {
-    All: 'All',
-    Images: 'Images',
-    Videos: 'Videos',
-  },
-}));
-
-// Mock @expo/vector-icons
+// Mock Icons
+jest.mock('react-native-vector-icons/AntDesign', () => 'AntDesignIcon');
+jest.mock('react-native-vector-icons/FontAwesome', () => 'FontAwesomeIcon');
 jest.mock('@expo/vector-icons', () => ({
   Ionicons: '',
 }));
@@ -94,3 +73,20 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   removeItem: jest.fn(),
   clear: jest.fn(),
 }));
+
+// Mock fetch API
+import fetchMock from 'jest-fetch-mock';
+fetchMock.enableMocks();
+
+// Mock react-navigation
+jest.mock('@react-navigation/native', () => {
+  const actualNav = jest.requireActual('@react-navigation/native');
+  return {
+    ...actualNav,
+    useNavigation: () => ({
+      navigate: jest.fn(),
+      goBack: jest.fn(),
+    }),
+    useFocusEffect: jest.fn(),
+  };
+});
