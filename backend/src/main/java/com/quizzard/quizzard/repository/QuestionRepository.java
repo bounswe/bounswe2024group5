@@ -1,6 +1,7 @@
 package com.quizzard.quizzard.repository;
 
 import com.quizzard.quizzard.model.Question;
+import com.quizzard.quizzard.model.QuestionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     List<Question> findByQuizId(Long quizId);
 
-
     boolean existsByIdAndQuizId(Long questionId, Long id);
+
+    List<Question> findByQuestionTypeAndWordAndCorrectAnswer(QuestionType questionType, String word, String correctAnswer);
 }
