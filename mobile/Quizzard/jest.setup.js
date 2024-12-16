@@ -2,19 +2,28 @@ import { jest } from '@jest/globals';
 import '@testing-library/jest-native';
 import 'jest-fetch-mock';
 
-// Suppress console warnings
-const originalWarn = console.warn;
-console.warn = (...args) => {
-  if (
-    args[0].includes('ProgressBarAndroid') ||
-    args[0].includes('Clipboard') ||
-    args[0].includes('PushNotificationIOS') ||
-    args[0].includes('NativeEventEmitter')
-  ) {
-    return;
+// Completely disable console.warn
+console.warn = jest.fn();
+
+// Only log critical errors
+console.error = jest.fn((...args) => {
+  const ignoredErrors = [
+    'The above error occurred in the',
+    'Consider adding an error boundary',
+    'Warning:',
+    'React does not recognize',
+    'Unknown event handler property',
+    'Cannot update a component',
+    'Invalid prop',
+    'Failed prop type',
+    'Each child in a list'
+  ];
+
+  if (!ignoredErrors.some(msg => args[0]?.includes(msg))) {
+    // eslint-disable-next-line no-console
+    console.log('Error:', ...args);
   }
-  originalWarn.apply(console, args);
-};
+});
 
 // Mock fetch API
 require('jest-fetch-mock').enableMocks();
