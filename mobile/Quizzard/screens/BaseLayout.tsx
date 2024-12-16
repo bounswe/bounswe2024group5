@@ -1,20 +1,23 @@
 // BaseLayout.tsx
 import React, { useState } from "react";
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   ScrollView,
-  Modal, 
-  TouchableWithoutFeedback 
+  Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
+import { useAuth } from "./AuthProvider";
 import { EloCefrInfoTable } from "../components/EloCefrInfoTable";
 
 const BaseLayout = ({ children, navigation }) => {
   const route = useRoute();
+  const authContext = useAuth(); // Get the authentication context
+  const { token, username } = authContext;
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
 
@@ -27,7 +30,7 @@ const BaseLayout = ({ children, navigation }) => {
   };
 
   const navigateToProfile = () => {
-    navigation.navigate("Profile");
+    navigation.navigate("Profile", { username: username });
   };
 
   const toggleInfoModal = () => {
@@ -47,10 +50,7 @@ const BaseLayout = ({ children, navigation }) => {
           <Text style={styles.appName}>Quizzard</Text>
         </TouchableOpacity>
         <View style={styles.icons}>
-          <TouchableOpacity 
-            style={styles.iconButton}
-            onPress={toggleInfoModal}
-          >
+          <TouchableOpacity style={styles.iconButton} onPress={toggleInfoModal}>
             <Ionicons name="help-circle-outline" size={28} color="black" />
           </TouchableOpacity>
           <TouchableOpacity
@@ -76,13 +76,13 @@ const BaseLayout = ({ children, navigation }) => {
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={styles.infoModalContent}>
-                <TouchableOpacity 
-                  style={styles.closeButton} 
+                <TouchableOpacity
+                  style={styles.closeButton}
                   onPress={toggleInfoModal}
                 >
                   <Ionicons name="close" size={24} color="black" />
                 </TouchableOpacity>
-                <ScrollView 
+                <ScrollView
                   contentContainerStyle={styles.scrollViewContent}
                   showsVerticalScrollIndicator={false}
                 >
@@ -105,29 +105,42 @@ const BaseLayout = ({ children, navigation }) => {
         >
           <Ionicons
             name={isHome ? "home" : "home-outline"}
-            size={24}
-            color="#6d28d9"
+            size={26}
+            color={isHome ? "#6d28d9" : "#94a3b8"}
           />
+          <Text style={[styles.navLabel, isHome && styles.navLabelActive]}>
+            Home
+          </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.navButton}
           onPress={() => navigation.navigate("Forum")}
         >
           <Ionicons
             name={isForum ? "chatbox" : "chatbox-outline"}
-            size={24}
-            color="#6d28d9"
+            size={26}
+            color={isForum ? "#6d28d9" : "#94a3b8"}
           />
+          <Text style={[styles.navLabel, isForum && styles.navLabelActive]}>
+            Forum
+          </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.navButton}
           onPress={() => navigation.navigate("Leaderboard")}
         >
           <Ionicons
             name={isLeaderboard ? "trophy" : "trophy-outline"}
-            size={24}
-            color="#6d28d9"
+            size={26}
+            color={isLeaderboard ? "#6d28d9" : "#94a3b8"}
           />
+          <Text
+            style={[styles.navLabel, isLeaderboard && styles.navLabelActive]}
+          >
+            Leaderboard
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -199,29 +212,56 @@ const styles = StyleSheet.create({
   },
   navBar: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    height: 45,
-    paddingHorizontal: 40,
-    backgroundColor: "#f2f2f2",
+    justifyContent: "space-around",
+    alignItems: "center",
+    height: 55,
+    backgroundColor: "#ede9fe",
+    paddingBottom: 8,
+    borderTopColor: "rgba(0,0,0,0.05)",
     borderTopWidth: 1,
-    borderColor: "#ccc",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 8,
+    backdropFilter: "blur(10px)", // iOS blur effect
   },
+
   navButton: {
-    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+    marginTop: 14,
+  },
+
+  navLabel: {
+    fontSize: 12,
+    marginTop: 4,
+    color: "#94a3b8",
+    opacity: 0.8,
+  },
+
+  navLabelActive: {
+    color: "#6d28d9",
+    fontWeight: "500",
+    opacity: 1,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   infoModalContent: {
-    width: '80%',
-    backgroundColor: '#ede9fe',
+    width: "80%",
+    backgroundColor: "#ede9fe",
     borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -246,7 +286,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   closeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
   },
@@ -286,6 +326,9 @@ const styles = StyleSheet.create({
   },
   quitButtonText: {
     color: "white",
+  },
+  scrollViewContent: {
+    padding: 10,
   },
 });
 

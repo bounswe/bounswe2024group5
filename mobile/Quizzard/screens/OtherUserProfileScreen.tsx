@@ -18,6 +18,7 @@ import HostUrlContext from "../app/HostContext";
 import { useAuth } from "./AuthProvider";
 import MyQuizzesView from "../components/MyQuizzesView";
 import MyPostsView from "../components/MyPostsView";
+import { calculateQuizDifficultyFromElo } from "../components/EloCefrInfoTable";
 
 interface OtherUserProfileScreenProps {
     route: {
@@ -44,16 +45,6 @@ const OtherUserProfileScreen: React.FC<OtherUserProfileScreenProps> = ({ route, 
     const [posts, setPosts] = useState<any[]>([]);
     const [showMyQuizzes, setShowMyQuizzes] = useState(true);
     const [showMyPosts, setShowMyPosts] = useState(true);
-
-    // Utility function to calculate quiz difficulty
-    const calculateQuizDifficultyFromElo = (elo: number) => {
-        if (elo < 400) return "A1";
-        else if (elo < 1000) return "A2";
-        else if (elo < 1800) return "B1";
-        else if (elo < 2600) return "B2";
-        else if (elo < 3300) return "C1";
-        else return "C2";
-    };
 
     // Fetch user profile
     const fetchUserProfile = async () => {

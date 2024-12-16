@@ -32,7 +32,7 @@ public class WikidataService {
 
         // Limit to first 3 URLs
         List<String> selectedUrls = sortedConceptUris.stream()
-                .limit(3)
+                .limit(2)
                 .collect(Collectors.toList());
 
         List<String> finalUrls = new ArrayList<>();
@@ -70,14 +70,22 @@ public class WikidataService {
             if (jsonResponse.has("claims") &&
                     jsonResponse.getJSONObject("claims").has("P18")) {
                 JSONArray claims = jsonResponse.getJSONObject("claims").getJSONArray("P18");
+                if (claims.length() > 1) {
+                    for (int i = 0; i < 2; i++) {
+                        String imageName = claims.getJSONObject(i).getJSONObject("mainsnak").getJSONObject("datavalue").getString("value");
 
-                for (int i = 0; i < 1; i++) {
-                    String imageName = claims.getJSONObject(i).getJSONObject("mainsnak").getJSONObject("datavalue").getString("value");
+                        // Create URL for getting image from Wikimedia Commons
+                        String imageUrl = WIKIDATA_COMMON_URL + imageName.replace(" ", "_");
+                        finalUrls.add(imageUrl);
+                    }
+                } else if (claims.length() == 1) {
+                    String imageName = claims.getJSONObject(0).getJSONObject("mainsnak").getJSONObject("datavalue").getString("value");
 
                     // Create URL for getting image from Wikimedia Commons
                     String imageUrl = WIKIDATA_COMMON_URL + imageName.replace(" ", "_");
                     finalUrls.add(imageUrl);
                 }
+
             }
         }
 

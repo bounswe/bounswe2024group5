@@ -242,7 +242,7 @@ const CreateQuestionScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Question Content Input */}
         <TextInput
-          style={styles.descriptionInput}
+          style={styles.contentInput}
           value={content}
           onChangeText={setContent}
           placeholder="Question Content*"
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#faf5ff',
   },
-  descriptionInput: {
+  contentInput: {
     height: 100,
     borderColor: "#2e1065",
     borderWidth: 1,

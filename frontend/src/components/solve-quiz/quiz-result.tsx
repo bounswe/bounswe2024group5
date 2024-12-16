@@ -17,6 +17,7 @@ interface QuizResultProps {
   eloGained: number;
   completedAt: string;
   quizId: number;
+  resetQuizState: () => void;
 }
 
 const Button = ({
@@ -67,6 +68,7 @@ export const QuizResult = ({
   questionCount,
   completedAt,
   quizId,
+  resetQuizState,
 }: QuizResultProps) => {
   const navigate = useNavigate();
   const percentage = Math.round((correctAnswers / questionCount) * 100);
@@ -149,7 +151,12 @@ export const QuizResult = ({
               <IconHome size={20} stroke={1.5} />
               Back to Home
             </Button>
-            <Button onClick={() => navigate(`/quiz/${quizId}`)}>
+            <Button
+              onClick={() => {
+                resetQuizState();
+                navigate(`/quiz/${quizId}`);
+              }}
+            >
               <IconRotate size={20} stroke={1.5} />
               Try Again
             </Button>

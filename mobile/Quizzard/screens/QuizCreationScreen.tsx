@@ -9,8 +9,11 @@ import {
   FlatList,
   Alert,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal,
+  Platform,
 } from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import DropdownComponent from "../components/QuestionTypeDropdown";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system"; // Import FileSystem for base64 conversion
@@ -35,24 +38,46 @@ const QuizCreationPage = ({ navigation }) => {
       isLoadingAnswerSuggestions: false
     }
   ]);
-  const [suggestions, setSuggestions] = useState<string[]>([]); // Store word suggestions
   const [selectedType, setSelectedType] = useState(""); // Default type
-  const [typedQuestionWord, setTypedQuestionWord] = useState("");
-  const [checkInputTimeoutId, setCheckInputTimeoutId] = useState(-1);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [image, setMedia] = useState<string | null>(null);
   const authContext = useAuth();
   const token = authContext ? authContext.token : null;
-  const [wordSuggestions, setWordSuggestions] = useState<string[]>([]);
-  const [showWordSuggestions, setShowWordSuggestions] = useState(false);
   const [isLoadingWordSuggestions, setIsLoadingWordSuggestions] = useState(false);
-  const [answerSuggestions, setAnswerSuggestions] = useState<string[]>([]);
-  const [showAnswerSuggestions, setShowAnswerSuggestions] = useState(false);
-  const [isLoadingAnswerSuggestions, setIsLoadingAnswerSuggestions] = useState(false);
-  const [activeWordSuggestionIndex, setActiveWordSuggestionIndex] = useState<number | null>(null);
+  const [selectedNumber, setSelectedNumber] = useState(1);
+  const [favoriteCount, setFavoriteCount] = useState(0);
 
   // TODO: Complete the implemenation of the following function once the `file/upload` endpoint is ready
+
+  const getFavoriteQuestionsCount = async () => {
+    try {
+      const response = await fetch(`${hostUrl}/api/favorite-question`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFavoriteCount(data.length);
+      } else {
+        console.error('Failed to fetch favorite questions');
+      }
+    } catch (error) {
+      console.error('Error fetching favorite questions:', error);
+    }
+  };
+
+  // Add useEffect to fetch count when component mounts
+  useEffect(() => {
+    if (token) {
+      getFavoriteQuestionsCount();
+    }
+  }, [token]);
+
 
   const uploadFile = async (fileUri: string) => {
     try {
@@ -377,177 +402,256 @@ const QuizCreationPage = ({ navigation }) => {
     );
   };
 
+  const createQuizFromFavorites = async () => {
+    if (!quizTitle) {
+      Alert.alert("Error", "Please enter a quiz title first");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${hostUrl}/api/quizzes/from-favorites`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          count: selectedNumber,
+          title: quizTitle
+        })
+      });
+
+      if (response.ok) {
+        const quiz = await response.json();
+        Alert.alert("Success", "Quiz created from favorites successfully! You can see it in your profile page under My Quizzes.");
+        navigation.navigate("Home");
+      } else {
+        const error = await response.text();
+        Alert.alert("Error", `Failed to create quiz: ${error}`);
+      }
+    } catch (error) {
+      console.error("Error creating quiz from favorites:", error);
+      Alert.alert("Error", "Failed to create quiz from favorites");
+    }
+  };
+
+
+  const incrementNumber = () => {
+    if (selectedNumber < favoriteCount) {
+      setSelectedNumber(prev => prev + 1);
+    }
+  };
+
+  const decrementNumber = () => {
+    if (selectedNumber > 1) {
+      setSelectedNumber(prev => prev - 1);
+    }
+  };
+
   return (
-    <ScrollView 
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-    >
-      {/* Header Section */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Text style={styles.appName}>Quizzard</Text>
-        </TouchableOpacity>
-        <View style={styles.icons}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="person-outline" size={24} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <Ionicons name="log-out-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Title Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Untitled Quiz"
-        value={quizTitle}
-        onChangeText={setQuizTitle}
-      />
-
-      {/* Image Upload Box */}
-      <TouchableOpacity
-        style={styles.imageUploadBox}
-        onPress={pickImageAndUpload}
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
       >
-        {imageUrl ? (
-          <Image
-            source={{ uri: imageUrl }}
-            style={{
-              width: '100%',
-              height: '100%',
-              borderRadius: 10
-            }}
-            resizeMode="cover"
-          />
-        ) : (
-          <Text style={styles.imageUploadText}>
-            + Upload Image
-          </Text>
-        )}
-      </TouchableOpacity>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+            <Text style={styles.appName}>Quizzard</Text>
+          </TouchableOpacity>
+          <View style={styles.icons}>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="person-outline" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => navigation.navigate("Login")}
+            >
+              <Ionicons name="log-out-outline" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      {/* Description Input */}
-      <TextInput
-        style={styles.descriptionInput}
-        placeholder="Enter quiz description..."
-        value={quizDescription}
-        onChangeText={setQuizDescription}
-        multiline
-      />
+        {/* Title Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Untitled Quiz"
+          value={quizTitle}
+          onChangeText={setQuizTitle}
+        />
 
-      {/* Render all question boxes */}
-      {questions.map((question, index) => (
-        <View key={index} style={styles.questionBox}>
-          {/* Existing header container */}
-          <View style={styles.headerContainer}>
-            <TextInput
-              style={styles.questionTitle}
-              placeholder="Enter a word"
-              value={question.word}
-              onChangeText={(word) => handleInputChange(index, word)}
-            />
-            {/* Loading indicator for suggestions */}
-            {isLoadingWordSuggestions && (
-              <ActivityIndicator
-                size="small"
-                color="#6a0dad"
-                style={styles.suggestionLoadingIndicator}
-              />
-            )}
-            <View style={styles.dropdownContainer}>
-              <DropdownComponent
-                testID="question-type-dropdown"
-                selectedValue={questions[index].questionType}
-                onValueChange={(type) => updateQuestionType(index, type)}
-              />
+        <View style={styles.favoritesContainer}>
+          <TouchableOpacity style={styles.favoritesButton} onPress={createQuizFromFavorites}>
+            <Text style={styles.favoritesButtonText}>Quiz from Favorites</Text>
+          </TouchableOpacity>
+
+          <View style={styles.numberInputContainer}>
+            <TouchableOpacity
+              style={styles.numberButton}
+              onPress={decrementNumber}
+            >
+              <Text style={styles.numberButtonText}>-</Text>
+            </TouchableOpacity>
+
+            <View style={styles.numberDisplay}>
+              <Text style={styles.numberText}>{selectedNumber}</Text>
             </View>
+
+            <TouchableOpacity
+              style={styles.numberButton}
+              onPress={incrementNumber}
+            >
+              <Text style={styles.numberButtonText}>+</Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Word Suggestions Dropdown */}
-          {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
-            <View style={styles.wordSuggestionsContainer}>
-              <FlatList
-                data={question.wordSuggestions}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.wordSuggestionItem}
-                    onPress={() => handleWordSuggestionSelect(index, item)}
-                  >
-                    <Text>{item}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          )}
-
-          {/* Answer Choices */}
-          {["A", "B", "C", "D"].map((option) => (
-            <View key={option}>
-              <TextInput
-                style={styles.choiceInput}
-                placeholder={`Choice ${option}`}
-                value={question.options[option]}
-                editable={option === 'A'}
-                onChangeText={(text) => {
-                  if (option === 'A') {
-                    updateQuestion(index, option, text);
-                    // Trigger answer suggestions only for option A
-                    fetchAnswerSuggestions(index, questions[index])
-                  }
-                }}
-              />
-
-              {/* Answer Suggestions Dropdown - Only for Option A */}
-              {option === 'A' &&
-                question.showAnswerSuggestions &&
-                question.answerSuggestions.length > 0 && (
-                  <View style={styles.answerSuggestionsContainer}>
-                    <FlatList
-                      data={question.answerSuggestions}
-                      keyExtractor={(item) => item}
-                      renderItem={({ item }) => (
-                        <TouchableOpacity
-                          style={styles.answerSuggestionItem}
-                          onPress={() => handleAnswerSuggestionSelect(index, item)}
-                        >
-                          <Text>{item}</Text>
-                        </TouchableOpacity>
-                      )}
-                    />
-                  </View>
-                )}
-            </View>
-          ))}
         </View>
-      ))}
 
-
-      {/* + Question Button */}
-      <TouchableOpacity
-        style={styles.addQuestionButton}
-        onPress={handleAddQuestion}
-      >
-        <Text style={styles.addQuestionButtonText}>+ Question</Text>
-      </TouchableOpacity>
-
-      {/* Bottom Cancel and Submit Buttons */}
-      <View style={styles.bottomButtons}>
+        {/* Image Upload Box */}
         <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
+          style={styles.imageUploadBox}
+          onPress={pickImageAndUpload}
         >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+          {imageUrl ? (
+            <Image
+              source={{ uri: imageUrl }}
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: 10
+              }}
+              resizeMode="cover"
+            />
+          ) : (
+            <Text style={styles.imageUploadText}>
+              + Upload Image
+            </Text>
+          )}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.submitButton} onPress={submitQuiz}>
-          <Text style={styles.submitButtonText}>Submit</Text>
+
+        {/* Description Input */}
+        <TextInput
+          style={styles.descriptionInput}
+          placeholder="Enter quiz description..."
+          value={quizDescription}
+          onChangeText={setQuizDescription}
+          multiline
+        />
+
+        {/* Render all question boxes */}
+        {questions.map((question, index) => (
+          <View
+            key={index}
+            style={[
+              styles.questionBox,
+              { zIndex: questions.length - index } // Higher index = lower in the stack
+            ]}
+          >
+            {/* Existing header container */}
+            <View style={styles.headerContainer}>
+              <TextInput
+                style={styles.questionTitle}
+                placeholder="Enter a word"
+                value={question.word}
+                onChangeText={(word) => handleInputChange(index, word)}
+              />
+              {/* Loading indicator for suggestions */}
+              {isLoadingWordSuggestions && (
+                <ActivityIndicator
+                  size="small"
+                  color="#6a0dad"
+                  style={styles.suggestionLoadingIndicator}
+                />
+              )}
+              <View style={styles.dropdownContainer}>
+                <DropdownComponent
+                  testID="question-type-dropdown"
+                  selectedValue={questions[index].questionType}
+                  onValueChange={(type) => updateQuestionType(index, type)}
+                />
+              </View>
+            </View>
+
+            {/* Word Suggestions Dropdown */}
+            {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
+              <View style={[styles.suggestionsOverlay, { top: 60 }]}>
+                <ScrollView>
+                  {question.wordSuggestions.map((item, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={styles.suggestionItem}
+                      onPress={() => handleWordSuggestionSelect(index, item)}
+                    >
+                      <Text style={styles.suggestionText}>{item}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+
+            {/* Answer Choices */}
+            {["A", "B", "C", "D"].map((option) => (
+              <View key={option}>
+                <TextInput
+                  style={styles.choiceInput}
+                  placeholder={`Choice ${option}`}
+                  value={question.options[option]}
+                  editable={option === 'A'}
+                  onChangeText={(text) => {
+                    if (option === 'A') {
+                      updateQuestion(index, option, text);
+                      // Trigger answer suggestions only for option A
+                      fetchAnswerSuggestions(index, questions[index])
+                    }
+                  }}
+                />
+
+                {/* Answer Suggestions Dropdown */}
+                {option === 'A' &&
+                  question.showAnswerSuggestions &&
+                  question.answerSuggestions.length > 0 && (
+                    <View style={[styles.suggestionsOverlay, { top: 40 }]}>
+                      <ScrollView>
+                        {question.answerSuggestions.map((item, i) => (
+                          <TouchableOpacity
+                            key={i}
+                            style={styles.suggestionItem}
+                            onPress={() => handleAnswerSuggestionSelect(index, item)}
+                          >
+                            <Text style={styles.suggestionText}>{item}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+              </View>
+            ))}
+          </View>
+        ))}
+
+
+        {/* + Question Button */}
+        <TouchableOpacity
+          style={styles.addQuestionButton}
+          onPress={handleAddQuestion}
+        >
+          <Text style={styles.addQuestionButtonText}>+ Question</Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+
+        {/* Bottom Cancel and Submit Buttons */}
+        <View style={styles.bottomButtons}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.submitButton} onPress={submitQuiz}>
+            <Text style={styles.submitButtonText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -636,7 +740,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 3,
   },
   headerContainer: {
     flexDirection: "row",
@@ -673,13 +776,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     marginBottom: 20,
+    zIndex: 0, // Changed from 1 to 0
+    elevation: 0, // Changed from 1 to 0
   },
-  addQuestionButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  
+
   contentContainer: {
     paddingBottom: 100, // Add extra padding to the bottom of the scrollable content
   },
@@ -694,7 +794,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    zIndex: 10, // Ensure buttons are above other content
+    zIndex: 999999, // Lower than suggestions
+    elevation: 999999,
   },
   cancelButton: {
     backgroundColor: "#ccc",
@@ -732,6 +833,128 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+  },
+  suggestionsOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    maxHeight: 200,
+    zIndex: 9999999, // Increased to be higher than everything
+    elevation: 9999999, // Match zIndex for Android
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+
+  suggestionItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+
+  suggestionText: {
+    fontSize: 14,
+    color: '#333',
+  },
+
+  favoritesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 10,
+  },
+
+  favoritesButton: {
+    backgroundColor: "#6d28d9",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  favoritesButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  numberInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 8,
+    width: 80,
+    textAlign: 'center',
+  },
+  modalView: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  pickerContainer: {
+    backgroundColor: 'white',
+    paddingBottom: 20,
+  },
+
+  picker: {
+    height: 200,
+  },
+
+  doneButton: {
+    alignItems: 'flex-end',
+    padding: 10,
+    backgroundColor: '#f8f8f8',
+  },
+
+  doneButtonText: {
+    color: '#6d28d9',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  numberInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 5,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+
+  numberButton: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    width: 40,
+    alignItems: 'center',
+  },
+
+  numberButtonText: {
+    fontSize: 20,
+    color: '#6d28d9',
+    fontWeight: 'bold',
+  },
+
+  numberDisplay: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    minWidth: 40,
+    alignItems: 'center',
+  },
+
+  numberText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
 

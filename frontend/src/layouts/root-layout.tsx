@@ -25,6 +25,11 @@ const NavBar = () => {
           <Link to="/quizzes" className="font-semibold text-violet-700">
             Quizzes
           </Link>
+          
+          <Link to="/leaderboard" className="font-semibold text-violet-700">
+            Leaderboard
+          </Link>
+
           <Link to="/forum" className="font-semibold text-violet-700">
             Forum
           </Link>
