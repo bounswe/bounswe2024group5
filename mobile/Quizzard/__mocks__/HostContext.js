@@ -1,5 +1,5 @@
-import React, { createContext } from 'react';
+import React from 'react';
 
-const HostUrlContext = createContext('https://api.example.com');
+const HostUrlContext = React.createContext('https://api.example.com');
 
 export default HostUrlContext;
