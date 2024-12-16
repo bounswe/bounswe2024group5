@@ -77,7 +77,11 @@ public class QuizService {
         Quiz quiz = new Quiz();
         quiz.setTitle(request.getTitle());
         quiz.setDescription(request.getDescription());
-        quiz.setImage(request.getImage());
+        if (request.getImage() == null || request.getImage().isEmpty())
+            quiz.setImage("https://storage.googleapis.com/quizzard-bucket/19042e06-bfff-49c0-adce-49901b6dc726-upload.jpg");
+        else {
+            quiz.setImage(request.getImage());
+        }
         quiz.setAuthor(author);
         quizRepository.save(quiz);
 
@@ -173,7 +177,13 @@ public class QuizService {
         Quiz quiz = new Quiz();
         quiz.setTitle(title);
         quiz.setAuthor(author);
-        quiz.setDescription(request.getDescription());
+
+        if (request.getDescription() == null || request.getDescription().isEmpty())
+            quiz.setDescription("This quiz is created from " + authorUsername + "'s favorite questions");
+        else {
+            quiz.setDescription(request.getDescription());
+        }
+
 
         if (request.getImage() != null || !request.getImage().isEmpty()) {
             quiz.setImage(request.getImage());
