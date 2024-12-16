@@ -260,15 +260,6 @@ const QuestionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
       if (response.ok) {
         const newReplyData: ForumReply = await response.json();
-        newReplyData.createdAt = new Date(
-          newReplyData.createdAt
-        ).toLocaleString("en-US", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
         setRepliesData((prev) => [...prev, newReplyData]);
         setNewReply("");
       } else {

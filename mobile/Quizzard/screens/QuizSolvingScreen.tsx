@@ -498,12 +498,10 @@ const QuizSolvingScreen = ({ route, navigation }) => {
 
       if (response.status === 201) {
         setIsFavorited(true);
-        setFavoriteModalMessage("Question added to favorites.");
       } else {
         setFavoriteModalMessage("Failed to add question to favorites.");
+        setShowFavoriteModal(true);
       }
-      // TODO: Consider removing the modals for favorite
-      setShowFavoriteModal(true);
     } catch (error) {
       console.error("Error adding to favorites:", error);
       setFavoriteModalMessage("Failed to add question to favorites.");
@@ -524,13 +522,10 @@ const QuizSolvingScreen = ({ route, navigation }) => {
 
       if (response.status === 204) {
         setIsFavorited(false);
-        setFavoriteModalMessage("Question removed from favorites.");
-        setShowFavoriteModal(true);
       } else {
         setFavoriteModalMessage("Failed to remove question from favorites.");
+        setShowFavoriteModal(true);
       }
-      // TODO: Consider removing the modals for favorite
-      setShowFavoriteModal(true);
     } catch (error) {
       console.error("Error removing from favorites:", error);
       setFavoriteModalMessage("Failed to remove question from favorites.");
