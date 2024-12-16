@@ -1,14 +1,14 @@
 import { CreateaPostComponent } from "../components/forum/CreatePost";
 import { ForumPostComponent } from "../components/forum/ForumPost";
-import { useFetchPosts } from "../hooks/api/get-forum-post";
 import { useState } from "react";
+import { useSearchPosts } from "../hooks/api/search-forum";
 
 export const ForumPage = () => {  
 
   const [postComponent, setPostComponent] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState<string>("");
 
-  const { data: posts } = useFetchPosts({tag:searchInput});
+  const { data: posts } = useSearchPosts({ keyword: searchInput });
 
   console.log('here', posts)
 
