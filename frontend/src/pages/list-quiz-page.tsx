@@ -10,11 +10,11 @@ import { useFetchQuizzes } from "../hooks/api/get-quizzes";
 type DifficultyFilter = "all" | string;
 
 export const getDifficultyLevel = (difficulty: number): string => {
-  if (difficulty < 400) return "A1";
+  if (difficulty < 500) return "A1";
   if (difficulty < 1000) return "A2";
-  if (difficulty < 1800) return "B1";
-  if (difficulty < 2600) return "B2";
-  if (difficulty < 3300) return "C1";
+  if (difficulty < 1500) return "B1";
+  if (difficulty < 2000) return "B2";
+  if (difficulty < 2500) return "C1";
   return "C2";
 };
 export const ListQuizzesPage = () => {
