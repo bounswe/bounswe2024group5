@@ -77,7 +77,11 @@ public class QuizService {
         Quiz quiz = new Quiz();
         quiz.setTitle(request.getTitle());
         quiz.setDescription(request.getDescription());
-        quiz.setImage(request.getImage());
+        if (request.getImage() == null || request.getImage().equals(""))
+            quiz.setImage("https://storage.googleapis.com/quizzard-bucket/19042e06-bfff-49c0-adce-49901b6dc726-upload.jpg");
+        else {
+            quiz.setImage(request.getImage());
+        }
         quiz.setAuthor(author);
         quizRepository.save(quiz);
 
@@ -161,6 +165,7 @@ public class QuizService {
         return mapQuizzesToQuizResponses(quizRepository.findRecommendedQuizzes(givenQuizId, username, pageable));
     }
 
+    @Transactional
     public QuizResponse createQuizFromFavorites(String authorUsername, CreateFromFavQuestionToQuizRequest request) {
         User author = userService.getOneUserByUsername(authorUsername);
         List<FavoriteQuestion> favoriteQuestions = favoriteQuestionRepository.findAllByUserId(author.getId());
@@ -170,14 +175,24 @@ public class QuizService {
         if (favoriteQuestions.size() < count)
             throw new ResourceNotFoundException("You don't have enough favorite questions");
 
-        // 1. Create Quiz
         Quiz quiz = new Quiz();
         quiz.setTitle(title);
         quiz.setAuthor(author);
-        quiz.setDescription("Created from favorite questions");
+
+        if (request.getDescription() == null || request.getDescription().equals(""))
+            quiz.setDescription("This quiz is created from " + authorUsername + "'s favorite questions");
+        else {
+            quiz.setDescription(request.getDescription());
+        }
+
+
+        if (request.getImage() == null || request.getImage().equals(""))
+            quiz.setImage("https://storage.googleapis.com/quizzard-bucket/19042e06-bfff-49c0-adce-49901b6dc726-upload.jpg");
+        else {
+            quiz.setImage(request.getImage());
+        }
         quizRepository.save(quiz);
 
-        // 2. Create questions from favorite questions and add them to quiz
         for (int i = 0; i < count; i++) {
             Question question = new Question();
             question.setQuizId(quiz.getId());
