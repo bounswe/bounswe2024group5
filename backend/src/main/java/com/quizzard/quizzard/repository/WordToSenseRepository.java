@@ -22,7 +22,7 @@ public interface WordToSenseRepository extends JpaRepository<WordToSense, Long> 
 
 
     @Query(value = """
-        SELECT sense.sense
+        SELECT DISTINCT sense.sense
         FROM word_to_sense
         LEFT JOIN sense ON word_to_sense.sense_id = sense.id
         LEFT JOIN english ON word_to_sense.english_id = english.id
