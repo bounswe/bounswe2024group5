@@ -1,92 +1,131 @@
+import { jest } from '@jest/globals';
+import '@testing-library/jest-native';
+import 'jest-fetch-mock';
 
-// Mock warnOnce before any other imports or mocks
-jest.mock('react-native/Libraries/Utilities/warnOnce', () => {
-  return jest.fn();
+// Completely disable console.warn
+console.warn = jest.fn();
+
+// Only log critical errors
+console.error = jest.fn((...args) => {
+  const ignoredErrors = [
+    'The above error occurred in the',
+    'Consider adding an error boundary',
+    'Warning:',
+    'React does not recognize',
+    'Unknown event handler property',
+    'Cannot update a component',
+    'Invalid prop',
+    'Failed prop type',
+    'Each child in a list'
+  ];
+
+  if (!ignoredErrors.some(msg => args[0]?.includes(msg))) {
+    // eslint-disable-next-line no-console
+    console.log('Error:', ...args);
+  }
 });
-
-import 'react-native-gesture-handler/jestSetup';
-
-// Mock the native modules before any imports
-jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
-// jest.mock('react-native/Libraries/Animated/src/NativeAnimatedHelper');
-
-// Mock Settings
-jest.mock('react-native/Libraries/Settings/Settings', () => ({
-  get: jest.fn(),
-  set: jest.fn(),
-  watchKeys: jest.fn(),
-  clearWatch: jest.fn(),
-}));
-
-// Mock Alert
-jest.mock('react-native/Libraries/Alert/Alert', () => ({
-  alert: jest.fn(),
-}));
-
-// Mock the entire react-native module
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-  RN.NativeModules.NativeAnimatedModule = {
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    removeAllListeners: jest.fn(),
-    getValue: jest.fn(),
-    setValue: jest.fn(),
-    setOffset: jest.fn(),
-    flattenOffset: jest.fn(),
-    extractOffset: jest.fn(),
-    addListener: jest.fn(),
-  };
-  RN.Animated.timing = () => ({
-    start: jest.fn(),
-  });
-  return RN;
-});
-
-// Mock react-native-gesture-handler
-jest.mock('react-native-gesture-handler', () => {});
-
-// Mock react-navigation
-jest.mock('@react-navigation/native', () => {
-  const actualNav = jest.requireActual('@react-navigation/native');
-  return {
-    ...actualNav,
-    useNavigation: () => ({
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-    }),
-    useFocusEffect: jest.fn(),
-  };
-});
-
-// Mock Icons
-jest.mock('react-native-vector-icons/AntDesign', () => 'AntDesignIcon');
-jest.mock('react-native-vector-icons/FontAwesome', () => 'FontAwesomeIcon');
-jest.mock('@expo/vector-icons', () => ({
-  Ionicons: '',
-}));
-
-// Mock AsyncStorage
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
-}));
 
 // Mock fetch API
-import fetchMock from 'jest-fetch-mock';
-fetchMock.enableMocks();
+require('jest-fetch-mock').enableMocks();
+global.fetch = require('jest-fetch-mock');
 
-// Mock react-navigation
-jest.mock('@react-navigation/native', () => {
-  const actualNav = jest.requireActual('@react-navigation/native');
-  return {
-    ...actualNav,
-    useNavigation: () => ({
-      navigate: jest.fn(),
-      goBack: jest.fn(),
+// Create all mock implementations first
+const mockDropdown = {
+  Dropdown: () => null,
+  MultiSelect: () => null,
+};
+
+const mockImagePicker = {
+  launchImageLibraryAsync: jest.fn(() => Promise.resolve({
+    canceled: false,
+    assets: [{ uri: 'test-image-uri' }]
+  })),
+  requestMediaLibraryPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted' })),
+  MediaTypeOptions: {
+    Images: 'Images'
+  },
+};
+
+const mockIcon = () => 'Icon';
+mockIcon.getImageSource = jest.fn();
+mockIcon.getImageSourceSync = jest.fn();
+mockIcon.loadFont = jest.fn();
+mockIcon.hasIcon = jest.fn();
+mockIcon.getRawGlyphMap = jest.fn();
+mockIcon.getFontFamily = jest.fn();
+
+// Then apply all mocks
+jest.mock('react-native-element-dropdown', () => mockDropdown);
+jest.mock('expo-image-picker', () => mockImagePicker);
+jest.mock('@expo/vector-icons', () => ({
+  Ionicons: mockIcon,
+  createIconSet: () => mockIcon,
+}));
+
+// Mock vector icons
+jest.mock('react-native-vector-icons/AntDesign', () => mockIcon);
+jest.mock('react-native-vector-icons/FontAwesome', () => mockIcon);
+jest.mock('react-native-vector-icons/Ionicons', () => mockIcon);
+
+// Mock React Native modules
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+  RN.NativeModules.SettingsManager = {
+    settings: {
+      AppleLocale: 'en_US',
+      AppleLanguages: ['en'],
+    },
+    getConstants: () => ({
+      settings: {
+        AppleLocale: 'en_US',
+        AppleLanguages: ['en'],
+      }
+    })
+  };
+  RN.NativeModules.StatusBarManager = {
+    getHeight: jest.fn(),
+  };
+  RN.NativeModules.PlatformConstants = {
+    getConstants: () => ({
+      forceTouchAvailable: false,
+      isTesting: true,
+      reactNativeVersion: {
+        major: 0,
+        minor: 68,
+        patch: 2,
+      },
+      Version: 123,
     }),
-    useFocusEffect: jest.fn(),
+  };
+  return {
+    ...RN,
+    NativeModules: {
+      ...RN.NativeModules,
+      SettingsManager: RN.NativeModules.SettingsManager,
+      StatusBarManager: RN.NativeModules.StatusBarManager,
+      PlatformConstants: RN.NativeModules.PlatformConstants,
+    },
+    Platform: {
+      ...RN.Platform,
+      OS: 'ios',
+      Version: 123,
+      isTesting: true,
+      select: (obj) => obj.ios,
+    },
+    InteractionManager: {
+      runAfterInteractions: jest.fn((callback) => callback()),
+    },
   };
 });
+
+// Mock AsyncStorage
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+);
+
+// Mock other Expo modules
+jest.mock('expo-font');
+jest.mock('expo-asset');
+jest.mock('expo-file-system', () => ({
+  readAsStringAsync: jest.fn(() => Promise.resolve('base64-string')),
+}));

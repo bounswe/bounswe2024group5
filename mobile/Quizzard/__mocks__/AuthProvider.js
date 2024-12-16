@@ -1,26 +1,25 @@
 import React from 'react';
 
-const AuthContext = React.createContext(null);
+export const AuthContext = React.createContext(null);
 
-export const AuthProvider = ({ children, value }) => {
-  // Use provided value or fallback to a default mock
-  const authValue = value || {
-    token: 'test-token',
+export const useAuth = () => {
+  return {
+    token: 'fake-token',
     user: {
       username: 'testuser',
       name: 'Test User'
     },
     isLoggedIn: true,
-    getToken: () => 'test-token',
-    login: () => {},
-    logout: () => {},
+    getToken: () => 'fake-token',
+    login: jest.fn(),
+    logout: jest.fn(),
   };
+};
 
+export const AuthProvider = ({ children, value }) => {
   return (
-    <AuthContext.Provider value={authValue}>
+    <AuthContext.Provider value={value || useAuth()}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => React.useContext(AuthContext);
