@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {  describe, expect, it, vi } from "vitest";
+import {  beforeEach, describe, expect, it, vi } from "vitest";
 import { useParams } from "react-router-dom";
 import { useGetProfile } from "../hooks/api/profile/get";
 import ProfilePage from "./profile-page";
@@ -43,8 +43,8 @@ const queryClient = new QueryClient();
 
 describe("Follow button", () => {
 
-    it("should not render in user's own profile.", () => {
-        (useParams as any).mockReturnValue({ username: undefined });
+    beforeEach(() => {
+        (useParams as any).mockReturnValue({ username:"testuser" });
         (useGetProfile as any).mockReturnValue({
             data: mockProfile,
             error: null,
@@ -59,6 +59,10 @@ describe("Follow button", () => {
         (useDeleteFollowing as any).mockReturnValue({
             mutateAsync: vi.fn().mockResolvedValue("testuser"),
         });
+    });
+
+    it("should not render in user's own profile.", () => {
+        (useParams as any).mockReturnValue({ username: undefined });
 
         render(
             <QueryClientProvider client={queryClient}>
@@ -69,21 +73,6 @@ describe("Follow button", () => {
     })
 
     it("should render in other users' profiles.", () => {
-        (useParams as any).mockReturnValue({ username: "testuser" });
-        (useGetProfile as any).mockReturnValue({
-            data: mockProfile,
-            error: null,
-        });
-        (useFetchFollowing as any).mockReturnValue({
-            data: [],
-            error: null,
-        });
-        (usePostFollowing as any).mockReturnValue({
-            mutateAsync: vi.fn().mockResolvedValue({ username: "testuser" }),
-        });
-        (useDeleteFollowing as any).mockReturnValue({
-            mutateAsync: vi.fn().mockResolvedValue("testuser"),
-        });
 
         render(
             <QueryClientProvider client={queryClient}>
@@ -94,21 +83,6 @@ describe("Follow button", () => {
     })
 
     it("should display 'Follow' when user is not following the profile.", () => {
-        (useParams as any).mockReturnValue({ username: "testuser" });
-        (useGetProfile as any).mockReturnValue({
-            data: mockProfile,
-            error: null,
-        });
-        (useFetchFollowing as any).mockReturnValue({
-            data: [],
-            error: null,
-        });
-        (usePostFollowing as any).mockReturnValue({
-            mutateAsync: vi.fn().mockResolvedValue({ username: "testuser" }),
-        });
-        (useDeleteFollowing as any).mockReturnValue({
-            mutateAsync: vi.fn().mockResolvedValue("testuser"),
-        });
 
         render(
             <QueryClientProvider client={queryClient}>
@@ -119,11 +93,6 @@ describe("Follow button", () => {
     })
 
     it("should display 'Unfollow' when user is following the profile.", () => {
-        (useParams as any).mockReturnValue({ username: "testuser" });
-        (useGetProfile as any).mockReturnValue({
-            data: mockProfile,
-            error: null,
-        });
         (useFetchFollowing as any).mockReturnValue({
             data: [
                 {
@@ -131,12 +100,6 @@ describe("Follow button", () => {
                 }
             ],
             error: null,
-        });
-        (usePostFollowing as any).mockReturnValue({
-            mutateAsync: vi.fn().mockResolvedValue({ username: "testuser" }),
-        });
-        (useDeleteFollowing as any).mockReturnValue({
-            mutateAsync: vi.fn().mockResolvedValue("testuser"),
         });
 
         render(
@@ -148,21 +111,6 @@ describe("Follow button", () => {
     })
 
     it("should call followUser when 'Follow' is clicked.", () => {
-        (useParams as any).mockReturnValue({ username: "testuser" });
-        (useGetProfile as any).mockReturnValue({
-            data: mockProfile,
-            error: null,
-        });
-        (useFetchFollowing as any).mockReturnValue({
-            data: [],
-            error: null,
-        });
-        (usePostFollowing as any).mockReturnValue({
-            mutateAsync: vi.fn().mockResolvedValue({ username: "testuser" }),
-        });
-        (useDeleteFollowing as any).mockReturnValue({
-            mutateAsync: vi.fn().mockResolvedValue("testuser"),
-        });
 
         render(
             <QueryClientProvider client={queryClient}>
@@ -175,11 +123,6 @@ describe("Follow button", () => {
     })
 
     it("should call unfollowUser when 'Unfollow' is clicked.", () => {
-        (useParams as any).mockReturnValue({ username: "testuser" });
-        (useGetProfile as any).mockReturnValue({
-            data: mockProfile,
-            error: null,
-        });
         (useFetchFollowing as any).mockReturnValue({
             data: [
                 {
@@ -187,12 +130,6 @@ describe("Follow button", () => {
                 }
             ],
             error: null,
-        });
-        (usePostFollowing as any).mockReturnValue({
-            mutateAsync: vi.fn().mockResolvedValue({ username: "testuser" }),
-        });
-        (useDeleteFollowing as any).mockReturnValue({
-            mutateAsync: vi.fn().mockResolvedValue("testuser"),
         });
 
         render(
