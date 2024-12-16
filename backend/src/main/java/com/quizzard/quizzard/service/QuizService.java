@@ -192,6 +192,7 @@ public class QuizService {
             questionRepository.save(question);
         }
         quiz.setDifficulty(calculateQuizDifficulty(quiz));
+        quizRepository.save(quiz);
         return mapQuizToQuizResponse(quiz);
     }
 
