@@ -81,11 +81,3 @@ export type ForumReply = {
 export type ForumFeed = {
     posts: ForumQuestion[];
 }
-// export type SearchEngine = {
-//     searchHistory: string[];
-//     filter: Filter;
-// };
-
-// export type Filter = {
-//     parameters: Map<string, Object>;
-// };
