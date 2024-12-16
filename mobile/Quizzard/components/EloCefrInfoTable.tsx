@@ -14,7 +14,8 @@ export const calculateQuizDifficultyFromElo = (elo: number) => {
     else if (elo < 1500) return "B1";
     else if (elo < 2000) return "B2";
     else if (elo < 2500) return "C1";
-    else if (elo < 5000) return "C2";
+    else if (elo <= 5000) return "C2";
+    else return "Unknown";
 };
 
 export const EloCefrInfoTable = () => {
