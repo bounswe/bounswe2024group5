@@ -3,6 +3,7 @@ package com.quizzard.quizzard.repository;
 import com.quizzard.quizzard.model.Post;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,6 +32,60 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByTagWordAndUsername(@Param("word") String word, @Param("username") String username);
 
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    @Query("""
+SELECT DISTINCT p 
+FROM Post p
+WHERE p.id IN (
+    SELECT DISTINCT fp.id
+    FROM Post fp
+    JOIN PostTag pt ON fp.id = pt.post.id
+    JOIN English e ON pt.english.id = e.id
+    JOIN Question q ON q.word = e.word
+    JOIN QuestionAnswer qa ON q.id = qa.question.id
+    JOIN QuizAttempt qa2 ON qa.quizAttempt.id = qa2.id
+    WHERE qa.isCorrect = false 
+    AND qa2.user.id = :userId
+    
+    UNION
+    
+    SELECT DISTINCT fp2.id
+    FROM Post fp2
+    WHERE fp2.id NOT IN (
+        SELECT DISTINCT fp3.id
+        FROM Post fp3
+        JOIN PostTag pt ON fp3.id = pt.post.id
+        JOIN English e ON pt.english.id = e.id
+        JOIN Question q ON q.word = e.word
+        JOIN QuestionAnswer qa ON q.id = qa.question.id
+        JOIN QuizAttempt qa2 ON qa.quizAttempt.id = qa2.id
+        WHERE qa.isCorrect = false 
+        AND qa2.user.id = :userId
+    )
+)
+ORDER BY 
+    CASE 
+        WHEN p.id IN (
+            SELECT DISTINCT fp.id
+            FROM Post fp
+            JOIN PostTag pt ON fp.id = pt.post.id
+            JOIN English e ON pt.english.id = e.id
+            JOIN Question q ON q.word = e.word
+            JOIN QuestionAnswer qa ON q.id = qa.question.id
+            JOIN QuizAttempt qa2 ON qa.quizAttempt.id = qa2.id
+            WHERE qa.isCorrect = false 
+            AND qa2.user.id = :userId
+        ) THEN 1 
+        ELSE 2 
+    END,
+    p.updatedAt DESC
+""")
+    Page<Post> findRelevantAndOtherPosts(@Param("userId") Long userId, Pageable pageable);
+
+    // Convenience method
+    default Page<Post> findRelevantAndOtherPosts(Long userId) {
+        return findRelevantAndOtherPosts(userId, PageRequest.of(0, 100));
+    }
 
     @Query(value = 
         "SELECT fp.* " +
