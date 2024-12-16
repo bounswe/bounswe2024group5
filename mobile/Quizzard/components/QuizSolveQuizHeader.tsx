@@ -1,4 +1,4 @@
-// QuizSolvingScreen.js
+// QuizHeader.tsx
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,6 +8,7 @@ interface QuizHeaderProps {
   questionIndex: number;
   totalQuestions: number;
   onFavorite?: () => void;
+  onUnfavorite?: () => void;
   isFavorited?: boolean;
 }
 
@@ -16,6 +17,7 @@ const QuizHeader = ({
   questionIndex,
   totalQuestions,
   onFavorite,
+  onUnfavorite,
   isFavorited,
 }: QuizHeaderProps) => {
   return (
@@ -31,10 +33,14 @@ const QuizHeader = ({
         </View>
       </View>
 
-      {onFavorite && (
-        <TouchableOpacity onPress={onFavorite} style={styles.favoriteButton}>
+      {(onFavorite || onUnfavorite) && (
+        <TouchableOpacity 
+          onPress={isFavorited ? onUnfavorite : onFavorite} 
+          style={styles.favoriteButton}>
           <View style={styles.favoriteContent}>
-            <Text style={styles.favoriteText}>Add To Favorite Questions</Text>
+            <Text style={styles.favoriteText}>
+              {isFavorited ? "Remove from Favorites" : "Add To Favorite Questions"}
+            </Text>
             <Ionicons
               name={isFavorited ? "heart" : "heart-outline"}
               size={24}

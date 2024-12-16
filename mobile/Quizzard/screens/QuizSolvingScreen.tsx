@@ -483,7 +483,6 @@ const QuizSolvingScreen = ({ route, navigation }) => {
     }
   };
 
-  // Update addToFavorites function
   const addToFavorites = async () => {
     const questionId = questions[questionIndex].id;
 
@@ -497,20 +496,44 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         body: JSON.stringify({ questionId }),
       });
 
-      if (response.status === 201 || response.status === 400) {
+      if (response.status === 201) {
         setIsFavorited(true);
-        setFavoriteModalMessage(
-          response.status === 201
-            ? "Question added to favorites."
-            : "This question is already in your favorites."
-        );
+        setFavoriteModalMessage("Question added to favorites.");
       } else {
         setFavoriteModalMessage("Failed to add question to favorites.");
       }
+      // TODO: Consider removing the modals for favorite
       setShowFavoriteModal(true);
     } catch (error) {
       console.error("Error adding to favorites:", error);
       setFavoriteModalMessage("Failed to add question to favorites.");
+      setShowFavoriteModal(true);
+    }
+  };
+
+  const removeFromFavorites = async () => {
+    const questionId = questions[questionIndex].id;
+
+    try {
+      const response = await fetch(`${hostUrl}/api/favorite-question/${questionId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 204) {
+        setIsFavorited(false);
+        setFavoriteModalMessage("Question removed from favorites.");
+        setShowFavoriteModal(true);
+      } else {
+        setFavoriteModalMessage("Failed to remove question from favorites.");
+      }
+      // TODO: Consider removing the modals for favorite
+      setShowFavoriteModal(true);
+    } catch (error) {
+      console.error("Error removing from favorites:", error);
+      setFavoriteModalMessage("Failed to remove question from favorites.");
       setShowFavoriteModal(true);
     }
   };
@@ -545,6 +568,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
         questionIndex={questionIndex}
         totalQuestions={questions.length}
         onFavorite={addToFavorites}
+        onUnfavorite={removeFromFavorites}
         isFavorited={isFavorited}
       />
 
@@ -612,7 +636,7 @@ const QuizSolvingScreen = ({ route, navigation }) => {
           <Ionicons name="help-circle-outline" size={20} color="#6a0dad" />
           <Text style={styles.hintButtonText}>Hint</Text>
         </TouchableOpacity>
-        
+
         {/* Hint Images Modal */}
         <Modal
           visible={isHintModalVisible}
@@ -953,7 +977,7 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     paddingVertical: 10,
-    paddingBottom: 20, 
+    paddingBottom: 20,
   },
   postsList: {
     flex: 1,
