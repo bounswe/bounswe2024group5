@@ -44,6 +44,8 @@ public class PostService {
     @Autowired
     private EnglishRepository englishRepository;
 
+    @Autowired
+    private FeedService feedService;
 
     private PostResponse mapToPostResponse(Post post){
         int noUpvote = (int) upvoteRepository.countByPostId(post.getId());
@@ -121,7 +123,7 @@ public class PostService {
         postRepository.deleteById(postId);
     }
 
-    public List<PostResponse> getAllPosts(Optional<String> word, Optional<String> username) {
+    public List<PostResponse> getAllPosts(String jwtToken ,Optional<String> word, Optional<String> username) {
         if (word.isPresent() && username.isPresent())
             return mapToPostResponse(postRepository.findAllByTagWordAndUsername(word.get(), username.get()));
         else if (word.isPresent())
@@ -132,8 +134,15 @@ public class PostService {
                 throw new ResourceNotFoundException("User not found");
             return mapToPostResponse(postRepository.findByUserId(user.getId()));
         }
-        else
-            return mapToPostResponse(postRepository.findAll());
+        else{
+            if(jwtToken == null){
+                return mapToPostResponse(postRepository.findAll());
+            }
+            String username1 = jwtUtils.getUserNameFromJwtToken(jwtToken.substring(7));
+            User user = userService.getOneUserByUsername(username1);
+
+            return mapToPostResponse(postRepository.findRelevantAndOtherPosts(user.getId()));
+        }
     }
 
     public PostResponse updatePost(String jwtToken, Long postId, PostRequest postRequest) {
