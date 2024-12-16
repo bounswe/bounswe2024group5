@@ -1,5 +1,6 @@
 package com.quizzard.quizzard.service;
 
+import com.quizzard.quizzard.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,9 @@ public class FeedService {
     @Autowired
     private ReplyRepository replyRepository;
 
+    @Autowired
+    private UserService userService;
+
     private PostResponse mapToPostResponse(Post post){
         int noUpvote = (int) upvoteRepository.countByPostId(post.getId());
         int NoReplies = (int) replyRepository.countByPostId(post.getId());
@@ -41,8 +45,10 @@ public class FeedService {
         return posts.map(this::mapToPostResponse).toList();
     }
 
-    public List<PostResponse> getFeed(Pageable pageable) {
-        return mapToPostResponse(postRepository.findAllByOrderByCreatedAtDesc(pageable));
+    public List<PostResponse> getFeed(String username, Pageable pageable) {
+        User user = userService.getOneUserByUsername(username);
+        //return mapToPostResponse(postRepository.findAllByOrderByCreatedAtDesc(pageable));
+        return mapToPostResponse((postRepository.findRelevantAndOtherPosts(user.getId(), pageable)));
     }
 
 }
