@@ -215,16 +215,10 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-
-  const fetchAnswerSuggestions = async (index, question) => {
-    const updatedQuestions = [...questions];
-
+  const fetchWrongAnswerSuggestions = async (index, question) => {
     try {
-      // Set loading state for the specific question
-      updatedQuestions[index].isLoadingAnswerSuggestions = true;
-      setQuestions(updatedQuestions);
 
-      const apiUrl = `${hostUrl}/api/answer-suggestion?word=${encodeURIComponent(question.word)}&questionType=${question.questionType}`;
+      const apiUrl = `${hostUrl}/api/get-wrong-answers?word=${encodeURIComponent(question.word)}&questionType=${question.questionType}&correctAnswer=${question.options.A}`;
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -235,16 +229,57 @@ const QuizCreationPage = ({ navigation }) => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
+
+        if (data.length >= 1) {
+          question.options.B = data[0];
+          if (data.length >= 2) {
+            question.options.C = data[1];
+            if (data.length >= 3) {
+              question.options.D = data[2];
+            }
+          }
+        }
 
         // Ensure we're updating the specific question's state
         const newQuestions = [...questions];
-        question.answerSuggestions = data.correctAnswerSuggestions;
-        question.showAnswerSuggestions = data.correctAnswerSuggestions.length > 0;
-        if (data.wrongAnswerSuggestions.length >= 3) {
-          question.options["B"] = data.wrongAnswerSuggestions[0]
-          question.options["C"] = data.wrongAnswerSuggestions[1]
-          question.options["D"] = data.wrongAnswerSuggestions[2]
-        }
+        newQuestions[index] = question
+
+        setQuestions(newQuestions);
+      } else {
+        console.error("Failed to fetch answer suggestions");
+      }
+    } catch (error) {
+      console.error("Error fetching answer suggestions:", error);
+    }
+  }
+
+
+  const fetchCorrectAnswerSuggestions = async (index, question) => {
+    const updatedQuestions = [...questions];
+
+    try {
+      // Set loading state for the specific question
+      updatedQuestions[index].isLoadingAnswerSuggestions = true;
+      setQuestions(updatedQuestions);
+
+      const apiUrl = `${hostUrl}/api/get-correct-answers?word=${encodeURIComponent(question.word)}&questionType=${question.questionType}`;
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+
+        // Ensure we're updating the specific question's state
+        const newQuestions = [...questions];
+        question.answerSuggestions = data;
+        question.showAnswerSuggestions = data.length > 0;
         question.isLoadingAnswerSuggestions = false;
         newQuestions[index] = question
 
@@ -275,6 +310,8 @@ const QuizCreationPage = ({ navigation }) => {
     // Update the questions state
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
+
+    fetchWrongAnswerSuggestions(index, updatedQuestion);
   };
 
   const handleInputChange = (index: number, word: string) => {
@@ -307,7 +344,14 @@ const QuizCreationPage = ({ navigation }) => {
   // New method to fetch word suggestions
   const fetchWordSuggestions = async (index, question) => {
     const updatedQuestions = [...questions];
-    const language = question.questionType.includes('english') ? 'english' : 'turkish';
+    let language = "english";
+    console.log(question.questionType);
+    if (question.questionType === "turkish_to_english") {
+      language = "turkish";
+    }
+
+
+    console.log(language);
 
     try {
       question.isLoadingWordSuggestions = true;
@@ -327,6 +371,7 @@ const QuizCreationPage = ({ navigation }) => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
 
         // Ensure we're updating the specific question's state
         const newQuestions = [...questions];
@@ -372,7 +417,7 @@ const QuizCreationPage = ({ navigation }) => {
     // Update the question in the state
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
-    fetchAnswerSuggestions(index, updatedQuestion);
+    fetchCorrectAnswerSuggestions(index, updatedQuestion);
   };
 
 
@@ -395,11 +440,6 @@ const QuizCreationPage = ({ navigation }) => {
     updatedQuestion.options = { ...updatedQuestion.options, [option]: text };
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
-    // console.log(`Question is: ${questions[index].options}`);
-    console.log(
-      `3- Question ${index + 1} options:`,
-      updatedQuestions[index].options
-    );
   };
 
   const createQuizFromFavorites = async () => {
@@ -544,7 +584,7 @@ const QuizCreationPage = ({ navigation }) => {
             key={index}
             style={[
               styles.questionBox,
-              { zIndex: questions.length - index } // Higher index = lower in the stack
+              { zIndex: questions.length - index }
             ]}
           >
             {/* Existing header container */}
@@ -596,17 +636,16 @@ const QuizCreationPage = ({ navigation }) => {
                   style={styles.choiceInput}
                   placeholder={`Choice ${option}`}
                   value={question.options[option]}
-                  editable={option === 'A'}
+                  editable={true}
                   onChangeText={(text) => {
+                    updateQuestion(index, option, text);
                     if (option === 'A') {
-                      updateQuestion(index, option, text);
-                      // Trigger answer suggestions only for option A
-                      fetchAnswerSuggestions(index, questions[index])
+                      fetchCorrectAnswerSuggestions(index, questions[index]);
                     }
                   }}
                 />
 
-                {/* Answer Suggestions Dropdown */}
+                {/* Answer Suggestions Dropdown - only for option A */}
                 {option === 'A' &&
                   question.showAnswerSuggestions &&
                   question.answerSuggestions.length > 0 && (
@@ -628,8 +667,6 @@ const QuizCreationPage = ({ navigation }) => {
             ))}
           </View>
         ))}
-
-
         {/* + Question Button */}
         <TouchableOpacity
           style={styles.addQuestionButton}
