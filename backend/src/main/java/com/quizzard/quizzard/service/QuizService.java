@@ -174,7 +174,12 @@ public class QuizService {
         quiz.setTitle(title);
         quiz.setAuthor(author);
         quiz.setDescription(request.getDescription());
-        quiz.setImage(request.getImage());
+
+        if (request.getImage() != null || !request.getImage().isEmpty()) {
+            quiz.setImage(request.getImage());
+        } else {
+            quiz.setImage("https://storage.googleapis.com/quizzard-bucket/19042e06-bfff-49c0-adce-49901b6dc726-upload.jpg");
+        }
         quizRepository.save(quiz);
 
         for (int i = 0; i < count; i++) {
