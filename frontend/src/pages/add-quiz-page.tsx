@@ -13,6 +13,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useUploadFile } from "../hooks/api/upload-image";
 import { useGetQuiz } from "../hooks/api/quizzes/get";
 import { useUpdateQuiz } from "../hooks/api/quizzes/update";
+import { useCreateQuizFromFavorites } from "../hooks/api/quizzes/from-favorites";
+import { useFetchQuestionFavorites } from "../hooks/api/question-favorite/get-question-favorite";
 
 export const AddQuizPage: React.FC = () => {
   const navigate = useNavigate();
@@ -33,6 +35,8 @@ export const AddQuizPage: React.FC = () => {
   const { data: quizData } = useGetQuiz(quizId);
 
   const { mutateAsync: updateQuiz } = useUpdateQuiz();
+  const { data: favoriteQuestions } = useFetchQuestionFavorites();
+  const { mutateAsync: createQuizFromFavorites } = useCreateQuizFromFavorites();
 
   useEffect(() => {
     if (quizData) {
@@ -119,6 +123,11 @@ export const AddQuizPage: React.FC = () => {
     }
     navigate("/quizzes");
   };
+
+  const handleFromFavorites = async () => {
+    await createQuizFromFavorites({ title: quiz.title || "My Favorites", count: favoriteQuestions?.length || 0 });
+    navigate("/quizzes");
+  }
 
   return (
     <div className="min-h-screen p-8 bg-purple-50 rounded-3xl">
@@ -283,6 +292,12 @@ export const AddQuizPage: React.FC = () => {
         >
           {!quizId ? "Submit Quiz" : "Update Quiz"}
         </button>
+
+        { !quizId && (
+          <button onClick={handleFromFavorites} className="w-full p-4 mt-4 text-purple-800 transition-colors bg-purple-100 rounded-lg hover:bg-purple-200">
+            Create new quiz from favorited questions.
+          </button>
+        )}
       </div>
     </div>
   );
