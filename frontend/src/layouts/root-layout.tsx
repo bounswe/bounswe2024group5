@@ -25,6 +25,7 @@ const NavBar = () => {
           <Link to="/quizzes" className="font-semibold text-violet-700">
             Quizzes
           </Link>
+          
           <Link to="/leaderboard" className="font-semibold text-violet-700">
             Leaderboard
           </Link>
@@ -93,12 +94,12 @@ const NavBar = () => {
               You can see the conversion logic:
             </p>
             <ul className="space-y-2 text-gray-700">
-              <li>• A1 → [000, 400]</li>
-              <li>• A2 → [400, 1800]</li>
-              <li>• B1 → [1000, 1800]</li>
-              <li>• B2 → [1800, 2600]</li>
-              <li>• C1 → [2600, 3300]</li>
-              <li>• C2 → [3300, 10000]</li>
+              <li>• A1 → [000, 500]</li>
+              <li>• A2 → [500, 1000]</li>
+              <li>• B1 → [1000, 1500]</li>
+              <li>• B2 → [1500, 2000]</li>
+              <li>• C1 → [2000, 2500]</li>
+              <li>• C2 → [2500, 5000]</li>
             </ul>
           </div>
         </div>
