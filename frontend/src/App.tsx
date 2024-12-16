@@ -37,7 +37,7 @@ const App = () => {
   console.log(hostUrl);
 
   return (
-    <HostContext.Provider value={`http://${hostUrl}:80`}>
+    <HostContext.Provider value={"http://34.55.188.177"}>
       <Router>
         <Routes>
           <Route path="signup" element={<SignUpPage />} />
