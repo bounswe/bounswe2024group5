@@ -215,16 +215,10 @@ const QuizCreationPage = ({ navigation }) => {
     }
   };
 
-
-  const fetchAnswerSuggestions = async (index, question) => {
-    const updatedQuestions = [...questions];
-
+  const fetchWrongAnswerSuggestions = async (index, question) => {
     try {
-      // Set loading state for the specific question
-      updatedQuestions[index].isLoadingAnswerSuggestions = true;
-      setQuestions(updatedQuestions);
 
-      const apiUrl = `${hostUrl}/api/answer-suggestion?word=${encodeURIComponent(question.word)}&questionType=${question.questionType}`;
+      const apiUrl = `${hostUrl}/api/get-wrong-answers?word=${encodeURIComponent(question.word)}&questionType=${question.questionType}&correctAnswer=${question.options.A}`;
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -235,16 +229,57 @@ const QuizCreationPage = ({ navigation }) => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
+
+        if (data.length >= 1) {
+          question.options.B = data[0];
+          if (data.length >= 2) {
+            question.options.C = data[1];
+            if (data.length >= 3) {
+              question.options.D = data[2];
+            }
+          }
+        }
 
         // Ensure we're updating the specific question's state
         const newQuestions = [...questions];
-        question.answerSuggestions = data.correctAnswerSuggestions;
-        question.showAnswerSuggestions = data.correctAnswerSuggestions.length > 0;
-        if (data.wrongAnswerSuggestions.length >= 3) {
-          question.options["B"] = data.wrongAnswerSuggestions[0]
-          question.options["C"] = data.wrongAnswerSuggestions[1]
-          question.options["D"] = data.wrongAnswerSuggestions[2]
-        }
+        newQuestions[index] = question
+
+        setQuestions(newQuestions);
+      } else {
+        console.error("Failed to fetch answer suggestions");
+      }
+    } catch (error) {
+      console.error("Error fetching answer suggestions:", error);
+    }
+  }
+
+
+  const fetchCorrectAnswerSuggestions = async (index, question) => {
+    const updatedQuestions = [...questions];
+
+    try {
+      // Set loading state for the specific question
+      updatedQuestions[index].isLoadingAnswerSuggestions = true;
+      setQuestions(updatedQuestions);
+
+      const apiUrl = `${hostUrl}/api/get-correct-answers?word=${encodeURIComponent(question.word)}&questionType=${question.questionType}`;
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+
+        // Ensure we're updating the specific question's state
+        const newQuestions = [...questions];
+        question.answerSuggestions = data;
+        question.showAnswerSuggestions = data.length > 0;
         question.isLoadingAnswerSuggestions = false;
         newQuestions[index] = question
 
@@ -275,6 +310,8 @@ const QuizCreationPage = ({ navigation }) => {
     // Update the questions state
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
+
+    fetchWrongAnswerSuggestions(index, updatedQuestion);
   };
 
   const handleInputChange = (index: number, word: string) => {
@@ -312,10 +349,10 @@ const QuizCreationPage = ({ navigation }) => {
     if (question.questionType === "turkish_to_english") {
       language = "turkish";
     }
-    
-    
+
+
     console.log(language);
-    
+
     try {
       question.isLoadingWordSuggestions = true;
       updatedQuestions[index] = question;
@@ -380,7 +417,7 @@ const QuizCreationPage = ({ navigation }) => {
     // Update the question in the state
     updatedQuestions[index] = updatedQuestion;
     setQuestions(updatedQuestions);
-    fetchAnswerSuggestions(index, updatedQuestion);
+    fetchCorrectAnswerSuggestions(index, updatedQuestion);
   };
 
 
@@ -542,94 +579,94 @@ const QuizCreationPage = ({ navigation }) => {
         />
 
         {/* Render all question boxes */}
-{questions.map((question, index) => (
-  <View
-    key={index}
-    style={[
-      styles.questionBox,
-      { zIndex: questions.length - index }
-    ]}
-  >
-    {/* Existing header container */}
-    <View style={styles.headerContainer}>
-      <TextInput
-        style={styles.questionTitle}
-        placeholder="Enter a word"
-        value={question.word}
-        onChangeText={(word) => handleInputChange(index, word)}
-      />
-      {/* Loading indicator for suggestions */}
-      {isLoadingWordSuggestions && (
-        <ActivityIndicator
-          size="small"
-          color="#6a0dad"
-          style={styles.suggestionLoadingIndicator}
-        />
-      )}
-      <View style={styles.dropdownContainer}>
-        <DropdownComponent
-          testID="question-type-dropdown"
-          selectedValue={questions[index].questionType}
-          onValueChange={(type) => updateQuestionType(index, type)}
-        />
-      </View>
-    </View>
+        {questions.map((question, index) => (
+          <View
+            key={index}
+            style={[
+              styles.questionBox,
+              { zIndex: questions.length - index }
+            ]}
+          >
+            {/* Existing header container */}
+            <View style={styles.headerContainer}>
+              <TextInput
+                style={styles.questionTitle}
+                placeholder="Enter a word"
+                value={question.word}
+                onChangeText={(word) => handleInputChange(index, word)}
+              />
+              {/* Loading indicator for suggestions */}
+              {isLoadingWordSuggestions && (
+                <ActivityIndicator
+                  size="small"
+                  color="#6a0dad"
+                  style={styles.suggestionLoadingIndicator}
+                />
+              )}
+              <View style={styles.dropdownContainer}>
+                <DropdownComponent
+                  testID="question-type-dropdown"
+                  selectedValue={questions[index].questionType}
+                  onValueChange={(type) => updateQuestionType(index, type)}
+                />
+              </View>
+            </View>
 
-    {/* Word Suggestions Dropdown */}
-    {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
-      <View style={[styles.suggestionsOverlay, { top: 60 }]}>
-        <ScrollView>
-          {question.wordSuggestions.map((item, i) => (
-            <TouchableOpacity
-              key={i}
-              style={styles.suggestionItem}
-              onPress={() => handleWordSuggestionSelect(index, item)}
-            >
-              <Text style={styles.suggestionText}>{item}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-    )}
+            {/* Word Suggestions Dropdown */}
+            {question.showWordSuggestions && question.wordSuggestions.length > 0 && (
+              <View style={[styles.suggestionsOverlay, { top: 60 }]}>
+                <ScrollView>
+                  {question.wordSuggestions.map((item, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={styles.suggestionItem}
+                      onPress={() => handleWordSuggestionSelect(index, item)}
+                    >
+                      <Text style={styles.suggestionText}>{item}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
 
-    {/* Answer Choices */}
-    {["A", "B", "C", "D"].map((option) => (
-      <View key={option}>
-        <TextInput
-          style={styles.choiceInput}
-          placeholder={`Choice ${option}`}
-          value={question.options[option]}
-          editable={true}
-          onChangeText={(text) => {
-            updateQuestion(index, option, text);
-            if (option === 'A') {
-              fetchAnswerSuggestions(index, questions[index]);
-            }
-          }}
-        />
+            {/* Answer Choices */}
+            {["A", "B", "C", "D"].map((option) => (
+              <View key={option}>
+                <TextInput
+                  style={styles.choiceInput}
+                  placeholder={`Choice ${option}`}
+                  value={question.options[option]}
+                  editable={true}
+                  onChangeText={(text) => {
+                    updateQuestion(index, option, text);
+                    if (option === 'A') {
+                      fetchCorrectAnswerSuggestions(index, questions[index]);
+                    }
+                  }}
+                />
 
-        {/* Answer Suggestions Dropdown - only for option A */}
-        {option === 'A' && 
-         question.showAnswerSuggestions && 
-         question.answerSuggestions.length > 0 && (
-          <View style={[styles.suggestionsOverlay, { top: 40 }]}>
-            <ScrollView>
-              {question.answerSuggestions.map((item, i) => (
-                <TouchableOpacity
-                  key={i}
-                  style={styles.suggestionItem}
-                  onPress={() => handleAnswerSuggestionSelect(index, item)}
-                >
-                  <Text style={styles.suggestionText}>{item}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+                {/* Answer Suggestions Dropdown - only for option A */}
+                {option === 'A' &&
+                  question.showAnswerSuggestions &&
+                  question.answerSuggestions.length > 0 && (
+                    <View style={[styles.suggestionsOverlay, { top: 40 }]}>
+                      <ScrollView>
+                        {question.answerSuggestions.map((item, i) => (
+                          <TouchableOpacity
+                            key={i}
+                            style={styles.suggestionItem}
+                            onPress={() => handleAnswerSuggestionSelect(index, item)}
+                          >
+                            <Text style={styles.suggestionText}>{item}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+              </View>
+            ))}
           </View>
-        )}
-      </View>
-    ))}
-  </View>
-))}
+        ))}
         {/* + Question Button */}
         <TouchableOpacity
           style={styles.addQuestionButton}
