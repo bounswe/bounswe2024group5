@@ -92,7 +92,7 @@ public class WikidataService {
         return finalUrls;
     }
 
-    private int extractQNumber(String uri) {
+    public int extractQNumber(String uri) {
         try {
             String qNumberStr = uri.substring(uri.lastIndexOf("Q") + 1);
             return Integer.parseInt(qNumberStr);
