@@ -43,6 +43,9 @@ public class FeedServiceTest {
     @Mock
     private ReplyRepository replyRepository;
 
+    @Mock
+    private UserService userService;
+
     public FeedServiceTest() {
         MockitoAnnotations.openMocks(this);
     }
@@ -94,7 +97,7 @@ public class FeedServiceTest {
         when(postTagRepository.findByPostId(post2.getId())).thenReturn(Arrays.asList(postTag2));
 
         // Call the method under test
-        List<PostResponse> feed = feedService.getFeed(Pageable.unpaged());
+        List<PostResponse> feed = feedService.getFeed(user1.getUsername(),Pageable.unpaged());
 
         // Assertions
         assertEquals(2, feed.size());
