@@ -849,12 +849,12 @@ paths:
                   isValid:
                     type: boolean
                     description: Whether the word exists in the database.
-  /answer-suggestion:
+  /get-correct-answers:
     get:
-      summary: Get answer suggestions (wrong answer suggestions not implemented yet)
+      summary: Get correct answers
       tags:
         - Word Related
-      description: Returns a list of correct and wrong answer suggestions based on the given word and question type.
+      description: Returns correct answers for a word and question type.
       parameters:
         - name: word
           in: query
@@ -878,25 +878,57 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  correctAnswerSuggestions:
-                    type: array
-                    items:
-                      type: string
-                    description: List of correct answer suggestions.
-                  wrongAnswerSuggestions:
-                    type: array
-                    items:
-                      type: string
-                    description: List of wrong answer suggestions.
+                type: array
+                items:
+                  type: string
                 example:
-                  correctAnswerSuggestions:
-                    - example_correct_1
-                    - example_correct_2
-                  wrongAnswerSuggestions:
-                    - example_wrong_1
-                    - example_wrong_2
+                  - "answer1"
+                  - "answer2"
+                  - "answer3"
+        '400':
+          description: Invalid parameters provided.
+  /get-wrong-answers:
+    get:
+      summary: Get wrong answers
+      tags:
+        - Word Related
+      description: Returns wrong answer suggestions for a word, correct answer, and question type.
+      parameters:
+        - name: word
+          in: query
+          required: true
+          description: The word for which suggestions are needed.
+          schema:
+            type: string
+        - name: correctAnswer
+          in: query
+          required: true
+          description: The correct answer for the question.
+          schema:
+            type: string
+        - name: questionType
+          in: query
+          required: true
+          description: The type of question (e.g., english_to_sense, english_to_turkish, turkish_to_english).
+          schema:
+            type: string
+            enum:
+              - english_to_sense
+              - english_to_turkish
+              - turkish_to_english
+      responses:
+        '200':
+          description: Successful response with wrong answer suggestions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  - "answer1"
+                  - "answer2"
+                  - "answer3"
         '400':
           description: Invalid parameters provided.
   /hint:
