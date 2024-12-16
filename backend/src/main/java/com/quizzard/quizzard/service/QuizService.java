@@ -170,14 +170,13 @@ public class QuizService {
         if (favoriteQuestions.size() < count)
             throw new ResourceNotFoundException("You don't have enough favorite questions");
 
-        // 1. Create Quiz
         Quiz quiz = new Quiz();
         quiz.setTitle(title);
         quiz.setAuthor(author);
-        quiz.setDescription("Created from favorite questions");
+        quiz.setDescription(request.getDescription());
+        quiz.setImage(request.getImage());
         quizRepository.save(quiz);
 
-        // 2. Create questions from favorite questions and add them to quiz
         for (int i = 0; i < count; i++) {
             Question question = new Question();
             question.setQuizId(quiz.getId());

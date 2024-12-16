@@ -158,6 +158,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/QuestionRequest'
+    CreateQuizFromFavoritesRequest:
+      type: object
+      properties:
+        count:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+      required:
+        - count
+        - title
     UpdateQuizRequest:
       type: object
       properties:
@@ -1005,20 +1019,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                count:
-                  type: integer
-                  description: The number of favorite questions to include in the quiz.
-                title:
-                  type: string
-                  description: The title of the quiz to be created.
-              required:
-                - count
-                - title
-            example:
-              count: 5
-              title: "My Favorite Quiz"
+              $ref: '#/components/schemas/CreateQuizFromFavoritesRequest'
       responses:
         '200':
           description: Quiz created successfully.
