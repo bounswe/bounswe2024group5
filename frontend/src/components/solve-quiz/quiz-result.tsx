@@ -133,7 +133,7 @@ export const QuizResult = ({
             <StatBox
               icon={<IconStar size={24} stroke={1.5} />}
               label="Points Gained"
-              value={`+${eloGained}`}
+              value={`${eloGained > 0 ? "+" : ""}${eloGained}`}
               valueColor="text-green-600"
             />
             <StatBox
