@@ -39,18 +39,7 @@ public interface TranslateRepository extends JpaRepository<Translate, Long> {
     List<String> findEnglishByTurkishWord(@Param("word") String word);
 
     @Query(value = """
-    SELECT DISTINCT s.sense
-    FROM word_to_sense w
-    INNER JOIN sense s ON w.sense_id = s.id
-    INNER JOIN english e ON w.english_id = e.id
-    WHERE e.word = :word
-    LIMIT 10
-    """,
-            nativeQuery = true)
-    List<String> findSenseByEnglishWord(String word);
-
-    @Query(value = """
-        SELECT turkish.word, t.category_id
+        SELECT turkish.word
         FROM translate t
         JOIN turkish ON t.turkish_id = turkish.id
         LEFT JOIN translate t2 ON t.turkish_id = t2.turkish_id
@@ -80,7 +69,7 @@ public interface TranslateRepository extends JpaRepository<Translate, Long> {
 
 
     @Query(value = """
-        SELECT english.word, t.category_id
+        SELECT english.word
         FROM translate t
         JOIN english ON t.english_id = english.id
         LEFT JOIN translate t2 ON t.english_id = t2.english_id

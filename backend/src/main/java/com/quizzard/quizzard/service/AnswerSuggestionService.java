@@ -1,8 +1,10 @@
 package com.quizzard.quizzard.service;
 
+import com.google.j2objc.annotations.AutoreleasePool;
 import com.quizzard.quizzard.model.QuestionType;
 import com.quizzard.quizzard.repository.EnglishRepository;
 import com.quizzard.quizzard.repository.TranslateRepository;
+import com.quizzard.quizzard.repository.WordToSenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +16,15 @@ public class AnswerSuggestionService {
     @Autowired
     private TranslateRepository translateRepository;
 
+    @Autowired
+    private WordToSenseRepository wordToSenseRepository;
+
     public List<String> getCorrectAnswers(String word, String questionType) {
         QuestionType questionTypeEnum = QuestionType.valueOf(questionType.toLowerCase());
         List<String> correctAnswerSuggestions = List.of();
         switch (questionTypeEnum) {
             case english_to_sense:
-                correctAnswerSuggestions = translateRepository.findSenseByEnglishWord(word);
+                correctAnswerSuggestions = wordToSenseRepository.findSenseByEnglishWord(word);
                 break;
             case english_to_turkish:
                 correctAnswerSuggestions = translateRepository.findTurkishByEnglishWord(word);
@@ -36,13 +41,13 @@ public class AnswerSuggestionService {
         List<String> wrongAnswerSuggestions = List.of();
         switch (questionTypeEnum) {
             case english_to_sense:
-                wrongAnswerSuggestions = translateRepository.findSenseByEnglishWord(word);
+                wrongAnswerSuggestions = wordToSenseRepository.findWrongAnswerSuggestions(word, correctAnswer);
                 break;
             case english_to_turkish:
-                wrongAnswerSuggestions = translateRepository.findTurkishByEnglishWord(word);
+                wrongAnswerSuggestions = translateRepository.findWrongAnswerSuggestionsForEnToTr(word, correctAnswer);
                 break;
             case turkish_to_english:
-                wrongAnswerSuggestions = translateRepository.findEnglishByTurkishWord(word);
+                wrongAnswerSuggestions = translateRepository.findWrongAnswerSuggestionsForTrToEn(word, correctAnswer);
                 break;
         }
         return wrongAnswerSuggestions;
