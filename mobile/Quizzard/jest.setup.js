@@ -1,14 +1,7 @@
-
-// Mock warnOnce before any other imports or mocks
-jest.mock('react-native/Libraries/Utilities/warnOnce', () => {
-  return jest.fn();
-});
-
 import 'react-native-gesture-handler/jestSetup';
 
 // Mock the native modules before any imports
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
-// jest.mock('react-native/Libraries/Animated/src/NativeAnimatedHelper');
 
 // Mock Settings
 jest.mock('react-native/Libraries/Settings/Settings', () => ({
@@ -46,19 +39,6 @@ jest.mock('react-native', () => {
 // Mock react-native-gesture-handler
 jest.mock('react-native-gesture-handler', () => {});
 
-// Mock react-navigation
-jest.mock('@react-navigation/native', () => {
-  const actualNav = jest.requireActual('@react-navigation/native');
-  return {
-    ...actualNav,
-    useNavigation: () => ({
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-    }),
-    useFocusEffect: jest.fn(),
-  };
-});
-
 // Mock Icons
 jest.mock('react-native-vector-icons/AntDesign', () => 'AntDesignIcon');
 jest.mock('react-native-vector-icons/FontAwesome', () => 'FontAwesomeIcon');
@@ -66,13 +46,10 @@ jest.mock('@expo/vector-icons', () => ({
   Ionicons: '',
 }));
 
-// Mock AsyncStorage
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
-}));
+// Use the official async storage mock
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+);
 
 // Mock fetch API
 import fetchMock from 'jest-fetch-mock';
