@@ -13,7 +13,7 @@ import {
 import ProfileUpdateModal from "../components/profile/update-modal";
 
 import { message, Spin, Tabs } from "antd";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetProfile } from "../hooks/api/profile/get";
 import { useUpdateProfile } from "../hooks/api/profile/update";
 import { useFetchQuizzes } from "../hooks/api/get-quizzes";
@@ -30,6 +30,7 @@ import { usePostFollowing } from "../hooks/api/profile/follow-button/post-follow
 import { useDeleteFollowing } from "../hooks/api/profile/follow-button/delete-following";
 
 import { DeleteQuizButton } from "../components/profile/delete-quiz-button";
+import { useQuizFavorite } from "../hooks/api/quiz-favorite/quiz-favorite";
 
 const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,6 +51,10 @@ const ProfilePage = () => {
 
   const { mutateAsync: followUser } = usePostFollowing();
   const { mutateAsync: unfollowUser } = useDeleteFollowing();
+
+  const { isQuizFavorite, handleLikeClick } = useQuizFavorite();
+
+  const navigate = useNavigate();
 
   const handleFollow = () => {
     if (isFollowing) {
@@ -230,6 +235,7 @@ const ProfilePage = () => {
                             key={quiz.id}
                             className="p-4 transition-colors cursor-pointer bg-purple-50 rounded-xl hover:bg-purple-100"
                             whileHover={{ scale: 1.01 }}
+                            onClick={() => {navigate("/quiz/" + quiz.id)}}
                           >
                             <div className="flex items-center justify-between">
                               <div>
@@ -240,11 +246,11 @@ const ProfilePage = () => {
                                   {quiz.questions.length} Questions
                                 </p>
                               </div>
-                              <div className="flex items-center gap-4">
+                              <div onClick={e => e.stopPropagation()} className="flex items-center gap-4">
                                 <DifficultyBadge difficulty={quiz.difficulty} />
                                 <div className="flex items-center gap-1">
-                                  <IconHeart className="w-5 h-5 text-red-500" />
-                                  {/* <span>{quiz.likes}</span> */}4
+                                  <IconHeart onClick={() => {handleLikeClick(quiz.id)}} className={`w-5 h-5 text-red-500 + ${(isQuizFavorite(quiz && quiz.id) ? "fill-red-500" : "")}`} />
+                                  {/* <span>{quiz.likes}</span> */}
                                 </div>
                                 {isOwnProfile && (
                                   <DeleteQuizButton
