@@ -16,30 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `category`
---
-
-DROP TABLE IF EXISTS `category`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `category` (
-  `id` int NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_turkish_ci DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `category`
---
-
-LOCK TABLES `category` WRITE;
-/*!40000 ALTER TABLE `category` DISABLE KEYS */;
-INSERT INTO `category` VALUES (1,'General'),(2,'Common Usage'),(3,'Technical'),(4,'Phrases'),(5,'Colloquial'),(6,'Idioms'),(7,'Slang'),(8,'Trade/Economic'),(9,'Law'),(10,'Politics'),(11,'Institutes'),(12,'Computer'),(13,'Telecom'),(14,'Electric'),(15,'Television'),(16,'Textile'),(17,'Construction'),(18,'Dyeing'),(19,'Automotive'),(20,'Aeronautic'),(21,'Marine'),(22,'Medical'),(23,'Pathology'),(24,'Pharmaceutics'),(25,'Math'),(26,'Statistics'),(27,'Physics'),(28,'Chemistry'),(29,'Biology'),(30,'Linguistics'),(31,'Religious'),(32,'Geology'),(33,'Military'),(34,'Sport'),(35,'Music'),(36,'Abbreviation'),(37,'British Slang'),(38,'Agriculture'),(39,'Informatics'),(40,'Photography'),(42,'Speaking'),(43,'Geography'),(44,'Railway'),(45,'Latin'),(46,'Zoology'),(47,'Tourism'),(48,'Media'),(49,'Advertising'),(50,'Logic'),(51,'Education'),(52,'Tennis'),(53,'Marine Biology'),(54,'Botanic'),(55,'Phrasals'),(56,'Optics'),(57,'Food Engineering'),(58,'History'),(59,'Printery'),(60,'Gastronomy'),(61,'Places'),(62,'Painting'),(63,'Astronomy'),(64,'Ornithology'),(65,'Anatomy'),(66,'Archaic'),(67,'Meteorology'),(68,'Architecture'),(69,'Mining'),(70,'Insurance'),(71,'Psychology'),(72,'Environment'),(73,'Hunting'),(74,'Archaeology'),(75,'Petrol'),(76,'Proverb'),(77,'Forestry'),(78,'Mechanic'),(79,'Traffic'),(80,'Social Sciences'),(81,'Biochemistry'),(82,'Physiology'),(83,'Philosophy'),(84,'Ottoman Turkish'),(85,'Engineering'),(86,'Literature'),(87,'Cinema'),(88,'Lighting'),(89,'Dentistry'),(90,'Printing'),(91,'Art'),(92,'Theatre'),(93,'Veterinary'),(94,'Librarianship'),(95,'Weight Lifting'),(96,'Wagering'),(97,'Card'),(98,'Volleyball'),(99,'Mythology'),(100,'Entomology'),(101,'Tobacco'),(102,'Poetic/Literary'),(103,'Industry'),(104,'Apiculture'),(105,'Geometry'),(106,'Chat Usage'),(107,'Breeding'),(108,'Mental Health'),(109,'Chess'),(110,'Radio'),(111,'Transportation'),(112,'Woodworking'),(113,'Jewellery'),(114,'Metallurgy'),(115,'Reptiles'),(116,'Fishery'),(117,'Football'),(118,'Parasitology'),(119,'Baseball'),(120,'Basketball'),(121,'Furniture'),(122,'Bookbindery'),(123,'Dermatology'),(124,'Formal'),(125,'Boxing'),(126,'Astrology'),(127,'Informal'),(128,'Archeology'),(129,'Aeronautics'),(130,'Genel'),(131,'Sports'),(132,'Electricity'),(133,'Numismatic'),(134,'Chemical'),(136,'Textiles'),(137,'Anthropology'),(138,'Fishing'),(139,'Idiom'),(140,'Fabric');
-/*!40000 ALTER TABLE `category` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `favorite_questions`
 --
 
