@@ -1,0 +1,481 @@
+{
+	"info": {
+		"_postman_id": "bd249ef1-6ff3-4170-8e73-2f9da9ae0f0a",
+		"name": "quizzard",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20530364"
+	},
+	"item": [
+		{
+			"name": "/auth/register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Semih Yilmaz\",\r\n  \"email\": \"semihy@gmail.com\",\r\n  \"username\": \"semih\",\r\n  \"password\": \"password123\",\r\n  \"englishProficiency\":\"A1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/auth/register",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/auth/login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Auth",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huX2RvZSIsImlhdCI6MTcxNTI4NTMwOSwiZXhwIjoxNzE1MzcxNzA5fQ.RuUmypkVJYp7ghkb_4W_mzj77gFsJcGIduLeALlpGP4",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"yılmaz\",\r\n    \"password\":\"Semih123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/auth/login",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "quizzes",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"English Vocabulary Quiz\",\r\n    \"description\": \"A quiz to test your English vocabulary skills.\",\r\n    \"image\": \"https://storage.googleapis.com/quizzard-bucket/19042e06-bfff-49c0-adce-49901b6dc726-upload.jpg\",\r\n    \"questions\": [\r\n        {\r\n        \"questionType\": \"english_to_turkish\",\r\n        \"word\": \"apple\",\r\n        \"correctAnswer\": \"elma\",\r\n        \"wrongAnswers\": [\"armut\", \"muz\", \"kiraz\"]\r\n        },\r\n        {\r\n        \"questionType\": \"turkish_to_english\",\r\n        \"word\": \"kedi\",\r\n        \"correctAnswer\": \"cat\",\r\n        \"wrongAnswers\": [\"dog\", \"bird\", \"fish\"]\r\n        }\r\n    ]\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/quizzes",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"quizzes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "quizzes",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/quizzes/4",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"quizzes",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "posts",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Sample Title\",\r\n  \"content\": \"This is a sample post content.\",\r\n  \"tags\": [\r\n    \"apple\"\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/posts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "posts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/posts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "feed",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/feed",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"feed"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "quiz-attempts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZW1paDIiLCJpYXQiOjE3MzE4NzAyOTMsImV4cCI6MTczMTk1NjY5M30.c2L_xer6L6X9YMeAvtWY5MVfb7GNjHe0TZyZb3Zog2k",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"quizAttemptId\":8,\r\n    \"questionId\":16,\r\n    \"newAnswer\":\"hiz\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/quizzes/4/recommended",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"quizzes",
+						"4",
+						"recommended"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-correct-answer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/get-correct-answers?word=fast&questionType=english_to_turkish",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"get-correct-answers"
+					],
+					"query": [
+						{
+							"key": "word",
+							"value": "fast"
+						},
+						{
+							"key": "questionType",
+							"value": "english_to_turkish"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "leaderboard",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/leaderboard",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"leaderboard"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "favorite-quiz",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/favorite-quiz",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"favorite-quiz"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "favorite-question",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"questionId\":3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/favorite-question",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"favorite-question"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "from-favorites",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\":\"my favorite\",\r\n    \"count\":2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/quizzes/from-favorites",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"quizzes",
+						"from-favorites"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "quiz-attempts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/quiz-attempts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"quiz-attempts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "question-answers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/question-answers",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"question-answers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "autocomplete",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/autocomplete?prefix=ca&language=english",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"autocomplete"
+					],
+					"query": [
+						{
+							"key": "prefix",
+							"value": "ca"
+						},
+						{
+							"key": "language",
+							"value": "english"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "posts/{id}/replies",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"content\": \"This is my reply to the post.\"\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/posts/12/replies",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"posts",
+						"12",
+						"replies"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJZxLFsbWF6IiwiaWF0IjoxNzM0NzAxODM1LCJleHAiOjE3MzQ3ODgyMzV9.3YS699InMgy-1PFMRJG0wboKWxHCLzknMQBfSkRpmhc",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://34.121.241.21:80"
+		}
+	]
+}
