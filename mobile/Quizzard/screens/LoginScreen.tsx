@@ -12,8 +12,8 @@ import { useAuth } from "./AuthProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import { RegisteredUser, Profile } from "../database/types";
 import CustomModal from "../components/CustomModal";
-import HostUrlContext from '../app/HostContext';
-import HostContext from '../app/HostContext';
+import HostUrlContext from "../app/HostContext";
+import HostContext from "../app/HostContext";
 
 const LoginScreen = ({ navigation }) => {
   const hostUrl = useContext(HostUrlContext);
@@ -21,20 +21,17 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // Added state for error message
-  const { login, saveUsername, token} = useAuth();
+  const { login, saveUsername, token } = useAuth();
 
   const fetchUserProfile = async (token) => {
     try {
       console.log("username is:", username);
-      const response = await fetch(
-        `${hostUrl}/api/profile/${username}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${hostUrl}/api/profile/${username}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const user = await response.json();
       if (response.ok) {
         console.log("Login screen - User profile data:", user);
@@ -50,60 +47,46 @@ const LoginScreen = ({ navigation }) => {
   };
 
   const handleLogin = async () => {
-    if (password === "" || username === "") {
-      setErrorMessage("Username and password cannot be empty.");
+    if (!username.trim() || !password.trim()) {
+      setErrorMessage("Please enter both username and password");
       setModalVisible(true);
       return;
     }
-    const requestBody = {
-      username: username,
-      password: password,
-    };
+
     try {
-      const response = await fetch(
-        `${hostUrl}/api/auth/login`, 
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Content-Length": JSON.stringify(requestBody).length.toString(),
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
+      const response = await fetch(`${hostUrl}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
+
       const data = await response.json();
+
       if (response.ok) {
         await login(data.token);
-        console.log("Logged in successfully");
-        fetchUserProfile(data.token);
-        const registeredUser = await fetchUserProfile(data.token);
-        const userProfile: Profile = {
-          name: registeredUser.name,
-          score: registeredUser.score,
-          profilePicture: registeredUser.profilePicture,
-          englishProficiency: registeredUser.englishProficiency,
-          createdQuizzes: [],
-          favoritedQuizzes: [],
-          favoritedQuestions: [],
-          posts: [],
-        };
-        const user: RegisteredUser = {
-          username: registeredUser.username,
-          password: registeredUser.password,
-          email: registeredUser.email,
-          profile: userProfile,
-        };
-        saveUsername(user.username);
-        console.log("Logged in user:", user);
-        navigation.navigate("Home", { registeredUser: user });
+        saveUsername(username);
+        navigation.navigate("Home");
       } else {
-        console.error("Login failed:", response.status);
-        setErrorMessage(data.message || "Invalid username/password");
+        // Handle specific error messages from the backend
+        if (data.message.includes("Username does not exist")) {
+          setErrorMessage("Account not found. Please check your username.");
+        } else if (data.message.includes("Wrong password")) {
+          setErrorMessage("Incorrect password. Please try again.");
+        } else {
+          setErrorMessage(data.message || "Login failed. Please try again.");
+        }
         setModalVisible(true);
       }
     } catch (error) {
-      console.error("Network or other error:", error);
-      setErrorMessage("Error trying to login. Please try again.");
+      console.error("Login error:", error);
+      setErrorMessage(
+        "Network error. Please check your connection and try again."
+      );
       setModalVisible(true);
     }
   };
