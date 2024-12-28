@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import CustomModal from "../components/CustomModal";
 import { useAuth } from "./AuthProvider";
-import HostUrlContext from '../app/HostContext';
+import HostUrlContext from "../app/HostContext";
 import { RegisteredUser, Profile } from "../database/types";
 import DifficultyLevelDropdown from "../components/DifficultyLevelDropdown";
 
@@ -25,7 +25,7 @@ const RegisterScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const { login, saveUsername, token} = useAuth();
+  const { login, saveUsername, token } = useAuth();
 
   const showError = (message) => {
     setErrorMessage(message);
@@ -109,73 +109,61 @@ const RegisterScreen = ({ navigation }) => {
       password: password,
       englishProficiency: englishProficiency,
     };
-    console.log(requestBody);
+
     try {
-      const response = await fetch(
-        `${hostUrl}/api/auth/register`, 
-        {
+      const response = await fetch(`${hostUrl}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Content-Length": JSON.stringify(requestBody).length.toString(),
         },
         body: JSON.stringify(requestBody),
       });
 
-      const rawData = await response.text();
-      console.log(rawData)
+      const data = await response.json();
 
       if (response.ok) {
-        const data = JSON.parse(rawData);
-        console.log(data.message);
         await login(data.token);
         setSuccessModalVisible(true);
-        // await login(data.token);
-        console.log("Registered successfully");
-        fetchUserProfile(data.token);
         const registeredUser = await fetchUserProfile(data.token);
-        const userProfile: Profile = {
-          name: registeredUser.name,
-          score: registeredUser.score,
-          profilePicture: registeredUser.profilePicture,
-          englishProficiency: registeredUser.englishProficiency,
-          createdQuizzes: [],
-          favoritedQuizzes: [],
-          favoritedQuestions: [],
-          posts: [],
-        };
-        const user: RegisteredUser = {
-          username: registeredUser.username,
-          password: registeredUser.password,
-          email: registeredUser.email,
-          profile: userProfile,
-        };
-        saveUsername(user.username);
-        console.log("Logged in user:", user);
-        navigation.navigate("Home", { registeredUser: user });
-
+        if (registeredUser) {
+          const userProfile: Profile = {
+            name: registeredUser.name,
+            score: registeredUser.score,
+            profilePicture: registeredUser.profilePicture,
+            englishProficiency: registeredUser.englishProficiency,
+            createdQuizzes: [],
+            favoritedQuizzes: [],
+            favoritedQuestions: [],
+            posts: [],
+          };
+          const user: RegisteredUser = {
+            username: registeredUser.username,
+            password: registeredUser.password,
+            email: registeredUser.email,
+            profile: userProfile,
+          };
+          saveUsername(user.username);
+          navigation.navigate("Home", { registeredUser: user });
+        }
       } else {
-        const data = rawData;
-        switch (response.status) {
-          case 400:
-            showError(data || "Invalid request. Please check your data.");
-            break;
-          case 401:
-            showError(data || "Unauthorized. Please check your credentials.");
-            break;
-          case 500:
-            showError(data || "Server error. Please try again later.");
-            break;
-          default:
-            showError(
-              data || "An unexpected error occurred. Please try again."
-            );
-            break;
+        // Handle specific error messages from the backend
+        if (data.message.includes("Username is already taken")) {
+          showError(
+            "This username is already taken. Please choose another one."
+          );
+        } else if (data.message.includes("Email is already in use")) {
+          showError(
+            "This email is already registered. Please use another email."
+          );
+        } else if (data.message.includes("Invalid English proficiency level")) {
+          showError("Please select a valid English proficiency level.");
+        } else {
+          showError(data.message || "Registration failed. Please try again.");
         }
       }
     } catch (error) {
-      console.log("Registration failed:", error);
-      showError(error.message || "An unexpected error occurred.");
+      console.error("Registration error:", error);
+      showError("Network error. Please check your connection and try again.");
     }
   };
 
@@ -197,7 +185,7 @@ const RegisterScreen = ({ navigation }) => {
       <Text style={styles.title}>Quizzard</Text>
       <Text style={styles.infoText}>Register to access Quizzard.</Text>
 
-      <View style={styles.inputContainer}> 
+      <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           placeholder="Name"
@@ -244,15 +232,15 @@ const RegisterScreen = ({ navigation }) => {
           secureTextEntry
         />
 
-      {/* English Proficiency */}
-      <Text style={styles.proficiencyLabel}>Select your Proficiency:</Text>
+        {/* English Proficiency */}
+        <Text style={styles.proficiencyLabel}>Select your Proficiency:</Text>
         <DifficultyLevelDropdown
           selectedValue={englishProficiency}
           onValueChange={(value) => setEnglishProficiency(value)}
         />
       </View>
 
-    <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerButtonText}>Register</Text>
       </TouchableOpacity>
 
@@ -340,6 +328,15 @@ const styles = StyleSheet.create({
     color: "#22005d",
     fontWeight: "bold",
     textDecorationLine: "underline",
+  },
+  inputContainer: {
+    width: "100%",
+    marginBottom: 16,
+  },
+  proficiencyLabel: {
+    fontSize: 16,
+    color: "#22005d",
+    marginBottom: 8,
   },
 });
 
