@@ -50,8 +50,8 @@ export const SignUpPage = () => {
     })
 
     if (!response.ok) {
-      const errorMessage = await response.text();
-      setError(errorMessage);
+      const errorMessage = await response.json();
+      setError(errorMessage.message);
       return;
     }
 
