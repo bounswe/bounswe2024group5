@@ -3,14 +3,24 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import HostContext from "../HostContext";
 
+type LoginResponse = {
+  token: string,
+  message: string
+}
+
+type ErrorResponse = {
+  message: string
+}
+
 export const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
   const hostURL = useContext(HostContext);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const requestBody = {
@@ -18,29 +28,31 @@ export const LoginPage = () => {
       password: password,
     };
 
-    fetch(`${hostURL}/api/auth/login`, {
+    const response = await fetch(`${hostURL}/api/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestBody),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((response) => {
-        localStorage.setItem("token", response.token);
-        localStorage.setItem('username', username);
-        navigate("/quizzes");
-      })
-      .catch((error) => {
-        // TODO: Display error in the UI.
-        console.log("Error:");
-        console.log(error);
-      });
+
+    if (!response.ok) {
+      try {
+        const errorBody = (await response.json()) as ErrorResponse;
+        setError(errorBody.message);
+      } catch (e) {
+        console.log(e);
+        setError("Invalid username or password.");
+      }
+      return;
+    }
+
+    const loginResponse = (await response.json()) as LoginResponse;
+
+    localStorage.setItem("token", loginResponse.token);
+    localStorage.setItem('username', username);
+    setError("");
+    navigate("/quizzes");
   };
 
   return (
@@ -90,6 +102,12 @@ export const LoginPage = () => {
             Register
           </Link>
         </p>
+
+        {error && (
+          <p className="mt-4 text-sm text-red-600">
+            {error}
+          </p>
+        )}
       </motion.div>
     </div>
   );

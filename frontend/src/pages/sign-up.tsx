@@ -4,6 +4,11 @@ import { motion } from "framer-motion";
 import HostContext from "../HostContext";
 import { ProfileResponse } from "../types/profile";
 
+type RegisterResponse = {
+  token: string,
+  message: string
+}
+
 export const SignUpPage = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -15,10 +20,17 @@ export const SignUpPage = () => {
     useState<ProfileResponse["englishProficiency"]>("A1");
   const navigate = useNavigate();
 
+  const [error, setError] = useState<string>("");
+
   const hostURL = useContext(HostContext);
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
 
     const requestBody = {
       username: username,
@@ -28,7 +40,7 @@ export const SignUpPage = () => {
       englishProficiency: englishProficiency,
     };
 
-    fetch(`${hostURL}/api/auth/register`, {
+    const response = await fetch(`${hostURL}/api/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,23 +48,19 @@ export const SignUpPage = () => {
 
       body: JSON.stringify(requestBody),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((response) => {
-        console.log("Registration successfull.");
-        localStorage.setItem("token", response.token);
-        localStorage.setItem("username", username);
-        navigate("/");
-      })
-      .catch((error) => {
-        // TODO: Display error in the UI.
-        console.log("Error:");
-        console.log(error);
-      });
+
+    if (!response.ok) {
+      const errorMessage = await response.json();
+      setError(errorMessage.message);
+      return;
+    }
+
+    const registerResponse = (await response.json()) as RegisterResponse;
+
+    localStorage.setItem("token", registerResponse.token);
+    localStorage.setItem('username', username);
+    setError("");
+    navigate("/quizzes");
   };
 
   return (
@@ -153,6 +161,12 @@ export const SignUpPage = () => {
             Sign in
           </Link>
         </p>
+
+        {error && (
+          <p className="mt-4 text-sm text-red-600">
+            {error}
+          </p>
+        )}
       </motion.div>
     </div>
   );
